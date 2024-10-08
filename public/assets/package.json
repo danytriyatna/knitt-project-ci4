@@ -1,0 +1,35 @@
+{
+  "name": "ci4-pr-package",
+  "version": "1.0.0",
+  "description": "Node Modules Package Manager For CI4 PR Template",
+  "private": true,
+  "scripts": {
+    "sass": "npx sass ./sass:./css -s compressed --no-source-map",
+    "sass-w": "npx sass -w ./sass:./css -s compressed --no-source-map",
+    "postcss": "npx postcss --config ./ ./css --dir ./dist",
+    "uglifyjs": "npx uglifyjs ./js/custom.js -o ./dist/custom.min.js -c -m",
+    "build-css": "yarn sass && yarn postcss",
+    "build": "yarn sass && yarn postcss && yarn uglifyjs"
+  },
+  "author": "Pejuang Rupiah",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap-datepicker": "^1.10.0",
+    "ckeditor4": "^4.22.1",
+    "datatables.net-bs5": "^1.13.5",
+    "datatables.net-responsive-bs5": "^2.5.0",
+    "echarts": "^5.4.3",
+    "jquery": "^3.7.0",
+    "select2": "^4.1.0-rc.0",
+    "sweetalert2": "^11.7.16",
+    "tabulator-tables": "^5.5.0",
+    "toastr": "^2.1.4"
+  },
+  "devDependencies": {
+    "@fullhuman/postcss-purgecss": "^5.0.0",
+    "cssnano": "^6.0.1",
+    "postcss-cli": "^10.1.0",
+    "sass": "^1.63.6",
+    "uglify-js": "^3.17.4"
+  }
+}
