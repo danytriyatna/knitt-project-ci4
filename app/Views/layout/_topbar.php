@@ -15,12 +15,12 @@
       <li class="nav-item"> <a class="nav-link sidebartoggler d-none d-lg-block d-md-block waves-effect waves-dark" href="javascript:void(0)"><i class="icon-menu"></i></a> </li>
     </ul>
     <ul class="navbar-nav my-lg-0">
-      <li class="nav-item dropdown u-pro">
+      <!-- <li class="nav-item dropdown u-pro">
         <a class="nav-link dropdown-toggle waves-effect waves-dark profile-pic" href="javascript:void(0)" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-moon"></i></a>
         <div class="dropdown-menu dropdown-menu-end animated flipInY">
           <a href="javascript:void(0)" class="dropdown-item" onclick="toggleTheme()">Toggle Dark Mode</a>
         </div>
-      </li>
+      </li> -->
       <li class="nav-item dropdown u-pro">
         <a class="nav-link dropdown-toggle waves-effect waves-dark profile-pic" href="javascript:void(0)" data-bs-toggle="dropdown"   aria-haspopup="true" aria-expanded="false"><img src="<?= $avatar != "" ? "uploads/users/$avatar" : "assets/images/no-image.webp" ?>" alt="user" class="" height="30px"> <span class="hidden-md-down"><?php echo $currentUser->full_name ?> &nbsp;<i class="fa fa-angle-down"></i></span> </a>
         <div class="dropdown-menu dropdown-menu-end animated flipInY">

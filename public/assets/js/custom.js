@@ -69,10 +69,10 @@ toastr.options = {
 
 // APP DEFAULT CUSTOMIZEABLE THEME STYLE
 const defaultColors = {
-  primaryColor: "#1C40E2",
-	hoverColor: "#1C40E2CC",
-	accentColor: "#01A9CF",
-	bgTheadColor: "#CCEEF6",
+  primaryColor: "#FA003F",
+	hoverColor: "#FA003FCC",
+	accentColor: "#EE6123",
+	bgTheadColor: "#FFCF00",
 	textTheadColor: "#212529",
 }
 
