@@ -9,6 +9,8 @@ class Auth extends \IonAuth\Controllers\Auth
 	protected $email;
 	protected $auth;
 	protected $user;
+	protected $files;
+	protected $situs;
 
 	function __construct()
 	{
