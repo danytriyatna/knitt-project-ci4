@@ -196,9 +196,10 @@ class Modules extends BaseController
                   'icon_cls'    => $icon_cls,         
                   'seq'         => $seq,         
                   'pid'         => $pid,         
-                  'group'       => $group        
+                  'group'       => $group,
+                  'is_sapage'   => 0        
             );
-                                   
+                   
             //check to see if we are updating
             if( $id > 0 AND $this->request->getPost('id')) { // update
                 if ($this->validation->withRequest($this->request)->run() === TRUE AND $this->modules->updateRecord($this->modules->table,$data, 'id',$id))
@@ -227,10 +228,11 @@ class Modules extends BaseController
                           
             } else { // insert
                 $data['publish'] = 1;
-
+                
                 if ($this->validation->withRequest($this->request)->run() === TRUE  )
                 {
                     $id = $this->modules->insertRecordGetid($this->modules->table,$data);
+                    
                     $this->mcommon->setLog($this->currentUser->user_id,$this->MOD_ALIAS,$id,"Tambah Modul");        
                     $this->modules->insertRolePriv($id);
                     $this->session->setFlashdata('message', "Tambah modul berhasil..");
@@ -328,7 +330,6 @@ class Modules extends BaseController
         $this->data['list_pmod'] =  $list_pmod;
         
         $this->data['csrf'] = $this->_get_sess_csrf();
-
         return view('\Modules\Utility\Views\modules_form', $this->data);
     }
 

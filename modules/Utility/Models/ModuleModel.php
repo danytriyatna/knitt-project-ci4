@@ -72,12 +72,12 @@ class ModuleModel extends \App\Models\PrModel
                 $datains = array(
                     'role_id' => $role->id,
                     'module_id' => $module_id,
-                    'allow_view' => true,
-                    'allow_new' => true,
-                    'allow_edit' => true,
-                    'allow_delete' => true,
-                    'allow_print' => true,
-                    'allow_approve' => true
+                    'allow_view' => 1,
+                    'allow_new' => 1,
+                    'allow_edit' => 1,
+                    'allow_delete' => 1,
+                    'allow_print' => 1,
+                    'allow_approve' => 1
                 );
                 $this->db->table('sec_role_priv')->insert($datains);
             }
