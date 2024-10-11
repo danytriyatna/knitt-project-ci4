@@ -18,7 +18,7 @@ class UkuranModel extends \App\Models\PrModel
     {
         $builder = $this->db->table($this->table . " uk");
 
-        $builder->select("uk.id, uk.kode_ukuran, uk.keterangan, uk.tipe_id");
+        $builder->select("uk.id, uk.kode_ukuran, uk.keterangan");
 
         if ($id == null or $id == "") {
             $builder->where('uk.active = 1');

@@ -116,7 +116,7 @@ $(document).ready(function () {
             }, hozAlign:"right",width:"16%"},
         ],
         locale: 'id',    
-        layout: 'fitColumns',
+        // layout: 'fitColumns',
         placeholder: "Tidak ada data",
 	});
 
@@ -307,6 +307,10 @@ $(document).ready(function () {
                
                 dtListDetail.setData(data.detail)
                 isModal.modal("show");
+
+                setTimeout(() => {
+                    dtListDetail.redraw(true)
+                }, 500);
             },
             error: function(xhr, status, error) {
                 console.error('Error fetching data:', error);
