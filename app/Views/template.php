@@ -29,6 +29,9 @@
   <link href="assets/node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
   <!-- Custom CSS, generated from /sass -->
   <link href="assets/css/custom.min.css" rel="stylesheet">
+  <script>
+    var baseUrl = '<?= base_url() ?>'
+  </script>
 </head>
 
 <body class="skin-blue fixed-layout custom-layout-0">

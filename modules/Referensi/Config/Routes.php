@@ -4,4 +4,5 @@ $routes->group("master-data/warna", ['namespace' => 'Modules\Referensi\Controlle
 
     $routes->post('list', 'RefWarna::lists');
     $routes->post('simpan', 'RefWarna::save');
+    $routes->get('delete/(:any)', 'RefWarna::deactivate/$1');
 });

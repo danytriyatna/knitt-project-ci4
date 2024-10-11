@@ -78,7 +78,7 @@ class RefWarna extends BaseController
             array_push($build_array["data"],
                 array(
                     "aksi" => $btnAction ? $btnAction : '',
-                    "id"   => encrypt($id),
+                    "id"   => ($id),
                     "kode_warna" => $row->kode_warna,
                     "keterangan" => $row->keterangan
                 )
@@ -391,7 +391,7 @@ class RefWarna extends BaseController
     function save(){
         $id         = $this->request->getPost('dataId');
         $kode_warna = $this->request->getPost('kodeWarna');
-        $keterangan = $this->request->getPost('ketarangan');
+        $keterangan = $this->request->getPost('keterangan');
 
 
         $msg    = "Data gagal ditambahkan !";
@@ -402,15 +402,16 @@ class RefWarna extends BaseController
             'keterangan' => $keterangan
         ];
 
+        
         if(empty($id)){
             $this->mwarna->insertRecordGetid($this->mwarna->table, $arr_isi);
             $msg    = "Data berhasil ditambahkan !";
-            $status = false;
+            $status = true;
         }else{
             $id = decrypt($id);
             $this->mwarna->updateRecord($this->mwarna->table, $arr_isi, 'id', $id);
             $msg    = "Data berhasil diupdate !";
-            $status = false;
+            $status = true;
         }
 
         $build_array['message'] = $msg;
@@ -430,14 +431,14 @@ class RefWarna extends BaseController
         }
 
         $id = (int)$id;
-        $activation = $this->mauth->activate($id);
+        $activation = $this->mwarna->activate($id);
         if ($activation) {
             $this->mcommon->setLog($this->currentUser->user_id,$this->MOD_ALIAS,$id,"User Diaktifkan");        
             $this->session->setFlashdata('message', "User berhasil di aktifkan");
         } else {
             $this->session->setFlashdata('err', "User gagal di aktifkan !");
         }
-		return redirect()->to('/utilitas/users');
+		return redirect()->to($this->urlv);
 
     }
 
@@ -453,17 +454,17 @@ class RefWarna extends BaseController
 
         $id = (int)$id;
         if ($id == 1) {
-		    return redirect()->to('/utilitas/users');
+		    return redirect()->to($this->urlv);
         }
-        
-        $deactivate = $this->mauth->deactivate($id);
+        $data = ['active' => 0];
+        $deactivate = $this->mwarna->updateRecord($this->mwarna->table, $data, 'id', $id);
         if ($deactivate) {
-            $this->mcommon->setLog($this->currentUser->user_id,$this->MOD_ALIAS,$id,"User Dinonaktifkan");        
-            $this->session->setFlashdata('message', "User berhasil di Non-aktifkan ");
+            $this->mcommon->setLog($this->currentUser->user_id,$this->MOD_ALIAS,$id,"Data Warna Dinonaktifkan");        
+            $this->session->setFlashdata('message', "Data Warna berhasil di Hapus ");
         } else {
-            $this->session->setFlashdata('err', "User gagal di Non-aktifkan !");
+            $this->session->setFlashdata('err', "Data Warna gagal di Hapus !");
         }
-		return redirect()->to('/utilitas/users');
+		return redirect()->to($this->urlv);
     }
 
     public function delete($id = NULL)
@@ -478,16 +479,16 @@ class RefWarna extends BaseController
 
         $id = (int)$id;
         if ($id == 1) {
-		    return redirect()->to('/utilitas/users');
+		    return redirect()->to($this->urlv);
         }
         
-        $res = $this->auth->deleteUser($id);
+        $res = $this->mwarna->deleteUser($id);
         if ($res) {
-            $this->mcommon->setLog($this->currentUser->user_id,$this->MOD_ALIAS,$id,"User Dihapus");        
-            $this->session->setFlashdata('message', "User berhasil dihapus");
+            $this->mcommon->setLog($this->currentUser->user_id,$this->MOD_ALIAS,$id,"Master Warna Dihapus");        
+            $this->session->setFlashdata('message', "Master Warna berhasil dihapus");
         } else {
-            $this->session->setFlashdata('err', "User gagal dihapus");
+            $this->session->setFlashdata('err', "Master Warna gagal dihapus");
         }
-		return redirect()->to('/utilitas/users');
+		return redirect()->to($this->urlv);
     }
 }
