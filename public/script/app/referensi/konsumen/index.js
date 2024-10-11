@@ -1,9 +1,11 @@
 
 
 $(document).ready(function () {
-    let inpData       = $('#data_id');
-    let inpKodeWarna  = $('#kode_warna');
-    let inpKeterangan = $('#keterangan');
+    let inpData         = $('#data_id');
+    let inpNamaKonsumen = $('#nama_konsumen');
+    let inpAlamat       = $('#alamat');
+    let inpNoHP         = $('#no_hp');
+    let inpEmail        = $('#email');
 
     let isModal       = $("#modal-form-add-po");
 
@@ -27,29 +29,39 @@ $(document).ready(function () {
                     let data_row = row.getData();
                     if (e.target.title === 'delete') {
                         if (confirm("Anda yakin akan menghapus data?")) {
-                            window.location.replace(baseUrl + "/master-data/warna/delete/" + data_row.id);
+                            window.location.replace(baseUrl + "/master-data/konsumen/delete/" + data_row.id);
                         }
                     }else if(e.target.title === 'edit'){
                         inpData.val(data_row.id)
-                        inpKodeWarna.val(data_row.kode_warna)
-                        inpKeterangan.val(data_row.keterangan)
+                        inpNamaKonsumen.val(data_row.nama)
+                        inpAlamat.val(data_row.alamat)
+                        inpNoHP.val(data_row.no_hp)
+                        inpEmail.val(data_row.email)
 
                         isModal.modal("show");
                     }   
                 }
             },
             {
-                title: "Kode Warna", field: "kode_warna", headerSort: false,
+                title: "Nama Konsumen", field: "nama", headerSort: false,
+                width: "20%"
+            },
+            {
+                title: "Alamat", field: "alamat", formatter: "html", headerSort: false,
+                
+            },
+            {
+                title: "Email", field: "email", headerSort: false,
                 width: "20%", cssClass : 'text-center'
             },
             {
-                title: "Keterangan", field: "keterangan", formatter: "html", headerSort: false,
-                
-            }
+                title: "No. HP", field: "no_hp", headerSort: false,
+                width: "20%", cssClass : 'text-center'
+            },
         ],
         locale: 'id',    
         layout: 'fitColumns',
-        ajaxURL: "/master-data/warna/list",
+        ajaxURL: "/master-data/konsumen/list",
         ajaxConfig: "POST",
         sortMode: "remote",
         filterMode: "remote",
@@ -111,8 +123,10 @@ $(document).ready(function () {
 
     $("#btn-add").on("click", function(){
         inpData.val("")
-        inpKodeWarna.val("")
-        inpKeterangan.val("")
+        inpNamaKonsumen.val("")
+        inpAlamat.val("")
+        inpNoHP.val("")
+        inpEmail.val("")
 
         isModal.modal("show");
     });
@@ -126,16 +140,21 @@ $(document).ready(function () {
     function simpanData() {
         
         let validation = true
-        if(inpKodeWarna.val().length == 0) validation = false
+        if(inpNamaKonsumen.val().length == 0) validation = false
+        if(inpNoHP.val().length == 0) validation = false
+        if(inpEmail.val().length == 0) validation = false
+        if(inpAlamat.val().length == 0) validation = false
     
         if(validation){
             $.ajax({
                 type: 'POST',
-                url: '/master-data/warna/simpan',
+                url: '/master-data/konsumen/simpan',
                 data: {
-                    dataId     : inpData.val(),
-                    kodeWarna  : inpKodeWarna.val(),
-                    keterangan : inpKeterangan.val(),
+                    dataId : inpData.val(),
+                    nama   : inpNamaKonsumen.val(),
+                    alamat : inpAlamat.val(),
+                    email  : inpEmail.val(),
+                    no_hp  : inpNoHP.val(),
                 },
                 dataType: "json",
                 beforeSend: function () {

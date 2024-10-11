@@ -5,7 +5,7 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Form Master Ukuran</h5>
+        <h5 class="modal-title">Form Master Konsumen</h5>
         <input type="hidden" id="data_id">
         <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -14,18 +14,37 @@
           <i>*) Wajib diisi</i>
         </div>
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="kode_ukuran">Kode Ukuran<span class="text-danger">*</span></label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="nama_konsumen">Nama Konsumen<span class="text-danger">*</span></label>
           <div class="col-md-9">
-            <input type="text" id="kode_ukuran" name="kode_ukuran" class="form-control" placeholder="Ketik Kode Ukuran" required>
+            <input type="text" id="nama_konsumen" name="nama_konsumen" class="form-control" placeholder="Ketik Nama Konsumen" required>
             <div class="invalid-feedback">
-              Kode Ukuran tidak valid
+              Nama Konsumen tidak valid
             </div>
           </div>
         </div>
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_sales_order">Keterangan</label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="alamat">Alamat</label>
           <div class="col-md-9">
-            <textarea name="keterangan" id="keterangan" class="form-control" rows="5"></textarea>
+            <textarea name="alamat" id="alamat" class="form-control" rows="5"></textarea>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="email">Email<span class="text-danger">*</span></label>
+          <div class="col-md-9">
+            <input type="email" id="email" name="email" class="form-control" placeholder="Ketik Email" required>
+            <div class="invalid-feedback">
+              Email Konsumen tidak valid
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="no_hp">No. HP<span class="text-danger">*</span></label>
+          <div class="col-md-9">
+            <input type="text" id="no_hp" name="no_hp" class="form-control" placeholder="Ketik No. HP" required>
+            <div class="invalid-feedback">
+              No. Hp Konsumen tidak valid
+            </div>
           </div>
         </div>
         
@@ -110,5 +129,5 @@
 
 <?= $this->endSection('content'); ?>
 <?= $this->section('script'); ?>
-<script src="script/app/referensi/ukuran/index.js"></script>
+<script src="script/app/referensi/konsumen/index.js"></script>
 <?= $this->endSection('script'); ?>

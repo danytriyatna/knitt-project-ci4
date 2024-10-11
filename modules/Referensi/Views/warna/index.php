@@ -50,7 +50,7 @@
         <div class="d-flex justify-content-end align-items-center">
           <ol class="breadcrumb">
             <li class="breadcrumb-item"><?= $name_app ?></li>
-            <li class="breadcrumb-item">Transaksi</li>
+            <li class="breadcrumb-item">Master Data</li>
             <li class="breadcrumb-item active"><?= $titlehead ?></li>
           </ol>
         </div>
