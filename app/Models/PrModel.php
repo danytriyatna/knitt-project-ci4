@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 namespace App\Models;
 
 use CodeIgniter\Model;
@@ -18,7 +19,7 @@ class PrModel extends Model
 
     public function delete($id = null, bool $purge = false)
     {
-		$builder = $this->db->table($this->table);
+        $builder = $this->db->table($this->table);
 
         if (is_array($id)) {
             $builder->whereIn($this->primaryKey, $id);
@@ -27,13 +28,13 @@ class PrModel extends Model
         }
 
         $result = $builder->delete();
-        
+
         return $result;
     }
 
     public function deleteRecord($table, $column, $id)
     {
-		$builder = $this->db->table($table);
+        $builder = $this->db->table($table);
 
         if (is_array($id)) {
             $builder->whereIn($column, $id);
@@ -45,23 +46,41 @@ class PrModel extends Model
 
         return $result;
     }
-    
+
     public function insertRecordGetid($table, $data)
     {
+
         $builder = $this->db->table($table);
-        $builder->insert($data);
+        if ($builder->insert($data) === false) {
+            $error = $this->db->error();
+            var_dump($error);
+            die;
+        }
         return $this->db->insertID();
     }
 
     public function updateRecord($table, $data, $column, $id)
     {
-		$exec = $this->db->table($table)->update($data, array($column => $id));
+        $exec = $this->db->table($table)->update($data, array($column => $id));
         return $exec;
     }
 
     public function sortParentchild($_modules)
     {
         return $this->buildTree($_modules, 0);
+    }
+
+    public function deleteRecordMultipleColumn($table, $arr)
+    {
+        $builder = $this->db->table($table);
+
+        if (is_array($arr)) {
+            $builder->where($arr);
+        }
+
+        $result = $builder->delete();
+
+        return $result;
     }
 
     private function buildTree($elements, $parentId = 0)
@@ -71,7 +90,7 @@ class PrModel extends Model
             if ($element->pid == $parentId) {
                 $element->treename = $element->name;
                 $branch[] = $element;
-            }else{
+            } else {
                 $element->treename = $element->name;
                 if (strlen($element->treename) >= 14 && substr($element->treename, 0, 14) == "&nbsp;|_&nbsp;") {
                     $element->treename = "&nbsp;&nbsp;&nbsp;&nbsp;|_&nbsp;" . $element->name;
@@ -89,5 +108,4 @@ class PrModel extends Model
         }
         return $branch;
     }
-
 }

@@ -8,6 +8,15 @@ $(document).ready(function () {
     let inpTglTransaksi       = $('#tgl_sample');
     let inpTglDeadline       = $('#tgl_deadline');
     let inpKetSample       = $('#ket_sample');
+    let inpPoWarna1       = $('#po_warna1');
+    let inpPoWarna2       = $('#po_warna2');
+    let inpPoWarna3       = $('#po_warna3');
+    let inpPoWarna4       = $('#po_warna4');
+    let inpPoWarna5       = $('#po_warna5');
+    let inpPoWarna6       = $('#po_warna6');
+    let inpPoWarna7       = $('#po_warna7');
+    let inpPoWarna8       = $('#po_warna8');
+
     let fileSample       = $('#fileSample');
     let fileSampleOld       = $('#fileSampleOld');
     let linkFileSample       = $('#linkFileSample');
@@ -21,6 +30,8 @@ $(document).ready(function () {
 
     let isModal       = $("#modal-form-add-po");
     let isModalPO      = $("#modal-form-po");
+    var idSample = null
+    var idSampleDet = null
 
     let buttonRowAction = function(cell) {
         let fmBtnDelete = "";        
@@ -28,7 +39,7 @@ $(document).ready(function () {
        
      
         fmBtnDelete = `<button type="button" class="btn btn-sm btn-danger" title='delete'><i class="fa fa-trash"></i></button>`;
-        fmBtnEdit = ` <button type="button" class="btn btn-sm btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#modal-form-po" title='edit'><i class="fa fa-edit"></i></button>`;
+        fmBtnEdit = ` <button type="button" class="btn btn-sm btn-warning text-dark" title='edit'><i class="fa fa-edit"></i></button>`;
         return fmBtnEdit + " " + fmBtnDelete;
     };
 
@@ -99,11 +110,11 @@ $(document).ready(function () {
                     let data_row = row.getData();
                     if (e.target.title === 'delete') {
                         if (confirm("Anda yakin akan menghapus data?")) {
-                            window.location.replace(baseUrl + "/master-data/konsumen/delete/" + data_row.id);
+                            deleteData(data_row.id)
+                            // window.location.replace(baseUrl + "/trans/sample/delete/detail" + data_row.id);
                         }
                     }else if(e.target.title === 'edit'){
-                        // inpData.val(data_row.id)
-                        // isModal.modal("show");
+                        getDetailQty(idSample,data_row.id)
                     }   
                 }
             },
@@ -127,34 +138,52 @@ $(document).ready(function () {
         placeholder: "Tidak ada data",
 	});
 
+    function calculateTotal(row) {
+    if(row){
+        let qty = row.qty || 0;
+        let harga = row.harga_satuan || 0;
+        return qty * harga;
+    }
+        
+    }
+
     let dtListDetailQty = new Tabulator("#dt-detail-qty", {
         pagination: true, 
         paginationSize: 10,
         paginationButtonCount: 5,
         columns:[
             {title:"ID", field:"id", visible:false},
-            {title:"No", field:"no", width:"5%"},
+            {title:"No",formatter: "rownum",hozAlign: "center", width:"5%"},
             {title:"id_ukuran", field:"id_ukuran", hozAlign:"center",width:"7%",visible:false},
-            {title:"Ukuran", field:"ukuran", hozAlign:"center",width:"7%"},
-            {title:"QTY", field:"qty", hozAlign:"center",width:"7%"},
+            {title:"Ukuran", field:"ukuran", hozAlign:"center",width:"23%"},
+            {title:"QTY", field:"qty", hozAlign:"center",width:"22%",editor: "input",cellEdited: updateTotal},
             {title:"Price", field:"harga_satuan",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
                 precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right",width:"16%"},
+            }, hozAlign:"right",width:"25%",editor: "input",cellEdited: updateTotal},
             {title:"Total", field:"harga_total",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
                 precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right",width:"16%"},
+            }, hozAlign:"right",width:"25%"},
         ],
+     
         locale: 'id',    
-        layout: 'fitColumns',
+        // layout: 'fitColumns',
         placeholder: "Tidak ada data",
         pagination:false
 	});
+
+    function updateTotal(cell) {
+        let row = cell.getRow();
+        if (row) { 
+            let newTotal = calculateTotal(row.getData());
+            row.update({ harga_total: newTotal });
+        } 
+    }
 
     
     let searchThread = null;
@@ -288,13 +317,26 @@ $(document).ready(function () {
     });
 
     $("#btn-add-detail").on("click", function(){
-       
+        idSample = inpData.val()
+        idSampleDet = null
+        inpPoWarna1.val('').trigger('change');
+        inpPoWarna2.val('').trigger('change');
+        inpPoWarna3.val('').trigger('change');
+        inpPoWarna4.val('').trigger('change');
+        inpPoWarna5.val('').trigger('change');
+        inpPoWarna6.val('').trigger('change');
+        inpPoWarna7.val('').trigger('change');
+        inpPoWarna8.val('').trigger('change');
         getDetailQty(inpData.val(),0)
     });
 
     $("#btn-save").on("click", function(e){
         e.preventDefault()
         simpanData()
+    });
+    $("#btn-save-detail").on("click", function(e){
+        e.preventDefault()
+        simpanDataDetail()
     });
 
     function formatterDate($date){
@@ -335,7 +377,7 @@ $(document).ready(function () {
             type: 'GET',
             dataType: 'json', 
             success: function(data) {
-         
+                idSample = id
                 rowDet.show()
                 inpData.val(data.id)
                 inpDeskripsi.val(data.deskripsi)
@@ -364,14 +406,30 @@ $(document).ready(function () {
             type: 'GET',
             dataType: 'json', 
             success: function(data) {
+                isModal.modal("hide")
                 noSampleText.html(data.kode_sample)
                 deskripsiText.html(data.deskripsi)
                 tglSampleText.html(formatterDate(data.tgl_transaksi))
                 buyerText.html(data.nama)
                 fotoText.attr("src",data.file_gambar)
                 tglDeadlineText.html(`<em>Deadline: ${formatterDate(data.tgl_deadline)}</em>`)
-                isModalPO.modal("show");
+                if(data.detail){
+                    idSampleDet = data.detail.id
+                    inpPoWarna1.val(data.detail.id_warna_1).trigger('change');
+                    inpPoWarna2.val(data.detail.id_warna_2).trigger('change');
+                    inpPoWarna3.val(data.detail.id_warna_3).trigger('change');
+                    inpPoWarna4.val(data.detail.id_warna_4).trigger('change');
+                    inpPoWarna5.val(data.detail.id_warna_5).trigger('change');
+                    inpPoWarna6.val(data.detail.id_warna_6).trigger('change');
+                    inpPoWarna7.val(data.detail.id_warna_7).trigger('change');
+                    inpPoWarna8.val(data.detail.id_warna_8).trigger('change');
+                }
+               
                 dtListDetailQty.setData(data.detailUkuran)
+                isModalPO.modal("show");
+                setTimeout(() => {
+                    dtListDetailQty.redraw(true)
+                }, 500);
             },
             error: function(xhr, status, error) {
                 console.error('Error fetching data:', error);
@@ -380,7 +438,59 @@ $(document).ready(function () {
     }
 
 
-
+    function deleteData($id) {
+        
+            $.ajax({
+                type: 'POST',
+                url: '/trans/sample/delete/detail',
+                data: {id:$id},
+                dataType: "json",
+                beforeSend: function () {
+                    Swal.fire({
+                        title: 'Loading...',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        onBeforeOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                },
+                success: function (response) {
+        
+                    if(response.status == true){
+                        Swal.fire({
+                            text: response.message,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                        getDetail(idSample)
+                        dtList.setData()
+                        Swal.close();
+                    
+                    }else{
+                        Swal.fire({
+                            text: response.message,
+                            icon: 'error',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+                },
+                error: function (e) {
+                    let msg = e.responseJSON.message;
+                    Swal.close();
+        
+                    Swal.fire({
+                        text: msg,
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                },
+            });
+        
+    }
     
     function simpanData() {
         
@@ -461,6 +571,91 @@ $(document).ready(function () {
             });
         }
     }
+
+    function simpanDataDetail() {
+        if(inpPoWarna1.val() == "")
+        {
+            return Swal.fire({
+                text: "Warna 1 Belum terpilih!",
+                icon: 'warning',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+
+        let dataUkuran = dtListDetailQty.getData().filter(x => x.qty && x.harga_satuan && x.harga_total);
+        if(dataUkuran.length ==0)
+            {
+                return Swal.fire({
+                    text: "Ukuran Minimal satu harus diisi",
+                    icon: 'warning',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+    
+            $.ajax({
+                type: 'POST',
+                url: '/trans/sample/save-detail',
+                data: {
+                    warna1:inpPoWarna1.val(),
+                    warna2:inpPoWarna2.val(),
+                    warna3:inpPoWarna3.val(),
+                    warna4:inpPoWarna4.val(),
+                    warna5:inpPoWarna5.val(),
+                    warna6:inpPoWarna6.val(),
+                    warna7:inpPoWarna7.val(),
+                    warna8:inpPoWarna8.val(),
+                    dataUkuran: dataUkuran,
+                    idSample:idSample,
+                    idSampleDet:idSampleDet,
+                },
+                dataType: "json",
+                beforeSend: function () {
+                    Swal.fire({
+                        title: 'Loading...',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        onBeforeOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                },
+                success: function (response) {
+        
+                    if(response.status == true){
+                        Swal.fire({
+                            text: response.message,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                        Swal.close();
+                        getDetail(idSample)
+                        isModalPO.modal("hide");
+                    }else{
+                        Swal.fire({
+                            text: response.message,
+                            icon: 'error',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+                },
+                error: function (e) {
+                    let msg = e.responseJSON.message;
+                    Swal.close();
+        
+                    Swal.fire({
+                        text: msg,
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                },
+            });
+        
+    }
     
 });
 
@@ -469,7 +664,6 @@ function readURL(input,id) {
       var reader = new FileReader();
       reader.onload = function(e) {
         const imageUrl = e.target.result;
-        console.log(e.target)
         const imgElement = document.getElementById('linkFileSample');
         imgElement.classList.remove("d-none");
         imgElement.src = imageUrl; // Set src dari <img> ke data URL

@@ -129,7 +129,7 @@ class Sample extends BaseController
   function detailQtyUkuran($idSample, $idSampleDet)
   {
     $id = !empty($idSample) ? decrypt($idSample) : 0;
-    $idSampleDet = !empty($idSampleDet) ? decrypt($idSampleDet) : 0;
+    $idSampleDet = !empty($idSampleDet) ? $idSampleDet : 0;
     $results = $this->mSample->getData($id);
     $build_array =  array(
       "id"   => encrypt($results->id),
@@ -140,7 +140,7 @@ class Sample extends BaseController
       "tgl_deadline" => $results->tgl_deadline,
       "deskripsi" => $results->deskripsi,
       "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
-      "detail" => $this->mSample->getDataDetailSampleWarna($id),
+      "detail" => $this->mSample->getDataDetailSampleWarna($id, $idSampleDet),
       "detailUkuran" =>  $this->mSample->getDataDetailSampleUkuran($id, $idSampleDet)
     );
     return $this->response->setJSON($build_array);
@@ -234,6 +234,47 @@ class Sample extends BaseController
     return $this->response->setJSON($build_array);
   }
 
+  function saveDetail()
+  {
+    $msg    = "Data gagal disimpan !";
+    $status = false;
+    $idSample = $this->request->getPost('idSample');
+    $idSampleDet = $this->request->getPost('idSampleDet');
+    $warna1 = $this->request->getPost('warna1');
+    $warna2 = $this->request->getPost('warna2');
+    $warna3 = $this->request->getPost('warna3');
+    $warna4 = $this->request->getPost('warna4');
+    $warna5 = $this->request->getPost('warna5');
+    $warna6 = $this->request->getPost('warna6');
+    $warna7 = $this->request->getPost('warna7');
+    $warna8 = $this->request->getPost('warna8');
+    $dataUkuran = $this->request->getPost('dataUkuran');
+    $dataWarna = [
+      "id_warna_1" => !empty($warna1) ? $warna1 : null,
+      "id_warna_2" => !empty($warna2) ? $warna2 : null,
+      "id_warna_3" => !empty($warna3) ? $warna3 : null,
+      "id_warna_4" => !empty($warna4) ? $warna4 : null,
+      "id_warna_5" => !empty($warna5) ? $warna5 : null,
+      "id_warna_6" => !empty($warna6) ? $warna6 : null,
+      "id_warna_7" => !empty($warna7) ? $warna7 : null,
+      "id_warna_8" => !empty($warna8) ? $warna8 : null,
+
+      "id_sample" => (int)decrypt($idSample),
+      "id" => !empty($idSampleDet) ? $idSampleDet :  null,
+    ];
+
+    $res = $this->mSample->trxInsertUpdateRecord($dataWarna, $dataUkuran);
+    if ($res) {
+      $status = true;
+      $msg = "Data berhasil disimpan!";
+    }
+
+    $build_array['message'] = $msg;
+    $build_array['status']  = $status;
+
+    return $this->response->setJSON($build_array);
+  }
+
   public function deleteList($id = NULL)
   {
     if (!$this->auth->loggedIn() or (!$this->auth->isAdmin() && !$this->auth->isSuperadmin())) {
@@ -245,8 +286,7 @@ class Sample extends BaseController
     }
 
     $id = (int)$id;
-    $msg    = "Data gagal dihapus !";
-    $status = false;
+
     $res = $this->mSample->deleteRecord($this->mSample->table, 'id', $id);
     if ($res) {
       $this->mcommon->setLog($this->currentUser->user_id, $this->MOD_ALIAS, $id, "Sample Dihapus");
@@ -258,17 +298,14 @@ class Sample extends BaseController
 
     return redirect()->to($this->urlv);
   }
-  public function deleteDetailList($id = NULL)
+  public function deleteDetailList()
   {
     if (!$this->auth->loggedIn() or (!$this->auth->isAdmin() && !$this->auth->isSuperadmin())) {
       throw new \Exception('You must be an administrator to view this page.');
     }
 
-    if ($id != null && $id != "") {
-      $id = decrypt($id);
-    }
 
-    $id = (int)$id;
+    $id = (int)$this->request->getPost('id');
     $msg    = "Data gagal dihapus !";
     $status = false;
     $res = $this->mSample->deleteRecord("trans_sample_det", 'id', $id);

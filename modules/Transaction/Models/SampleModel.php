@@ -139,12 +139,13 @@ END
         $this->_data = $builder->get()->getResult();
         return $this->_data;
     }
+
     function getDataDetailSampleUkuran($idSample, $idSampleDet)
     {
         $sql = "SELECT
 	bbx.id,
 	abx.kode_ukuran as ukuran,
-    bbx.id_ukuran,
+    abx.id AS id_ukuran,
 	bbx.qty,
 	bbx.harga_satuan,
     bbx.harga_total
@@ -158,10 +159,61 @@ FROM
         $this->_data   = $result->getResult();
         return $this->_data;
     }
-    function getDataDetailSampleWarna($idSample)
+
+    function getDataDetailSampleWarna($idSample, $id)
     {
+
         $builder = $this->db->table("trans_sample_det");
         $builder->where("id_sample", $idSample);
+        $builder->where("id", $id);
         $this->_data = $builder->get()->getRow();
+        return $this->_data;
+    }
+
+    function trxInsertUpdateRecord($dataWarna, $dataUkuran)
+    {
+        $this->db->transStart();
+        try {
+            if (!empty($dataWarna['id'])) {
+                $dataWarna['updated_at'] = date("Y-m-d H:i:s");
+                $this->updateRecord("trans_sample_det", $dataWarna, 'id', $dataWarna['id']);
+            } else {
+                unset($dataWarna['id']);
+                $dataWarna['created_at'] = date("Y-m-d H:i:s");
+                $idSampleDet = $this->insertRecordGetid("trans_sample_det", $dataWarna);
+            }
+            if (!empty($dataWarna['id']) && ($dataWarna['id_sample'])) {
+                $arrDelete = [
+                    "id_sample" => $dataWarna['id_sample'],
+                    "id_sample_det" => $dataWarna['id']
+                ];
+                $this->deleteRecordMultipleColumn("trans_sample_ukuran", $arrDelete);
+            }
+            foreach ($dataUkuran as $rowData) {
+
+                $arrDataUkuran = [
+                    "id_sample" => $dataWarna['id_sample'],
+                    "id_sample_det" => !empty($dataWarna['id']) ? $dataWarna['id'] : $idSampleDet,
+                    "id_ukuran" => $rowData['id_ukuran'],
+                    "qty" => $rowData['qty'],
+                    "harga_satuan" => $rowData['harga_satuan'],
+                    "harga_total" => $rowData['harga_total'],
+                    "active" => 1,
+                    "created_at" =>  date("Y-m-d H:i:s"),
+
+                ];
+                $this->insertRecordGetid("trans_sample_ukuran", $arrDataUkuran);
+            }
+            $this->db->transComplete();
+
+            if ($this->db->transStatus() === TRUE) {
+                return true;
+            } else {
+                throw new \Exception("Transaction failed");
+            }
+        } catch (\Exception $e) {
+            $this->db->transRollback();
+            throw $e;
+        }
     }
 }

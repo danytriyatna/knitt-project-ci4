@@ -295,7 +295,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="m-s-5 btn btn-success" data-bs-toggle="modal" data-bs-target="#modal-form-add-po"> <i class="fa fa-save"></i> Simpan</button>
+        <button type="button" class="m-s-5 btn btn-success" id="btn-save-detail"> <i class="fa fa-save"></i> Simpan</button>
       </div>
     </div>
   </div>
