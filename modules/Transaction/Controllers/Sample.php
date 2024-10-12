@@ -6,6 +6,8 @@ use CodeIgniter\Controller;
 use App\Controllers\BaseController;
 use Modules\Transaction\Models\SampleModel;
 use Modules\Referensi\Models\KonsumenModel;
+use Modules\Referensi\Models\UkuranModel;
+use Modules\Referensi\Models\WarnaModel;
 use App\Models\FileModel;
 
 class Sample extends BaseController
@@ -13,6 +15,8 @@ class Sample extends BaseController
   protected $mSample;
   protected $mkonsumen;
   protected $files;
+  protected $mUkuran;
+  protected $mWarna;
 
   protected $views = '\Modules\Transaction\Views';
   protected $urlv  = 'trans/sample';
@@ -20,9 +24,10 @@ class Sample extends BaseController
   function __construct()
   {
     $this->MOD_ALIAS = "MOD_TRANSAKSI_SAMPLE";
-
+    $this->mUkuran = new UkuranModel();
     $this->mSample = new SampleModel();
     $this->mkonsumen = new KonsumenModel();
+    $this->mWarna = new WarnaModel();
     $this->files  = new FileModel();
   }
 
@@ -35,6 +40,8 @@ class Sample extends BaseController
 
     $this->data['titlehead'] = "Sample";
     $this->data['buyer'] = $this->mkonsumen->where("active", 1)->findAll();
+    $this->data['ukuran'] = $this->mUkuran->where("active", 1)->findAll();
+    $this->data['warna'] = $this->mWarna->where("active", 1)->findAll();
 
     return view($this->views . '\sample_list', $this->data);
   }
@@ -115,6 +122,26 @@ class Sample extends BaseController
       "gambar_id" => $results->gambar_id,
       "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
       "detail" => $this->mSample->getDataDetailSample($results->id)
+    );
+    return $this->response->setJSON($build_array);
+  }
+
+  function detailQtyUkuran($idSample, $idSampleDet)
+  {
+    $id = !empty($idSample) ? decrypt($idSample) : 0;
+    $idSampleDet = !empty($idSampleDet) ? decrypt($idSampleDet) : 0;
+    $results = $this->mSample->getData($id);
+    $build_array =  array(
+      "id"   => encrypt($results->id),
+      "keterangan" => $results->keterangan,
+      "nama" => $results->nama,
+      "tgl_transaksi" => $results->tgl_transaksi,
+      "kode_sample" => $results->kode_sample,
+      "tgl_deadline" => $results->tgl_deadline,
+      "deskripsi" => $results->deskripsi,
+      "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
+      "detail" => $this->mSample->getDataDetailSampleWarna($id),
+      "detailUkuran" =>  $this->mSample->getDataDetailSampleUkuran($id, $idSampleDet)
     );
     return $this->response->setJSON($build_array);
   }

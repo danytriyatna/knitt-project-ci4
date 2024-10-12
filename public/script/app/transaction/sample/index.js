@@ -11,9 +11,16 @@ $(document).ready(function () {
     let fileSample       = $('#fileSample');
     let fileSampleOld       = $('#fileSampleOld');
     let linkFileSample       = $('#linkFileSample');
+    let deskripsiText       = $('#deskripsiText');
+    let tglSampleText       = $('#tglSampleText');
+    let buyerText       = $('#buyerText');
+    let tglDeadlineText       = $('#tglDeadlineText');
+    let noSampleText       = $('#noSampleText');
+    let fotoText       = $('#fotoText');
     let rowDet = $("#rowDet")
 
     let isModal       = $("#modal-form-add-po");
+    let isModalPO      = $("#modal-form-po");
 
     let buttonRowAction = function(cell) {
         let fmBtnDelete = "";        
@@ -118,6 +125,35 @@ $(document).ready(function () {
         locale: 'id',    
         // layout: 'fitColumns',
         placeholder: "Tidak ada data",
+	});
+
+    let dtListDetailQty = new Tabulator("#dt-detail-qty", {
+        pagination: true, 
+        paginationSize: 10,
+        paginationButtonCount: 5,
+        columns:[
+            {title:"ID", field:"id", visible:false},
+            {title:"No", field:"no", width:"5%"},
+            {title:"id_ukuran", field:"id_ukuran", hozAlign:"center",width:"7%",visible:false},
+            {title:"Ukuran", field:"ukuran", hozAlign:"center",width:"7%"},
+            {title:"QTY", field:"qty", hozAlign:"center",width:"7%"},
+            {title:"Price", field:"harga_satuan",formatter: "money", formatterParams: {
+                decimal: ",",
+                thousand: ".",
+                symbol: "Rp",  // Simbol mata uang Rupiah
+                precision: 0,   // Tidak ada desimal
+            }, hozAlign:"right",width:"16%"},
+            {title:"Total", field:"harga_total",formatter: "money", formatterParams: {
+                decimal: ",",
+                thousand: ".",
+                symbol: "Rp",  // Simbol mata uang Rupiah
+                precision: 0,   // Tidak ada desimal
+            }, hozAlign:"right",width:"16%"},
+        ],
+        locale: 'id',    
+        layout: 'fitColumns',
+        placeholder: "Tidak ada data",
+        pagination:false
 	});
 
     
@@ -251,6 +287,11 @@ $(document).ready(function () {
         isModal.modal("show");
     });
 
+    $("#btn-add-detail").on("click", function(){
+       
+        getDetailQty(inpData.val(),0)
+    });
+
     $("#btn-save").on("click", function(e){
         e.preventDefault()
         simpanData()
@@ -317,6 +358,27 @@ $(document).ready(function () {
             }
         });
     }
+    function getDetailQty(id,idDet) {
+        $.ajax({
+            url: `/trans/sample/detail-qty/${id}/${idDet}`,
+            type: 'GET',
+            dataType: 'json', 
+            success: function(data) {
+                noSampleText.html(data.kode_sample)
+                deskripsiText.html(data.deskripsi)
+                tglSampleText.html(formatterDate(data.tgl_transaksi))
+                buyerText.html(data.nama)
+                fotoText.attr("src",data.file_gambar)
+                tglDeadlineText.html(`<em>Deadline: ${formatterDate(data.tgl_deadline)}</em>`)
+                isModalPO.modal("show");
+                dtListDetailQty.setData(data.detailUkuran)
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching data:', error);
+            }
+        });
+    }
+
 
 
     
