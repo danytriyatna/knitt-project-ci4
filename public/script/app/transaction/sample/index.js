@@ -133,25 +133,25 @@ $(document).ready(function () {
         paginationButtonCount: 5,
         columns:[
             {title:"ID", field:"id", visible:false},
-            {title:"No", field:"no", width:"5%"},
-            {title:"id_ukuran", field:"id_ukuran", hozAlign:"center",width:"7%",visible:false},
-            {title:"Ukuran", field:"ukuran", hozAlign:"center",width:"7%"},
-            {title:"QTY", field:"qty", hozAlign:"center",width:"7%"},
+            {title:"No", field:"no", width:"10%", visible:false},
+            {title:"id_ukuran", field:"id_ukuran", hozAlign:"center",width:"10%",visible:false},
+            {title:"Ukuran", field:"ukuran", hozAlign:"center",width:"15%"},
+            {title:"QTY", field:"qty", hozAlign:"center",width:"15%"},
             {title:"Price", field:"harga_satuan",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
                 precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right",width:"16%"},
+            }, hozAlign:"right",width:"35%"},
             {title:"Total", field:"harga_total",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
                 precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right",width:"16%"},
+            }, hozAlign:"right",width:"35%"},
         ],
         locale: 'id',    
-        layout: 'fitColumns',
+        // layout: 'fitColumns',
         placeholder: "Tidak ada data",
         pagination:false
 	});
