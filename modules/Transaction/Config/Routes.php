@@ -6,9 +6,9 @@ $routes->group('trans/sample', ['namespace' => 'Modules\Transaction\Controllers'
   $routes->get('detail-qty/(:any)', 'Sample::detailQtyUkuran/$1/$1');
   $routes->post('list', 'Sample::lists');
   $routes->post('save', 'Sample::save');
-  $routes->post('sample/save-detail', 'Sample::saveDetail');
+  $routes->post('save-detail', 'Sample::saveDetail');
   $routes->get('delete/list(:any)', 'Sample::deleteList/$1');
-  $routes->post('sample/delete/detail', 'Sample::deleteDetailList');
+  $routes->post('delete/detail', 'Sample::deleteDetailList');
 });
 
 $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
