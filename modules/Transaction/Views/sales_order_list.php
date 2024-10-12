@@ -6,6 +6,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Form Tambah Sales Order</h5>
+        <input type="hidden" id="data_id">
         <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -15,16 +16,16 @@
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="no_sales_order">Sales Order No.<span class="text-danger">*</span></label>
           <div class="col-md-9">
-            <input type="text" id="no_sales_order" name="no_sales_order" class="form-control" placeholder="Ketikkan nomor sales order" value="SPL/003/10/2024" required>
+            <input type="text" id="no_sales_order" name="no_sales_order" class="form-control" placeholder="Ketikkan nomor sales_order" value="" required>
             <div class="invalid-feedback">
               Sales Order No. tidak valid
             </div>
           </div>
         </div>
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_sales_order">Description<span class="text-danger">*</span></label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_style">Description<span class="text-danger">*</span></label>
           <div class="col-md-9">
-            <input type="text" id="desc_sales_order" name="desc_sales_order" class="form-control" placeholder="Ketikkan sales order description" value="SWATCH LOGO 'S'" required>
+            <input type="text" id="desc_style" name="desc_style" class="form-control" placeholder="Ketikkan sales_order description" value="" required>
             <div class="invalid-feedback">
               Sales Order Description tidak valid
             </div>
@@ -34,8 +35,9 @@
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_buyer">Buyer<span class="text-danger">*</span></label>
           <div class="col-md-9">
             <select id="select_buyer" name="select_buyer" class="form-select select2" data-placeholder="-- Pilih Buyer --" required>
+              <option value=""></option>
               <?php foreach ($buyer as $item) : ?>
-                <option value="<?= $item->nama ?>"><?= $item->nama ?></option>
+                <option value="<?= $item['id'] ?>"><?= $item['nama'] ?></option>
               <?php endforeach; ?>
             </select>
             <div class="invalid-feedback">
@@ -46,7 +48,7 @@
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="tgl_sales_order">Date<span class="text-danger">*</span></label>
           <div class="col-md-9">
-            <input type="text" id="tgl_sales_order" name="tgl_sales_order" class="form-control datepicker" placeholder="Pilih tanggal sales order" value="1 Sep 2024" required>
+            <input type="text" id="tgl_sales_order" name="tgl_sales_order" class="form-control datepicker" placeholder="Pilih tanggal sales_order" value="" required>
             <div class="invalid-feedback">
               Date tidak valid
             </div>
@@ -55,7 +57,7 @@
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="tgl_deadline">Deadline<span class="text-danger">*</span></label>
           <div class="col-md-9">
-            <input type="text" id="tgl_deadline" name="tgl_deadline" class="form-control datepicker" placeholder="Pilih tanggal deadline" value="10 Sep 2024" required>
+            <input type="text" id="tgl_deadline" name="tgl_deadline" class="form-control datepicker" placeholder="Pilih tanggal deadline" value="" required>
             <div class="invalid-feedback">
               Deadline tidak valid
             </div>
@@ -70,122 +72,27 @@
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="foto_style">Foto</label>
           <div class="col-md-9">
-            <input type="file" id="foto_style" name="foto_style" class="form-control file-drag-drop" accept=".jpg, .jpeg, .png">
+            <input type="hidden" id="fileSalesOrderOld">
+            <input type="file" id="fileSalesOrder" onchange="readURL(this,'#fileSalesOrder')" name="fileSalesOrder" class="form-control file-drag-drop" accept=".jpg, .jpeg, .png">
             <small class="form-text">Format file *.JPG, *.JPEG, *.PNG, ukuran maks. 1 MB</small>
             <br>
-            <img class="m-t-10 w-40" src="assets/images/sample-dummy.png" alt="Foto Sample">
+            <img class="m-t-10 w-40 d-none" id="linkFileSalesOrder" alt="Foto Sales Order">
           </div>
         </div>
+        <div id="rowDet">
+          <hr>
+          <div class="row">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-sm btn-success mb-2" data-bs-toggle="modal" data-bs-target="#modal-form-po"> Tambah <i class="fa fa-plus"></i></button>
+              <div id="dt-detail" class="table-responsive table-striped"></div>
 
-        <hr>
-
-        <div class="row">
-          <div class="col-sm-12">
-            <div class="table-responsive">
-              <table class="table table-striped table-centered">
-                <thead>
-                  <tr>
-                    <th style="min-width: 100px; width: 100px;">
-                      <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modal-form-po"> <i class="fa fa-plus"></i></button>
-                    </th>
-                    <th>No.</th>
-                    <th>COLOUR</th>
-                    <th style="min-width: 80px;">S</th>
-                    <th style="min-width: 80px;">M</th>
-                    <th style="min-width: 80px;">L</th>
-                    <th style="min-width: 80px;">XL</th>
-                    <th style="min-width: 80px;">2XL</th>
-                    <th style="min-width: 80px;">ALL</th>
-                    <th rowspan="2">QTY</th>
-                    <th rowspan="2">AMOUNT</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <button type="button" class="btn btn-sm btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#modal-form-po"><i class="fa fa-edit"></i></button>
-                      <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
-                    </td>
-                    <td>1</td>
-                    <td class="text-nowrap">M38 - MINT - HITAM - OFF WHITE</td>
-                    <td>44</td>
-                    <td>90</td>
-                    <td>66</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>200</td>
-                    <td class="text-nowrap">Rp 200.000.000,00</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <button type="button" class="btn btn-sm btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#modal-form-po"><i class="fa fa-edit"></i></button>
-                      <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
-                    </td>
-                    <td>2</td>
-                    <td class="text-nowrap">M527 - OFF WHITE K - SMA - ROSE TUA</td>
-                    <td>66</td>
-                    <td>135</td>
-                    <td>99</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>300</td>
-                    <td class="text-nowrap">Rp 300.000.000,00</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <button type="button" class="btn btn-sm btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#modal-form-po"><i class="fa fa-edit"></i></button>
-                      <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
-                    </td>
-                    <td>3</td>
-                    <td class="text-nowrap">SAGE - OFF WHITE K - ROSE TUA - LILAC</td>
-                    <td>33</td>
-                    <td>68</td>
-                    <td>50</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>151</td>
-                    <td class="text-nowrap">Rp 151.000.000,00</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <button type="button" class="btn btn-sm btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#modal-form-po"><i class="fa fa-edit"></i></button>
-                      <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
-                    </td>
-                    <td>4</td>
-                    <td class="text-nowrap">HITAM - CREAM - ROSE TUA - LILAC</td>
-                    <td>55</td>
-                    <td>113</td>
-                    <td>83</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>251</td>
-                    <td class="text-nowrap">Rp 251.000.000,00</td>
-                  </tr>
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <th colspan="3" class="text-end">TOTAL</th>
-                    <th>198</th>
-                    <th>406</th>
-                    <th>298</th>
-                    <th>0</th>
-                    <th>0</th>
-                    <th>0</th>
-                    <th>902</th>
-                    <th class="text-nowrap">Rp 902.000.000,00</th>
-                  </tr>
-                </tfoot>
-              </table>
             </div>
           </div>
         </div>
+
       </div>
       <div class="modal-footer">
-        <button type="button" class="m-s-5 btn btn-success" data-bs-dismiss="modal"> <i class="fa fa-save"></i> Simpan</button>
+        <button type="button" class="m-s-5 btn btn-success" id="btn-save"> <i class="fa fa-save"></i> Simpan</button>
       </div>
     </div>
   </div>
@@ -195,13 +102,13 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Form Detail Warna & Ukuran</h5>
+        <h5 class="modal-title">Form Detail Warna & Ukuran Sales Order</h5>
         <button class="btn-close" data-bs-toggle="modal" data-bs-target="#modal-form-add-po" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="row">
           <div class="col-sm-3">
-            <img class="w-100" src="assets/images/sample-dummy.png" alt="Foto Sample">
+            <img class="w-100" src="assets/images/sales_order-dummy.png" alt="Foto Sales Order">
           </div>
           <div class="col-sm-9">
             <h6 class="f-w-700 m-b-6">SPL/003/10/2024</h6>
@@ -462,42 +369,65 @@
 
 <div class="container-fluid">
 
-    <div class="row page-titles">
-      <div class="col-md-5 align-self-center">
-        <h4 class="text-themecolor"><?= $titlehead ?></h4>
-      </div>
-      <div class="col-md-7 align-self-center text-right">
-        <div class="d-flex justify-content-end align-items-center">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><?= $name_app ?></li>
-            <li class="breadcrumb-item">Transaksi</li>
-            <li class="breadcrumb-item active"><?= $titlehead ?></li>
-          </ol>
-        </div>
+  <div class="row page-titles">
+    <div class="col-md-5 align-self-center">
+      <h4 class="text-themecolor"><?= $titlehead ?></h4>
+    </div>
+    <div class="col-md-7 align-self-center text-right">
+      <div class="d-flex justify-content-end align-items-center">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><?= $name_app ?></li>
+          <li class="breadcrumb-item">Transaksi</li>
+          <li class="breadcrumb-item active"><?= $titlehead ?></li>
+        </ol>
       </div>
     </div>
+  </div>
 
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="card">
-          <div class="card-body">
-            <div class="row">
-              <div class="col-sm-3">
-                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modal-form-add-po"> <i class="fa fa-plus"></i> Tambah</button>
-              </div>
-              <div class="col-sm-4 offset-md-5">
-                <div class="form-group">
-                  <div class="input-group mb-3">
-                    <span class="input-group-text bg-white" id="basic-addon11" style="border-right-width: 0px;"><i class="ti-search"></i></span>
-                    <input type="text" class="form-control p-s-0" placeholder="Pencarian" aria-label="Username" aria-describedby="basic-addon11" style="border-left-width: 0px;">
-                  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12 mb-3">
+              <?php if (isset($_SESSION['message'])) { ?>
+                <script type="text/javascript">
+                  window.setTimeout(function() {
+                    $(".alert").alert('close');
+                  }, 3000);
+                </script>
+                <div class="alert alert-success">
+                  <?php echo $_SESSION['message']; ?>
+                </div>
+              <?php } ?>
+              <?php if (isset($_SESSION['err'])) { ?>
+                <script type="text/javascript">
+                  window.setTimeout(function() {
+                    $(".alert").alert('close');
+                  }, 5000);
+                </script>
+                <div class="alert alert-error">
+                  <strong>Warning! </strong><?php echo $_SESSION['err']; ?>
+                </div>
+              <?php } ?>
+            </div>
+            <div class="col-sm-3">
+              <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" id="btn-add"> <i class="fa fa-plus"></i> Tambah</button>
+            </div>
+            <div class="col-sm-4 offset-md-5">
+              <div class="form-group">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-white" id="basic-addon11" style="border-right-width: 0px;"><i class="ti-search"></i></span>
+                  <input type="text" class="form-control p-s-0" id="tb-search" placeholder="Pencarian" aria-label="Username" aria-describedby="basic-addon11" style="border-left-width: 0px;">
                 </div>
               </div>
             </div>
+          </div>
 
-            <div class="row">
-              <div class="col-sm-12">
-                <?php for ($i = 0; $i < 3; $i++) : ?>
+          <div class="row">
+            <div class="col-sm-12">
+              <div id="dt-list"></div>
+              <!-- <?php for ($i = 0; $i < 3; $i++) : ?>
                 <div class="card shadow-sm">
                   <div class="card-header">
                     <div class="row">
@@ -545,7 +475,7 @@
                         <p class="m-y-0">7 Mei 2024</p>
                         <p class="m-y-0"><em>Deadline: 3 Juni 2024</em></p>
                         <p class="f-w-700 m-t-4">YUSUF</p>
-                        <img class="m-t-10 w-90" src="assets/images/sample-dummy.png" alt="Foto Sample">
+                        <img class="m-t-10 w-90" src="assets/images/sales_order-dummy.png" alt="Foto Sales Order">
                       </div>
                       <div class="col-sm-9">
                         <div class="table-responsive">
@@ -633,16 +563,16 @@
                     </div>
                   </div>
                 </div>
-                <?php endfor; ?>
-              </div>
+                <?php endfor; ?> -->
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 </div>
 
 <?= $this->endSection('content'); ?>
 <?= $this->section('script'); ?>
-<script src="script/user/index.js"></script>
+<script src="script/app/transaction/sales_order/index.js"></script>
 <?= $this->endSection('script'); ?>
