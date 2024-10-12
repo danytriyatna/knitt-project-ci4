@@ -139,4 +139,29 @@ END
         $this->_data = $builder->get()->getResult();
         return $this->_data;
     }
+    function getDataDetailSampleUkuran($idSample, $idSampleDet)
+    {
+        $sql = "SELECT
+	bbx.id,
+	abx.kode_ukuran as ukuran,
+    bbx.id_ukuran,
+	bbx.qty,
+	bbx.harga_satuan,
+    bbx.harga_total
+FROM
+	ref_ukuran abx
+	LEFT JOIN trans_sample_ukuran bbx ON bbx.id_ukuran = abx.id
+	AND bbx.id_sample = $idSample
+	AND bbx.id_sample_det = $idSampleDet
+	ORDER BY abx.id";
+        $result = $this->db->query($sql);
+        $this->_data   = $result->getResult();
+        return $this->_data;
+    }
+    function getDataDetailSampleWarna($idSample)
+    {
+        $builder = $this->db->table("trans_sample_det");
+        $builder->where("id_sample", $idSample);
+        $this->_data = $builder->get()->getRow();
+    }
 }
