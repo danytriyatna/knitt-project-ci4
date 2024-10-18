@@ -20,6 +20,7 @@
  * CKEDITOR INIT
  * DATEPICKER INIT
  * PERFECT SCROLLBAR INIT
+ * DATATABLES INIT
  * FORMAT & UNFORMAT IDR CURRENCY
  * BOOTSTRAP FORM VALIDATION
  * CUSTOM INPUT FILE DRAG & DROP
@@ -400,6 +401,34 @@ if(datepickerInit != null) {
 const psInit = document.getElementsByClassName("perfect-scroll");
 if(psInit != null) {
 	$(".perfect-scroll").perfectScrollbar();
+}
+
+
+// DATATABLES INIT
+const dataTablesInit = [...document.getElementsByClassName("datatable")];
+if(dataTablesInit != null) {
+  dataTablesInit.forEach(dt => {
+    const dtPageLength = dt.getAttribute("dt-page-length");
+    const dtOrderInt = dt.getAttribute("dt-order-int");
+    const dtOrderSort = dt.getAttribute("dt-order-sort");
+    $(dt).DataTable({
+      responsive: false,
+      pageLength: dtPageLength ? dtPageLength : 10,
+      order: dtOrderInt && dtOrderSort ? [[dtOrderInt, dtOrderSort]] : [],
+      language: {
+        lengthMenu: "Menampilkan _MENU_ entri per-halaman",
+        zeroRecords: "Data tidak ditemukan",
+        info: "Menampilkan _START_ - _END_ dari _TOTAL_ entri",
+        infoEmpty: "Tidak ada data",
+        infoFiltered: "(difilter dari total _MAX_ entri)",
+        paginate: {
+          next: "Selanjutnya",
+          previous: "Sebelumnya"
+        },
+        search: "Pencarian",
+      },
+    });
+  })
 }
 
 
