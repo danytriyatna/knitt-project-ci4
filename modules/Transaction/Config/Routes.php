@@ -19,3 +19,13 @@ $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Control
   $routes->get('delete/list(:any)', 'SalesOrder::deleteList/$1');
   $routes->get('delete/detail(:any)', 'SalesOrder::deleteDetailList/$1');
 });
+
+$routes->group('trans/work-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
+  $routes->get('/', 'WorkOrder::index');
+  $routes->get('form', 'WorkOrder::form');
+});
+
+$routes->group('trans/production', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
+  $routes->get('/', 'Production::index');
+  $routes->get('form', 'Production::form');
+});
