@@ -166,6 +166,7 @@ class Sample extends BaseController
       'deskripsi'             => ['label' => 'Deskripsi', 'rules' => 'required|trim'],
     ]);
 
+
     if (!empty($this->request->getFile('fileSample'))) {
       $fileSample       = $this->request->getFile('fileSample');
       $fileName       = $fileSample->getRandomName();
@@ -197,11 +198,12 @@ class Sample extends BaseController
 
         $this->files->delete(['id' => $fileIdSampleOld]);
       }
+    } else {
+      $fileIdSample = !empty($fileIdSampleOld) ? $fileIdSampleOld : null;
     }
 
     $msg    = "Data gagal ditambahkan !";
     $status = false;
-
     $arr_isi = [
       'id_konsumen' => $idKonsumen,
       'keterangan' => $keterangan,
