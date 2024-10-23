@@ -156,13 +156,13 @@ $(document).ready(function () {
             {title:"No",formatter: "rownum",hozAlign: "center", width:"5%"},
             {title:"id_ukuran", field:"id_ukuran", hozAlign:"center",width:"7%",visible:false},
             {title:"Ukuran", field:"ukuran", hozAlign:"center",width:"23%"},
-            {title:"QTY", field:"qty", hozAlign:"center",width:"22%",editor: "input",cellEdited: updateTotal},
+            {title:"QTY", field:"qty", hozAlign:"center",width:"22%",editor: "number",cellEdited: updateTotal},
             {title:"Price", field:"harga_satuan",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
                 precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right",width:"25%",editor: "input",cellEdited: updateTotal},
+            }, hozAlign:"right",width:"25%",editor: "number",cellEdited: updateTotal},
             {title:"Total", field:"harga_total",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
@@ -280,7 +280,7 @@ $(document).ready(function () {
                 paginationButtonCount: 5,
                 columns:[
                     {title:"No", field:"no",   width: "5%"},
-                    {title:"Colour", field:"colour", width:"40%"},
+                    {title:"Colour", field:"colordasar", width:"20%"},
                     {title:"S", field:"s", hozAlign:"center",width:"7%"},
                     {title:"M", field:"m", hozAlign:"center",width:"7%"},
                     {title:"L", field:"l", hozAlign:"center",width:"7%"},
@@ -583,7 +583,7 @@ $(document).ready(function () {
             });
         }
 
-        let dataUkuran = dtListDetailQty.getData().filter(x => x.qty && x.harga_satuan && x.harga_total);
+        let dataUkuran = dtListDetailQty.getData().filter(x => x.qty && x.harga_satuan);
         if(dataUkuran.length ==0)
             {
                 return Swal.fire({

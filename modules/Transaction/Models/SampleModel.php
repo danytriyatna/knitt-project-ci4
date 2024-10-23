@@ -30,6 +30,10 @@ class SampleModel extends \App\Models\PrModel
                 $builder->groupEnd();
             }
 
+            if(!empty($params['id_konsumen'])){
+                $builder->where('abx.id_konsumen', $params['id_konsumen']);
+            }
+
             if (!empty($order)) {
                 $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
             } else {
@@ -76,46 +80,47 @@ class SampleModel extends \App\Models\PrModel
         $builder = $this->db->table("trans_sample_det" . " abx");
         $builder->select("abx.id,ROW_NUMBER
 	( ) OVER ( ORDER BY abx.id ) AS No,
-	TRIM (
-		BOTH ' - ' 
-	FROM
-		COALESCE ( w1.kode_warna, '' ) ||
-	CASE
-			
-			WHEN w2.kode_warna IS NOT NULL THEN
-			' - ' || w2.kode_warna ELSE'' 
-		END ||
-CASE
-	
-	WHEN w3.kode_warna IS NOT NULL THEN
-	' - ' || w3.kode_warna ELSE'' 
-	END ||
-CASE
-	
-	WHEN w4.kode_warna IS NOT NULL THEN
-	' - ' || w4.kode_warna ELSE'' 
-	END ||
-CASE
-	
-	WHEN w5.kode_warna IS NOT NULL THEN
-	' - ' || w5.kode_warna ELSE'' 
-	END ||
-CASE
-	
-	WHEN w6.kode_warna IS NOT NULL THEN
-	' - ' || w6.kode_warna ELSE'' 
-	END ||
-CASE
-	
-	WHEN w7.kode_warna IS NOT NULL THEN
-	' - ' || w7.kode_warna ELSE'' 
-	END ||
-CASE
-	
-	WHEN w8.kode_warna IS NOT NULL THEN
-	' - ' || w8.kode_warna ELSE'' 
-END 
-	) AS colour");
+            TRIM (
+                BOTH ' - ' 
+            FROM
+                COALESCE ( w1.kode_warna, '' ) ||
+            CASE
+                    
+                    WHEN w2.kode_warna IS NOT NULL THEN
+                    ' - ' || w2.kode_warna ELSE'' 
+                END ||
+        CASE
+            
+            WHEN w3.kode_warna IS NOT NULL THEN
+            ' - ' || w3.kode_warna ELSE'' 
+            END ||
+        CASE
+            
+            WHEN w4.kode_warna IS NOT NULL THEN
+            ' - ' || w4.kode_warna ELSE'' 
+            END ||
+        CASE
+            
+            WHEN w5.kode_warna IS NOT NULL THEN
+            ' - ' || w5.kode_warna ELSE'' 
+            END ||
+        CASE
+            
+            WHEN w6.kode_warna IS NOT NULL THEN
+            ' - ' || w6.kode_warna ELSE'' 
+            END ||
+        CASE
+            
+            WHEN w7.kode_warna IS NOT NULL THEN
+            ' - ' || w7.kode_warna ELSE'' 
+            END ||
+        CASE
+            
+            WHEN w8.kode_warna IS NOT NULL THEN
+            ' - ' || w8.kode_warna ELSE'' 
+        END 
+            ) AS colour,
+             COALESCE ( w1.kode_warna, '' ) as colorDasar");
         $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'S' THEN bbx.qty ELSE 0 END ) AS S ");
         $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'M' THEN bbx.qty ELSE 0 END ) AS M ");
         $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'L' THEN bbx.qty ELSE 0 END ) AS L ");
@@ -140,21 +145,28 @@ END
         return $this->_data;
     }
 
+    function getDataDetailSample_ori($idSample){
+        $builder = $this->db->table("trans_sample_det" . " abx");
+        $builder->where("abx.id_sample", $idSample);
+        $this->_data = $builder->get()->getResult();
+        return $this->_data;
+    }
+
     function getDataDetailSampleUkuran($idSample, $idSampleDet)
     {
         $sql = "SELECT
-	bbx.id,
-	abx.kode_ukuran as ukuran,
-    abx.id AS id_ukuran,
-	bbx.qty,
-	bbx.harga_satuan,
-    bbx.harga_total
-FROM
-	ref_ukuran abx
-	LEFT JOIN trans_sample_ukuran bbx ON bbx.id_ukuran = abx.id
-	AND bbx.id_sample = $idSample
-	AND bbx.id_sample_det = $idSampleDet
-	ORDER BY abx.id";
+                    bbx.id,
+                    abx.kode_ukuran as ukuran,
+                    abx.id AS id_ukuran,
+                    bbx.qty,
+                    bbx.harga_satuan,
+                    bbx.harga_total
+                FROM
+                    ref_ukuran abx
+                    LEFT JOIN trans_sample_ukuran bbx ON bbx.id_ukuran = abx.id
+                    AND bbx.id_sample = $idSample
+                    AND bbx.id_sample_det = $idSampleDet
+                    ORDER BY abx.id";
         $result = $this->db->query($sql);
         $this->_data   = $result->getResult();
         return $this->_data;
@@ -197,7 +209,7 @@ FROM
                     "id_ukuran" => $rowData['id_ukuran'],
                     "qty" => $rowData['qty'],
                     "harga_satuan" => $rowData['harga_satuan'],
-                    "harga_total" => $rowData['harga_total'],
+                    "harga_total" => (!empty($rowData['qty']) && !empty($rowData['harga_satuan'])) ? $rowData['qty'] * $rowData['harga_satuan'] : 0,//$rowData['harga_total'],
                     "active" => 1,
                     "created_at" =>  date("Y-m-d H:i:s"),
 

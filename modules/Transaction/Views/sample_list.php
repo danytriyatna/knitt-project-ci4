@@ -127,9 +127,9 @@
         <div class="row">
           <div class="col-sm-6">
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna1">Warna 1</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna1">Warna A</label>
               <div class="col-md-9">
-                <select id="po_warna1" name="po_warna1" class="form-select select2" data-placeholder="-- Pilih Warna 1 --">
+                <select id="po_warna1" name="po_warna1" class="form-select select2" data-placeholder="-- Pilih Warna A --">
                   <option value=""></option>
                   <?php foreach ($warna as $item) : ?>
                     <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
@@ -138,9 +138,9 @@
               </div>
             </div>
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna2">Warna 2</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna2">Warna B</label>
               <div class="col-md-9">
-                <select id="po_warna2" name="po_warna2" class="form-select select2" data-placeholder="-- Pilih Warna 2 --">
+                <select id="po_warna2" name="po_warna2" class="form-select select2" data-placeholder="-- Pilih Warna B --">
                   <option value=""></option>
                   <?php foreach ($warna as $item) : ?>
                     <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
@@ -149,9 +149,9 @@
               </div>
             </div>
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna3">Warna 3</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna3">Warna C</label>
               <div class="col-md-9">
-                <select id="po_warna3" name="po_warna3" class="form-select select2" data-placeholder="-- Pilih Warna 3 --">
+                <select id="po_warna3" name="po_warna3" class="form-select select2" data-placeholder="-- Pilih Warna C --">
                   <option value=""></option>
                   <?php foreach ($warna as $item) : ?>
                     <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
@@ -160,9 +160,9 @@
               </div>
             </div>
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna4">Warna 4</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna4">Warna D</label>
               <div class="col-md-9">
-                <select id="po_warna4" name="po_warna4" class="form-select select2" data-placeholder="-- Pilih Warna 4 --">
+                <select id="po_warna4" name="po_warna4" class="form-select select2" data-placeholder="-- Pilih Warna D --">
                   <option value=""></option>
                   <?php foreach ($warna as $item) : ?>
                     <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
@@ -174,9 +174,9 @@
           </div>
           <div class="col-sm-6">
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna6">Warna 5</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna6">Warna E</label>
               <div class="col-md-9">
-                <select id="po_warna5" name="po_warna5" class="form-select select2" data-placeholder="-- Pilih Warna 5 --">
+                <select id="po_warna5" name="po_warna5" class="form-select select2" data-placeholder="-- Pilih Warna E --">
                   <option value=""></option>
                   <?php foreach ($warna as $item) : ?>
                     <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
@@ -185,9 +185,9 @@
               </div>
             </div>
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna7">Warna 6</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna7">Warna F</label>
               <div class="col-md-9">
-                <select id="po_warna6" name="po_warna6" class="form-select select2" data-placeholder="-- Pilih Warna 6 --">
+                <select id="po_warna6" name="po_warna6" class="form-select select2" data-placeholder="-- Pilih Warna F --">
                   <option value=""></option>
                   <?php foreach ($warna as $item) : ?>
                     <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
@@ -196,9 +196,9 @@
               </div>
             </div>
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna7">Warna 7</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna7">Warna G</label>
               <div class="col-md-9">
-                <select id="po_warna7" name="po_warna7" class="form-select select2" data-placeholder="-- Pilih Warna 7 --">
+                <select id="po_warna7" name="po_warna7" class="form-select select2" data-placeholder="-- Pilih Warna G --">
                   <option value=""></option>
                   <?php foreach ($warna as $item) : ?>
                     <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
@@ -207,9 +207,9 @@
               </div>
             </div>
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna9">Warna 8</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna9">Warna H</label>
               <div class="col-md-9">
-                <select id="po_warna8" name="po_warna8" class="form-select select2" data-placeholder="-- Pilih Warna 8 --">
+                <select id="po_warna8" name="po_warna8" class="form-select select2" data-placeholder="-- Pilih Warna H --">
                   <option value=""></option>
                   <?php foreach ($warna as $item) : ?>
                     <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>

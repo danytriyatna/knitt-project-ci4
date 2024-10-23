@@ -18,7 +18,7 @@ class SalesOrderModel extends \App\Models\PrModel
     {
         $builder = $this->db->table($this->table . " abx");
 
-        $builder->select("abx.id, abx.kode_sales_order, abx.deskripsi, bbx.nama, abx.id_konsumen, abx.keterangan, abx.tgl_transaksi, abx.tgl_deadline, abx.status, abx.gambar_id,cbx.file_name");
+        $builder->select("abx.id, abx.kode_sales_order, abx.deskripsi, bbx.nama, abx.id_konsumen, abx.keterangan, abx.tgl_transaksi, abx.tgl_deadline, abx.status, abx.gambar_id,cbx.file_name, abx.id_sample");
         $builder->join("ref_konsumen bbx", "abx.id_konsumen = bbx.id", "inner");
         $builder->join("_files cbx", "abx.gambar_id = cbx.id", "left");
         if ($id == null or $id == "") {
@@ -75,47 +75,48 @@ class SalesOrderModel extends \App\Models\PrModel
     {
         $builder = $this->db->table("trans_sales_order_det" . " abx");
         $builder->select("abx.id,ROW_NUMBER
-	( ) OVER ( ORDER BY abx.id ) AS No,
-	TRIM (
-		BOTH ' - ' 
-	FROM
-		COALESCE ( w1.kode_warna, '' ) ||
-	CASE
-			
-			WHEN w2.kode_warna IS NOT NULL THEN
-			' - ' || w2.kode_warna ELSE'' 
-		END ||
-CASE
-	
-	WHEN w3.kode_warna IS NOT NULL THEN
-	' - ' || w3.kode_warna ELSE'' 
-	END ||
-CASE
-	
-	WHEN w4.kode_warna IS NOT NULL THEN
-	' - ' || w4.kode_warna ELSE'' 
-	END ||
-CASE
-	
-	WHEN w5.kode_warna IS NOT NULL THEN
-	' - ' || w5.kode_warna ELSE'' 
-	END ||
-CASE
-	
-	WHEN w6.kode_warna IS NOT NULL THEN
-	' - ' || w6.kode_warna ELSE'' 
-	END ||
-CASE
-	
-	WHEN w7.kode_warna IS NOT NULL THEN
-	' - ' || w7.kode_warna ELSE'' 
-	END ||
-CASE
-	
-	WHEN w8.kode_warna IS NOT NULL THEN
-	' - ' || w8.kode_warna ELSE'' 
-END 
-	) AS colour");
+                            ( ) OVER ( ORDER BY abx.id ) AS No,
+                            TRIM (
+                                BOTH ' - ' 
+                            FROM
+                                COALESCE ( w1.kode_warna, '' ) ||
+                            CASE
+                                    
+                                    WHEN w2.kode_warna IS NOT NULL THEN
+                                    ' - ' || w2.kode_warna ELSE'' 
+                                END ||
+                        CASE
+                            
+                            WHEN w3.kode_warna IS NOT NULL THEN
+                            ' - ' || w3.kode_warna ELSE'' 
+                            END ||
+                        CASE
+                            
+                            WHEN w4.kode_warna IS NOT NULL THEN
+                            ' - ' || w4.kode_warna ELSE'' 
+                            END ||
+                        CASE
+                            
+                            WHEN w5.kode_warna IS NOT NULL THEN
+                            ' - ' || w5.kode_warna ELSE'' 
+                            END ||
+                        CASE
+                            
+                            WHEN w6.kode_warna IS NOT NULL THEN
+                            ' - ' || w6.kode_warna ELSE'' 
+                            END ||
+                        CASE
+                            
+                            WHEN w7.kode_warna IS NOT NULL THEN
+                            ' - ' || w7.kode_warna ELSE'' 
+                            END ||
+                        CASE
+                            
+                            WHEN w8.kode_warna IS NOT NULL THEN
+                            ' - ' || w8.kode_warna ELSE'' 
+                        END 
+                            ) AS colour,
+                        COALESCE ( w1.kode_warna, '' ) as colorDasar");
         $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'S' THEN bbx.qty ELSE 0 END ) AS S ");
         $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'M' THEN bbx.qty ELSE 0 END ) AS M ");
         $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'L' THEN bbx.qty ELSE 0 END ) AS L ");
@@ -138,5 +139,89 @@ END
         $builder->groupBy(array("abx.id", "w1.kode_warna", "w2.kode_warna", "w3.kode_warna", "w4.kode_warna", "w5.kode_warna", "w6.kode_warna", "w7.kode_warna", "w8.kode_warna"));
         $this->_data = $builder->get()->getResult();
         return $this->_data;
+    }
+
+    function getDataDetailSalesOrder_ori($idSalesOrder){
+        $builder = $this->db->table("trans_sales_order_det" . " abx");
+        $builder->where("abx.id_sales_order", $idSalesOrder);
+        $this->_data = $builder->get()->getResult();
+        return $this->_data;
+    }
+    
+    function getDataDetailSampleUkuran($idSample, $idSampleDet)
+    {
+        $sql = "SELECT
+                    bbx.id,
+                    abx.kode_ukuran as ukuran,
+                    abx.id AS id_ukuran,
+                    bbx.qty,
+                    bbx.harga_satuan,
+                    bbx.harga_total
+                FROM
+                    ref_ukuran abx
+                    LEFT JOIN trans_sales_order_ukuran bbx ON bbx.id_ukuran = abx.id
+                    AND bbx.id_sales_order = $idSample
+                    AND bbx.id_sales_order_det = $idSampleDet
+                    ORDER BY abx.id";
+        $result = $this->db->query($sql);
+        $this->_data   = $result->getResult();
+        return $this->_data;
+    }
+
+    function getDataDetailSampleWarna($idSample, $id)
+    {
+
+        $builder = $this->db->table("trans_sales_order_det");
+        $builder->where("id_sales_order", $idSample);
+        $builder->where("id", $id);
+        $this->_data = $builder->get()->getRow();
+        return $this->_data;
+    }
+
+    function trxInsertUpdateRecord($dataWarna, $dataUkuran)
+    {
+        $this->db->transStart();
+        try {
+            if (!empty($dataWarna['id'])) {
+                $dataWarna['updated_at'] = date("Y-m-d H:i:s");
+                $this->updateRecord("trans_sales_order_det", $dataWarna, 'id', $dataWarna['id']);
+            } else {
+                unset($dataWarna['id']);
+                $dataWarna['created_at'] = date("Y-m-d H:i:s");
+                $idSampleDet = $this->insertRecordGetid("trans_sales_order_det", $dataWarna);
+            }
+            if (!empty($dataWarna['id']) && ($dataWarna['id_sales_order'])) {
+                $arrDelete = [
+                    "id_sales_order" => $dataWarna['id_sales_order'],
+                    "id_sales_order_det" => $dataWarna['id']
+                ];
+                $this->deleteRecordMultipleColumn("trans_sales_order_ukuran", $arrDelete);
+            }
+            foreach ($dataUkuran as $rowData) {
+
+                $arrDataUkuran = [
+                    "id_sales_order" => $dataWarna['id_sales_order'],
+                    "id_sales_order_det" => !empty($dataWarna['id']) ? $dataWarna['id'] : $idSampleDet,
+                    "id_ukuran" => $rowData['id_ukuran'],
+                    "qty" => $rowData['qty'],
+                    "harga_satuan" => $rowData['harga_satuan'],
+                    "harga_total" => (!empty($rowData['qty']) && !empty($rowData['harga_satuan'])) ? $rowData['qty'] * $rowData['harga_satuan'] : 0,//$rowData['harga_total'],
+                    "active" => 1,
+                    "created_at" =>  date("Y-m-d H:i:s"),
+
+                ];
+                $this->insertRecordGetid("trans_sales_order_ukuran", $arrDataUkuran);
+            }
+            $this->db->transComplete();
+
+            if ($this->db->transStatus() === TRUE) {
+                return true;
+            } else {
+                throw new \Exception("Transaction failed");
+            }
+        } catch (\Exception $e) {
+            $this->db->transRollback();
+            throw $e;
+        }
     }
 }

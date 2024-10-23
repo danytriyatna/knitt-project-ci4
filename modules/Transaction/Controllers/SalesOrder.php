@@ -6,13 +6,19 @@ use CodeIgniter\Controller;
 use App\Controllers\BaseController;
 use Modules\Transaction\Models\SalesOrderModel;
 use Modules\Referensi\Models\KonsumenModel;
+use Modules\Referensi\Models\UkuranModel;
+use Modules\Referensi\Models\WarnaModel;
+use Modules\Transaction\Models\SampleModel;
 use App\Models\FileModel;
 
 class SalesOrder extends BaseController
 {
   protected $mSalesOrder;
+  protected $mSample;
   protected $mkonsumen;
   protected $files;
+  protected $mUkuran;
+  protected $mWarna;
 
   protected $views = '\Modules\Transaction\Views';
   protected $urlv  = 'trans/sales_order';
@@ -24,6 +30,9 @@ class SalesOrder extends BaseController
     $this->mSalesOrder = new SalesOrderModel();
     $this->mkonsumen = new KonsumenModel();
     $this->files  = new FileModel();
+    $this->mUkuran = new UkuranModel();
+    $this->mWarna = new WarnaModel();
+    $this->mSample = new SampleModel();
   }
 
 
@@ -35,6 +44,8 @@ class SalesOrder extends BaseController
 
     $this->data['titlehead'] = "SalesOrder";
     $this->data['buyer'] = $this->mkonsumen->where("active", 1)->findAll();
+    $this->data['ukuran'] = $this->mUkuran->where("active", 1)->findAll();
+    $this->data['warna'] = $this->mWarna->where("active", 1)->findAll();
 
     return view($this->views . '\sales_order_list', $this->data);
   }
@@ -87,6 +98,7 @@ class SalesOrder extends BaseController
         $build_array["data"],
         array(
           "id"   => ($id),
+          "id_sample"   => ($row->id_sample),
           "nama" => $row->nama,
           "tgl_transaksi" => $row->tgl_transaksi,
           "kode_sales_order" => $row->kode_sales_order,
@@ -114,7 +126,28 @@ class SalesOrder extends BaseController
       "deskripsi" => $results->deskripsi,
       "gambar_id" => $results->gambar_id,
       "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sales_order/" . $results->file_name : "",
+      "id_sample" => $results->id_sample,
       "detail" => $this->mSalesOrder->getDataDetailSalesOrder($results->id)
+    );
+    return $this->response->setJSON($build_array);
+  }
+
+  function detailQtyUkuran($idSalesOrder, $idSalesOrderDet)
+  {
+    $id = !empty($idSalesOrder) ? decrypt($idSalesOrder) : 0;
+    $idSalesOrderDet = !empty($idSalesOrderDet) ? $idSalesOrderDet : 0;
+    $results = $this->mSalesOrder->getData($id);
+    $build_array =  array(
+      "id"   => encrypt($results->id),
+      "keterangan" => $results->keterangan,
+      "nama" => $results->nama,
+      "tgl_transaksi" => $results->tgl_transaksi,
+      "kode_sales_order" => $results->kode_sales_order,
+      "tgl_deadline" => $results->tgl_deadline,
+      "deskripsi" => $results->deskripsi,
+      "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
+      "detail" => $this->mSalesOrder->getDataDetailSampleWarna($id, $idSalesOrderDet),
+      "detailUkuran" =>  $this->mSalesOrder->getDataDetailSampleUkuran($id, $idSalesOrderDet)
     );
     return $this->response->setJSON($build_array);
   }
@@ -130,6 +163,7 @@ class SalesOrder extends BaseController
     $keterangan = $this->request->getPost('deskripsi');
     $fileIdSalesOrderOld = $this->request->getPost('fileIdSalesOrderOld');
     $noSalesOrder = $this->request->getPost('noSalesOrder');
+    $sampleId = $this->request->getPost('samples');
 
 
     $this->validation->setRules([
@@ -187,18 +221,104 @@ class SalesOrder extends BaseController
     ];
 
 
+
+
     if (empty($id)) {
+      $this->db->transBegin();
       $arr_isi['created_at'] = date("Y-m-d H:i:s");
       $arr_isi['status'] = 0;
-      $this->mSalesOrder->insertRecordGetid($this->mSalesOrder->table, $arr_isi);
-      $msg    = "Data berhasil ditambahkan !";
-      $status = true;
+      $hid = $this->mSalesOrder->insertRecordGetid($this->mSalesOrder->table, $arr_isi);
+
+      if(!empty($sampleId)){
+        $data_detail = $this->mSample->getDataDetailSample_ori($sampleId);
+        if(!empty($data_detail)){
+          foreach ($data_detail as $r) {
+            $arr_isid = [
+              'id_sales_order' => $hid,
+              'keterangan' => '',
+              'id_warna_1' => $r->id_warna_1,
+              'id_warna_2' => $r->id_warna_2,
+              'id_warna_3' => $r->id_warna_3,
+              'id_warna_4' => $r->id_warna_4,
+              'id_warna_5' => $r->id_warna_5,
+              'id_warna_6' => $r->id_warna_6,
+              'id_warna_7' => $r->id_warna_7,
+              'id_warna_8' => $r->id_warna_8,
+              'total_harga' => $r->total_harga,
+            ];
+            $hidd = $this->mSalesOrder->insertRecordGetid('trans_sales_order_det', $arr_isid);
+            $data_details = $this->mSample->getDataDetailSampleUkuran($sampleId, $r->id);
+            if(!empty($data_details)){
+                foreach ($data_details as $rx) {
+                  $arr_isidx = [
+                    'id_sales_order' => $hid,
+                    'id_sales_order_det' => $hidd,
+                    'id_ukuran' => $rx->id_ukuran,
+                    'qty' => $rx->qty,
+                    'harga_satuan' => $rx->harga_satuan,
+                    'harga_total' => $rx->harga_total,
+                  ];
+                   $this->mSalesOrder->insertRecordGetid('trans_sales_order_ukuran', $arr_isidx);
+                }
+            }
+          }
+        }
+      }
+
+      if ($this->db->transStatus() === FALSE) {
+        $this->db->transRollback();
+      } else {
+          $this->db->transCommit();
+          $msg    = "Data berhasil ditambahkan !";
+          $status = true;
+      }
     } else {
       $arr_isi['updated_at'] = date("Y-m-d H:i:s");
       $id = decrypt($id);
       $this->mSalesOrder->updateRecord($this->mSalesOrder->table, $arr_isi, 'id', $id);
       $msg    = "Data berhasil diupdate !";
       $status = true;
+    }
+
+    $build_array['message'] = $msg;
+    $build_array['status']  = $status;
+
+    return $this->response->setJSON($build_array);
+  }
+
+  function saveDetail()
+  {
+    $msg    = "Data gagal disimpan !";
+    $status = false;
+    $idSalesOrder = $this->request->getPost('idSalesOrder');
+    $idSalesOrderDet = $this->request->getPost('idSalesOrderDet');
+    $warna1 = $this->request->getPost('warna1');
+    $warna2 = $this->request->getPost('warna2');
+    $warna3 = $this->request->getPost('warna3');
+    $warna4 = $this->request->getPost('warna4');
+    $warna5 = $this->request->getPost('warna5');
+    $warna6 = $this->request->getPost('warna6');
+    $warna7 = $this->request->getPost('warna7');
+    $warna8 = $this->request->getPost('warna8');
+    $dataUkuran = $this->request->getPost('dataUkuran');
+    $dataWarna = [
+      "id_warna_1" => !empty($warna1) ? $warna1 : null,
+      "id_warna_2" => !empty($warna2) ? $warna2 : null,
+      "id_warna_3" => !empty($warna3) ? $warna3 : null,
+      "id_warna_4" => !empty($warna4) ? $warna4 : null,
+      "id_warna_5" => !empty($warna5) ? $warna5 : null,
+      "id_warna_6" => !empty($warna6) ? $warna6 : null,
+      "id_warna_7" => !empty($warna7) ? $warna7 : null,
+      "id_warna_8" => !empty($warna8) ? $warna8 : null,
+
+      "id_sales_order" => (int)decrypt($idSalesOrder),
+      "id" => !empty($idSalesOrderDet) ? $idSalesOrderDet :  null,
+    ];
+
+    $res = $this->mSalesOrder->trxInsertUpdateRecord($dataWarna, $dataUkuran);
+    if ($res) {
+      $status = true;
+      $msg = "Data berhasil disimpan!";
     }
 
     $build_array['message'] = $msg;
@@ -254,6 +374,31 @@ class SalesOrder extends BaseController
     $build_array['message'] = $msg;
     $build_array['status']  = $status;
 
+    return $this->response->setJSON($build_array);
+  }
+
+  public function getSampleBuyer(){
+    $buyerId = $this->request->getPost("buyers");
+
+    $msg = "Gagal mengambil data sample !";
+    $status = false;
+    $data = [];
+
+    if(!empty($buyerId)){
+      $params = [
+        'id_konsumen' => $buyerId
+      ];
+      $data_sample = $this->mSample->getData(0, 0, 99999, null, null, $params);
+      if(!empty($data_sample)){
+        $msg = "Berhasil mengambil data sample !";
+        $status = true;
+        $data = $data_sample;
+      }
+    }
+
+    $build_array['message'] = $msg;
+    $build_array['status']  = $status;
+    $build_array['data']    = $data;
     return $this->response->setJSON($build_array);
   }
 }

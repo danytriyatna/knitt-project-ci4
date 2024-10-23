@@ -14,10 +14,13 @@ $routes->group('trans/sample', ['namespace' => 'Modules\Transaction\Controllers'
 $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'SalesOrder::index');
   $routes->get('detail/(:any)', 'SalesOrder::detail/$1');
+  $routes->get('detail-qty/(:any)', 'SalesOrder::detailQtyUkuran/$1/$1');
   $routes->post('list', 'SalesOrder::lists');
   $routes->post('save', 'SalesOrder::save');
+  $routes->post('save-detail', 'SalesOrder::saveDetail');
   $routes->get('delete/list(:any)', 'SalesOrder::deleteList/$1');
   $routes->get('delete/detail(:any)', 'SalesOrder::deleteDetailList/$1');
+  $routes->post('getSample', 'SalesOrder::getSampleBuyer');
 });
 
 $routes->group('trans/work-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {

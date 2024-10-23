@@ -14,24 +14,6 @@
           <i>*) Wajib diisi</i>
         </div>
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="no_sales_order">Sales Order No.<span class="text-danger">*</span></label>
-          <div class="col-md-9">
-            <input type="text" id="no_sales_order" name="no_sales_order" class="form-control" placeholder="Ketikkan nomor sales_order" value="" required>
-            <div class="invalid-feedback">
-              Sales Order No. tidak valid
-            </div>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_style">Description<span class="text-danger">*</span></label>
-          <div class="col-md-9">
-            <input type="text" id="desc_style" name="desc_style" class="form-control" placeholder="Ketikkan sales_order description" value="" required>
-            <div class="invalid-feedback">
-              Sales Order Description tidak valid
-            </div>
-          </div>
-        </div>
-        <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_buyer">Buyer<span class="text-danger">*</span></label>
           <div class="col-md-9">
             <select id="select_buyer" name="select_buyer" class="form-select select2" data-placeholder="-- Pilih Buyer --" required>
@@ -42,6 +24,35 @@
             </select>
             <div class="invalid-feedback">
               Buyer tidak valid
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="no_sales_order">Sales Order No.<span class="text-danger">*</span></label>
+          <div class="col-md-9">
+            <input type="text" id="no_sales_order" name="no_sales_order" class="form-control" placeholder="Ketikkan nomor sales_order" value="" required>
+            <div class="invalid-feedback">
+              Sales Order No. tidak valid
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_samples">Style/Sample<span class="text-danger">*</span></label>
+          <div class="col-md-9">
+            <select id="select_samples" name="select_samples" class="form-select select2" data-placeholder="-- Pilih Style/Sample --" required>
+              <option value=""></option>
+            </select>
+            <div class="invalid-feedback">
+                Style/Sample tidak valid
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_style">Description<span class="text-danger">*</span></label>
+          <div class="col-md-9">
+            <input type="text" id="desc_style" name="desc_style" class="form-control" placeholder="Ketikkan sales_order description" value="" required>
+            <div class="invalid-feedback">
+              Sales Order Description tidak valid
             </div>
           </div>
         </div>
@@ -103,19 +114,21 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Form Detail Warna & Ukuran Sales Order</h5>
+        <input type="hidden" id="id_sales_order_qty">
+        <input type="hidden" id="id_sales_order_det_qty">
         <button class="btn-close" data-bs-toggle="modal" data-bs-target="#modal-form-add-po" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="row">
           <div class="col-sm-3">
-            <img class="w-100" src="assets/images/sales_order-dummy.png" alt="Foto Sales Order">
+            <img class="w-100" id="fotoText" src="" alt="Foto Sales Order">
           </div>
           <div class="col-sm-9">
-            <h6 class="f-w-700 m-b-6">SPL/003/10/2024</h6>
-            <h5 class="f-w-700 m-b-12">K-17 (CARDIGAN PITA)</h5>
-            <p class="m-y-0">7 Mei 2024</p>
-            <p class="m-y-0"><em>Deadline: 3 Juni 2024</em></p>
-            <p class="f-w-700 m-t-4">YUSUF</p>
+            <h6 class="f-w-700 m-b-6" id="noSalesOrderText"></h6>
+            <h5 class="f-w-700 m-b-12" id="deskripsiText"></h5>
+            <p class="m-y-0" id="tglSalesOrderText"></p>
+            <p class="m-y-0" id="tglDeadlineText"></p>
+            <p class="f-w-700 m-t-4" id="buyerText"></p>
           </div>
         </div>
 
@@ -125,163 +138,97 @@
         <div class="row">
           <div class="col-sm-6">
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna1">Warna 1</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna1">Warna A</label>
               <div class="col-md-9">
-                <select id="po_warna1" name="po_warna1" class="form-select select2" data-placeholder="-- Pilih Warna 1 --">
+                <select id="po_warna1" name="po_warna1" class="form-select select2" data-placeholder="-- Pilih Warna A --">
                   <option value=""></option>
-                  <option value="1">M38</option>
-                  <option value="2">M527</option>
-                  <option value="3">SAGE</option>
-                  <option value="4">HITAM</option>
+                  <?php foreach ($warna as $item) : ?>
+                    <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
+                  <?php endforeach; ?>
                 </select>
               </div>
             </div>
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna2">Warna 2</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna2">Warna B</label>
               <div class="col-md-9">
-                <select id="po_warna2" name="po_warna2" class="form-select select2" data-placeholder="-- Pilih Warna 2 --">
+                <select id="po_warna2" name="po_warna2" class="form-select select2" data-placeholder="-- Pilih Warna B --">
                   <option value=""></option>
-                  <option value="1">MINT</option>
-                  <option value="2">OFF WHITE K</option>
-                  <option value="3">CREAM</option>
-                  <option value="4">HITAM</option>
-                  <option value="5">SMA</option>
-                  <option value="6">ROSE TUA</option>
-                  <option value="7">OFF WHITE</option>
-                  <option value="8">LILAC</option>
+                  <?php foreach ($warna as $item) : ?>
+                    <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
+                  <?php endforeach; ?>
                 </select>
               </div>
             </div>
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna3">Warna 3</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna3">Warna C</label>
               <div class="col-md-9">
-                <select id="po_warna3" name="po_warna3" class="form-select select2" data-placeholder="-- Pilih Warna 3 --">
+                <select id="po_warna3" name="po_warna3" class="form-select select2" data-placeholder="-- Pilih Warna C --">
                   <option value=""></option>
-                  <option value="1">MINT</option>
-                  <option value="2">OFF WHITE K</option>
-                  <option value="3">CREAM</option>
-                  <option value="4">HITAM</option>
-                  <option value="5">SMA</option>
-                  <option value="6">ROSE TUA</option>
-                  <option value="7">OFF WHITE</option>
-                  <option value="8">LILAC</option>
+                  <?php foreach ($warna as $item) : ?>
+                    <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
+                  <?php endforeach; ?>
                 </select>
               </div>
             </div>
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna4">Warna 4</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna4">Warna D</label>
               <div class="col-md-9">
-                <select id="po_warna4" name="po_warna4" class="form-select select2" data-placeholder="-- Pilih Warna 4 --">
+                <select id="po_warna4" name="po_warna4" class="form-select select2" data-placeholder="-- Pilih Warna D --">
                   <option value=""></option>
-                  <option value="1">MINT</option>
-                  <option value="2">OFF WHITE K</option>
-                  <option value="3">CREAM</option>
-                  <option value="4">HITAM</option>
-                  <option value="5">SMA</option>
-                  <option value="6">ROSE TUA</option>
-                  <option value="7">OFF WHITE</option>
-                  <option value="8">LILAC</option>
+                  <?php foreach ($warna as $item) : ?>
+                    <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
+                  <?php endforeach; ?>
                 </select>
               </div>
             </div>
-            <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna5">Warna 5</label>
-              <div class="col-md-9">
-                <select id="po_warna5" name="po_warna5" class="form-select select2" data-placeholder="-- Pilih Warna 5 --">
-                  <option value=""></option>
-                  <option value="1">MINT</option>
-                  <option value="2">OFF WHITE K</option>
-                  <option value="3">CREAM</option>
-                  <option value="4">HITAM</option>
-                  <option value="5">SMA</option>
-                  <option value="6">ROSE TUA</option>
-                  <option value="7">OFF WHITE</option>
-                  <option value="8">LILAC</option>
-                </select>
-              </div>
-            </div>
+
           </div>
           <div class="col-sm-6">
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna6">Warna 6</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna6">Warna E</label>
               <div class="col-md-9">
-                <select id="po_warna6" name="po_warna6" class="form-select select2" data-placeholder="-- Pilih Warna 6 --">
+                <select id="po_warna5" name="po_warna5" class="form-select select2" data-placeholder="-- Pilih Warna E --">
                   <option value=""></option>
-                  <option value="1">MINT</option>
-                  <option value="2">OFF WHITE K</option>
-                  <option value="3">CREAM</option>
-                  <option value="4">HITAM</option>
-                  <option value="5">SMA</option>
-                  <option value="6">ROSE TUA</option>
-                  <option value="7">OFF WHITE</option>
-                  <option value="8">LILAC</option>
+                  <?php foreach ($warna as $item) : ?>
+                    <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
+                  <?php endforeach; ?>
                 </select>
               </div>
             </div>
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna7">Warna 7</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna7">Warna F</label>
               <div class="col-md-9">
-                <select id="po_warna7" name="po_warna7" class="form-select select2" data-placeholder="-- Pilih Warna 7 --">
+                <select id="po_warna6" name="po_warna6" class="form-select select2" data-placeholder="-- Pilih Warna F --">
                   <option value=""></option>
-                  <option value="1">MINT</option>
-                  <option value="2">OFF WHITE K</option>
-                  <option value="3">CREAM</option>
-                  <option value="4">HITAM</option>
-                  <option value="5">SMA</option>
-                  <option value="6">ROSE TUA</option>
-                  <option value="7">OFF WHITE</option>
-                  <option value="8">LILAC</option>
+                  <?php foreach ($warna as $item) : ?>
+                    <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
+                  <?php endforeach; ?>
                 </select>
               </div>
             </div>
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna8">Warna 8</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna7">Warna G</label>
               <div class="col-md-9">
-                <select id="po_warna8" name="po_warna8" class="form-select select2" data-placeholder="-- Pilih Warna 8 --">
+                <select id="po_warna7" name="po_warna7" class="form-select select2" data-placeholder="-- Pilih Warna G --">
                   <option value=""></option>
-                  <option value="1">MINT</option>
-                  <option value="2">OFF WHITE K</option>
-                  <option value="3">CREAM</option>
-                  <option value="4">HITAM</option>
-                  <option value="5">SMA</option>
-                  <option value="6">ROSE TUA</option>
-                  <option value="7">OFF WHITE</option>
-                  <option value="8">LILAC</option>
+                  <?php foreach ($warna as $item) : ?>
+                    <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
+                  <?php endforeach; ?>
                 </select>
               </div>
             </div>
             <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna9">Warna 9</label>
+              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna9">Warna H</label>
               <div class="col-md-9">
-                <select id="po_warna9" name="po_warna9" class="form-select select2" data-placeholder="-- Pilih Warna 9 --">
+                <select id="po_warna8" name="po_warna8" class="form-select select2" data-placeholder="-- Pilih Warna H --">
                   <option value=""></option>
-                  <option value="1">MINT</option>
-                  <option value="2">OFF WHITE K</option>
-                  <option value="3">CREAM</option>
-                  <option value="4">HITAM</option>
-                  <option value="5">SMA</option>
-                  <option value="6">ROSE TUA</option>
-                  <option value="7">OFF WHITE</option>
-                  <option value="8">LILAC</option>
+                  <?php foreach ($warna as $item) : ?>
+                    <option value="<?= $item['id'] ?>"><?= $item['kode_warna'] ?></option>
+                  <?php endforeach; ?>
                 </select>
               </div>
             </div>
-            <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna10">Warna 10</label>
-              <div class="col-md-9">
-                <select id="po_warna10" name="po_warna10" class="form-select select2" data-placeholder="-- Pilih Warna 10 --">
-                  <option value=""></option>
-                  <option value="1">MINT</option>
-                  <option value="2">OFF WHITE K</option>
-                  <option value="3">CREAM</option>
-                  <option value="4">HITAM</option>
-                  <option value="5">SMA</option>
-                  <option value="6">ROSE TUA</option>
-                  <option value="7">OFF WHITE</option>
-                  <option value="8">LILAC</option>
-                </select>
-              </div>
-            </div>
+
           </div>
         </div>
 
@@ -290,7 +237,8 @@
         <h6 class="f-w-700">Quantity dan Harga per Ukuran</h6>
         <div class="row m-t-16">
           <div class="col-sm-12">
-            <div class="table-responsive">
+            <div id="dt-detail-qty" class="table-responsive table-striped"></div>
+            <div class="table-responsive d-none">
               <table class="table table-striped">
                 <thead>
                   <tr>
@@ -358,7 +306,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="m-s-5 btn btn-success" data-bs-toggle="modal" data-bs-target="#modal-form-add-po"> <i class="fa fa-save"></i> Simpan</button>
+        <button type="button" class="m-s-5 btn btn-success" id="btn-save-detail"> <i class="fa fa-save"></i> Simpan</button>
       </div>
     </div>
   </div>
