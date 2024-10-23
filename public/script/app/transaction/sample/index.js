@@ -263,8 +263,9 @@ $(document).ready(function () {
         onRendered(()=>{
             
             document.querySelector(`.edit[data-id='${data.id}']`).addEventListener('click', ()=>{
-                fileSample.val('')
+                fileSample.val(null)
                 linkFileSample.attr('src', "")
+                linkFileSample.addClass("d-none")
                 getDetail(data.id)
             });
             document.querySelector(`.delete[data-id='${data.id}']`).addEventListener('click', ()=>{
@@ -303,6 +304,7 @@ $(document).ready(function () {
 
     $("#btn-add").on("click", function(){
         inpData.val("")
+        linkFileSample.addClass("d-none")
         linkFileSample.attr('src', "")
         inpNoSample.val("")
         fileSampleOld.val("")
@@ -387,7 +389,12 @@ $(document).ready(function () {
                 inpBuyer.val(data.id_konsumen).trigger('change')
                 inpTglDeadline.val(formatterDate(data.tgl_deadline))
                 inpTglTransaksi.val(formatterDate(data.tgl_transaksi))
-               
+                if(data.file_gambar){
+                    fileSampleOld.val(data.gambar_id)
+                    linkFileSample.removeClass("d-none")
+                    linkFileSample.attr('src', data.file_gambar)
+                }
+                console.log(data.file_gambar)
                 dtListDetail.setData(data.detail)
                 isModal.modal("show");
 
@@ -500,14 +507,14 @@ $(document).ready(function () {
         if(inpBuyer.val().length == 0) validation = false
         if(inpTglDeadline.val().length == 0) validation = false
         if(inpTglTransaksi.val().length == 0) validation = false
-        if(fileSample[0].files[0] == undefined) validation = false
+        if(fileSample[0].files[0] == undefined && fileSampleOld.val().length == 0) validation = false
     
         if(validation){
             var formData = new FormData();
             formData.append("id",inpData.val());
             formData.append("noSample",inpNoSample.val());
             formData.append("deskripsi",inpDeskripsi.val());
-            formData.append("fileSample",fileSample[0].files[0]);
+            formData.append("fileSample",fileSample[0].files[0] == undefined ? null : fileSample[0].files[0] );
             formData.append("fileIdSampleOld",fileSampleOld.val());
             formData.append("idKonsumen",inpBuyer.val());
             formData.append("tglDeadline",formatLocaleDate(inpTglDeadline.val()));
@@ -632,6 +639,7 @@ $(document).ready(function () {
                         });
                         Swal.close();
                         getDetail(idSample)
+                        dtList.setData()
                         isModalPO.modal("hide");
                     }else{
                         Swal.fire({
