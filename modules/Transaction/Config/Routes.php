@@ -23,6 +23,11 @@ $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Control
   $routes->post('getSample', 'SalesOrder::getSampleBuyer');
 });
 
+$routes->group('trans/delivery-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
+  $routes->get('/', 'DeliveryOrder::index');
+  $routes->get('form', 'DeliveryOrder::form');
+});
+
 $routes->group('trans/work-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'WorkOrder::index');
   $routes->get('form', 'WorkOrder::form');
