@@ -315,6 +315,8 @@ $(document).ready(function () {
         inpTglDeadline.val("")
         inpKetSample.val("")
         rowDet.hide()
+        $("#btn-save").hide()
+        $("#btn-draft").show()
         isModal.modal("show");
     });
 
@@ -334,7 +336,11 @@ $(document).ready(function () {
 
     $("#btn-save").on("click", function(e){
         e.preventDefault()
-        simpanData()
+        simpanData(1)
+    });
+    $("#btn-draft").on("click", function(e){
+        e.preventDefault()
+        simpanData(0)
     });
     $("#btn-save-detail").on("click", function(e){
         e.preventDefault()
@@ -381,6 +387,13 @@ $(document).ready(function () {
             success: function(data) {
                 idSample = id
                 rowDet.show()
+                if(data.status == 1){
+                    $("#btn-save").hide()
+                    $("#btn-draft").hide()
+                } else{
+                    $("#btn-save").show()
+                    $("#btn-draft").show()
+                }
                 inpData.val(data.id)
                 inpDeskripsi.val(data.deskripsi)
                 inpNoSample.val(data.kode_sample)
@@ -394,7 +407,7 @@ $(document).ready(function () {
                     linkFileSample.removeClass("d-none")
                     linkFileSample.attr('src', data.file_gambar)
                 }
-                console.log(data.file_gambar)
+                
                 dtListDetail.setData(data.detail)
                 isModal.modal("show");
 
@@ -499,7 +512,7 @@ $(document).ready(function () {
         
     }
     
-    function simpanData() {
+    function simpanData(status) {
         
         let validation = true
         if(inpNoSample.val().length == 0) validation = false
@@ -512,6 +525,7 @@ $(document).ready(function () {
         if(validation){
             var formData = new FormData();
             formData.append("id",inpData.val());
+            formData.append("status",status);
             formData.append("noSample",inpNoSample.val());
             formData.append("deskripsi",inpDeskripsi.val());
             formData.append("fileSample",fileSample[0].files[0] == undefined ? null : fileSample[0].files[0] );

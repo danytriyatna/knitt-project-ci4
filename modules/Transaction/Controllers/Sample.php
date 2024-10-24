@@ -120,6 +120,7 @@ class Sample extends BaseController
       "tgl_deadline" => $results->tgl_deadline,
       "deskripsi" => $results->deskripsi,
       "gambar_id" => $results->gambar_id,
+      "status" => $results->status,
       "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
       "detail" => $this->mSample->getDataDetailSample($results->id)
     );
@@ -157,6 +158,7 @@ class Sample extends BaseController
     $keterangan = $this->request->getPost('deskripsi');
     $fileIdSampleOld = $this->request->getPost('fileIdSampleOld');
     $noSample = $this->request->getPost('noSample');
+    $stat = $this->request->getPost('status');
 
 
     $this->validation->setRules([
@@ -212,13 +214,13 @@ class Sample extends BaseController
       'tgl_deadline' => $tglDeadline,
       'kode_sample' => $noSample,
       'active' => 1,
+      'status' => $stat,
       'gambar_id' => !empty($fileIdSample) ? $fileIdSample : null
     ];
 
 
     if (empty($id)) {
       $arr_isi['created_at'] = date("Y-m-d H:i:s");
-      $arr_isi['status'] = 0;
       $this->mSample->insertRecordGetid($this->mSample->table, $arr_isi);
       $msg    = "Data berhasil ditambahkan !";
       $status = true;
