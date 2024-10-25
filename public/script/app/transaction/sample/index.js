@@ -2,7 +2,6 @@
 
 $(document).ready(function () {
     let inpData         = $('#data_id');
-    let inpNoSample = $('#no_sample');
     let inpDeskripsi       = $('#desc_style');
     let inpBuyer         = $('#select_buyer');
     let inpTglTransaksi       = $('#tgl_sample');
@@ -32,14 +31,26 @@ $(document).ready(function () {
     let isModalPO      = $("#modal-form-po");
     var idSample = null
     var idSampleDet = null
+    var status = null
+
+    let buttonQRAction = function(cell){
+       if(cell.getData().id){
+           let fmBtnQRCode = "";
+           fmBtnQRCode = ` <button type="button" class="btn btn-sm btn-info" title='qr code'><i class="fa fa-print" title='qr code'></i></button>`;
+           return fmBtnQRCode;
+        }
+    }
 
     let buttonRowAction = function(cell) {
         let fmBtnDelete = "";        
         let fmBtnEdit = "";        
+
+        if (status == 0){
+            fmBtnDelete = `<button type="button" class="btn btn-sm btn-danger" title='delete'><i class="fa fa-trash" title='delete'></i></button>`;
+        }
        
-     
-        fmBtnDelete = `<button type="button" class="btn btn-sm btn-danger" title='delete'><i class="fa fa-trash" title='delete'></i></button>`;
         fmBtnEdit = ` <button type="button" class="btn btn-sm btn-warning text-dark" title='edit'><i class="fa fa-edit" title='edit'></i></button>`;
+
         return fmBtnEdit + " " + fmBtnDelete;
     };
 
@@ -47,8 +58,9 @@ $(document).ready(function () {
         columns: [
             {formatter: cardFormatter, hozAlign:"center", widthGrow: 1,headerSort: false},
         ],
+        responsiveLayout: true, // Untuk membuat tabel responsif
+        layout: "fitColumns",
         locale: 'id',    
-        layout: 'fitColumns',
         ajaxURL: "/trans/sample/list",
         ajaxConfig: "POST",
         sortMode: "remote",
@@ -104,7 +116,7 @@ $(document).ready(function () {
                 headerSort: false,  
                 title: 'Aksi', 
                 formatter: buttonRowAction,
-                width: 100, align: "center", cssClass: "text-center",
+                width: '15%', align: "center", cssClass: "text-center",
                 cellClick: function(e, cell) {
                     let row = cell.getRow();
                     let data_row = row.getData();
@@ -115,7 +127,7 @@ $(document).ready(function () {
                         }
                     }else if(e.target.title === 'edit'){
                         getDetailQty(idSample,data_row.id)
-                    }   
+                    } 
                 }
             },
             {title:"Colour", field:"colour", width:"40%"},
@@ -153,6 +165,19 @@ $(document).ready(function () {
         paginationButtonCount: 5,
         columns:[
             {title:"ID", field:"id", visible:false},
+            {
+                headerSort: false,  
+                title: 'Aksi', 
+                formatter: buttonQRAction,
+                width: '10%', align: "center", cssClass: "text-center",
+                cellClick: function(e, cell) {
+                    let row = cell.getRow();
+                    let data_row = row.getData();
+                    if (e.target.title === 'qr code') {
+                        generateQRCode(data_row)
+                    } 
+                }
+            },
             {title:"No",formatter: "rownum",hozAlign: "center", width:"5%"},
             {title:"id_ukuran", field:"id_ukuran", hozAlign:"center",width:"7%",visible:false},
             {title:"Ukuran", field:"ukuran", hozAlign:"center",width:"23%"},
@@ -251,7 +276,7 @@ $(document).ready(function () {
                         <p class="m-y-0">${formatterDate(data.tgl_transaksi)}</p>
                         <p class="m-y-0"><em>Deadline: ${formatterDate(data.tgl_deadline)}</em></p>
                         <p class="f-w-700 m-t-4">${data.nama}</p>
-                        <img class="m-t-10 w-20" src="${data.file_gambar}" alt="Foto Sample">
+                        <img class="m-t-10 w-100" src="${data.file_gambar}" alt="Foto Sample">
                       </div>
                       <div class="col-sm-9">
                            <div id="dt-list-detail-${data.id}" class="table-responsive table-striped"></div>
@@ -306,7 +331,6 @@ $(document).ready(function () {
         inpData.val("")
         linkFileSample.addClass("d-none")
         linkFileSample.attr('src', "")
-        inpNoSample.val("")
         fileSampleOld.val("")
         fileSample.val("")
         inpDeskripsi.val("")
@@ -336,7 +360,9 @@ $(document).ready(function () {
 
     $("#btn-save").on("click", function(e){
         e.preventDefault()
-        simpanData(1)
+        if (confirm("Anda yakin akan mengsubmit data?")) {
+            simpanData(1)
+        }
     });
     $("#btn-draft").on("click", function(e){
         e.preventDefault()
@@ -386,17 +412,19 @@ $(document).ready(function () {
             dataType: 'json', 
             success: function(data) {
                 idSample = id
+                status = data.status
                 rowDet.show()
                 if(data.status == 1){
                     $("#btn-save").hide()
                     $("#btn-draft").hide()
+                    $("#btn-add-detail").hide()
                 } else{
                     $("#btn-save").show()
                     $("#btn-draft").show()
+                    $("#btn-add-detail").show()
                 }
                 inpData.val(data.id)
                 inpDeskripsi.val(data.deskripsi)
-                inpNoSample.val(data.kode_sample)
                 fileSampleOld.val(data.gambar_id)
                 inpKetSample.val(data.keterangan)
                 inpBuyer.val(data.id_konsumen).trigger('change')
@@ -427,6 +455,11 @@ $(document).ready(function () {
             dataType: 'json', 
             success: function(data) {
                 isModal.modal("hide")
+                if(status == 1){
+                    $("#btn-save-detail").hide()
+                } else{
+                    $("#btn-save-detail").show()
+                }
                 noSampleText.html(data.kode_sample)
                 deskripsiText.html(data.deskripsi)
                 tglSampleText.html(formatterDate(data.tgl_transaksi))
@@ -457,6 +490,83 @@ $(document).ready(function () {
         });
     }
 
+    function generateQRCode(data){
+        $.ajax({
+            type: 'POST',
+            url: '/trans/sample/generate',
+            data:{data:JSON.stringify(data)},
+            dataType: "json",
+            beforeSend: function () {
+                Swal.fire({
+                    title: 'Loading...',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    onBeforeOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+            },
+            success: function (response) {
+    
+                if(response.status == true){
+                    Swal.fire({
+                        text: response.message,
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    const blob = base64ToBlob(response.file_base64, 'image/png');
+                    const url = URL.createObjectURL(blob);
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = url;  
+                    downloadLink.download = response.file_name; 
+
+                    downloadLink.click();
+                
+                    URL.revokeObjectURL(url);
+                    Swal.close();
+                
+                }else{
+                    Swal.fire({
+                        text: response.message,
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            },
+            error: function (e) {
+                let msg = e.responseJSON.message;
+                Swal.close();
+    
+                Swal.fire({
+                    text: msg,
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            },
+        });
+    }
+
+    function base64ToBlob(base64, contentType = '', sliceSize = 512) {
+        const byteCharacters = atob(base64); // Hapus prefix "data:image/png;base64,"
+        const byteArrays = [];
+    
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            const slice = byteCharacters.slice(offset, offset + sliceSize);
+            const byteNumbers = new Array(slice.length);
+            
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+    
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+        }
+    
+        return new Blob(byteArrays, { type: contentType });
+    }
 
     function deleteData($id) {
         
@@ -515,7 +625,6 @@ $(document).ready(function () {
     function simpanData(status) {
         
         let validation = true
-        if(inpNoSample.val().length == 0) validation = false
         if(inpDeskripsi.val().length == 0) validation = false
         if(inpBuyer.val().length == 0) validation = false
         if(inpTglDeadline.val().length == 0) validation = false
@@ -526,7 +635,6 @@ $(document).ready(function () {
             var formData = new FormData();
             formData.append("id",inpData.val());
             formData.append("status",status);
-            formData.append("noSample",inpNoSample.val());
             formData.append("deskripsi",inpDeskripsi.val());
             formData.append("fileSample",fileSample[0].files[0] == undefined ? null : fileSample[0].files[0] );
             formData.append("fileIdSampleOld",fileSampleOld.val());
@@ -534,6 +642,13 @@ $(document).ready(function () {
             formData.append("tglDeadline",formatLocaleDate(inpTglDeadline.val()));
             formData.append("tglTransaksi",formatLocaleDate(inpTglTransaksi.val()));
             formData.append("keterangan",inpKetSample.val());
+            let data = dtListDetail.getData()
+            if (data){
+                const totalHarga = data.reduce((sum, item) => sum + parseFloat(item.harga_satuan), 0);
+                const totalQty = data.reduce((sum, item) => sum + parseInt(item.s) +parseInt(item.m)+parseInt(item.l)+parseInt(item.xl)+parseInt(item.xxl)+parseInt(item.xxxl)+parseInt(item.all)     , 0);
+                formData.append("qty",totalQty)
+                formData.append("hargaTotal",totalHarga)
+            }
             $.ajax({
                 type: 'POST',
                 url: '/trans/sample/save',

@@ -28,7 +28,7 @@ class BaseController extends Controller
 	 *
 	 * @var array
 	 */
-	protected $helpers = ['path','form','html','text','encrypter'];
+	protected $helpers = ['path', 'form', 'html', 'text', 'encrypter', 'utils'];
 
 	protected $MOD_ALIAS = null;
 	protected $auth = null;
@@ -41,8 +41,8 @@ class BaseController extends Controller
 	protected $currentUser = null;
 	protected $role = null;
 	protected $encrypter = null;
-    protected $crud;
-    protected $_new,$_edit,$_delete,$_print,$_approve;
+	protected $crud;
+	protected $_new, $_edit, $_delete, $_print, $_approve;
 	protected $session;
 	protected $validation;
 	protected $data;
@@ -67,96 +67,96 @@ class BaseController extends Controller
 		$this->session 		= \Config\Services::session();
 		$this->auth 		= new \App\Libraries\CIonAuth();
 		$this->menulib 		= new \App\Libraries\MenuLib();
-        $this->mauth 		= new \IonAuth\Models\IonAuthModel();
-        $this->mcommon 		= new \App\Models\Mcommon();
-        $this->files 		= new \App\Models\FileModel();
-        $this->situs 		= new \Modules\Utility\Models\SitusModel();
+		$this->mauth 		= new \IonAuth\Models\IonAuthModel();
+		$this->mcommon 		= new \App\Models\Mcommon();
+		$this->files 		= new \App\Models\FileModel();
+		$this->situs 		= new \Modules\Utility\Models\SitusModel();
 		$this->validation 	= \Config\Services::validation();
 		$this->encrypter 	= \Config\Services::encrypter();
-		
+
 		$this->currentUser 	= $this->auth->user()->row();
 		$this->role = $this->mauth->getUsersGroups()->getRow();
-		
+
 		$this->data['currentUser'] = $this->currentUser;
 		$this->auth->setSession($this->role);
-        $this->_checkAuthorization($this->MOD_ALIAS);   
-        $this->setMenu();   
-        $this->setSitus();   
+		$this->_checkAuthorization($this->MOD_ALIAS);
+		$this->setMenu();
+		$this->setSitus();
 	}
 
 	protected function _checkAuthorization($MOD_ALIAS)
-    {
-        $this->MOD_ALIAS = $MOD_ALIAS;
-        $isAuthorized = false;
+	{
+		$this->MOD_ALIAS = $MOD_ALIAS;
+		$isAuthorized = false;
 		$user_id = $this->session->get('user_id');
-        $role_id = $this->session->get('role_id');
+		$role_id = $this->session->get('role_id');
 
 		if (!$this->auth->loggedIn()) {
-            return redirect()->to('/auth/login');
-        } else {
-			if ($this->MOD_ALIAS == "MOD_HOME" OR $this->mcommon->checkMenuAccess($role_id, $this->MOD_ALIAS)) {
+			return redirect()->to('/auth/login');
+		} else {
+			if ($this->MOD_ALIAS == "MOD_HOME" or $this->mcommon->checkMenuAccess($role_id, $this->MOD_ALIAS)) {
 				$isAuthorized = true;
-            }
-        }
+			}
+		}
 
-        if (!$isAuthorized) {
+		if (!$isAuthorized) {
 			return redirect()->to('/');
-        }else{
-            $this->crud = $this->mcommon->getMenuAccessCRUD($role_id, $this->MOD_ALIAS);
-            if($this->crud !=null) {
-                $this->_new = $this->crud->allow_new;
-                $this->_edit = $this->crud->allow_edit;
-                $this->_delete = $this->crud->allow_delete;
-                $this->_print = $this->crud->allow_print;
-                $this->_approve = $this->crud->allow_approve;
-            }else{
-                $this->_new = false;
-                $this->_edit =  false;
-                $this->_delete =  false;
-                $this->_print =  false;
-                $this->_approve =  false;
-            }
-
-        }
-
-    }
-
-	public function setSitus(){
-		$situs = $this->situs->getData();
-		$this->data['name_app'] = ($situs)?$situs->name_app : "NO DATA";
-		$this->data['deskripsi'] = ($situs)?$situs->description : "NO DATA";
-		$this->data['judul'] = ($situs)?$situs->title : "NO DATA";
-		$this->data['foot'] = ($situs)?$situs->footer : "NO DATA";
-		$this->data['logo'] = ($situs && $situs->file_id_logo)?$this->files->getFiles($situs->file_id_logo)->file_name : "";
-		$this->data['logo_text'] = ($situs && $situs->file_id_logo_text)?$this->files->getFiles($situs->file_id_logo_text)->file_name : "";
-		$this->data['avatar'] = ($this->currentUser && $this->files->getFiles($this->currentUser->file_id_photo))?$this->files->getFiles($this->currentUser->file_id_photo)->file_name : "";
+		} else {
+			$this->crud = $this->mcommon->getMenuAccessCRUD($role_id, $this->MOD_ALIAS);
+			if ($this->crud != null) {
+				$this->_new = $this->crud->allow_new;
+				$this->_edit = $this->crud->allow_edit;
+				$this->_delete = $this->crud->allow_delete;
+				$this->_print = $this->crud->allow_print;
+				$this->_approve = $this->crud->allow_approve;
+			} else {
+				$this->_new = false;
+				$this->_edit =  false;
+				$this->_delete =  false;
+				$this->_print =  false;
+				$this->_approve =  false;
+			}
+		}
 	}
-	
-	public function setMenu(){
+
+	public function setSitus()
+	{
+		$situs = $this->situs->getData();
+		$this->data['name_app'] = ($situs) ? $situs->name_app : "NO DATA";
+		$this->data['deskripsi'] = ($situs) ? $situs->description : "NO DATA";
+		$this->data['judul'] = ($situs) ? $situs->title : "NO DATA";
+		$this->data['foot'] = ($situs) ? $situs->footer : "NO DATA";
+		$this->data['logo'] = ($situs && $situs->file_id_logo) ? $this->files->getFiles($situs->file_id_logo)->file_name : "";
+		$this->data['logo_text'] = ($situs && $situs->file_id_logo_text) ? $this->files->getFiles($situs->file_id_logo_text)->file_name : "";
+		$this->data['avatar'] = ($this->currentUser && $this->files->getFiles($this->currentUser->file_id_photo)) ? $this->files->getFiles($this->currentUser->file_id_photo)->file_name : "";
+	}
+
+	public function setMenu()
+	{
 		$menu = $this->menulib->showMenu();
-		
-        if($this->session->get('mode_penyamaran')){
-            $addMenu = "<li>
-                <a href='".base_url('go-to/admin')."' class='waves-effect waves-dark'>
+
+		if ($this->session->get('mode_penyamaran')) {
+			$addMenu = "<li>
+                <a href='" . base_url('go-to/admin') . "' class='waves-effect waves-dark'>
                 <i class='icon-cursor'></i>
                 <span class='hide-menu'> Go to Admin </span>
                 </a>
             </li>";
-    
-            $menu = substr_replace($menu, $addMenu, -5, 0);
-        }
+
+			$menu = substr_replace($menu, $addMenu, -5, 0);
+		}
 
 		$this->data['menus'] = $menu;
 	}
 
 	public function _get_sess_csrf()
-    {
-        $key = random_string('alnum', 8);
-        $value = random_string('alnum', 20);
-        $this->session->set('csrfkey', $key);
-        $this->session->set('csrfvalue', $value);
-        return array($key => $value);
-    }
+	{
+		$key = random_string('alnum', 8);
+		$value = random_string('alnum', 20);
+		$this->session->set('csrfkey', $key);
+		$this->session->set('csrfvalue', $value);
+		return array($key => $value);
+	}
 
 	public function validation_msg_error()
 	{

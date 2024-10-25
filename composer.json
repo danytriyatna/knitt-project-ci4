@@ -8,7 +8,9 @@
 		"php": "^7.3||^8.0",
 		"codeigniter4/framework": "4.3.4",
 		"benedmunds/codeigniter-ion-auth": "4.x-dev",
-		"firebase/php-jwt": "dev-main"
+		"firebase/php-jwt": "dev-main",
+		"endroid/qr-code": "^6.0@dev",
+		"khanamiryan/qrcode-detector-decoder": "dev-master"
 	},
 	"suggest": {
 		"ext-fileinfo": "Improves mime type detection for files"

@@ -13,15 +13,7 @@
         <div class="alert alert-secondary p-y-8 text-muted">
           <i>*) Wajib diisi</i>
         </div>
-        <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="no_sample">Sample No.<span class="text-danger">*</span></label>
-          <div class="col-md-9">
-            <input type="text" id="no_sample" name="no_sample" class="form-control" placeholder="Ketikkan nomor sample" value="" required>
-            <div class="invalid-feedback">
-              Sample No. tidak valid
-            </div>
-          </div>
-        </div>
+
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_style">Description<span class="text-danger">*</span></label>
           <div class="col-md-9">

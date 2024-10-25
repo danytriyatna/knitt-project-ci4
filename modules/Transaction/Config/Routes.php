@@ -8,6 +8,7 @@ $routes->group('trans/sample', ['namespace' => 'Modules\Transaction\Controllers'
   $routes->post('save', 'Sample::save');
   $routes->post('save-detail', 'Sample::saveDetail');
   $routes->get('delete/list(:any)', 'Sample::deleteList/$1');
+  $routes->post('generate', 'Sample::generateQRCode');
   $routes->post('delete/detail', 'Sample::deleteDetailList');
 });
 
