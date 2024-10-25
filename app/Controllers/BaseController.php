@@ -28,7 +28,7 @@ class BaseController extends Controller
 	 *
 	 * @var array
 	 */
-	protected $helpers = ['path','form','html','text','encrypter'];
+	protected $helpers = ['path','form','html','text','encrypter', 'utils_helper'];
 
 	protected $MOD_ALIAS = null;
 	protected $auth = null;

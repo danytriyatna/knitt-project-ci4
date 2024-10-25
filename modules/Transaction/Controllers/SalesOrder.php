@@ -9,6 +9,7 @@ use Modules\Referensi\Models\KonsumenModel;
 use Modules\Referensi\Models\UkuranModel;
 use Modules\Referensi\Models\WarnaModel;
 use Modules\Transaction\Models\SampleModel;
+use Modules\Transaction\Models\WalkorderModel;
 use App\Models\FileModel;
 
 class SalesOrder extends BaseController
@@ -19,6 +20,7 @@ class SalesOrder extends BaseController
   protected $files;
   protected $mUkuran;
   protected $mWarna;
+  protected $mworkOrder;
 
   protected $views = '\Modules\Transaction\Views';
   protected $urlv  = 'trans/sales_order';
@@ -33,6 +35,7 @@ class SalesOrder extends BaseController
     $this->mUkuran = new UkuranModel();
     $this->mWarna = new WarnaModel();
     $this->mSample = new SampleModel();
+    $this->mworkOrder = new WalkorderModel();
   }
 
 
@@ -94,6 +97,8 @@ class SalesOrder extends BaseController
       // $aktif =  ($row->active) ? "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/deactivate/".$id."' data-confirm-message='Anda yakin ingin menonaktifkan user ini?'><i class='fa fa-check text-success'>&nbsp;</i></a>" :
       //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
 
+      $status = $row->status == 1 ? "Draft" : "Submit";
+
       array_push(
         $build_array["data"],
         array(
@@ -104,6 +109,7 @@ class SalesOrder extends BaseController
           "kode_sales_order" => $row->kode_sales_order,
           "tgl_deadline" => $row->tgl_deadline,
           "deskripsi" => $row->deskripsi,
+          "status"  => $status,
           "file_gambar" => !empty($row->file_name) ? base_url() . "uploads/sales_order/"  . $row->file_name : "",
           "detail" => $this->mSalesOrder->getDataDetailSalesOrder($row->id)
         )
@@ -116,6 +122,7 @@ class SalesOrder extends BaseController
   {
     $id = decrypt($id);
     $results = $this->mSalesOrder->getData($id);
+    $status = $results->status == 1 ? "Draft" : "Submit";
     $build_array =  array(
       "id"   => encrypt($results->id),
       "keterangan" => $results->keterangan,
@@ -127,6 +134,7 @@ class SalesOrder extends BaseController
       "gambar_id" => $results->gambar_id,
       "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sales_order/" . $results->file_name : "",
       "id_sample" => $results->id_sample,
+      "status" => $status,
       "detail" => $this->mSalesOrder->getDataDetailSalesOrder($results->id)
     );
     return $this->response->setJSON($build_array);
@@ -164,6 +172,7 @@ class SalesOrder extends BaseController
     $fileIdSalesOrderOld = $this->request->getPost('fileIdSalesOrderOld');
     $noSalesOrder = $this->request->getPost('noSalesOrder');
     $sampleId = $this->request->getPost('samples');
+    $submit_data = $this->request->getPost('submit_data');
 
 
     $this->validation->setRules([
@@ -199,11 +208,13 @@ class SalesOrder extends BaseController
       $fileSalesOrder->move(WRITEPATH . 'uploads/sales_order/', $fileName);
 
       if ($fileIdSalesOrderOld != "") {
-        $nama_file =  $this->files->where('id', $fileIdSalesOrderOld)->get()->getRow()->file_name;
-        unlink(WRITEPATH . 'uploads/sales_order/' . $nama_file);
+        // $nama_file =  $this->files->where('id', $fileIdSalesOrderOld)->get()->getRow()->file_name;
+        // unlink(WRITEPATH . 'uploads/sales_order/' . $nama_file);
 
-        $this->files->delete(['id' => $fileIdSalesOrderOld]);
+        // $this->files->delete(['id' => $fileIdSalesOrderOld]);
       }
+    }else{
+      $fileIdSalesOrder = $fileIdSalesOrderOld;
     }
 
     $msg    = "Data gagal ditambahkan !";
@@ -215,18 +226,19 @@ class SalesOrder extends BaseController
       'deskripsi' => $deskripsi,
       'tgl_transaksi' => $tglTransaksi,
       'tgl_deadline' => $tglDeadline,
-      'kode_sales_order' => $noSalesOrder,
+      // 'kode_sales_order' => $noSalesOrder,
       'active' => 1,
       'gambar_id' => !empty($fileIdSalesOrder) ? $fileIdSalesOrder : null
     ];
 
+    if(!empty($submit_data)){
+      $arr_isi['status'] = 2;
+    }
+    $this->db->transBegin();
 
-
-
-    if (empty($id)) {
-      $this->db->transBegin();
+    if (empty($id)) {  
       $arr_isi['created_at'] = date("Y-m-d H:i:s");
-      $arr_isi['status'] = 0;
+      $arr_isi['kode_sales_order'] = $this->mSalesOrder->generete_kode();
       $hid = $this->mSalesOrder->insertRecordGetid($this->mSalesOrder->table, $arr_isi);
 
       if(!empty($sampleId)){
@@ -265,19 +277,68 @@ class SalesOrder extends BaseController
         }
       }
 
-      if ($this->db->transStatus() === FALSE) {
-        $this->db->transRollback();
-      } else {
-          $this->db->transCommit();
-          $msg    = "Data berhasil ditambahkan !";
-          $status = true;
-      }
+     
     } else {
       $arr_isi['updated_at'] = date("Y-m-d H:i:s");
       $id = decrypt($id);
       $this->mSalesOrder->updateRecord($this->mSalesOrder->table, $arr_isi, 'id', $id);
-      $msg    = "Data berhasil diupdate !";
-      $status = true;
+
+      if(!empty($submit_data)){
+        $allQty = $this->mSalesOrder->getTotal_qty($id, 1);
+        $wo_data = [
+          'kode_walkorder' => $this->mworkOrder->generete_kode(),
+          'ref_id' => $id,
+          'ref_kode' => $noSalesOrder,
+          'id_konsumen' => $idKonsumen,
+          'keterangan_style' => $keterangan,
+          'tgl_deadline' => $tglDeadline,
+          'tgl_transaksi' => date("Y-m-d"),
+          // 'id_style' => $id,
+          'qty' => !empty($allQty) ? $allQty : 0,
+          'tipe_id' => 2,
+          'file_id' => !empty($fileIdSalesOrder) ? $fileIdSalesOrder : null,
+          'status' => 1,
+          'created_at' => date("Y-m-d H:i:s")
+        ];
+
+        $wo_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table, $wo_data);
+
+        // detail data 
+        $data_warna = $this->mSalesOrder->getDataDetailSalesOrder_ori($id);
+        
+        if(!empty($data_warna)){
+            foreach ($data_warna as $xrow) {
+              $detail_wo = [
+                'id_walkorder' => $wo_id,
+                'ref_detail_id' => $xrow->id,
+                'tipe_id' => 2,
+                'created_at' => date("Y-m-d H:i:s")
+              ];
+
+              $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
+
+              for ($i=0; $i < 8 ; $i++) { 
+                $field_name = 'id_warna_' . ($i + 1);
+                if(!empty($xrow->$field_name)){
+                  $isi_warna = [
+                    'id_walkorder_detail' => $wo_det_id,
+                    'id_warna' => $xrow->$field_name,
+                    'created_at' => date("Y-m-d H:i:s")
+                  ];
+                  $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
+                }
+              }
+            }
+        }
+      }
+    }
+
+    if ($this->db->transStatus() === FALSE) {
+        $this->db->transRollback();
+    } else {
+        $this->db->transCommit();
+        $msg    = "Data berhasil ditambahkan !";
+        $status = true;
     }
 
     $build_array['message'] = $msg;

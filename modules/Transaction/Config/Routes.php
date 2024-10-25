@@ -25,12 +25,13 @@ $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Control
 
 $routes->group('trans/delivery-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'DeliveryOrder::index');
-  $routes->get('form', 'DeliveryOrder::form');
+  $routes->get('form/(:any)', 'DeliveryOrder::form/$1');
 });
 
 $routes->group('trans/work-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'WorkOrder::index');
-  $routes->get('form', 'WorkOrder::form');
+  $routes->post('list', 'WorkOrder::lists');
+  $routes->get('form/(:any)', 'WorkOrder::form/$1');
 });
 
 $routes->group('trans/production', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
