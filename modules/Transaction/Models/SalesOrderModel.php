@@ -33,7 +33,7 @@ class SalesOrderModel extends \App\Models\PrModel
             if (!empty($order)) {
                 $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
             } else {
-                $builder->orderBy('abx.id');
+                $builder->orderBy('abx.id DESC');
             }
 
             if (empty($offset)) $offset = 0;
@@ -223,5 +223,35 @@ class SalesOrderModel extends \App\Models\PrModel
             $this->db->transRollback();
             throw $e;
         }
+    }
+
+
+    function generete_kode(){
+        $kd = "SOD";
+        $builder = $this->db->table($this->table . ' a');
+        $builder->select('LEFT(kode_sales_order, 7) AS tgl, RIGHT( kode_sales_order, 4 ) AS kode ');
+
+        $builder->orderBy('a.id', "DESC");
+        $builder->limit(1);
+        $query = $builder->get()->getRow();
+       
+        if ($query != NULL) {
+            if ($query->tgl == $kd . date('y') . date('m')) {     //cek dulu apakah ada sudah ada tahun dan bulan di tabel.   
+                //jika tahun dan bulan ternyata sudah ada.      
+                // $data = $query->row();
+                $kode = intval($query->kode) + 1;
+            } else {
+                //jika tahun dan belum ada      
+                $kode = 1;
+            }
+        } else {
+            $kode = 1;
+        }
+
+        $kodemax = str_pad($kode, 5, "0", STR_PAD_LEFT); // angka 3 menunjukkan jumlah digit angka 0
+        $kodejadi = $kd . date('y') . date('m') . $kodemax;
+        
+        // hasilnya SOD24100001 dst.
+        return $kodejadi;
     }
 }
