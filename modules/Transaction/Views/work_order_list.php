@@ -1,9 +1,5 @@
 <?= $this->extend('template'); ?>
 
-<?= $this->section('modal') ?>
-
-<?= $this->endSection('modal') ?>
-
 <?= $this->section('content'); ?>
 
 <div class="container-fluid">
@@ -39,61 +35,18 @@
                 </select>
               </div>
             </div>
+            <div class="col-sm-4 offset-md-5">
+              <div class="form-group">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-white" id="basic-addon11" style="border-right-width: 0px;"><i class="ti-search"></i></span>
+                  <input type="text" id="tb-search" class="form-control p-s-0" id="tb-search" placeholder="Pencarian" aria-describedby="basic-addon11" style="border-left-width: 0px;">
+                </div>
+              </div>
+            </div>
           </div>
           <hr>
           <div class="table-responsive">
-            <table class="table table-striped datatable">
-              <thead>
-                <tr>
-                  <th style="min-width: 105px; width: 105px;">
-                    <!-- <a href="trans/work-order/form" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Tambah</a> -->
-                  </th>
-                  <th>WO DATE</th>
-                  <th>SO NO.</th>
-                  <th>SO DATE</th>
-                  <th>DEADLINE</th>
-                  <th>BUYER</th>
-                  <th>STYLE</th>
-                  <th>SO QTY</th>
-                  <th>WO QTY</th>
-                  <th>PROD RESUT</th>
-                  <th>REMAIN QTY</th>
-                  <th>PROD STATUS</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php for($i = 0; $i < 3; $i++) : ?>
-                <tr>
-                  <td>
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-default btn-sm dropdown-toggle"
-                        data-bs-toggle="dropdown">
-                        <i class="fas fa-cog"></i> Aksi <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu dropdown-menu-act" role="menu">
-                        <li><a href="trans/work-order/form" title="Edit"><i class="fa fa-fw fa-edit"></i> Edit</a></li>
-                        <li><a href="javascript:void(0)" title="Hapus"><i class="fa fa-fw fa-trash"></i> Hapus</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                  <td>01-10-2024</td>
-                  <td>SOD2410001</td>
-                  <td>01-10-2024</td>
-                  <td>31-10-2024</td>
-                  <td>YUSUF</td>
-                  <td>K-17 (CARDIGAN PITA)</td>
-                  <td>1.000</td>
-                  <td>1.000</td>
-                  <td>1.000</td>
-                  <td></td>
-                  <td>
-                    <span class="badge bg-secondary">DRAFT</span>
-                  </td>
-                </tr>
-                <?php endfor; ?>
-              </tbody>
-            </table>
+            <div class="table-striped" id="dt-list"> </div>
           </div>
         </div>
       </div>
@@ -102,3 +55,7 @@
 </div>
 
 <?= $this->endSection('content'); ?>
+
+<?= $this->section('script'); ?>
+<script src="script/app/transaction/walkorder/index.js"></script>
+<?= $this->endSection('script'); ?>

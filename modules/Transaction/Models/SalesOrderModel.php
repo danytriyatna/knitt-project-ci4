@@ -225,6 +225,19 @@ class SalesOrderModel extends \App\Models\PrModel
         }
     }
 
+    function getTotal_qty($trans_id, $tipe){
+        $builder = $this->db->table("trans_sales_order_ukuran tsu");
+        $builder->select("sum(tsu.qty) as cnt");
+        $builder->join("trans_sales_order_det td", "td.id = tsu.id_sales_order_det");
+        if($tipe == 1){
+            $builder->where("td.id_sales_order", $trans_id);
+        }else{
+            $builder->where("tsu.id_sales_order_det", $trans_id);
+        }
+        $this->_data = $builder->get()->getRow();
+        return $this->_data->cnt;
+    }
+
 
     function generete_kode(){
         $kd = "SOD";

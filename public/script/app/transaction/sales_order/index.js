@@ -33,10 +33,11 @@ $(document).ready(function () {
     var idSalesOrder = null
     var idSalesOrderDet = null
 
+    let btnSend = $("#btn-send");
+
     let buttonRowAction = function(cell) {
         let fmBtnDelete = "";        
         let fmBtnEdit = "";        
-       
      
         fmBtnDelete = `<button type="button" class="btn btn-sm btn-danger" title='delete'><i class="fa fa-trash" title='delete'></i></button>`;
         fmBtnEdit = ` <button type="button" class="btn btn-sm btn-warning text-dark" title='edit'><i class="fa fa-edit" title='edit'></i></button>`;
@@ -61,6 +62,7 @@ $(document).ready(function () {
         sortMode: "remote",
         filterMode: "remote",
         placeholder: "Tidak ada data",
+        height: '1200px',
         ajaxRequesting: function (url, params) {
             params.start = params.size * (params.page - 1);
             params.length = params.size;
@@ -208,44 +210,44 @@ $(document).ready(function () {
     }
 
     function cardFormatter(cell, formatterParams, onRendered){
-        var data = cell.getRow().getData(); // Ambil data row
+        let data = cell.getRow().getData(); // Ambil data row
+        let status = '';
+        let aksi = '';
+        if(data.status == 'Draft'){
+         status = ` <i class="fa fa-dot-circle f-s-20 text-muted m-e-6"></i>
+                    <span class="f-w-700 text-muted">`+data.status+`</span>`
+
+         aksi = `<button type="button" class="btn btn-sm btn-warning text-dark edit" data-id="${data.id}"> <i class="fa fa-edit"></i> Edit</button>
+                 <button type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>`;
+        }else{
+         status = ` <i class="fa fa-check-circle f-s-20 text-success m-e-6"></i>
+                    <span class="f-w-700 text-success">`+data.status+`</span>`
+
+
+        aksi = `<button type="button" class="btn btn-sm btn-warning text-dark edit" data-id="${data.id}"> <i class="fa fa-edit"></i> Edit</button>
+                <button hidden type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>`;
+        }
         
         // HTML Card Layout
         var cardHtml = `<div class="card shadow-sm">
                   <div class="card-header">
                     <div class="row">
-                      <div class="col-sm-6">
-                        <button type="button" class="btn btn-sm btn-warning text-dark edit" data-id="${data.id}"> <i class="fa fa-edit"></i> Edit</button>
-                        <button type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>
+                      <div class="col-sm-6 text-start">
+                          ${aksi}
                       </div>
                       <div class="col-sm-6">
                         <div class="d-flex justify-content-end" style="column-gap: 8px;">
-                          <div class="card m-y-8 cursor-pointer">
-                            <div class="card-body p-y-6">
-                              <div class="d-flex justify-content-start align-items-center">
-                                <i class="fa fa-check-circle f-s-20 text-success m-e-6"></i>
-                                <span class="f-w-700 text-success">PROGRAM</span>
-                              </div>
-                            </div>
-                          </div>
 
                           <div class="card m-y-8 cursor-pointer">
                             <div class="card-body p-y-6">
                               <div class="d-flex justify-content-start align-items-center">
-                                <i class="fa fa-check-circle f-s-20 text-success m-e-6"></i>
-                                <span class="f-w-700 text-success">RAJUT</span>
+                                `
+                                    +status+
+                                `
                               </div>
                             </div>
                           </div>
 
-                          <div class="card m-y-8 cursor-pointer">
-                            <div class="card-body p-y-6">
-                              <div class="d-flex justify-content-start align-items-center">
-                                <i class="fa fa-dot-circle f-s-20 text-muted m-e-6"></i>
-                                <span class="f-w-700 text-muted">KIRIM</span>
-                              </div>
-                            </div>
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -320,6 +322,7 @@ $(document).ready(function () {
         inpTglDeadline.val("")
         inpKetSalesOrder.val("")
         rowDet.hide()
+        btnSend.hide()
         isModal.modal("show");
     });
 
@@ -341,6 +344,13 @@ $(document).ready(function () {
         e.preventDefault()
         simpanData()
     });
+
+    $("#btn-send").on("click", function(e){
+        e.preventDefault()
+        simpanData(1)
+    });
+
+
     $("#btn-save-detail").on("click", function(e){
         e.preventDefault()
         simpanDataDetail()
@@ -395,8 +405,19 @@ $(document).ready(function () {
                 inpTglDeadline.val(formatterDate(data.tgl_deadline))
                 inpTglTransaksi.val(formatterDate(data.tgl_transaksi))
                 inpSample.val(data.id_sample).trigger("change")
-               
+                if(data.file_gambar){
+                    fileSalesOrderOld.val(data.gambar_id)
+                    linkFileSalesOrder.removeClass("d-none")
+                    linkFileSalesOrder.attr('src', data.file_gambar)
+                }
                 dtListDetail.setData(data.detail)
+                
+                if(data.status == 'Draft'){
+                    btnSend.show()
+                }else{
+                    btnSend.hide()
+                }
+
                 isModal.modal("show");
 
                 setTimeout(() => {
@@ -500,10 +521,10 @@ $(document).ready(function () {
         
     }
     
-    function simpanData() {
+    function simpanData(send) {
         
         let validation = true
-        if(inpNoSalesOrder.val().length == 0) validation = false
+        // if(inpNoSalesOrder.val().length == 0) validation = false
         if(inpDeskripsi.val().length == 0) validation = false
         if(inpBuyer.val().length == 0) validation = false
         if(inpTglDeadline.val().length == 0) validation = false
@@ -522,6 +543,7 @@ $(document).ready(function () {
             formData.append("tglTransaksi",formatLocaleDate(inpTglTransaksi.val()));
             formData.append("keterangan",inpKetSalesOrder.val());
             formData.append("samples", inpSample.val())
+            formData.append("submit_data", send)
             $.ajax({
                 type: 'POST',
                 url: '/trans/sales-order/save',
@@ -684,16 +706,17 @@ $(document).ready(function () {
               if(res.status){
                 isSampleData = res.data
                 inpSample.empty()
+                inpSample.append($("<option></option>").attr("value", 0).text("- Pilih Sample -"));
                 $.each(isSampleData, function(key,value) {
                     inpSample.append($("<option></option>").attr("value", value.id).text(value.kode_sample + " : " + value.keterangan));
                 });
 
                 if(inpData.val().length == 0){
-                    inpTglTransaksi.datepicker('setDate', isSampleData[0].tgl_transaksi); //.val(changeTgl(isSampleData[0].tgl_transaksi))
-                    inpTglDeadline.datepicker('setDate', isSampleData[0].tgl_deadline); //.val(changeTgl(isSampleData[0].tgl_transaksi))
-                    // inpTglDeadline.val(changeTgl(isSampleData[0].tgl_deadline))
-                    inpKetSalesOrder.val(isSampleData[0].deskripsi)
-                    inpDeskripsi.val(isSampleData[0].deskripsi)
+                    // inpTglTransaksi.datepicker('setDate', isSampleData[0].tgl_transaksi); //.val(changeTgl(isSampleData[0].tgl_transaksi))
+                    // inpTglDeadline.datepicker('setDate', isSampleData[0].tgl_deadline); //.val(changeTgl(isSampleData[0].tgl_transaksi))
+                    // // inpTglDeadline.val(changeTgl(isSampleData[0].tgl_deadline))
+                    // inpKetSalesOrder.val(isSampleData[0].deskripsi)
+                    // inpDeskripsi.val(isSampleData[0].deskripsi)
                 }
                 
                 
@@ -718,9 +741,15 @@ $(document).ready(function () {
         let val = $(this).val()
         let isin = isSampleData.filter((isi) => val == isi.id);
         if(isin.length > 0){
+            inpTglTransaksi.val("")
+            inpTglDeadline.val("")
             if(inpData.val().length == 0){
-                inpTglTransaksi.datepicker('setDate', isSampleData[0].tgl_transaksi); //.val(changeTgl(isSampleData[0].tgl_transaksi))
-                inpTglDeadline.datepicker('setDate', isSampleData[0].tgl_deadline); //.val(changeTgl(isSampleData[0].tgl_transaksi))
+                let tglTr = isSampleData[0].tgl_transaksi.split('-')
+                let tglTransaksi = tglTr['2'] + '-' + tglTr['1']+ '-' + tglTr['0']
+                inpTglTransaksi.datepicker('setDate', tglTransaksi); //.val(changeTgl(isSampleData[0].tgl_transaksi))
+                let tglD = isSampleData[0].tgl_deadline.split('-')
+                let tglDead = tglD['2'] + '-' + tglD['1']+ '-' + tglD['0']
+                inpTglDeadline.datepicker('setDate', tglDead); //.val(changeTgl(isSampleData[0].tgl_transaksi))
                 inpKetSalesOrder.val(isin[0].deskripsi)
                 inpDeskripsi.val(isin[0].deskripsi)
             }

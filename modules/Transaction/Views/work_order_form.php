@@ -172,6 +172,7 @@
           <li class="breadcrumb-item"><?= $name_app ?></li>
           <li class="breadcrumb-item">Transaksi</li>
           <li class="breadcrumb-item active"><?= $titlehead ?></li>
+          <input type="hidden" id="data-details" value='<?= $detail; ?>' >
         </ol>
       </div>
     </div>
@@ -183,45 +184,16 @@
         <div class="card-body">
           <div class="row">
             <div class="col-sm-3 text-center">
-              <h6 class="f-w-700 m-b-6">WOD2410002</h6>
-              <h5 class="f-w-700 m-b-12">K-17 (CARDIGAN PITA)</h5>
-              <p class="m-y-0">7 Mei 2024</p>
-              <p class="m-y-0"><em>Deadline: 3 Juni 2024</em></p>
-              <p class="f-w-700 m-t-4">YUSUF</p>
-              <img class="m-t-10 w-90" src="assets/images/sample-dummy.png" alt="Foto Sample">
+              <h6 class="f-w-700 m-b-6"><?= $row->kode_walkorder; ?></h6>
+              <h5 class="f-w-700 m-b-12"><?= $row->keterangan_style; ?></h5>
+              <p class="m-y-0"><?= fdate_eng_to_ind($row->tgl_transaksi); ?></p>
+              <p class="m-y-0"><em>Deadline: <?= fdate_eng_to_ind($row->tgl_deadline); ?></em></p>
+              <p class="f-w-700 m-t-4"><?= $row->konsumen_nama; ?></p>
+              <img class="m-t-10 w-90" src="<?= $row->file_gambar; ?>" alt="Foto Sample">
             </div>
             <div class="col-sm-9">
-              <div class="table-responsive">
-                <table class="table table-striped table-centered">
-                  <thead>
-                    <tr>
-                      <th>No.</th>
-                      <th>COLOUR</th>
-                      <th style="min-width: 80px;">S</th>
-                      <th style="min-width: 80px;">M</th>
-                      <th style="min-width: 80px;">L</th>
-                      <th style="min-width: 80px;">XL</th>
-                      <th style="min-width: 80px;">2XL</th>
-                      <th style="min-width: 80px;">ALL</th>
-                      <th rowspan="2">QTY ORDER</th>
-                      <th rowspan="2">QTY PROD</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td class="text-nowrap">A. HITAM</td>
-                      <td>10</td>
-                      <td>10</td>
-                      <td>10</td>
-                      <td>10</td>
-                      <td>10</td>
-                      <td></td>
-                      <td>50</td>
-                      <td>20</td>
-                    </tr>
-                  </tfoot>
-                </table>
+              <div>
+                <div class="table-striped table-centered" id="dt-detail"></div>
               </div>
             </div>
           </div>
@@ -286,3 +258,6 @@
 </div>
 
 <?= $this->endSection('content'); ?>
+<?= $this->section('script'); ?>
+<script src="script/app/transaction/walkorder/form.js"></script>
+<?= $this->endSection('script'); ?>

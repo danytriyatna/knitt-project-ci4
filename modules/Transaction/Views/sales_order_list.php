@@ -28,16 +28,16 @@
           </div>
         </div>
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="no_sales_order">Sales Order No.<span class="text-danger">*</span></label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="no_sales_order">Sales Order No.</label>
           <div class="col-md-9">
-            <input type="text" id="no_sales_order" name="no_sales_order" class="form-control" placeholder="Ketikkan nomor sales_order" value="" required>
+            <input type="text" id="no_sales_order" readonly name="no_sales_order" class="form-control" placeholder="Ketikkan nomor sales_order" value="" required>
             <div class="invalid-feedback">
               Sales Order No. tidak valid
             </div>
           </div>
         </div>
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_samples">Style/Sample<span class="text-danger">*</span></label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_samples">Style/Sample</label>
           <div class="col-md-9">
             <select id="select_samples" name="select_samples" class="form-select select2" data-placeholder="-- Pilih Style/Sample --" required>
               <option value=""></option>
@@ -104,6 +104,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="m-s-5 btn btn-success" id="btn-save"> <i class="fa fa-save"></i> Simpan</button>
+        <button type="button" class="m-s-5 btn btn-info" id="btn-send"> <i class="fa fa-paper-plane"></i> Submit</button>
       </div>
     </div>
   </div>
@@ -360,7 +361,7 @@
               <?php } ?>
             </div>
             <div class="col-sm-3">
-              <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" id="btn-add"> <i class="fa fa-plus"></i> Tambah</button>
+              <button type="button" class="btn btn-sm btn-success" id="btn-add"> <i class="fa fa-plus"></i> Tambah</button>
             </div>
             <div class="col-sm-4 offset-md-5">
               <div class="form-group">
