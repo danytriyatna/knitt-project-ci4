@@ -173,13 +173,17 @@ class SampleModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getDataDetailSampleWarna($idSample, $id)
+    function getDataDetailSampleWarna($idSample, $id = null)
     {
 
         $builder = $this->db->table("trans_sample_det");
         $builder->where("id_sample", $idSample);
-        $builder->where("id", $id);
-        $this->_data = $builder->get()->getRow();
+        if (!empty($id)) {
+            $builder->where("id", $id);
+            $this->_data = $builder->get()->getRow();
+        } else {
+            $this->_data = $builder->get()->getResult();
+        }
         return $this->_data;
     }
     function getDataDetailSampleUkuranById($id)
@@ -254,23 +258,57 @@ class SampleModel extends \App\Models\PrModel
     {
         $this->db->transStart();
         try {
-            $this->db->transComplete();
+
             $this->updateRecord("trans_sample", $arrData, 'id', $id);
             if ($arrData['status'] == 1) {
+                $result = $this->getData($id);
                 $arrWorkOrder = [
                     "ref_id" => $id,
-                    "ref_kode" => "SAMPLE",
-                    "kode_walkorder" => $this->generateNo("WOD", "trans_walkorder", "kode_walkorder"),
+                    "ref_kode" => !empty($result->kode_sample) ? $result->kode_sample : null,
+                    "kode_walkorder" => $this->generateNo("WRD", "trans_walkorder", "kode_walkorder"),
                     "id_konsumen" => $arrData['id_konsumen'],
-                    "qty" => $arrData['qty'],
-                    "file_id" => $arrData['gambar_id'],
-                    "status" => 0,
+                    'tgl_transaksi' => date("Y-m-d"),
+                    'tgl_deadline' => $arrData['tgl_deadline'],
+                    "qty" => !empty($arrData['qty']) ? $arrData['qty'] : 0,
+                    "file_id" => !empty($arrData['gambar_id']) ? $arrData['gambar_id'] : null,
+                    "status" => 1,
+                    "tipe_id" => 2,
                     "active" => 1,
+                    'keterangan_style' => $arrData['keterangan'],
                     "created_at" => $arrData['updated_at'],
 
                 ];
-                $this->insertRecordGetid("trans_walkorder", $arrWorkOrder);
+                $idWorkOrder = $this->insertRecordGetid("trans_walkorder", $arrWorkOrder);
+                $dataWarna = $this->getDataDetailSampleWarna($id);
+
+                if (!empty($dataWarna)) {
+                    foreach ($dataWarna as $rowData) {
+
+                        $detailWorkOrder = [
+                            'id_walkorder' => $idWorkOrder,
+                            'ref_detail_id' => $rowData->id,
+                            'tipe_id' => 2,
+                            'created_at' => date("Y-m-d H:i:s")
+                        ];
+
+                        $woIdDet = $this->insertRecordGetid("trans_walkorder_detail", $detailWorkOrder);
+
+                        for ($i = 0; $i < 8; $i++) {
+                            $field_name = 'id_warna_' . ($i + 1);
+                            if (!empty($field_name)) {
+                                $arrWarna = [
+                                    'id_walkorder_detail' => $woIdDet,
+                                    'id_warna' => $field_name,
+                                    'created_at' => date("Y-m-d H:i:s")
+                                ];
+                                $this->insertRecordGetid("trans_walkorder_warna", $arrWarna);
+                            }
+                        }
+                    }
+                }
             }
+
+            $this->db->transComplete();
 
             if ($this->db->transStatus() === TRUE) {
                 return true;
