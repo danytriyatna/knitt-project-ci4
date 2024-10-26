@@ -22,7 +22,7 @@ $(document).ready(function () {
 			}, 
 
             {
-				title: 'Tipe', field: 'status', formatter : "html", align: "center", cssClass: "text-center", headerSort:false,
+				title: 'Tipe', field: 'tipe', formatter : "html", align: "center", cssClass: "text-center", headerSort:false,
                 width: 120, 
 			} ,
 

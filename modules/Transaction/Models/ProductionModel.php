@@ -1,0 +1,83 @@
+<?php
+
+namespace Modules\Transaction\Models;
+
+class ProductionModel extends \App\Models\PrModel
+{
+
+    protected $table = "trans_produksi";
+    protected $_data = null;
+    protected $primaryKey = 'id';
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    function getData($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
+    {
+        $builder = $this->db->table($this->table . " abx");
+
+        $builder->select("abx.id, abx.ref_id, abx.ref_kode, abx.kode_walkorder, abx.id_konsumen, abx.id_style, abx.qty, abx.file_id,
+                          abx.ref_kode, abx.status, bbx.nama as konsumen_nama, abx.tgl_deadline, abx.tgl_transaksi, abx.keterangan_style,
+                          abx.tipe_id, cbx.file_name
+                        ");
+
+        $builder->join("ref_konsumen bbx", "abx.id_konsumen = bbx.id", "inner");
+        // $builder->join("trans_sample ts", "ts.id = abx.ref_id and abx.tipe_id = 1", "left");
+        // $builder->join("trans_sales_order tso", "tso.id = abx.ref_id and abx.tipe_id = 2", "left");
+        $builder->join("_files cbx", "abx.file_id = cbx.id", "left");
+        if ($id == null or $id == "") {
+            $builder->where('abx.active = 1');
+            if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+                $builder->groupStart();
+                    $builder->where('LOWER(abx.kode_walkorder) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(abx.ref_kode) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->groupEnd();
+            }
+
+            if (!empty($params['id_konsumen'])) {
+                $builder->where('abx.id_konsumen', $params['id_konsumen']);
+            }
+
+            if (!empty($order)) {
+                $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
+            } else {
+                $builder->orderBy('abx.id');
+            }
+
+            if (empty($offset)) $offset = 0;
+            if (empty($limit)) $limit = 10;
+
+            $builder->limit($limit, $offset);
+
+            $this->_data = $builder->get()->getResult();
+        } else {
+            $builder->where("abx.id", $id);
+
+            $this->_data = $builder->get()->getRow();
+        }
+
+        return $this->_data;
+    }
+
+    function getDataCnt($filters = null, $params = null)
+    {
+        $builder = $this->db->table($this->table . " abx");
+
+        $builder->join("ref_konsumen bbx", "abx.id_konsumen = bbx.id", "inner");
+        $builder->select("count(1) as _cnt");
+        $builder->where('abx.active = 1');
+
+        if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+            $builder->groupStart();
+                    $builder->where('LOWER(abx.kode_walkorder) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(abx.ref_kode) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->groupEnd();
+        }
+
+        $this->_data = $builder->get()->getRow()->_cnt;
+
+        return $this->_data;
+    }
+}

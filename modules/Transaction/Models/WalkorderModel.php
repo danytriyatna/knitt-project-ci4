@@ -144,10 +144,10 @@ class WalkorderModel extends \App\Models\PrModel
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
                 $builder->groupStart();
                     $builder->where('LOWER(abx.qty) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    $builder->orWhere('LOWER(bbx.gram) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    $builder->orWhere('LOWER(bbx.gram_nd) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    $builder->orWhere('LOWER(bbx.kg) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    $builder->orWhere('LOWER(bbx.loss) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(abx.gram) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(abx.gram_nd) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(abx.kg) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(abx.loss) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
             }
 
@@ -192,10 +192,10 @@ class WalkorderModel extends \App\Models\PrModel
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             $builder->groupStart();
                 $builder->where('LOWER(abx.qty) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(bbx.gram) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(bbx.gram_nd) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(bbx.kg) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(bbx.loss) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(abx.gram) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(abx.gram_nd) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(abx.kg) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(abx.loss) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
         }
 
@@ -210,7 +210,7 @@ class WalkorderModel extends \App\Models\PrModel
     {
         $builder = $this->db->table($this->table3 . " abx");
 
-        $builder->select(" abx.id, abx.id_walkorder, abx.id_proses, bbx.keterangan,
+        $builder->select(" abx.id, abx.id_walkorder, abx.id_proses, abx.keterangan,
                            pp.seq, pp.nama as proses
                         ");
 
@@ -275,7 +275,7 @@ class WalkorderModel extends \App\Models\PrModel
     {
         $builder = $this->db->table($this->table4 . " abx");
 
-        $builder->select(" abx.id, abx.id_walkorder_proses, abx.id_ukuran, bbx.qty,
+        $builder->select(" abx.id, abx.id_walkorder_proses, abx.id_ukuran, abx.qty,
                            rk.kode_ukuran, rk.keterangan
                         ");
 

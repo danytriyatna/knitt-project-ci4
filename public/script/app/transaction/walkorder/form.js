@@ -111,6 +111,23 @@ $(document).ready(function () {
         }, 1000);
     }
 
+
+    let detailp = $("#data-psaved").val().replace(/&quot;/ig,'"');
+    if(detailp.length > 0){
+        setTimeout(() => {
+            try {
+                let isdatap = JSON.parse(detailp);
+                
+                for (const item of isdatap) {
+                    let idw = 'proses_' + item.id_proses;
+                    $('#' + idw).attr("checked", true);
+                }
+            } catch (e) {
+                console.error("Error parsing JSON:", e);
+            }
+        }, 1000);
+    }
+
     // end config ukuran size 
 
 
@@ -458,15 +475,6 @@ $(document).ready(function () {
     $("#btn-save").on("click", function(e) {
         e.preventDefault();
 
-        let dataJenis = $('input[name="jenis_proses"]');
-        let listJenis = [];
-        for (const dataJenis of inpel) {
-            let inp = $("#" + inpel.id)
-            if(inp.is(":checked")){
-                listJenis.push(inp.cal());
-            }
-        }
-
         Swal.fire({
             title: "Apakah anda ingin menyimpan Work Order ?",
             icon: 'question',
@@ -477,9 +485,108 @@ $(document).ready(function () {
             cancelButtonColor: '#6C757D'
         }).then((result) => {
             if (result.isConfirmed) {
-                
+                saved(0)
             }
         })
     });
+
+    $("#btn-send").on("click", function(e) {
+        e.preventDefault();
+        
+
+        Swal.fire({
+            title: "Apakah anda ingin mensubmit Work Order dan meneruskan ke Produksi ?",
+            icon: 'question',
+            confirmButtonText: 'Simpan',
+            confirmButtonColor: '#198754',
+            showCancelButton: true,
+            cancelButtonText: 'Batal',
+            cancelButtonColor: '#6C757D'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                saved(1)
+            }
+        })
+    });
+
+
+
+    function saved(isstataus){
+        let dataJenis = $('input[name="jenis_proses"]');
+        let dataid = $("#dataid").val();
+        let listJenis = [];
+        for (const inpel of dataJenis) {
+            let inp = $("#" + inpel.id)
+            if(inp.is(":checked")){
+                listJenis.push(inp.val());
+            }
+        }
+
+        let ukuran_data = dtListDetail.getData();
+        let ukuran_calc = dtListDetail.getCalcResults();
+
+        let form_data = new FormData();
+        form_data.append('dataid', dataid);
+        form_data.append('listproses', JSON.stringify(listJenis));
+        form_data.append('status_data', isstataus);
+        form_data.append('data_ukuran_warna', JSON.stringify(ukuran_data));
+        form_data.append('data_ukuran', JSON.stringify(ukuran_calc));
+        
+        $.ajax({
+            url: "/trans/work-order/save-data", // point to server-side controller method
+            dataType: "json", // what to expect back from the server
+            data: form_data,
+            type: "post",
+            cache: false,
+            contentType: false,
+            processData: false,
+            beforeSend: function () {
+                Swal.fire({
+                    title: 'Loading...',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    onBeforeOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+            },
+            success: function (res) {
+                Swal.close();
+
+                if(res.status){
+                    Swal.fire({
+                        text: res.message,
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 2500
+                    }).then((result) => {
+                        // similar behavior as clicking on a link
+                        window.location.href = "/trans/work-order";
+                    });
+                }else{
+                    Swal.fire({
+                        text: res.message,
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+
+                }
+                
+            },
+            error: function (res) {
+                Swal.close();
+                Swal.fire({
+                    text: "Gagal simpan data",
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then((result) => {
+                    
+                });
+                
+            },
+        });
+    }
 
 });

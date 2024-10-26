@@ -56,7 +56,9 @@
           <li class="breadcrumb-item"><?= $name_app ?></li>
           <li class="breadcrumb-item">Transaksi</li>
           <li class="breadcrumb-item active"><?= $titlehead ?></li>
+          <input type="hidden" id="dataid" value="<?= $id; ?>" >
           <input type="hidden" id="data-details" value='<?= $detail; ?>' >
+          <input type="hidden" id="data-psaved" value='<?= $proses_saved; ?>' >
         </ol>
       </div>
     </div>
@@ -120,9 +122,12 @@
                   <a href="trans/work-order" class="btn btn-default m-e-5">
                     <span class="fa fa-arrow-left"></span> Kembali
                   </a>
-                  <a href="trans/work-order" class='btn btn-success'>
+                  <button type="button" id="btn-save" class='btn btn-success'>
                     <span class="fa fa-save"></span> Simpan
-                  </a>
+                  </button>
+                  <button type="button" id="btn-send" class='btn btn-info'>
+                    <span class="fa fa-paper-plane"></span> Submit
+                  </button>
                 </div>
               </div>
             </div>
