@@ -26,7 +26,7 @@ $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Control
 
 $routes->group('trans/delivery-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'DeliveryOrder::index');
-  $routes->get('form/(:any)', 'DeliveryOrder::form/$1');
+  $routes->get('form', 'DeliveryOrder::form');
 });
 
 $routes->group('trans/work-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {

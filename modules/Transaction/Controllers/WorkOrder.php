@@ -194,7 +194,10 @@ class WorkOrder extends BaseController
     $filters    = $this->request->getPost('filter');
     $order      = $this->request->getPost('sort');
 
+    $wo_id = $this->request->getPost('woid');
+
     $params = [];
+    $params['id_walkorder'] = decrypt($wo_id);
 
     $results = $this->mWalkorder->getData_detail(null, $start, $limit, $order, $filters, $params);
     $totalfiltered = $this->mWalkorder->getDataCnt_detail($filters, $params);
