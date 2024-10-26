@@ -356,7 +356,7 @@
 
           <div class="row">
             <div class="col-sm-12">
-              <div id="dt-list"></div>
+              <div id="dt-list" class="custom-dt-layout"></div>
               <!-- <?php for ($i = 0; $i < 3; $i++) : ?>
                 <div class="card shadow-sm">
                   <div class="card-header">

@@ -184,15 +184,30 @@ table
 #dt-list
   overflow: unset
   
-.tabulator.table-striped
-  .tabulator-col-content, .tabulator-cell
-    padding: 8px 15px
-  .tabulator-header
-    .tabulator-headers
-      .tabulator-col
-        font-weight: 700
-        border-top: 1px solid #AAA
-        border-bottom: 1px solid #AAA
+.tabulator
+  &.table-striped
+    .tabulator-col-content, .tabulator-cell
+      padding: 8px 15px
+    .tabulator-header
+      .tabulator-headers
+        .tabulator-col
+          font-weight: 700
+          border-top: 1px solid #AAA
+          border-bottom: 1px solid #AAA
+  &.custom-dt-layout
+    .tabulator-table
+      .tabulator-row
+        .tabulator-cell
+          height: fit-content !important
+          .card
+            .card-body
+              .tabulator
+                .tabulator-header
+                  .tabulator-header-contents
+                    .tabulator-headers
+                .tabulator-tableholder
+                  .tabulator-table
+                    width: 100%
 
 .tabulator-cell
   .dropdown-menu

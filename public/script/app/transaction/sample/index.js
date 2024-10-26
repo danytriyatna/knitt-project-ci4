@@ -143,7 +143,7 @@ $(document).ready(function () {
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
                 precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right",width:"16%"},
+            }, hozAlign:"right"},
         ],
         locale: 'id',    
         // layout: 'fitColumns',
@@ -309,7 +309,7 @@ $(document).ready(function () {
                         thousand: ".",
                         symbol: "Rp",  // Simbol mata uang Rupiah
                         precision: 0,   // Tidak ada desimal
-                    }, hozAlign:"right",width:"16%"},
+                    }, hozAlign:"right"},
                 ],
             });
         });
