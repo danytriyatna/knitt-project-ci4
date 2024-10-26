@@ -157,7 +157,11 @@ class WorkOrder extends BaseController
       if (!empty($list_detail)) {
         for ($i = 0; $i < count($list_detail); $i++) {
           $drow = $list_detail[$i];
-          $allQty = $this->mSalesOrder->getTotal_qty($drow->id, 2);
+          if ($stdData->tipe_id == 1) {
+            $allQty = $this->mSample->getTotal_qty($drow->id, 2);
+          } else {
+            $allQty = $this->mSalesOrder->getTotal_qty($drow->id, 2);
+          }
           $list_detail[$i]->qty      = $allQty;
           $list_detail[$i]->qty_prod = 0;
         }
