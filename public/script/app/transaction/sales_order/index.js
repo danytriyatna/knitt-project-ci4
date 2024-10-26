@@ -214,13 +214,13 @@ $(document).ready(function () {
         let status = '';
         let aksi = '';
         if(data.status == 'Draft'){
-         status = ` <i class="fa fa-dot-circle f-s-20 text-muted m-e-6"></i>
+         status = ` <i class="fa fa-dot-circle text-muted m-e-6"></i>
                     <span class="f-w-700 text-muted">`+data.status+`</span>`
 
          aksi = `<button type="button" class="btn btn-sm btn-warning text-dark edit" data-id="${data.id}"> <i class="fa fa-edit"></i> Edit</button>
                  <button type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>`;
         }else{
-         status = ` <i class="fa fa-check-circle f-s-20 text-success m-e-6"></i>
+         status = ` <i class="fa fa-check-circle text-success m-e-6"></i>
                     <span class="f-w-700 text-success">`+data.status+`</span>`
 
 
@@ -238,9 +238,9 @@ $(document).ready(function () {
                       <div class="col-sm-6">
                         <div class="d-flex justify-content-end" style="column-gap: 8px;">
 
-                          <div class="card m-y-8 cursor-pointer">
-                            <div class="card-body p-y-6">
-                              <div class="d-flex justify-content-start align-items-center">
+                          <div class="card m-y-0 cursor-pointer">
+                            <div class="card-body p-y-4">
+                              <div class="d-flex justify-content-start align-items-center f-s-11">
                                 `
                                     +status+
                                 `
