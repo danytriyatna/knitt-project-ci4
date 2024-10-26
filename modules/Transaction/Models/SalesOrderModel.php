@@ -71,6 +71,72 @@ class SalesOrderModel extends \App\Models\PrModel
         return $this->_data;
     }
 
+    function getDataUkuran($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
+    {
+        $builder = $this->db->table("trans_sales_order_ukuran abx");
+
+        $builder->select("abx.id,bbx.id as id_ukuran, dbx.id as id_warna,  bbx.kode_ukuran,dbx.kode_warna, abx.qty, abx.harga_satuan");
+        $builder->join("ref_ukuran bbx", "abx.id_ukuran = bbx.id", "inner");
+        $builder->join("trans_sales_order_det cbx", "abx.id_sales_order_det = cbx.id AND abx.id_sales_order = cbx.id_sales_order ", "inner");
+        $builder->join("ref_warna dbx", "cbx.id_warna_1 = dbx.id", "inner");
+        if ($id == null or $id == "") {
+            if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+                $builder->groupStart();
+                $builder->where('LOWER(dbx.kode_warna) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(bbx.kode_ukuran) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->groupEnd();
+            }
+
+            if (!empty($params['id_sales_order'])) {
+                $builder->where('abx.id_sales_order', $params['id_sales_order']);
+            }
+
+            if (!empty($order)) {
+                $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
+            } else {
+                $builder->orderBy('abx.id');
+            }
+
+            if (empty($offset)) $offset = 0;
+            if (empty($limit)) $limit = 10;
+
+            $builder->limit($limit, $offset);
+
+            $this->_data = $builder->get()->getResult();
+        } else {
+            $builder->where("abx.id", $id);
+
+            $this->_data = $builder->get()->getRow();
+        }
+
+        return $this->_data;
+    }
+
+    function getDataUkuranCnt($filters = null, $params = null)
+    {
+        $builder = $this->db->table("trans_sales_order_ukuran abx");
+
+        $builder->join("ref_ukuran bbx", "abx.id_ukuran = bbx.id", "inner");
+        $builder->join("trans_sales_order_det cbx", "abx.id_sales_order_det = cbx.id AND abx.id_sales_order = cbx.id_sales_order ", "inner");
+        $builder->join("ref_warna dbx", "cbx.id_warna_1 = dbx.id", "inner");
+
+        $builder->select("count(1) as _cnt");
+        if (!empty($params['id_sales_order'])) {
+            $builder->where('abx.id_sales_order', $params['id_sales_order']);
+        }
+
+        if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+            $builder->groupStart();
+            $builder->where('LOWER(dbx.kode_warna) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(bbx.kode_ukuran) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->groupEnd();
+        }
+
+        $this->_data = $builder->get()->getRow()->_cnt;
+
+        return $this->_data;
+    }
+
     function getDataDetailSalesOrder($idSalesOrder)
     {
         $builder = $this->db->table("trans_sales_order_det" . " abx");
@@ -141,13 +207,14 @@ class SalesOrderModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getDataDetailSalesOrder_ori($idSalesOrder){
+    function getDataDetailSalesOrder_ori($idSalesOrder)
+    {
         $builder = $this->db->table("trans_sales_order_det" . " abx");
         $builder->where("abx.id_sales_order", $idSalesOrder);
         $this->_data = $builder->get()->getResult();
         return $this->_data;
     }
-    
+
     function getDataDetailSampleUkuran($idSample, $idSampleDet)
     {
         $sql = "SELECT
@@ -205,7 +272,7 @@ class SalesOrderModel extends \App\Models\PrModel
                     "id_ukuran" => $rowData['id_ukuran'],
                     "qty" => $rowData['qty'],
                     "harga_satuan" => $rowData['harga_satuan'],
-                    "harga_total" => (!empty($rowData['qty']) && !empty($rowData['harga_satuan'])) ? $rowData['qty'] * $rowData['harga_satuan'] : 0,//$rowData['harga_total'],
+                    "harga_total" => (!empty($rowData['qty']) && !empty($rowData['harga_satuan'])) ? $rowData['qty'] * $rowData['harga_satuan'] : 0, //$rowData['harga_total'],
                     "active" => 1,
                     "created_at" =>  date("Y-m-d H:i:s"),
 
@@ -225,13 +292,14 @@ class SalesOrderModel extends \App\Models\PrModel
         }
     }
 
-    function getTotal_qty($trans_id, $tipe){
+    function getTotal_qty($trans_id, $tipe)
+    {
         $builder = $this->db->table("trans_sales_order_ukuran tsu");
         $builder->select("sum(tsu.qty) as cnt");
         $builder->join("trans_sales_order_det td", "td.id = tsu.id_sales_order_det");
-        if($tipe == 1){
+        if ($tipe == 1) {
             $builder->where("td.id_sales_order", $trans_id);
-        }else{
+        } else {
             $builder->where("tsu.id_sales_order_det", $trans_id);
         }
         $this->_data = $builder->get()->getRow();
@@ -239,7 +307,8 @@ class SalesOrderModel extends \App\Models\PrModel
     }
 
 
-    function generete_kode(){
+    function generete_kode()
+    {
         $kd = "SOD";
         $builder = $this->db->table($this->table . ' a');
         $builder->select('LEFT(kode_sales_order, 7) AS tgl, RIGHT( kode_sales_order, 4 ) AS kode ');
@@ -247,7 +316,7 @@ class SalesOrderModel extends \App\Models\PrModel
         $builder->orderBy('a.id', "DESC");
         $builder->limit(1);
         $query = $builder->get()->getRow();
-       
+
         if ($query != NULL) {
             if ($query->tgl == $kd . date('y') . date('m')) {     //cek dulu apakah ada sudah ada tahun dan bulan di tabel.   
                 //jika tahun dan bulan ternyata sudah ada.      
@@ -263,7 +332,7 @@ class SalesOrderModel extends \App\Models\PrModel
 
         $kodemax = str_pad($kode, 5, "0", STR_PAD_LEFT); // angka 3 menunjukkan jumlah digit angka 0
         $kodejadi = $kd . date('y') . date('m') . $kodemax;
-        
+
         // hasilnya SOD24100001 dst.
         return $kodejadi;
     }

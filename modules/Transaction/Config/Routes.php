@@ -42,5 +42,7 @@ $routes->group('trans/production', ['namespace' => 'Modules\Transaction\Controll
   $routes->get('/', 'Production::index');
   $routes->get('form', 'Production::form');
   $routes->get('form/(:any)', 'Production::form/$1');
+  $routes->post('save', 'Production::save');
   $routes->post('list', 'Production::lists');
+  $routes->post('list_ukuran', 'Production::lists_ukuran');
 });

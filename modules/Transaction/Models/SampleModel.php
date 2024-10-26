@@ -75,6 +75,71 @@ class SampleModel extends \App\Models\PrModel
         return $this->_data;
     }
 
+    function getDataUkuran($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
+    {
+        $builder = $this->db->table("trans_sample_ukuran abx");
+
+        $builder->select("abx.id,bbx.id as id_ukuran, dbx.id as id_warna, bbx.kode_ukuran,dbx.kode_warna, abx.qty, abx.harga_satuan");
+        $builder->join("ref_ukuran bbx", "abx.id_ukuran = bbx.id", "inner");
+        $builder->join("trans_sample_det cbx", "abx.id_sample_det = cbx.id AND abx.id_sample = cbx.id_sample ", "inner");
+        $builder->join("ref_warna dbx", "cbx.id_warna_1 = bbx.id", "inner");
+        if ($id == null or $id == "") {
+            if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+                $builder->groupStart();
+                $builder->where('LOWER(dbx.kode_warna) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(bbx.kode_ukuran) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->groupEnd();
+            }
+
+            if (!empty($params['id_sample'])) {
+                $builder->where('abx.id_sample', $params['id_sample']);
+            }
+
+            if (!empty($order)) {
+                $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
+            } else {
+                $builder->orderBy('abx.id');
+            }
+
+            if (empty($offset)) $offset = 0;
+            if (empty($limit)) $limit = 10;
+
+            $builder->limit($limit, $offset);
+
+            $this->_data = $builder->get()->getResult();
+        } else {
+            $builder->where("abx.id", $id);
+
+            $this->_data = $builder->get()->getRow();
+        }
+
+        return $this->_data;
+    }
+
+    function getDataUkuranCnt($filters = null, $params = null)
+    {
+        $builder = $this->db->table("trans_sample_ukuran abx");
+
+        $builder->join("ref_ukuran bbx", "abx.id_ukuran = bbx.id", "inner");
+        $builder->join("trans_sample_det cbx", "abx.id_sample_det = cbx.id AND abx.id_sample = cbx.id_sample ", "inner");
+        $builder->join("ref_warna dbx", "cbx.id_warna_1 = dbx.id", "inner");
+
+        $builder->select("count(1) as _cnt");
+        if (!empty($params['id_sample'])) {
+            $builder->where('abx.id_sample', $params['id_sample']);
+        }
+        if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+            $builder->groupStart();
+            $builder->where('LOWER(dbx.kode_warna) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(bbx.kode_ukuran) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->groupEnd();
+        }
+
+        $this->_data = $builder->get()->getRow()->_cnt;
+
+        return $this->_data;
+    }
+
     function getDataDetailSample($idSample)
     {
         $builder = $this->db->table("trans_sample_det" . " abx");
@@ -272,7 +337,7 @@ class SampleModel extends \App\Models\PrModel
                     "qty" => !empty($arrData['qty']) ? $arrData['qty'] : 0,
                     "file_id" => !empty($arrData['gambar_id']) ? $arrData['gambar_id'] : null,
                     "status" => 1,
-                    "tipe_id" => 2,
+                    "tipe_id" => 1,
                     "active" => 1,
                     'keterangan_style' => $arrData['keterangan'],
                     "created_at" => $arrData['updated_at'],
@@ -287,7 +352,7 @@ class SampleModel extends \App\Models\PrModel
                         $detailWorkOrder = [
                             'id_walkorder' => $idWorkOrder,
                             'ref_detail_id' => $rowData->id,
-                            'tipe_id' => 2,
+                            'tipe_id' => 1,
                             'created_at' => date("Y-m-d H:i:s")
                         ];
 
@@ -295,10 +360,10 @@ class SampleModel extends \App\Models\PrModel
 
                         for ($i = 0; $i < 8; $i++) {
                             $field_name = 'id_warna_' . ($i + 1);
-                            if (!empty($field_name)) {
+                            if (!empty($rowData->$field_name)) {
                                 $arrWarna = [
                                     'id_walkorder_detail' => $woIdDet,
-                                    'id_warna' => $field_name,
+                                    'id_warna' => $rowData->$field_name,
                                     'created_at' => date("Y-m-d H:i:s")
                                 ];
                                 $this->insertRecordGetid("trans_walkorder_warna", $arrWarna);
@@ -319,6 +384,20 @@ class SampleModel extends \App\Models\PrModel
             $this->db->transRollback();
             throw $e;
         }
+    }
+
+    function getTotal_qty($trans_id, $tipe)
+    {
+        $builder = $this->db->table("trans_sample_ukuran tsu");
+        $builder->select("sum(tsu.qty) as cnt");
+        $builder->join("trans_sample_det td", "td.id = tsu.id_sample_det");
+        if ($tipe == 1) {
+            $builder->where("td.id_sample", $trans_id);
+        } else {
+            $builder->where("tsu.id_sample_det", $trans_id);
+        }
+        $this->_data = $builder->get()->getRow();
+        return $this->_data->cnt;
     }
 
     function generateNo($prefix, $table, $kode)

@@ -156,6 +156,36 @@
     </div>
   </div>
 </div>
+
+<div id="modal-list-wo" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-m" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title ipendix-penguji-preview-title">List Data</h5>
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12 mb-3">
+            <div class="col-md-4" style="float: right; position: relative; right: 15px;">
+              <div class="homeSearch w-100" style="width: 100%; margin-left: 5%; margin-top: 0;">
+                <input type="text" id="tb-search2" class="form-control" placeholder="Pencarian . . .">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div id="dt-list-ukuran" class="table-striped table-centered"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="javascript:void(0)" id="pilihUkuran" class="btn btn-success float-left">Pilih Data</a>
+      </div>
+    </div>
+  </div>
+</div>
 <?= $this->endSection('modal') ?>
 
 <?= $this->section('content'); ?>
@@ -172,6 +202,11 @@
           <li class="breadcrumb-item"><?= $name_app ?></li>
           <li class="breadcrumb-item">Transaksi</li>
           <li class="breadcrumb-item active"><?= $titlehead ?></li>
+          <input type="hidden" id="data-details" value='<?= $detail; ?>'>
+          <input type="hidden" id="data-prods" value='<?= $listProd; ?>'>
+          <input type="hidden" id="ref_id" value='<?= $ref_id; ?>'>
+          <input type="hidden" id="tipe_id" value='<?= $tipe_id; ?>'>
+          <input type="hidden" id="id_produksi" value='<?= $id_produksi; ?>'>
         </ol>
       </div>
     </div>
@@ -183,46 +218,15 @@
         <div class="card-body">
           <div class="row">
             <div class="col-sm-3 text-center">
-              <h6 class="f-w-700 m-b-6">PRD24100001</h6>
-              <h5 class="f-w-700 m-b-12">K-17 (CARDIGAN PITA)</h5>
-              <p class="m-y-0">7 Mei 2024</p>
-              <p class="m-y-0"><em>Deadline: 3 Juni 2024</em></p>
-              <p class="f-w-700 m-t-4">YUSUF</p>
-              <img class="m-t-10 w-90" src="assets/images/sample-dummy.png" alt="Foto Sample">
+              <h6 class="f-w-700 m-b-6"><?= $row->kode_prod; ?></h6>
+              <h5 class="f-w-700 m-b-12"><?= $row->keterangan_style; ?></h5>
+              <p class="m-y-0"><?= fdate_eng_to_ind($row->tgl_transaksi); ?></p>
+              <p class="m-y-0"><em>Deadline: <?= fdate_eng_to_ind($row->tgl_deadline); ?></em></p>
+              <p class="f-w-700 m-t-4"><?= $row->konsumen_nama; ?></p>
+              <img class="m-t-10 w-90" src="<?= $row->file_gambar; ?>" alt="Foto Sample">
             </div>
             <div class="col-sm-9">
-              <div class="table-responsive">
-                <table class="table table-striped table-centered">
-                  <thead>
-                    <tr>
-                      <th>No.</th>
-                      <th>COLOUR</th>
-                      <th style="min-width: 80px;">S</th>
-                      <th style="min-width: 80px;">M</th>
-                      <th style="min-width: 80px;">L</th>
-                      <th style="min-width: 80px;">XL</th>
-                      <th style="min-width: 80px;">2XL</th>
-                      <th style="min-width: 80px;">ALL</th>
-                      <th rowspan="2">QTY ORDER</th>
-                      <th rowspan="2">QTY PROD</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td class="text-nowrap">M38 - MINT- HITAM- OFF WHITE</td>
-                      <td>1511</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td>1511</td>
-                      <td>864</td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
+              <div class="table-striped table-centered" id="dt-detail"></div>
             </div>
           </div>
 
@@ -230,33 +234,30 @@
 
           <div class="row">
             <div class="col-sm-12">
-              <div class="table-responsive">
-                <table class="table table-striped table-centered">
-                  <thead>
-                    <tr>
-                      <th>RAJUT</th>
-                      <th>LINKING-OBRAS</th>
-                      <th>RABUT-SONTEK</th>
-                      <th>WASHING</th>
-                      <th>STEAM</th>
-                      <th>LUBANG-KANCING</th>
-                      <th>LABEL-SIZE</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>1511</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <hr>
+              <h5><b>PRODUCTION PROCESS</b></h5>
+              <div class="container">
+                <div class="row">
+
+                  <?php foreach ($proses as $r) { ?>
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="min-height: 80px;">
+                          <div class="form-check form-check-inline">
+                            <input type="hidden" id="proses_<?= $r->id ?>" value="<?= $r->qty ?>" />
+                            <h5 class="form-check-h1" for="proses_<?= $r->seq ?>"><?= $r->nama ?></h5>
+                            <label class="form-check-label" for="proses_<?= $r->seq ?>"><?= $r->qty - $r->qty_prod ?></label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  <?php } ?>
+
+                </div>
               </div>
-              
+
+              <hr>
+
               <br>
 
               <div class="row">
@@ -264,13 +265,9 @@
                   <div class="form-group m-b-0 d-flex align-items-center">
                     <label class="control-label text-start text-md-end m-e-8" for="filter_status">Status</label>
                     <select id="filter_status" name="filter_status" class="form-control custom-select select2">
-                      <option value="1">RAJUT</option>
-                      <option value="2">LINKING-OBRAS</option>
-                      <option value="3">RABUT-SONTEK</option>
-                      <option value="4">WASHING</option>
-                      <option value="5">STEAM</option>
-                      <option value="6">LUBANG-KANCING</option>
-                      <option value="7">LABEL-SIZE</option>
+                      <?php foreach ($proses as $rowData) : ?>
+                        <option value="<?= $rowData->id ?>"><?= $rowData->nama ?></option>
+                      <?php endforeach ?>
                     </select>
                   </div>
                 </div>
@@ -278,7 +275,7 @@
                   <div class="form-group m-b-0 d-flex align-items-center">
                     <label class="control-label text-start text-md-end m-e-8" for="filter_operator">Operator</label>
                     <select id="filter_operator" name="filter_operator" class="form-control custom-select select2">
-                      <option value="0">-</option>
+                      <option value="">-</option>
                       <option value="1">Teh Endok</option>
                       <option value="2">Amih</option>
                       <option value="3">Pak Juju</option>
@@ -298,17 +295,22 @@
                   <div class="form-group row">
                     <label class="control-label text-start text-md-end col-md-3 col-form-label" for="name_prod">Nama</label>
                     <div class="col-md-9">
-                      <input type="text" id="name_prod" name="name_prod" class="form-control" placeholder="Ketikkan Nama" value="Matt">
+                      <input type="text" id="name_prod" name="name_prod" class="form-control" placeholder="Ketikkan Nama" value="<?= $row->konsumen_nama ?>">
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div class="row">
-                <div class="col-sm-12">
-                  <div class="input-group my-2">
-                    <span class="input-group-text" id="basic-addon1"><i class="fa fa-qrcode"></i></span>
-                    <input type="text" class="form-control bg-info bg-opacity-25" placeholder="Scan" aria-label="Scan" aria-describedby="basic-addon1" disabled>
+              <div class="row mt-1">
+                <div class="col-sm-2">
+                  <button type="button" class="btn btn-sm btn-info text-white mb-2" id="btn-add-detail"> Tambah <i class="fa fa-plus"></i></button>
+                </div>
+                <div class="col-sm-5 d-none">
+                  <div class="form-group row">
+                    <label class="control-label text-start text-md-end col-md-2 col-form-label" for="foto_style">Upload File QR Code</label>
+                    <div class="col-md-9">
+                      <input type="file" id="fileQR" onchange="readURL(this,'#fileQR')" name="fileQR" class="form-control file-drag-drop" accept=".jpg, .jpeg, .png">
+                    </div>
                   </div>
                 </div>
               </div>
@@ -317,56 +319,8 @@
 
           <div class="row">
             <div class="col-sm-12">
-              <div class="table-responsive">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>DATE</th>
-                      <th>COLOUR</th>
-                      <th>PROCESS</th>
-                      <th>OPERATOR</th>
-                      <th>SIZE</th>
-                      <th>QTY</th>
-                      <th>PRICE</th>
-                      <th>TOTAL</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <button type="button" class="btn btn-sm btn-danger"> <i class="fa fa-trash"></i></button>
-                      </td>
-                      <td>01-10-2024</td>
-                      <td>M38 - MINT- HITAM- OFF WHITE</td>
-                      <td>Rajut</td>
-                      <td></td>
-                      <td>M</td>
-                      <td>
-                        <input type="text" class="form-control" value="12">
-                      </td>
-                      <td>0</td>
-                      <td>0</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <button type="button" class="btn btn-sm btn-danger"> <i class="fa fa-trash"></i></button>
-                      </td>
-                      <td>05-10-2024</td>
-                      <td>M38 - MINT- HITAM- OFF WHITE</td>
-                      <td>Linking-Obras</td>
-                      <td>Teh Endok</td>
-                      <td>M</td>
-                      <td>
-                        <input type="text" class="form-control" value="24">
-                      </td>
-                      <td>55.000</td>
-                      <td>1.320.000</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              
+              <div id="dt-list-prod" class="table-striped table-centered"></div>
+
               <br>
 
               <div class="row">
@@ -374,9 +328,7 @@
                   <a href="trans/production" class="btn btn-default m-e-5">
                     <span class="fa fa-arrow-left"></span> Kembali
                   </a>
-                  <a href="trans/production" class='btn btn-success'>
-                    <span class="fa fa-save"></span> Simpan
-                  </a>
+                  <button type="button" class="m-s-5 btn btn-success" id="btn-save-ukuran"> <i class="fa fa-save"></i> Submit</button>
                 </div>
               </div>
             </div>
@@ -388,3 +340,6 @@
 </div>
 
 <?= $this->endSection('content'); ?>
+<?= $this->section('script'); ?>
+<script src="script/app/transaction/production/form.js"></script>
+<?= $this->endSection('script'); ?>

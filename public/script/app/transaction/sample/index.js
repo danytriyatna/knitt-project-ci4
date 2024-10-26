@@ -121,10 +121,19 @@ $(document).ready(function () {
                     let row = cell.getRow();
                     let data_row = row.getData();
                     if (e.target.title === 'delete') {
-                        if (confirm("Anda yakin akan menghapus data?")) {
-                            deleteData(data_row.id)
-                            // window.location.replace(baseUrl + "/trans/sample/delete/detail" + data_row.id);
-                        }
+                        Swal.fire({
+                            title: "Apakah anda yakin ingin menghapus data?",
+                            icon: 'question',
+                            confirmButtonText: 'Hapus',
+                            confirmButtonColor: '#dc3545',
+                            showCancelButton: true,
+                            cancelButtonText: 'Batal',
+                            cancelButtonColor: '#6C757D'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                deleteData(data_row.id)
+                            }
+                        })
                     }else if(e.target.title === 'edit'){
                         getDetailQty(idSample,data_row.id)
                     } 
@@ -284,9 +293,19 @@ $(document).ready(function () {
                 getDetail(data.id)
             });
             document.querySelector(`.delete[data-id='${data.id}']`).addEventListener('click', ()=>{
-                if (confirm("Anda yakin akan menghapus data?")) {
-                    window.location.replace(baseUrl + "/trans/sample/delete/list" + data.id);
-                }
+                Swal.fire({
+                    title: "Apakah anda yakin ingin menghapus data?",
+                    icon: 'question',
+                    confirmButtonText: 'Hapus',
+                    confirmButtonColor: '#dc3545',
+                    showCancelButton: true,
+                    cancelButtonText: 'Batal',
+                    cancelButtonColor: '#6C757D'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.replace(baseUrl + "/trans/sample/delete/list" + data.id);
+                    }
+                })
             });
             new Tabulator(`#dt-list-detail-${data.id}`, {
                 data: data.detail, 
@@ -350,8 +369,27 @@ $(document).ready(function () {
 
     $("#btn-save").on("click", function(e){
         e.preventDefault()
-        if (confirm("Anda yakin akan mengsubmit data?")) {
-            simpanData(1)
+        if(dtListDetail.getData().length > 0){
+            Swal.fire({
+                title: "Apakah anda ingin mensubmit data Sample ?",
+                icon: 'question',
+                confirmButtonText: 'Simpan',
+                confirmButtonColor: '#198754',
+                showCancelButton: true,
+                cancelButtonText: 'Batal',
+                cancelButtonColor: '#6C757D'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    simpanData(1)
+                }
+            })
+        } else{
+            Swal.fire({
+                text: "Detail data harus diisi",
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
         }
     });
     $("#btn-draft").on("click", function(e){

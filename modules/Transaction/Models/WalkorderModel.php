@@ -38,16 +38,16 @@ class WalkorderModel extends \App\Models\PrModel
             $builder->where('abx.active = 1');
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
                 $builder->groupStart();
-                    $builder->where('LOWER(abx.kode_walkorder) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    $builder->orWhere('LOWER(abx.ref_kode) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->where('LOWER(abx.kode_walkorder) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(abx.ref_kode) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
             }
 
-            if(!empty($params['id_konsumen'])){
+            if (!empty($params['id_konsumen'])) {
                 $builder->where('abx.id_konsumen', $params['id_konsumen']);
             }
 
-            if(!empty($params['ref_kode'])){
+            if (!empty($params['ref_kode'])) {
                 $builder->where('abx.ref_kode', $params['ref_kode']);
             }
 
@@ -82,8 +82,8 @@ class WalkorderModel extends \App\Models\PrModel
 
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             $builder->groupStart();
-                $builder->where('LOWER(abx.kode_walkorder) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(abx.ref_kode) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->where('LOWER(abx.kode_walkorder) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(abx.ref_kode) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
         }
 
@@ -92,7 +92,8 @@ class WalkorderModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function generete_kode(){
+    function generete_kode()
+    {
         $kd = "WRD";
         $builder = $this->db->table($this->table . ' a');
         $builder->select('LEFT(kode_walkorder, 7) AS tgl, RIGHT( kode_walkorder, 4 ) AS kode ');
@@ -100,7 +101,7 @@ class WalkorderModel extends \App\Models\PrModel
         $builder->orderBy('a.id', "DESC");
         $builder->limit(1);
         $query = $builder->get()->getRow();
-       
+
         if ($query != NULL) {
             if ($query->tgl == $kd . date('y') . date('m')) {     //cek dulu apakah ada sudah ada tahun dan bulan di tabel.   
                 //jika tahun dan bulan ternyata sudah ada.      
@@ -116,7 +117,7 @@ class WalkorderModel extends \App\Models\PrModel
 
         $kodemax = str_pad($kode, 5, "0", STR_PAD_LEFT); // angka 3 menunjukkan jumlah digit angka 0
         $kodejadi = $kd . date('y') . date('m') . $kodemax;
-        
+
         // hasilnya SOD24100001 dst.
         return $kodejadi;
     }
@@ -143,15 +144,15 @@ class WalkorderModel extends \App\Models\PrModel
             $builder->where('abx.active = 1');
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
                 $builder->groupStart();
-                    $builder->where('LOWER(abx.qty) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    $builder->orWhere('LOWER(abx.gram) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    $builder->orWhere('LOWER(abx.gram_nd) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    $builder->orWhere('LOWER(abx.kg) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    $builder->orWhere('LOWER(abx.loss) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->where('LOWER(abx.qty) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(abx.gram) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(abx.gram_nd) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(abx.kg) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(abx.loss) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
             }
 
-            if(!empty($params['id_walkorder'])){
+            if (!empty($params['id_walkorder'])) {
                 $builder->where('abx.id_walkorder', $params['id_walkorder']);
             }
 
@@ -191,11 +192,11 @@ class WalkorderModel extends \App\Models\PrModel
 
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             $builder->groupStart();
-                $builder->where('LOWER(abx.qty) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(abx.gram) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(abx.gram_nd) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(abx.kg) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(abx.loss) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->where('LOWER(abx.qty) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(abx.gram) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(abx.gram_nd) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(abx.kg) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(abx.loss) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
         }
 
@@ -215,16 +216,16 @@ class WalkorderModel extends \App\Models\PrModel
                         ");
 
         $builder->join("_jenis_proses_produksi pp", "pp.id = abx.id_proses", "inner");
-        
+
         if ($id == null or $id == "") {
             $builder->where('abx.active = 1');
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
                 $builder->groupStart();
-                    $builder->where('LOWER(pp.proses) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->where('LOWER(pp.proses) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
             }
 
-            if(!empty($params['id_walkorder'])){
+            if (!empty($params['id_walkorder'])) {
                 $builder->where('abx.id_walkorder', $params['id_walkorder']);
             }
 
@@ -260,7 +261,7 @@ class WalkorderModel extends \App\Models\PrModel
 
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             $builder->groupStart();
-                $builder->where('LOWER(pp.proses) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->where('LOWER(pp.proses) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
         }
 
@@ -280,17 +281,17 @@ class WalkorderModel extends \App\Models\PrModel
                         ");
 
         $builder->join("ref_ukuran rk", "rk.id = abx.id_ukuran", "inner");
-        
+
         if ($id == null or $id == "") {
             $builder->where('abx.active = 1');
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
                 $builder->groupStart();
-                    $builder->where('LOWER(rk.kode_ukuran) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    $builder->orWhere('LOWER(rk.keterangan) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->where('LOWER(rk.kode_ukuran) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(rk.keterangan) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
             }
 
-            if(!empty($params['id_walkorder'])){
+            if (!empty($params['id_walkorder'])) {
                 $builder->where('abx.id_walkorder', $params['id_walkorder']);
             }
 
@@ -326,8 +327,8 @@ class WalkorderModel extends \App\Models\PrModel
 
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             $builder->groupStart();
-                $builder->where('LOWER(rk.kode_ukuran) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(rk.keterangan) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->where('LOWER(rk.kode_ukuran) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(rk.keterangan) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
         }
 
@@ -348,17 +349,17 @@ class WalkorderModel extends \App\Models\PrModel
                         ");
 
         $builder->join("ref_warna rw", "rw.id = abx.id_warna", "inner");
-        
+
         if ($id == null or $id == "") {
             $builder->where('abx.active = 1');
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
                 $builder->groupStart();
-                    $builder->where('LOWER(rw.kode_warna) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    // $builder->orWhere('LOWER(rk.keterangan) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->where('LOWER(rw.kode_warna) LIKE', strtolower("%{$filters[0]['value']}%"));
+                // $builder->orWhere('LOWER(rk.keterangan) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
             }
 
-            if(!empty($params['id_walkorder_detail'])){
+            if (!empty($params['id_walkorder_detail'])) {
                 $builder->where('abx.id_walkorder_detail', $params['id_walkorder_detail']);
             }
 
@@ -394,7 +395,7 @@ class WalkorderModel extends \App\Models\PrModel
 
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             $builder->groupStart();
-                $builder->where('LOWER(rw.kode_warna) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->where('LOWER(rw.kode_warna) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
         }
 
