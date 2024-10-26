@@ -84,8 +84,8 @@
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="m-s-5 btn btn-info" id="btn-draft"> <i class="fa fa-save"></i> Draft</button>
-        <button type="button" class="m-s-5 btn btn-success" id="btn-save"> <i class="fa fa-save"></i> Submit</button>
+        <button type="button" class="m-s-5 btn btn-success" id="btn-draft"> <i class="fa fa-save"></i> Simpan</button>
+        <button type="button" class="m-s-5 btn btn-info" id="btn-save"> <i class="fa fa-paper-plane"></i> Submit</button>
       </div>
     </div>
   </div>
