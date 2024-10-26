@@ -10,7 +10,7 @@
     <meta name="image" property="og:image" content="assets/images/og-image.webp">
     <meta name="description" property="og:description" content="<?= $deskripsi?>">
     <meta name="author" property="og:author" content="Pejuang Rupiah">
-    <link rel="icon" type="image/png" sizes="64x64" href="assets/images/favicon.webp">
+    <link rel="icon" type="image/png" sizes="64x64" href="assets/images/favicon.png">
     <title>Reset Password &mdash; <?= $judul ?></title>
     <link href="assets/css/style.min.css" rel="stylesheet">
     <link href="assets/css/custom.min.css" rel="stylesheet">

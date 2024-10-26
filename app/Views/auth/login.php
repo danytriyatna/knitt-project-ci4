@@ -11,7 +11,7 @@
     <meta name="image" property="og:image" content="assets/images/og-image.webp">
     <meta name="description" property="og:description" content="<?= $deskripsi?>">
     <meta name="author" property="og:author" content="Pejuang Rupiah">
-    <link rel="icon" type="image/png" sizes="64x64" href="assets/images/favicon.webp">
+    <link rel="icon" type="image/png" sizes="64x64" href="assets/images/favicon.png">
     <title><?= $titlehead ?> &mdash; <?= $judul ?></title>
     <link href="assets/css/style.min.css" rel="stylesheet">
     <!-- sweetalert2 - https://sweetalert2.github.io/ -->
@@ -35,9 +35,9 @@
       <div class="login-box login-sidebar" style="margin-top:auto !important;">
         <div class="white-box">
           <a href="javascript:void(0)" class="text-center d-block m-b-10">
-            <img height="75px" src="assets/images/logo.webp" alt="Home" />
+            <img height="96px" src="assets/images/logo-knitt.png" alt="Home" />
           </a>
-          <h4><?= $name_app ?></h4>
+          <!-- <h4><?= $name_app ?></h4> -->
           <div id="infoMessage"><?= $message;?></div>
 
           <?php
