@@ -128,9 +128,16 @@ class WalkorderModel extends \App\Models\PrModel
     {
         $builder = $this->db->table($this->table2 . " abx");
 
-        $builder->select("abx.id, abx.id_walkorder, abx.ref_detail_id, bbx.qty, abx.gram, abx.gram_nd, abx.kg, abx.loss,
-                          abx.kg_loss, abx.total, abx.tipe_id
+        $builder->select("abx.id, abx.id_walkorder, abx.ref_detail_id, abx.qty, abx.gram, abx.gram_nd, abx.kg, abx.loss,
+                          abx.kg_loss, abx.total, abx.tipe_id,
+                          (case when abx.tipe_id = 2 then tso.id_warna_1 else ts.id_warna_1 end) as id_wdasar,
+		                  (case when abx.tipe_id = 2 then rw2.kode_warna else rw1.kode_warna end) as wdasar
                         ");
+
+        $builder->join("trans_sales_order_det tso", "tso.id = abx.ref_detail_id and abx.tipe_id = 2", "left");
+        $builder->join("ref_warna rw2", "rw2.id = tso.id_warna_1", "left");
+        $builder->join("trans_sample_det ts", "ts.id = abx.ref_detail_id and abx.tipe_id = 1", "left");
+        $builder->join("ref_warna rw1", "rw1.id = ts.id_warna_1", "left");
 
         if ($id == null or $id == "") {
             $builder->where('abx.active = 1');
@@ -174,6 +181,12 @@ class WalkorderModel extends \App\Models\PrModel
         $builder = $this->db->table($this->table2 . " abx");
 
         $builder->select("count(1) as _cnt");
+
+        $builder->join("trans_sales_order_det tso", "tso.id = abx.ref_detail_id and abx.tipe_id = 2", "left");
+        $builder->join("ref_warna rw2", "rw2.id = tso.id_warna_1", "left");
+        $builder->join("trans_sample_det ts", "ts.id = abx.ref_detail_id and abx.tipe_id = 1", "left");
+        $builder->join("ref_warna rw1", "rw1.id = ts.id_warna_1", "left");
+
         $builder->where('abx.active = 1');
 
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
@@ -329,8 +342,8 @@ class WalkorderModel extends \App\Models\PrModel
     {
         $builder = $this->db->table($this->table5 . " abx");
 
-        $builder->select(" abx.id, abx.id_walkorder_detail, abx.id_warna, bbx.persen,
-                           abx.gram, abx.gram_nd, abx.kg, abx.loss, abx.kg_loss, abx.total
+        $builder->select(" abx.id, abx.id_walkorder_detail, abx.id_warna, abx.persen,
+                           abx.gram, abx.gram_nd, abx.kg, abx.loss, abx.kg_loss, abx.total,
                            abx.kuota, abx.kuota_tambah, rw.kode_warna, rw.keterangan as warna_keterangan
                         ");
 
@@ -345,8 +358,8 @@ class WalkorderModel extends \App\Models\PrModel
                 $builder->groupEnd();
             }
 
-            if(!empty($params['id_walkorder'])){
-                $builder->where('abx.id_walkorder', $params['id_walkorder']);
+            if(!empty($params['id_walkorder_detail'])){
+                $builder->where('abx.id_walkorder_detail', $params['id_walkorder_detail']);
             }
 
             if (!empty($order)) {

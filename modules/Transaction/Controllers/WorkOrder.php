@@ -22,6 +22,7 @@ class WorkOrder extends BaseController
   protected $mWarna;
   protected $mSample;
   protected $mSalesOrder;
+  protected $mPproduksi;
 
   protected $views = '\Modules\Transaction\Views';
   protected $urlv  = 'trans/work-order';
@@ -37,6 +38,7 @@ class WorkOrder extends BaseController
     $this->mWarna = new WarnaModel();
     $this->mSample = new SampleModel();
     $this->mSalesOrder = new SalesOrderModel();
+    $this->mPproduksi = new ProsesProduksiModel();
   }
 
 
@@ -152,289 +154,141 @@ class WorkOrder extends BaseController
           $list_detail[$i]->qty_prod = 0;
         }
       }
+
+      if(isset($_POST)){
+        
+      }
       
       $this->data['row']    = $stdData;
       $this->data['detail'] = json_encode($list_detail); 
     }
 
+    $proces_data = $this->mPproduksi->getData(null, 0, 999);
+
+    $this->data['proses'] = $proces_data;
+
 		return view($this->views.'/work_order_form', $this->data);
 
   }
 
-  function detail($id)
+  public function lists_detail()
   {
-    $id = decrypt($id);
-    $results = $this->mSalesOrder->getData($id);
-    $build_array =  array(
-      "id"   => encrypt($results->id),
-      "keterangan" => $results->keterangan,
-      "id_konsumen" => $results->id_konsumen,
-      "tgl_transaksi" => $results->tgl_transaksi,
-      "kode_sales_order" => $results->kode_sales_order,
-      "tgl_deadline" => $results->tgl_deadline,
-      "deskripsi" => $results->deskripsi,
-      "gambar_id" => $results->gambar_id,
-      "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sales_order/" . $results->file_name : "",
-      "id_sample" => $results->id_sample,
-      "detail" => $this->mSalesOrder->getDataDetailSalesOrder($results->id)
+    $start      = $this->request->getPost('start');
+    $limit      = $this->request->getPost('length');
+    $filters    = $this->request->getPost('filter');
+    $order      = $this->request->getPost('sort');
+
+    $params = [];
+
+    $results = $this->mWalkorder->getData_detail(null, $start, $limit, $order, $filters, $params);
+    $totalfiltered = $this->mWalkorder->getDataCnt_detail($filters, $params);
+    $totaldata = $this->mWalkorder->getDataCnt_detail(null, $params);
+    $maxpage = ceil($totalfiltered / $limit);
+
+    $build_array = array(
+      "last_page" => $maxpage,
+      "recordsTotal" => $totaldata,
+      "recordsFiltered" => $totalfiltered,
+      "data" => array()
     );
+
+    foreach ($results as $row) {
+      $id = encrypt($row->id);
+
+      $params_d['id_walkorder_detail'] = $row->id;
+      $data_detail = $this->mWalkorder->getData_warna(null, 0, 9999, null, null, $params_d);
+
+      array_push(
+        $build_array["data"],
+          array(
+          "id"      => ($id),
+          "wdasar"  => ($row->wdasar),
+          "qty"     => $row->qty,
+          "gram"    => $row->gram,
+          "gram_nd" => $row->gram_nd,
+          "kg"      => $row->kg,
+          "kg_loss" => $row->kg_loss,
+          "total"   => $row->total,
+          "loss"    => $row->loss,
+          'details' => !empty($data_detail) ? $data_detail : []
+        )
+      );
+    }
     return $this->response->setJSON($build_array);
   }
 
-  function detailQtyUkuran($idSalesOrder, $idSalesOrderDet)
-  {
-    $id = !empty($idSalesOrder) ? decrypt($idSalesOrder) : 0;
-    $idSalesOrderDet = !empty($idSalesOrderDet) ? $idSalesOrderDet : 0;
-    $results = $this->mSalesOrder->getData($id);
-    $build_array =  array(
-      "id"   => encrypt($results->id),
-      "keterangan" => $results->keterangan,
-      "nama" => $results->nama,
-      "tgl_transaksi" => $results->tgl_transaksi,
-      "kode_sales_order" => $results->kode_sales_order,
-      "tgl_deadline" => $results->tgl_deadline,
-      "deskripsi" => $results->deskripsi,
-      "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
-      "detail" => $this->mSalesOrder->getDataDetailSampleWarna($id, $idSalesOrderDet),
-      "detailUkuran" =>  $this->mSalesOrder->getDataDetailSampleUkuran($id, $idSalesOrderDet)
-    );
-    return $this->response->setJSON($build_array);
-  }
-
-  function save()
-  {
-    $id         = $this->request->getPost('id');
-    $idKonsumen         = $this->request->getPost('idKonsumen');
-    $tglTransaksi = $this->request->getPost('tglTransaksi');
-    $tglDeadline = $this->request->getPost('tglDeadline');
-    $deskripsi = $this->request->getPost('deskripsi');
-    $keterangan = $this->request->getPost('deskripsi');
-    $fileIdSalesOrderOld = $this->request->getPost('fileIdSalesOrderOld');
-    $noSalesOrder = $this->request->getPost('noSalesOrder');
-    $sampleId = $this->request->getPost('samples');
-    $submit_data = $this->request->getPost('submit_data');
-
-
-    $this->validation->setRules([
-      'idKonsumen '               => ['label' => 'Pilih Buyer', 'rules' => 'required'],
-      'tglTransaksi'         => ['label' => 'Tanggal Transaksi', 'rules' => 'required'],
-      'tglDeadline'          => ['label' => 'Tanggal Deadline', 'rules' => 'required'],
-      'deskripsi'             => ['label' => 'Deskripsi', 'rules' => 'required|trim'],
-    ]);
-
-    if (!empty($this->request->getFile('fileSalesOrder'))) {
-      $fileSalesOrder       = $this->request->getFile('fileSalesOrder');
-      $fileName       = $fileSalesOrder->getRandomName();
-      $originName     = $fileSalesOrder->getName();
-      $fileType       = $fileSalesOrder->getMimeType();
-      $fileSize       = $fileSalesOrder->getSize();
-
-
-      if (!in_array($fileType, ['image/png', 'image/jpeg', 'image/webp'])) {
-        $build_array['message'] = "<br>File <b>SalesOrder</b> hanya menerima tipe file <b>*.webp</b> <b>*.jpg</b>, atau <b>*.png</b>";
-        $build_array['status']  = false;
-        return $this->response->setJSON($build_array);
-      }
-
-      $this->files->insert([
-        'file_name' => $fileName,
-        'file_size' => $fileSize,
-        'file_type' => $fileType,
-        'file_name_origin' => $originName,
-        'active'    => 1,
-      ]);
-
-      $fileIdSalesOrder = $this->files->insertID();
-      $fileSalesOrder->move(WRITEPATH . 'uploads/sales_order/', $fileName);
-
-      if ($fileIdSalesOrderOld != "") {
-        $nama_file =  $this->files->where('id', $fileIdSalesOrderOld)->get()->getRow()->file_name;
-        unlink(WRITEPATH . 'uploads/sales_order/' . $nama_file);
-
-        $this->files->delete(['id' => $fileIdSalesOrderOld]);
-      }
-    }else{
-      $fileIdSalesOrder = $fileIdSalesOrderOld;
-    }
-
-    $msg    = "Data gagal ditambahkan !";
-    $status = false;
-
-    $arr_isi = [
-      'id_konsumen' => $idKonsumen,
-      'keterangan' => $keterangan,
-      'deskripsi' => $deskripsi,
-      'tgl_transaksi' => $tglTransaksi,
-      'tgl_deadline' => $tglDeadline,
-      // 'kode_sales_order' => $noSalesOrder,
-      'active' => 1,
-      'gambar_id' => !empty($fileIdSalesOrder) ? $fileIdSalesOrder : null
-    ];
-
-    if(!empty($submit_data)){
-      $arr_isi['status'] = 2;
-    }
-
-    if (empty($id)) {
-      $this->db->transBegin();
-      $arr_isi['created_at'] = date("Y-m-d H:i:s");
-      $arr_isi['kode_sales_order'] = $this->mSalesOrder->generete_kode();
-      $hid = $this->mSalesOrder->insertRecordGetid($this->mSalesOrder->table, $arr_isi);
-
-      if(!empty($sampleId)){
-        $data_detail = $this->mSample->getDataDetailSample_ori($sampleId);
-        if(!empty($data_detail)){
-          foreach ($data_detail as $r) {
-            $arr_isid = [
-              'id_sales_order' => $hid,
-              'keterangan' => '',
-              'id_warna_1' => $r->id_warna_1,
-              'id_warna_2' => $r->id_warna_2,
-              'id_warna_3' => $r->id_warna_3,
-              'id_warna_4' => $r->id_warna_4,
-              'id_warna_5' => $r->id_warna_5,
-              'id_warna_6' => $r->id_warna_6,
-              'id_warna_7' => $r->id_warna_7,
-              'id_warna_8' => $r->id_warna_8,
-              'total_harga' => $r->total_harga,
-            ];
-            $hidd = $this->mSalesOrder->insertRecordGetid('trans_sales_order_det', $arr_isid);
-            $data_details = $this->mSample->getDataDetailSampleUkuran($sampleId, $r->id);
-            if(!empty($data_details)){
-                foreach ($data_details as $rx) {
-                  $arr_isidx = [
-                    'id_sales_order' => $hid,
-                    'id_sales_order_det' => $hidd,
-                    'id_ukuran' => $rx->id_ukuran,
-                    'qty' => $rx->qty,
-                    'harga_satuan' => $rx->harga_satuan,
-                    'harga_total' => $rx->harga_total,
-                  ];
-                   $this->mSalesOrder->insertRecordGetid('trans_sales_order_ukuran', $arr_isidx);
-                }
-            }
-          }
-        }
-      }
-
-      if ($this->db->transStatus() === FALSE) {
-        $this->db->transRollback();
-      } else {
-          $this->db->transCommit();
-          $msg    = "Data berhasil ditambahkan !";
-          $status = true;
-      }
-    } else {
-      $arr_isi['updated_at'] = date("Y-m-d H:i:s");
-      $id = decrypt($id);
-      $this->mSalesOrder->updateRecord($this->mSalesOrder->table, $arr_isi, 'id', $id);
-
-      if(!empty($submit_data)){
-        $wo_data = [
-          'ref_id' => $id,
-          'ref_kode' => $noSalesOrder,
-          'id_konsumen' => $idKonsumen,
-          // 'id_style' => $id,
-          'file_id' => !empty($fileIdSalesOrder) ? $fileIdSalesOrder : null,
-          'status' => 1,
-        ];
-      }
-
-      $msg    = "Data berhasil diupdate !";
-      $status = true;
-    }
-
-    $build_array['message'] = $msg;
-    $build_array['status']  = $status;
-
-    return $this->response->setJSON($build_array);
-  }
-
-  function saveDetail()
+  function saveWarna()
   {
     $msg    = "Data gagal disimpan !";
     $status = false;
-    $idSalesOrder = $this->request->getPost('idSalesOrder');
-    $idSalesOrderDet = $this->request->getPost('idSalesOrderDet');
-    $warna1 = $this->request->getPost('warna1');
-    $warna2 = $this->request->getPost('warna2');
-    $warna3 = $this->request->getPost('warna3');
-    $warna4 = $this->request->getPost('warna4');
-    $warna5 = $this->request->getPost('warna5');
-    $warna6 = $this->request->getPost('warna6');
-    $warna7 = $this->request->getPost('warna7');
-    $warna8 = $this->request->getPost('warna8');
-    $dataUkuran = $this->request->getPost('dataUkuran');
-    $dataWarna = [
-      "id_warna_1" => !empty($warna1) ? $warna1 : null,
-      "id_warna_2" => !empty($warna2) ? $warna2 : null,
-      "id_warna_3" => !empty($warna3) ? $warna3 : null,
-      "id_warna_4" => !empty($warna4) ? $warna4 : null,
-      "id_warna_5" => !empty($warna5) ? $warna5 : null,
-      "id_warna_6" => !empty($warna6) ? $warna6 : null,
-      "id_warna_7" => !empty($warna7) ? $warna7 : null,
-      "id_warna_8" => !empty($warna8) ? $warna8 : null,
 
-      "id_sales_order" => (int)decrypt($idSalesOrder),
-      "id" => !empty($idSalesOrderDet) ? $idSalesOrderDet :  null,
-    ];
+    $detail_id    = $this->request->getPost('detail');
+    $detail_qty   = $this->request->getPost('detail_qty');
+    $detail_loss  = $this->request->getPost('detail_loss');
+    $list_data    = $this->request->getPost('warna_data');
 
-    $res = $this->mSalesOrder->trxInsertUpdateRecord($dataWarna, $dataUkuran);
-    if ($res) {
-      $status = true;
-      $msg = "Data berhasil disimpan!";
+
+    $detail_id = \decrypt($detail_id);
+    $det_grams = 0;
+    $det_grams_nd = 0;
+    $det_kg = 0;
+    $det_kg_loss = 0;
+    $det_total = 0;
+    
+    $this->db->transBegin();
+    $list_data = json_decode($list_data, true);
+    
+    try {
+      if(!empty($list_data)){
+        foreach ($list_data as $r) {
+          $warna_id = $r['id'];
+  
+          $det_grams = $det_grams + $r['gram'];
+          $det_grams_nd = $det_grams_nd + $r['gram_nd'];
+          $det_kg = $det_kg + $r['kg'];
+          $det_kg_loss = $det_kg_loss + $r['kg_loss'];
+          $det_total = $det_total + $r['total'];
+  
+          $warna_isi = [
+            'persen'  => $r['persen'],
+            'gram'    => $r['gram'],
+            'gram_nd' => $r['gram_nd'],
+            'kg'      => $r['kg'],
+            'kg_loss' => $r['kg_loss'],
+            'total'   => $r['total'],
+            'kuota'   => $r['kuota'],
+            'loss'    => $detail_loss
+          ];
+          
+          $this->mWalkorder->updateRecord($this->mWalkorder->table5, $warna_isi, 'id', $warna_id);
+        }
+      }
+  
+      $detail_isi = [
+        'gram'    => $det_grams,
+        'gram_nd' => $det_grams_nd,
+        'kg'      => $det_kg,
+        'loss'    => $detail_loss,
+        'kg_loss' => $det_kg_loss,
+        'total'   => $det_total
+      ];
+  
+      $this->mWalkorder->updateRecord($this->mWalkorder->table2, $detail_isi, 'id', $detail_id);
+  
+      if ($this->db->transStatus() === FALSE) {
+        $this->db->transRollback();
+
+      } else {
+          $this->db->transCommit();
+          $msg    = "Data berhasil disimpan !";
+          $status = true;
+      }
+    } catch (\Throwable $th) {
+      //throw $th;
+      $this->db->transRollback();
+      // $msg    = $th;
     }
 
-    $build_array['message'] = $msg;
-    $build_array['status']  = $status;
-
-    return $this->response->setJSON($build_array);
-  }
-
-  public function deleteList($id = NULL)
-  {
-    if (!$this->auth->loggedIn() or (!$this->auth->isAdmin() && !$this->auth->isSuperadmin())) {
-      throw new \Exception('You must be an administrator to view this page.');
-    }
-
-    if ($id != null && $id != "") {
-      $id = decrypt($id);
-    }
-
-    $id = (int)$id;
-    $msg    = "Data gagal dihapus !";
-    $status = false;
-    $res = $this->mSalesOrder->deleteRecord($this->mSalesOrder->table, 'id', $id);
-    if ($res) {
-      $this->mcommon->setLog($this->currentUser->user_id, $this->MOD_ALIAS, $id, "SalesOrder Dihapus");
-      $this->session->setFlashdata('message', "SalesOrder berhasil dihapus");
-    } else {
-      $this->session->setFlashdata('err', "SalesOrder gagal dihapus");
-    }
-
-
-    return redirect()->to($this->urlv);
-  }
-  public function deleteDetailList($id = NULL)
-  {
-    if (!$this->auth->loggedIn() or (!$this->auth->isAdmin() && !$this->auth->isSuperadmin())) {
-      throw new \Exception('You must be an administrator to view this page.');
-    }
-
-    if ($id != null && $id != "") {
-      $id = decrypt($id);
-    }
-
-    $id = (int)$id;
-    $msg    = "Data gagal dihapus !";
-    $status = false;
-    $res = $this->mSalesOrder->deleteRecord("trans_sales_order_det", 'id', $id);
-    $resDel = $this->mSalesOrder->deleteRecord("trans_sales_order_ukuran", 'id_sales_order_det', $id);
-    if ($resDel) {
-      $this->mcommon->setLog($this->currentUser->user_id, $this->MOD_ALIAS, $id, "SalesOrder Dihapus");
-      $status = true;
-      $msg = "Data berhasil dihapus!";
-    }
     $build_array['message'] = $msg;
     $build_array['status']  = $status;
 

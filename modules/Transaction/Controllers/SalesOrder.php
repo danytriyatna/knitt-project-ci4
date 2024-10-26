@@ -311,6 +311,7 @@ class SalesOrder extends BaseController
               $detail_wo = [
                 'id_walkorder' => $wo_id,
                 'ref_detail_id' => $xrow->id,
+                'qty' => $this->mSalesOrder->getTotal_qty($xrow->id, 2),
                 'tipe_id' => 2,
                 'created_at' => date("Y-m-d H:i:s")
               ];
