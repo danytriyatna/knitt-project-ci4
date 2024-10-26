@@ -260,13 +260,14 @@ $(document).ready(function () {
                   </div>
                   <div class="card-body">
                     <div class="row">
-                      <div class="col-sm-3 text-center">
+                      <div class="col-sm-3 text-start">
                         <h6 class="f-w-700 m-b-6">${data.kode_sample}</h6>
-                        <h5 class="f-w-700 m-b-12">${data.deskripsi}</h5>
-                        <p class="m-y-0">${formatterDate(data.tgl_transaksi)}</p>
-                        <p class="m-y-0"><em>Deadline: ${formatterDate(data.tgl_deadline)}</em></p>
-                        <p class="f-w-700 m-t-4">${data.nama}</p>
-                        <img class="m-t-10 w-100" src="${data.file_gambar}" alt="Foto Sample">
+                        <p class="f-w-500 m-y-0">${data.deskripsi}</p>
+                        <hr class="m-y-8" />
+                        <p class="m-y-0"><i class="fa fa-calendar-day f-s-11"></i>&nbsp; ${formatterDate(data.tgl_transaksi)}</p>
+                        <p class="m-y-0"><i class="fa fa-calendar-week f-s-11"></i>&nbsp; <em>Deadline: ${formatterDate(data.tgl_deadline)}</em></p>
+                        <p class="m-t-8 badge bg-secondary d-inline-block"><i class="fa fa-user f-s-11"></i>&nbsp; ${data.nama}</p>
+                        <a class="hover-zoom-rotate" href="${data.file_gambar}" target="_blank"><img class="m-t-0 d-block object-fit-cover rounded" src="${data.file_gambar}" alt="Foto Sample" width="160px" height="90px" /></a>
                       </div>
                       <div class="col-sm-9">
                            <div id="dt-list-detail-${data.id}" class="table-responsive table-striped"></div>
