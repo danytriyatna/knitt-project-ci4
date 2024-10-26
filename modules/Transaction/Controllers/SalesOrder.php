@@ -228,15 +228,15 @@ class SalesOrder extends BaseController
       'tgl_deadline' => $tglDeadline,
       // 'kode_sales_order' => $noSalesOrder,
       'active' => 1,
+      // 'status' => 1,
       'gambar_id' => !empty($fileIdSalesOrder) ? $fileIdSalesOrder : null
     ];
 
-    if(!empty($submit_data)){
-      $arr_isi['status'] = 2;
-    }
+    
     $this->db->transBegin();
 
     if (empty($id)) {  
+      $arr_isi['status'] = 1;
       $arr_isi['created_at'] = date("Y-m-d H:i:s");
       $arr_isi['kode_sales_order'] = $this->mSalesOrder->generete_kode();
       $hid = $this->mSalesOrder->insertRecordGetid($this->mSalesOrder->table, $arr_isi);
@@ -281,6 +281,9 @@ class SalesOrder extends BaseController
     } else {
       $arr_isi['updated_at'] = date("Y-m-d H:i:s");
       $id = decrypt($id);
+      if(!empty($submit_data)){
+        $arr_isi['status'] = 2;
+      }
       $this->mSalesOrder->updateRecord($this->mSalesOrder->table, $arr_isi, 'id', $id);
 
       if(!empty($submit_data)){

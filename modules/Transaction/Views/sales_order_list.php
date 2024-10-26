@@ -13,6 +13,27 @@
         <div class="alert alert-secondary p-y-8 text-muted">
           <i>*) Wajib diisi</i>
         </div>
+
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="no_sales_order">Sales Order No.</label>
+          <div class="col-md-9">
+            <input type="text" id="no_sales_order" readonly name="no_sales_order" class="form-control" placeholder="Ketikkan nomor sales_order" value="" required>
+            <div class="invalid-feedback">
+              Sales Order No. tidak valid
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="tgl_sales_order">Date<span class="text-danger">*</span></label>
+          <div class="col-md-9">
+            <input type="text" id="tgl_sales_order" name="tgl_sales_order" class="form-control datepicker" placeholder="Pilih tanggal sales_order" value="" required>
+            <div class="invalid-feedback">
+              Date tidak valid
+            </div>
+          </div>
+        </div>
+
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_buyer">Buyer<span class="text-danger">*</span></label>
           <div class="col-md-9">
@@ -27,15 +48,7 @@
             </div>
           </div>
         </div>
-        <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="no_sales_order">Sales Order No.</label>
-          <div class="col-md-9">
-            <input type="text" id="no_sales_order" readonly name="no_sales_order" class="form-control" placeholder="Ketikkan nomor sales_order" value="" required>
-            <div class="invalid-feedback">
-              Sales Order No. tidak valid
-            </div>
-          </div>
-        </div>
+       
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_samples">Style/Sample</label>
           <div class="col-md-9">
@@ -56,15 +69,7 @@
             </div>
           </div>
         </div>
-        <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="tgl_sales_order">Date<span class="text-danger">*</span></label>
-          <div class="col-md-9">
-            <input type="text" id="tgl_sales_order" name="tgl_sales_order" class="form-control datepicker" placeholder="Pilih tanggal sales_order" value="" required>
-            <div class="invalid-feedback">
-              Date tidak valid
-            </div>
-          </div>
-        </div>
+       
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="tgl_deadline">Deadline<span class="text-danger">*</span></label>
           <div class="col-md-9">
