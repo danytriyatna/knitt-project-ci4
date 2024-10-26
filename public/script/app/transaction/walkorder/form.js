@@ -217,6 +217,7 @@ $(document).ready(function () {
         ajaxRequesting: function (url, params) {
             params.start = params.size * (params.page - 1);
             params.length = params.size;
+            params.woid = $("#dataid").val();
         },
         ajaxResponse: function (url, params, response) {
             let pageSize = dtList_detail1.getPageSize();
@@ -292,10 +293,11 @@ $(document).ready(function () {
                         let val_kg_loss = inpDetailLoss.val().length > 0 ? (val_kg * inpDetailLoss.val())/ 100 : 0
                             // val_kg_loss = val_kg_loss > 0 ? val_kg_loss.toFixed(2) : 0;
 
-                        let val_total = parseFloat(val_kg) - parseFloat(val_kg_loss);
+                        let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
                             // val_total = val_total > 0 ? val_total.toFixed(2) : 0
-                        let val_kuota = parseFloat(val_kg) + parseFloat(val_kg_loss);
+                        let val_kuota = 0;
                             // val_kuota    = val_kuota    > 0 ? val_kuota   .toFixed(2) : 0
+                        let val_kuota_tambah =  val_kuota - val_total
             
                         // Set nilai total di baris yang sama
                         cell.getRow().update({ 
@@ -304,7 +306,8 @@ $(document).ready(function () {
                             kg: val_kg,
                             kg_loss: val_kg_loss,
                             total: val_total,
-                            kuota: val_kuota 
+                            kuota: val_kuota,
+                            kuota_tambah: val_kuota_tambah,
                          });
                     },
                 },
@@ -370,16 +373,19 @@ $(document).ready(function () {
             let val_kg_loss = val.length > 0 ? (val_kg * val) / 100 : 0
                 val_kg_loss = val_kg_loss > 0 ? val_kg_loss.toFixed(2) : 0;
 
-            let val_total = parseFloat(val_kg) - parseFloat(val_kg_loss);
+            let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
                 val_total = val_total > 0 ? val_total.toFixed(2) : 0
 
-            let val_kuota = parseFloat(val_kg) + parseFloat(val_kg_loss);
+            let val_kuota = 0;//parseFloat(val_kg) - parseFloat(val_kg_loss);
                 val_kuota    = val_kuota    > 0 ? val_kuota   .toFixed(2) : 0
+
+            let val_kuota_tambah = val_kuota - val_total;
 
             row.update({
                 kg_loss: val_kg_loss,
                 total: val_total,
-                kuota: val_kuota 
+                kuota: val_kuota,
+                kuota_tambah: val_kuota_tambah,
             });
         });
     });

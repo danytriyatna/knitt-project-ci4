@@ -529,7 +529,7 @@ $(document).ready(function () {
         if(inpBuyer.val().length == 0) validation = false
         if(inpTglDeadline.val().length == 0) validation = false
         if(inpTglTransaksi.val().length == 0) validation = false
-        if(fileSalesOrder[0].files[0] == undefined) validation = false
+        // if(fileSalesOrder[0].files[0] == undefined) validation = false
     
         if(validation){
             var formData = new FormData();
