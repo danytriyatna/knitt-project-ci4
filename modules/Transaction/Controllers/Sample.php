@@ -9,6 +9,15 @@ use Modules\Referensi\Models\KonsumenModel;
 use Modules\Referensi\Models\UkuranModel;
 use Modules\Referensi\Models\WarnaModel;
 use App\Models\FileModel;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\Logo\Logo;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Writer\ValidationException;
 
 class Sample extends BaseController
 {
@@ -157,7 +166,8 @@ class Sample extends BaseController
     $deskripsi = $this->request->getPost('deskripsi');
     $keterangan = $this->request->getPost('deskripsi');
     $fileIdSampleOld = $this->request->getPost('fileIdSampleOld');
-    $noSample = $this->request->getPost('noSample');
+    $qty = $this->request->getPost('qty');
+    $hargaTotal = $this->request->getPost('hargaTotal');
     $stat = $this->request->getPost('status');
 
 
@@ -212,7 +222,8 @@ class Sample extends BaseController
       'deskripsi' => $deskripsi,
       'tgl_transaksi' => $tglTransaksi,
       'tgl_deadline' => $tglDeadline,
-      'kode_sample' => $noSample,
+      'total_harga' => $hargaTotal,
+      'qty' => $qty,
       'active' => 1,
       'status' => $stat,
       'gambar_id' => !empty($fileIdSample) ? $fileIdSample : null
@@ -221,15 +232,18 @@ class Sample extends BaseController
 
     if (empty($id)) {
       $arr_isi['created_at'] = date("Y-m-d H:i:s");
+      $arr_isi['kode_sample'] = $this->mSample->generateNo("SPL", "trans_sample", "kode_sample");
       $this->mSample->insertRecordGetid($this->mSample->table, $arr_isi);
       $msg    = "Data berhasil ditambahkan !";
       $status = true;
     } else {
       $arr_isi['updated_at'] = date("Y-m-d H:i:s");
       $id = decrypt($id);
-      $this->mSample->updateRecord($this->mSample->table, $arr_isi, 'id', $id);
-      $msg    = "Data berhasil diupdate !";
-      $status = true;
+      $res = $this->mSample->trxSubmitSample($arr_isi, $id);
+      if ($res) {
+        $msg    = "Data berhasil diupdate !";
+        $status = true;
+      }
     }
 
     $build_array['message'] = $msg;
@@ -299,7 +313,6 @@ class Sample extends BaseController
       $this->session->setFlashdata('err', "Sample gagal dihapus");
     }
 
-
     return redirect()->to($this->urlv);
   }
   public function deleteDetailList()
@@ -323,5 +336,50 @@ class Sample extends BaseController
     $build_array['status']  = $status;
 
     return $this->response->setJSON($build_array);
+  }
+
+  public function generateQRCode()
+  {
+
+    $data = $this->request->getPost('data');
+    if (empty($data)) {
+      return $this->response->setStatusCode(400)->setBody("QR Code Failed Generated");
+    }
+    $data = json_decode((string)$data);
+    $resData = $this->mSample->getDataDetailSampleUkuranById($data->id);
+
+    try {
+
+      $writer = new PngWriter();
+      $qrCode = new QrCode(
+        data: encrypt($data->id),
+        encoding: new Encoding('UTF-8'),
+        errorCorrectionLevel: ErrorCorrectionLevel::Low,
+        size: 300,
+        margin: 10,
+        roundBlockSizeMode: RoundBlockSizeMode::Margin,
+        foregroundColor: new Color(0, 0, 0),
+        backgroundColor: new Color(255, 255, 255)
+      );
+
+      $result = $writer->write($qrCode);
+      // $writer->validateResult($result, 'QRcode Failed Generated');
+      $base64QrCode = base64_encode($result->getString());
+      $build_array['file_base64'] = $base64QrCode;
+      $build_array['ext']  = 'png';
+      $build_array['file_name']  = $resData->warna1 . "_" . $data->ukuran . "_" . $data->harga_satuan;
+      $build_array['status']  = true;
+      $build_array['message'] = "QR Code Behasil digenerate";
+      return $this->response->setJSON($build_array);
+    } catch (\Exception $e) {
+      $build_array['status']  = false;
+      $build_array['message'] = "QR Code Gagal digenerate";
+      return $this->response->setJSON($build_array);
+    }
+
+
+    // header('Content-Type: ' . $result->getMimeType());
+    // header('Content-Disposition: attachment; filename="qrcode.png"');
+    // echo $result->getString();
   }
 }
