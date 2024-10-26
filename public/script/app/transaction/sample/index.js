@@ -227,40 +227,30 @@ $(document).ready(function () {
 
     function cardFormatter(cell, formatterParams, onRendered){
         var data = cell.getRow().getData(); // Ambil data row
+        let btnAksi = `<button type="button" class="btn btn-sm btn-warning text-dark edit" data-id="${data.id}"> <i class="fa fa-edit"></i> Edit</button>
+                        <button type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>`
+        let status = ` <i class="fa fa-dot-circle f-s-20 text-muted m-e-6"></i>
+                    <span class="f-w-700 text-muted">`+data.status+`</span>`
+        if(data.status === 'Submit'){
+            btnAksi = `<button type="button" class="btn btn-sm btn-warning text-dark edit" data-id="${data.id}"> <i class="fa fa-edit"></i> Edit</button>
+            <button type="button" hidden class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>`
+             status = ` <i class="fa fa-check-circle f-s-20 text-success m-e-6"></i>
+                    <span class="f-w-700 text-success">`+data.status+`</span>`
+        }
         
-        // HTML Card Layout
         var cardHtml = `<div class="card shadow-sm">
                   <div class="card-header">
                     <div class="row">
                       <div class="col-sm-6 text-start">
-                        <button type="button" class="btn btn-sm btn-warning text-dark edit" data-id="${data.id}"> <i class="fa fa-edit"></i> Edit</button>
-                        <button type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>
+                        ${btnAksi}
                       </div>
                       <div class="col-sm-6">
                         <div class="d-flex justify-content-end" style="column-gap: 8px;">
+                          
                           <div class="card m-y-8 cursor-pointer">
                             <div class="card-body p-y-6">
                               <div class="d-flex justify-content-start align-items-center">
-                                <i class="fa fa-check-circle f-s-20 text-success m-e-6"></i>
-                                <span class="f-w-700 text-success">PROGRAM</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="card m-y-8 cursor-pointer">
-                            <div class="card-body p-y-6">
-                              <div class="d-flex justify-content-start align-items-center">
-                                <i class="fa fa-check-circle f-s-20 text-success m-e-6"></i>
-                                <span class="f-w-700 text-success">RAJUT</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="card m-y-8 cursor-pointer">
-                            <div class="card-body p-y-6">
-                              <div class="d-flex justify-content-start align-items-center">
-                                <i class="fa fa-dot-circle f-s-20 text-muted m-e-6"></i>
-                                <span class="f-w-700 text-muted">KIRIM</span>
+                                ${status}
                               </div>
                             </div>
                           </div>

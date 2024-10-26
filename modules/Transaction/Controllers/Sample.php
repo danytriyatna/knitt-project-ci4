@@ -108,6 +108,7 @@ class Sample extends BaseController
           "kode_sample" => $row->kode_sample,
           "tgl_deadline" => $row->tgl_deadline,
           "deskripsi" => $row->deskripsi,
+          "status" => $row->status == 0 ? "Draft" : "Submit",
           "file_gambar" => !empty($row->file_name) ? base_url() . "uploads/sample/"  . $row->file_name : "",
           "detail" => $this->mSample->getDataDetailSample($row->id)
         )
