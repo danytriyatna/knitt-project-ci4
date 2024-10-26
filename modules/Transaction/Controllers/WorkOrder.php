@@ -98,7 +98,7 @@ class WorkOrder extends BaseController
         $atr_del['onclick'] = "return confirm('Hapus Data ?')";
       }
       // if ($atr_edit || $atr_del)
-        $btnAction = btn_action_group($id, $atr_edit, $atr_del);
+      $btnAction = btn_action_group($id, $atr_edit, $atr_del);
 
       // $aktif =  ($row->active) ? "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/deactivate/".$id."' data-confirm-message='Anda yakin ingin menonaktifkan user ini?'><i class='fa fa-check text-success'>&nbsp;</i></a>" :
       //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
@@ -108,7 +108,7 @@ class WorkOrder extends BaseController
 
       array_push(
         $build_array["data"],
-          array(
+        array(
           "id"                => ($id),
           "ref_kode"          => ($row->ref_kode),
           "konsumen_nama"     => $row->konsumen_nama,
@@ -128,48 +128,48 @@ class WorkOrder extends BaseController
     return $this->response->setJSON($build_array);
   }
 
-  function form($id = null){
+  function form($id = null)
+  {
     if (!$this->auth->loggedIn()) {
-        return redirect()->to('/auth/login');
+      return redirect()->to('/auth/login');
     }
 
     $this->data['id'] = $id;
     $this->data['titlehead'] = "Form Work Order";
-    if ($id != ""){
-        $id = decrypt($id);
-        $this->data['titlehead'] = "Form Work Order";
+    if ($id != "") {
+      $id = decrypt($id);
+      $this->data['titlehead'] = "Form Work Order";
     }
-    
+
     $status = 1;
-    if(!empty($id)){
-      $stdData = $this->mWalkorder->getData($id);  
-      
+    if (!empty($id)) {
+      $stdData = $this->mWalkorder->getData($id);
+
       $data_detail = [];
-      if($stdData->tipe_id == 1){
+      if ($stdData->tipe_id == 1) {
         $list_detail = $this->mSample->getDataDetailSample($stdData->ref_id);
         $stdData->file_gambar = !empty($stdData->file_name) ? base_url() . "uploads/sample/"  . $stdData->file_name : "";
-      }else{
+      } else {
         $list_detail = $this->mSalesOrder->getDataDetailSalesOrder($stdData->ref_id);
         $stdData->file_gambar = !empty($stdData->file_name) ? base_url() . "uploads/sales_order/"  . $stdData->file_name : "";
       }
-      
-      if(!empty($list_detail)){
-        for ($i=0; $i < count($list_detail); $i++) { 
+
+      if (!empty($list_detail)) {
+        for ($i = 0; $i < count($list_detail); $i++) {
           $drow = $list_detail[$i];
           $allQty = $this->mSalesOrder->getTotal_qty($drow->id, 2);
           $list_detail[$i]->qty      = $allQty;
           $list_detail[$i]->qty_prod = 0;
         }
       }
-      
+
       $this->data['row']    = $stdData;
-      $this->data['detail'] = json_encode($list_detail); 
+      $this->data['detail'] = json_encode($list_detail);
 
       $status = $stdData->status;
     }
 
-    if(isset($_POST)){
-
+    if (isset($_POST)) {
     }
 
     $proces_data = $this->mPproduksi->getData(null, 0, 999);
@@ -180,8 +180,7 @@ class WorkOrder extends BaseController
     $this->data['proses_saved'] = json_encode($proces_saved);
     $this->data['status'] = $status;
 
-		return view($this->views.'/work_order_form', $this->data);
-
+    return view($this->views . '/work_order_form', $this->data);
   }
 
   public function lists_detail()
@@ -213,7 +212,7 @@ class WorkOrder extends BaseController
 
       array_push(
         $build_array["data"],
-          array(
+        array(
           "id"      => ($id),
           "wdasar"  => ($row->wdasar),
           "qty"     => $row->qty,
@@ -247,21 +246,21 @@ class WorkOrder extends BaseController
     $det_kg = 0;
     $det_kg_loss = 0;
     $det_total = 0;
-    
+
     $this->db->transBegin();
     $list_data = json_decode($list_data, true);
-    
+
     try {
-      if(!empty($list_data)){
+      if (!empty($list_data)) {
         foreach ($list_data as $r) {
           $warna_id = $r['id'];
-  
+
           $det_grams = $det_grams + $r['gram'];
           $det_grams_nd = $det_grams_nd + $r['gram_nd'];
           $det_kg = $det_kg + $r['kg'];
           $det_kg_loss = $det_kg_loss + $r['kg_loss'];
           $det_total = $det_total + $r['total'];
-  
+
           $warna_isi = [
             'persen'  => $r['persen'],
             'gram'    => $r['gram'],
@@ -273,11 +272,11 @@ class WorkOrder extends BaseController
             'loss'    => $detail_loss,
             'updated_at' => date('Y-m-d H:i:s')
           ];
-          
+
           $this->mWalkorder->updateRecord($this->mWalkorder->table5, $warna_isi, 'id', $warna_id);
         }
       }
-  
+
       $detail_isi = [
         'gram'    => $det_grams,
         'gram_nd' => $det_grams_nd,
@@ -287,16 +286,15 @@ class WorkOrder extends BaseController
         'total'   => $det_total,
         'updated_at' => date('Y-m-d H:i:s')
       ];
-  
+
       $this->mWalkorder->updateRecord($this->mWalkorder->table2, $detail_isi, 'id', $detail_id);
-  
+
       if ($this->db->transStatus() === FALSE) {
         $this->db->transRollback();
-
       } else {
-          $this->db->transCommit();
-          $msg    = "Data berhasil disimpan !";
-          $status = true;
+        $this->db->transCommit();
+        $msg    = "Data berhasil disimpan !";
+        $status = true;
       }
     } catch (\Throwable $th) {
       //throw $th;
@@ -310,7 +308,8 @@ class WorkOrder extends BaseController
     return $this->response->setJSON($build_array);
   }
 
-  function save(){
+  function save()
+  {
     $dataid      = $this->request->getPost('dataid');
     $list_proses = $this->request->getPost('listproses');
     $status_data = $this->request->getPost('status_data');
@@ -322,80 +321,80 @@ class WorkOrder extends BaseController
     $status = false;
 
     // try {
-      $dataid = \decrypt($dataid);
-      $data        = $this->mWalkorder->getData($dataid);
-      $data_ukuran = $this->mUkuran->getData(0, 0, 999); 
-      $data_ukuran_input = json_decode($data_ukuran_input, true);
-      $data_ukuran_warna = json_decode($data_ukuran_warna, true);
-      $this->db->transBegin();
+    $dataid = \decrypt($dataid);
+    $data        = $this->mWalkorder->getData($dataid);
+    $data_ukuran = $this->mUkuran->getData(0, 0, 999);
+    $data_ukuran_input = json_decode($data_ukuran_input, true);
+    $data_ukuran_warna = json_decode($data_ukuran_warna, true);
+    $this->db->transBegin();
 
 
-      $builder_proses = $this->db->table($this->mWalkorder->table3);
-      $builder_proses->where("id_walkorder", $dataid);
-      $builder_proses->delete();
+    $builder_proses = $this->db->table($this->mWalkorder->table3);
+    $builder_proses->where("id_walkorder", $dataid);
+    $builder_proses->delete();
 
-      $i = 1;
-      $list_proses = json_decode($list_proses, true);
-      foreach ($list_proses as $item) {
-        $isiProses = [
-          'id_walkorder' => $dataid,
-          'id_proses' => $item,
-          'created_at' => date('Y-m-d H:i:s')
-        ];
+    $i = 1;
+    $list_proses = json_decode($list_proses, true);
+    foreach ($list_proses as $item) {
+      $isiProses = [
+        'id_walkorder' => $dataid,
+        'id_proses' => $item,
+        'created_at' => date('Y-m-d H:i:s')
+      ];
 
-        $proses_id = $this->mWalkorder->insertRecordGetid($this->mWalkorder->table3, $isiProses);
+      $proses_id = $this->mWalkorder->insertRecordGetid($this->mWalkorder->table3, $isiProses);
 
-        if(!empty($status_data)){
-            foreach ($data_ukuran as $x) {
-              $isiProses_det = [
-                'id_walkorder_proses' => $proses_id,
-                'id_ukuran' => $x->id,
-                'created_at' => date('Y-m-d H:i:s')
-              ];
+      if (!empty($status_data)) {
+        foreach ($data_ukuran as $x) {
+          $isiProses_det = [
+            'id_walkorder_proses' => $proses_id,
+            'id_ukuran' => $x->id,
+            'created_at' => date('Y-m-d H:i:s')
+          ];
 
-              $key_ukuran = $x->key_ukuran;
-              if($i == 1){
-                $isiProses_det['qty'] = !empty($data_ukuran_input['bottom'][$x->key_ukuran]) ? $data_ukuran_input['bottom'][$x->key_ukuran] : 0;
-              }else{
-                $isiProses_det['qty'] = 0;
-              }
+          $key_ukuran = $x->key_ukuran;
+          if ($i == 1) {
+            $isiProses_det['qty'] = !empty($data_ukuran_input['bottom'][$x->key_ukuran]) ? $data_ukuran_input['bottom'][$x->key_ukuran] : 0;
+          } else {
+            $isiProses_det['qty'] = 0;
+          }
 
-              $this->mWalkorder->insertRecordGetid($this->mWalkorder->table4, $isiProses_det);
-            }
+          $this->mWalkorder->insertRecordGetid($this->mWalkorder->table4, $isiProses_det);
         }
-
-        $i++;
       }
 
-      if(!empty($status_data)){
-        $update_stat['status'] = 2;
-        $this->mWalkorder->updateRecord($this->mWalkorder->table, $update_stat, 'id', $dataid);
+      $i++;
+    }
 
-        // insert to work order 
-        $data_wo = [
-           'id_walkorder' => $dataid,
-           'tipe_id' => $data->tipe_id,
-           'kode_walkorder' => $data->kode_walkorder,
-           'id_konsumen' => $data->id_konsumen,
-           'qty' => $data->qty,
-           'file_id' => $data->file_id,
-           'keterangan_style' => $data->keterangan_style,
-           'tgl_transaksi' => date('Y-m-d'),
-           'tgl_deadline' => $data->tgl_deadline,
-           'status' => 1
-        ];
+    if (!empty($status_data)) {
+      $update_stat['status'] = 2;
+      $this->mWalkorder->updateRecord($this->mWalkorder->table, $update_stat, 'id', $dataid);
 
-        $this->mProduksi->insertRecordGetid($this->mProduksi->table, $data_wo);
-      }
+      // insert to work order 
+      $data_wo = [
+        'id_walkorder' => $dataid,
+        'tipe_id' => $data->tipe_id,
+        'kode_walkorder' => $data->kode_walkorder,
+        'kode_prod' =>  $this->mSample->generateNo("PRD", "trans_produksi", "kode_prod"),
+        'id_konsumen' => $data->id_konsumen,
+        'qty' => $data->qty,
+        'file_id' => $data->file_id,
+        'keterangan_style' => $data->keterangan_style,
+        'tgl_transaksi' => date('Y-m-d'),
+        'tgl_deadline' => $data->tgl_deadline,
+        'status' => 1
+      ];
 
-      if ($this->db->transStatus() === FALSE) {
-        $this->db->transRollback();
+      $this->mProduksi->insertRecordGetid($this->mProduksi->table, $data_wo);
+    }
 
-      } else {
-          $this->db->transCommit();
-          $msg    = "Data berhasil disimpan !";
-          $status = true;
-      }
+    if ($this->db->transStatus() === FALSE) {
+      $this->db->transRollback();
+    } else {
+      $this->db->transCommit();
+      $msg    = "Data berhasil disimpan !";
+      $status = true;
+    }
     // } catch (\Throwable $th) {
     //   //throw $th;
     //   $this->db->transRollback();
