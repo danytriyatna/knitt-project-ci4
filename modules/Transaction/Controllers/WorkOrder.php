@@ -140,6 +140,7 @@ class WorkOrder extends BaseController
         $this->data['titlehead'] = "Form Work Order";
     }
     
+    $status = 1;
     if(!empty($id)){
       $stdData = $this->mWalkorder->getData($id);  
       
@@ -160,13 +161,15 @@ class WorkOrder extends BaseController
           $list_detail[$i]->qty_prod = 0;
         }
       }
-
-      if(isset($_POST)){
-
-      }
       
       $this->data['row']    = $stdData;
       $this->data['detail'] = json_encode($list_detail); 
+
+      $status = $stdData->status;
+    }
+
+    if(isset($_POST)){
+
     }
 
     $proces_data = $this->mPproduksi->getData(null, 0, 999);
@@ -175,6 +178,7 @@ class WorkOrder extends BaseController
 
     $this->data['proses'] = $proces_data;
     $this->data['proses_saved'] = json_encode($proces_saved);
+    $this->data['status'] = $status;
 
 		return view($this->views.'/work_order_form', $this->data);
 

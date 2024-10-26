@@ -232,7 +232,7 @@ $(document).ready(function () {
         var cardHtml = `<div class="card shadow-sm">
                   <div class="card-header">
                     <div class="row">
-                      <div class="col-sm-6">
+                      <div class="col-sm-6 text-start">
                         <button type="button" class="btn btn-sm btn-warning text-dark edit" data-id="${data.id}"> <i class="fa fa-edit"></i> Edit</button>
                         <button type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>
                       </div>

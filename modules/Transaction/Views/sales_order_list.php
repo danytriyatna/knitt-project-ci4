@@ -94,7 +94,7 @@
           <hr>
           <div class="row">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-sm btn-success mb-2" data-bs-toggle="modal" data-bs-target="#modal-form-po"> Tambah <i class="fa fa-plus"></i></button>
+              <button type="button" class="btn btn-sm btn-success mb-2" id="btn-add-detail"> Tambah <i class="fa fa-plus"></i></button>
               <div id="dt-detail" class="table-responsive table-striped"></div>
 
             </div>

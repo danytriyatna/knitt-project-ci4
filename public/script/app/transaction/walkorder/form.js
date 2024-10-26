@@ -156,6 +156,7 @@ $(document).ready(function () {
                         textDetId.val(rowData.id);
                         textTitleWarna.html(rowData.wdasar);
                         textQtyWarna.html(rowData.qty);
+                        inpDetailLoss.val(rowData.loss);
                         
                         dtListDetailWarna.setData(rowData.details)
                         mdDetail.modal("show");

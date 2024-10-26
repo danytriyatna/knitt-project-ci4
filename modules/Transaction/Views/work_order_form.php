@@ -28,9 +28,11 @@
         <div class="table-striped" id="dt-warna">
         </div>
       </div>
+      <?php if($status == 1) { ?>
       <div class="modal-footer">
         <button type="button" class="m-s-5 btn btn-success" id="btn-save-warna"> <i class="fa fa-save"></i> Simpan</button>
       </div>
+      <?php } ?>
     </div>
   </div>
 </div>
@@ -122,12 +124,14 @@
                   <a href="trans/work-order" class="btn btn-default m-e-5">
                     <span class="fa fa-arrow-left"></span> Kembali
                   </a>
-                  <button type="button" id="btn-save" class='btn btn-success'>
-                    <span class="fa fa-save"></span> Simpan
-                  </button>
-                  <button type="button" id="btn-send" class='btn btn-info'>
-                    <span class="fa fa-paper-plane"></span> Submit
-                  </button>
+                  <?php if($status == 1) { ?>
+                    <button type="button" id="btn-save" class='btn btn-success'>
+                      <span class="fa fa-save"></span> Simpan
+                    </button>
+                    <button type="button" id="btn-send" class='btn btn-info'>
+                      <span class="fa fa-paper-plane"></span> Submit
+                    </button>
+                  <?php } ?>
                 </div>
               </div>
             </div>

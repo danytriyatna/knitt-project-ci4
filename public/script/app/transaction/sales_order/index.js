@@ -453,7 +453,7 @@ $(document).ready(function () {
                     inpPoWarna7.val(data.detail.id_warna_7).trigger('change');
                     inpPoWarna8.val(data.detail.id_warna_8).trigger('change');
                 }
-               
+                
                 dtListDetailQty.setData(data.detailUkuran)
                 isModalPO.modal("show");
                 setTimeout(() => {
