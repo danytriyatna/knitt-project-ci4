@@ -439,10 +439,10 @@ $(document).ready(function () {
                 isModal.modal("hide")
                 noSalesOrderText.html(data.kode_sales_order)
                 deskripsiText.html(data.deskripsi)
-                tglSalesOrderText.html(formatterDate(data.tgl_transaksi))
-                buyerText.html(data.nama)
+                tglSalesOrderText.html(`<i class="fa fa-calendar-day f-s-11"></i>&nbsp; ${formatterDate(data.tgl_transaksi)}`)
+                buyerText.html(`<i class="fa fa-user f-s-11"></i>&nbsp; ${data.nama}`)
                 fotoText.attr("src",data.file_gambar)
-                tglDeadlineText.html(`<em>Deadline: ${formatterDate(data.tgl_deadline)}</em>`)
+                tglDeadlineText.html(`<i class="fa fa-calendar-week f-s-11"></i>&nbsp; <em>Deadline: ${formatterDate(data.tgl_deadline)}</em>`)
                 if(data.detail){
                     idSalesOrderDet = data.detail.id
                     inpPoWarna1.val(data.detail.id_warna_1).trigger('change');

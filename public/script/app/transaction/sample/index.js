@@ -453,10 +453,10 @@ $(document).ready(function () {
                 }
                 noSampleText.html(data.kode_sample)
                 deskripsiText.html(data.deskripsi)
-                tglSampleText.html(formatterDate(data.tgl_transaksi))
-                buyerText.html(data.nama)
+                tglSampleText.html(`<i class="fa fa-calendar-day f-s-11"></i>&nbsp; ${formatterDate(data.tgl_transaksi)}`)
+                buyerText.html(`<i class="fa fa-user f-s-11"></i>&nbsp; ${data.nama}`)
                 fotoText.attr("src",data.file_gambar)
-                tglDeadlineText.html(`<em>Deadline: ${formatterDate(data.tgl_deadline)}</em>`)
+                tglDeadlineText.html(`<i class="fa fa-calendar-week f-s-11"></i>&nbsp; <em>Deadline: ${formatterDate(data.tgl_deadline)}</em>`)
                 if(data.detail){
                     idSampleDet = data.detail.id
                     inpPoWarna1.val(data.detail.id_warna_1).trigger('change');
