@@ -41,4 +41,6 @@ $routes->group('trans/work-order', ['namespace' => 'Modules\Transaction\Controll
 $routes->group('trans/production', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'Production::index');
   $routes->get('form', 'Production::form');
+  $routes->get('form/(:any)', 'Production::form/$1');
+  $routes->post('list', 'Production::lists');
 });
