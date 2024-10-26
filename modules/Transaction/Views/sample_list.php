@@ -84,8 +84,8 @@
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="m-s-5 btn btn-info" id="btn-draft"> <i class="fa fa-save"></i> Draft</button>
-        <button type="button" class="m-s-5 btn btn-success" id="btn-save"> <i class="fa fa-save"></i> Submit</button>
+        <button type="button" class="m-s-5 btn btn-success" id="btn-draft"> <i class="fa fa-save"></i> Simpan</button>
+        <button type="button" class="m-s-5 btn btn-info" id="btn-save"> <i class="fa fa-paper-plane"></i> Submit</button>
       </div>
     </div>
   </div>
@@ -107,10 +107,11 @@
           </div>
           <div class="col-sm-9">
             <h6 class="f-w-700 m-b-6" id="noSampleText"></h6>
-            <h5 class="f-w-700 m-b-12" id="deskripsiText"></h5>
+            <p class="f-w-500 m-y-0" id="deskripsiText"></p>
+            <hr class="m-y-8" />
             <p class="m-y-0" id="tglSampleText"></p>
             <p class="m-y-0" id="tglDeadlineText"></p>
-            <p class="f-w-700 m-t-4" id="buyerText"></p>
+            <p class="m-t-8 badge bg-secondary d-inline-block" id="buyerText"></p>
           </div>
         </div>
 

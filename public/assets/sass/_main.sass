@@ -195,19 +195,27 @@ table
           border-top: 1px solid #AAA
           border-bottom: 1px solid #AAA
   &.custom-dt-layout
-    .tabulator-table
-      .tabulator-row
-        .tabulator-cell
-          height: fit-content !important
-          .card
-            .card-body
-              .tabulator
-                .tabulator-header
-                  .tabulator-header-contents
-                    .tabulator-headers
-                .tabulator-tableholder
-                  .tabulator-table
-                    width: 100%
+    > .tabulator-header
+      border: 0
+      > .tabulator-header-contents
+        display: none
+    > .tabulator-tableholder
+      > .tabulator-table
+        > .tabulator-row
+          border: 0 !important
+          background-color: #FFF !important
+          > .tabulator-cell
+            height: fit-content !important
+            padding: 0px !important
+            .card
+              .card-body
+                .tabulator
+                  .tabulator-header
+                    .tabulator-header-contents
+                      .tabulator-headers
+                  .tabulator-tableholder
+                    .tabulator-table
+                      width: 100%
 
 .tabulator-cell
   .dropdown-menu
@@ -480,3 +488,12 @@ footer.footer
         background-color: #BDC2C9
       &:disabled
         cursor: progress
+
+.hover-zoom-rotate
+  img
+    transition: all .2s
+  &:hover
+    img
+      transform: scale(1.025)
+      rotate: 2deg
+      box-shadow: 0px 3px 6px 2px rgb(0, 0, 0, 10%)

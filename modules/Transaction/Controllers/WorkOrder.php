@@ -229,6 +229,8 @@ class WorkOrder extends BaseController
           "kg_loss" => $row->kg_loss,
           "total"   => $row->total,
           "loss"    => $row->loss,
+          "kuota"   => $row->kuota,
+          "kuota_tambah"    => $row->kuota_tambah,
           'details' => !empty($data_detail) ? $data_detail : []
         )
       );
@@ -253,6 +255,8 @@ class WorkOrder extends BaseController
     $det_kg = 0;
     $det_kg_loss = 0;
     $det_total = 0;
+    $det_kuota = 0;
+    $det_kuotat = 0;
 
     $this->db->transBegin();
     $list_data = json_decode($list_data, true);
@@ -267,15 +271,18 @@ class WorkOrder extends BaseController
           $det_kg = $det_kg + $r['kg'];
           $det_kg_loss = $det_kg_loss + $r['kg_loss'];
           $det_total = $det_total + $r['total'];
+          $det_kuota = $det_kuota + $r['kuota'];
+          $det_kuotat = $det_kuotat + $r['kuota_tambah'];
 
           $warna_isi = [
-            'persen'  => $r['persen'],
-            'gram'    => $r['gram'],
-            'gram_nd' => $r['gram_nd'],
-            'kg'      => $r['kg'],
-            'kg_loss' => $r['kg_loss'],
-            'total'   => $r['total'],
-            'kuota'   => $r['kuota'],
+            'persen'       => $r['persen'],
+            'gram'         => $r['gram'],
+            'gram_nd'      => $r['gram_nd'],
+            'kg'           => $r['kg'],
+            'kg_loss'      => $r['kg_loss'],
+            'total'        => $r['total'],
+            'kuota'        => $r['kuota'],
+            'kuota_tambah' => $r['kuota_tambah'],
             'loss'    => $detail_loss,
             'updated_at' => date('Y-m-d H:i:s')
           ];
@@ -285,13 +292,15 @@ class WorkOrder extends BaseController
       }
 
       $detail_isi = [
-        'gram'    => $det_grams,
-        'gram_nd' => $det_grams_nd,
-        'kg'      => $det_kg,
-        'loss'    => $detail_loss,
-        'kg_loss' => $det_kg_loss,
-        'total'   => $det_total,
-        'updated_at' => date('Y-m-d H:i:s')
+        'gram'         => $det_grams,
+        'gram_nd'      => $det_grams_nd,
+        'kg'           => $det_kg,
+        'loss'         => $detail_loss,
+        'kg_loss'      => $det_kg_loss,
+        'total'        => $det_total,
+        'kuota'        => $det_kuota,
+        'kuota_tambah' => $det_kuotat,
+        'updated_at'   => date('Y-m-d H:i:s')
       ];
 
       $this->mWalkorder->updateRecord($this->mWalkorder->table2, $detail_isi, 'id', $detail_id);

@@ -190,17 +190,22 @@ $(document).ready(function () {
 			},
 
             {
-				title: 'Loss', field: 'kg_loss', headerSort:false, sorter: 'string',
+				title: 'Loss (KG)', field: 'kg_loss', headerSort:false, sorter: 'string',
 				width: 140, bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney 
 			},
 
             {
-				title: 'Stock', field: 'total', headerSort:false, sorter: 'string',
+				title: 'NFP (KG)', field: 'total', headerSort:false, sorter: 'string',
+				width: 140, bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney 
+			},
+            
+            {
+				title: 'Stock', field: 'kuota', headerSort:false, sorter: 'string',
 				width: 140, bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney 
 			},
 
             {
-				title: 'Margin', field: 'loss', headerSort:false, sorter: 'string',
+				title: 'Margin', field: 'kuota_tambah', headerSort:false, sorter: 'string',
 				width: 140, bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney 
 			},
 				
@@ -317,7 +322,7 @@ $(document).ready(function () {
                 },
 
                 {
-                    title: "IN KGS", field: "kg",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                    title: "IN KG", field: "kg",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
                     width:"11%", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
                 },
 

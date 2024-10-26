@@ -214,13 +214,13 @@ $(document).ready(function () {
         let status = '';
         let aksi = '';
         if(data.status == 'Draft'){
-         status = ` <i class="fa fa-dot-circle f-s-20 text-muted m-e-6"></i>
+         status = ` <i class="fa fa-dot-circle text-muted m-e-6"></i>
                     <span class="f-w-700 text-muted">`+data.status+`</span>`
 
          aksi = `<button type="button" class="btn btn-sm btn-warning text-dark edit" data-id="${data.id}"> <i class="fa fa-edit"></i> Edit</button>
                  <button type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>`;
         }else{
-         status = ` <i class="fa fa-check-circle f-s-20 text-success m-e-6"></i>
+         status = ` <i class="fa fa-check-circle text-success m-e-6"></i>
                     <span class="f-w-700 text-success">`+data.status+`</span>`
 
 
@@ -238,9 +238,9 @@ $(document).ready(function () {
                       <div class="col-sm-6">
                         <div class="d-flex justify-content-end" style="column-gap: 8px;">
 
-                          <div class="card m-y-8 cursor-pointer">
-                            <div class="card-body p-y-6">
-                              <div class="d-flex justify-content-start align-items-center">
+                          <div class="card m-y-0 cursor-pointer">
+                            <div class="card-body p-y-4">
+                              <div class="d-flex justify-content-start align-items-center f-s-11">
                                 `
                                     +status+
                                 `
@@ -254,13 +254,14 @@ $(document).ready(function () {
                   </div>
                   <div class="card-body">
                     <div class="row">
-                      <div class="col-sm-3 text-center">
+                      <div class="col-sm-3 text-start">
                         <h6 class="f-w-700 m-b-6">${data.kode_sales_order}</h6>
-                        <h5 class="f-w-700 m-b-12">${data.deskripsi}</h5>
-                        <p class="m-y-0">${formatterDate(data.tgl_transaksi)}</p>
-                        <p class="m-y-0"><em>Deadline: ${formatterDate(data.tgl_deadline)}</em></p>
-                        <p class="f-w-700 m-t-4">${data.nama}</p>
-                        <img class="m-t-10 w-20" src="${data.file_gambar}" alt="Foto SalesOrder">
+                        <p class="f-w-500 m-y-0">${data.deskripsi}</p>
+                        <hr class="m-y-8" />
+                        <p class="m-y-0"><i class="fa fa-calendar-day f-s-11"></i>&nbsp; ${formatterDate(data.tgl_transaksi)}</p>
+                        <p class="m-y-0"><i class="fa fa-calendar-week f-s-11"></i>&nbsp; <em>Deadline: ${formatterDate(data.tgl_deadline)}</em></p>
+                        <p class="m-t-8 badge bg-secondary d-inline-block"><i class="fa fa-user f-s-11"></i>&nbsp; ${data.nama}</p>
+                        <a class="hover-zoom-rotate" href="${data.file_gambar}" target="_blank"><img class="m-t-0 d-block object-fit-cover rounded" src="${data.file_gambar}" alt="Foto Sample" width="160px" height="90px" /></a>
                       </div>
                       <div class="col-sm-9">
                            <div id="dt-list-detail-${data.id}" class="table-responsive table-striped"></div>
@@ -438,10 +439,10 @@ $(document).ready(function () {
                 isModal.modal("hide")
                 noSalesOrderText.html(data.kode_sales_order)
                 deskripsiText.html(data.deskripsi)
-                tglSalesOrderText.html(formatterDate(data.tgl_transaksi))
-                buyerText.html(data.nama)
+                tglSalesOrderText.html(`<i class="fa fa-calendar-day f-s-11"></i>&nbsp; ${formatterDate(data.tgl_transaksi)}`)
+                buyerText.html(`<i class="fa fa-user f-s-11"></i>&nbsp; ${data.nama}`)
                 fotoText.attr("src",data.file_gambar)
-                tglDeadlineText.html(`<em>Deadline: ${formatterDate(data.tgl_deadline)}</em>`)
+                tglDeadlineText.html(`<i class="fa fa-calendar-week f-s-11"></i>&nbsp; <em>Deadline: ${formatterDate(data.tgl_deadline)}</em>`)
                 if(data.detail){
                     idSalesOrderDet = data.detail.id
                     inpPoWarna1.val(data.detail.id_warna_1).trigger('change');

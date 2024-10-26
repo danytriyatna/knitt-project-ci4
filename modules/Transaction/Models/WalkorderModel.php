@@ -130,7 +130,7 @@ class WalkorderModel extends \App\Models\PrModel
         $builder = $this->db->table($this->table2 . " abx");
 
         $builder->select("abx.id, abx.id_walkorder, abx.ref_detail_id, abx.qty, abx.gram, abx.gram_nd, abx.kg, abx.loss,
-                          abx.kg_loss, abx.total, abx.tipe_id,
+                          abx.kg_loss, abx.total, abx.tipe_id, abx.kuota, abx.kuota_tambah,
                           (case when abx.tipe_id = 2 then tso.id_warna_1 else ts.id_warna_1 end) as id_wdasar,
 		                  (case when abx.tipe_id = 2 then rw2.kode_warna else rw1.kode_warna end) as wdasar
                         ");
