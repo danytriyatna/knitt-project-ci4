@@ -130,9 +130,9 @@ class Production extends BaseController
 
 
     $params = [];
-    if ($tipeId == 2) {
+    if ($tipeId == 1) {
       $params = [];
-      $params['id_sample'] = 1;
+      $params['id_sample'] = $refId;
       $results = $this->mSample->getDataUkuran(null, $start, $limit, $order, $filters, $params, $id_proses);
       $totalfiltered = $this->mSample->getDataUkuranCnt($filters, $params);
       $totaldata = $this->mSample->getDataUkuranCnt(null, $params);
