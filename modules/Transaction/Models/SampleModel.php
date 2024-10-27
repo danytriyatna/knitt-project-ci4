@@ -37,7 +37,7 @@ class SampleModel extends \App\Models\PrModel
             if (!empty($order)) {
                 $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
             } else {
-                $builder->orderBy('abx.id');
+                $builder->orderBy('abx.id desc');
             }
 
             if (empty($offset)) $offset = 0;
@@ -364,6 +364,7 @@ class SampleModel extends \App\Models\PrModel
                         $detailWorkOrder = [
                             'id_walkorder' => $idWorkOrder,
                             'ref_detail_id' => $rowData->id,
+                            'qty' => $this->getTotal_qty($rowData->id, 2),
                             'tipe_id' => 1,
                             'created_at' => date("Y-m-d H:i:s")
                         ];

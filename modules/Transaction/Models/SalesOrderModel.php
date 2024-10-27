@@ -348,4 +348,26 @@ class SalesOrderModel extends \App\Models\PrModel
         // hasilnya SOD24100001 dst.
         return $kodejadi;
     }
+
+    function getDataDetailSalesOrderUkuranById($id)
+    {
+
+        $builder = $this->db->table("trans_sales_order_ukuran abx");
+        $builder->select("w1.kode_warna as warna1,w2.kode_warna as warna2,w3.kode_warna as warna3,w4.kode_warna as warna4");
+        $builder->select("w5.kode_warna as warna5,w6.kode_warna as warna6,w7.kode_warna as warna7,w8.kode_warna as warna8");
+        $builder->select("abx.id_sales_order, abx.id_sales_order_det");
+        $builder->join("trans_sales_order_det bbx", "abx.id_sales_order_det=bbx.id", "inner");
+        $builder->join("ref_warna w1", "bbx.id_warna_1 = w1.id", "left");
+        $builder->join("ref_warna w2", "bbx.id_warna_2 = w2.id", "left");
+        $builder->join("ref_warna w3", "bbx.id_warna_3 = w3.id", "left");
+        $builder->join("ref_warna w4", "bbx.id_warna_4 = w4.id", "left");
+        $builder->join("ref_warna w5", "bbx.id_warna_5 = w5.id", "left");
+        $builder->join("ref_warna w6", "bbx.id_warna_6 = w6.id", "left");
+        $builder->join("ref_warna w7", "bbx.id_warna_7 = w7.id", "left");
+        $builder->join("ref_warna w8", "bbx.id_warna_8 = w8.id", "left");
+        $builder->where("abx.id", $id);
+        $this->_data = $builder->get()->getRow();
+        return $this->_data;
+    }
+
 }
