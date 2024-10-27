@@ -224,24 +224,25 @@ $(document).ready(function () {
         {title:"ID", field:"id", visible:false},
         {field:"id_ukuran", visible:false},
         {field:"id_warna", visible:false},
+        {field:"id_walkorder_proses", visible:false},
         {
             title: 'Colour', field: 'kode_warna', headerSort:true, formatter: "html", sorter: 'string',
-            width: '25%'
+            width: '30%'
         }, 
   
         {
             title: 'Size', field: 'kode_ukuran', headerSort:false, formatter: "html", sorter: 'string',
-            width: '25%'
+            width: '30%'
         }, 
   
         {
-            title: 'QTY', field: 'qty', headerSort:false, formatter: "html", sorter: 'string',
+            title: 'QTY', field: 'qty', headerSort:false, formatter: "html", sorter: 'string', visible:false,
             width: '15%'
         }, 
   
         {
             title: 'Amount', field: 'harga_satuan', headerSort:false, formatter: "html",
-            width: '35%',formatter: "money", formatterParams: {
+            width: '40%',formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
@@ -260,6 +261,7 @@ $(document).ready(function () {
             params.length = params.size;
             params.tipe_id = $("#tipe_id").val()
             params.ref_id = $("#ref_id").val()
+            params.id_proses = statusProses.val()
         },
         ajaxResponse: function (url, params, response) {
             let pageSize = dtListUkuran.getPageSize();
@@ -326,9 +328,18 @@ $(document).ready(function () {
             });
         }
 
-        if (dtListProd.getData().some(x => x.id == data.id)){
+        if (dtListProd.getData().some(x => x.id_ukuran == data.id_ukuran && x.id_walkorder_proses_ukuran == data.id_walkorder_proses_ukuran)){
             return Swal.fire({
                 text: "Data sudah dipilih, silahkan pilih data yang lain",
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+
+        if(!data.harga_satuan){
+            return Swal.fire({
+                text: "Data ukuran, tidak terdapat dalam sample",
                 icon: 'error',
                 showConfirmButton: false,
                 timer: 2000
@@ -345,6 +356,8 @@ $(document).ready(function () {
             });
         }
 
+        console.log(data.id_walkorder_proses_ukuran)
+
         dtListProd.addRow({
             id:data.id,
             kode_warna:data.kode_warna,
@@ -355,7 +368,8 @@ $(document).ready(function () {
             qty:1,
             harga_total:data.harga_satuan,
             flag:0,
-            id_walkorder_proses_ukuran:statusProses.val(),
+            id_walkorder_proses_ukuran:data.id_walkorder_proses,
+            id_proses:statusProses.val(),
             id_operator:operator.val(),
             operator:$('#filter_operator option:selected').text(),
             process:$('#filter_status option:selected').text(),
@@ -426,13 +440,14 @@ $(document).ready(function () {
     
 
     $("#btn-add-detail").click(function () {
+            // dtListUkuran.setData()
             $("#modal-list-wo").modal("show");
             dtListUkuran.deselectRow();
     });
 
     $("#btn-save-ukuran").on("click", function(e){
         e.preventDefault()
-        if(dtListProd.getData().length > 0){
+        if(dtListProd.getData().filter(x => x.flag == 0).length > 0){
             Swal.fire({
                 title: "Apakah anda ingin mensubmit data Produksi?",
                 icon: 'question',

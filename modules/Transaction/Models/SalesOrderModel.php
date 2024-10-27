@@ -71,14 +71,26 @@ class SalesOrderModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getDataUkuran($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
+    function getDataUkuran($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null, $idProses = null)
     {
         $builder = $this->db->table("trans_sales_order_ukuran abx");
 
-        $builder->select("abx.id,bbx.id as id_ukuran, dbx.id as id_warna,  bbx.kode_ukuran,dbx.kode_warna, abx.qty, abx.harga_satuan");
+        $builder->select("abx.id,xb.id_walkorder_proses,bbx.id as id_ukuran, dbx.id as id_warna,  bbx.kode_ukuran,dbx.kode_warna, abx.qty, abx.harga_satuan");
         $builder->join("ref_ukuran bbx", "abx.id_ukuran = bbx.id", "inner");
         $builder->join("trans_sales_order_det cbx", "abx.id_sales_order_det = cbx.id AND abx.id_sales_order = cbx.id_sales_order ", "inner");
         $builder->join("ref_warna dbx", "cbx.id_warna_1 = dbx.id", "inner");
+        $builder->join("trans_walkorder x", "x.ref_id = abx.id_sales_order AND x.tipe_id = 2", "left");
+        $builder->join("trans_walkorder_proses xa", "x.id = xa.id_walkorder AND xa.id_proses = $idProses", "left");
+        $builder->join("trans_walkorder_proses_ukuran xb", "xa.id = xb.id_walkorder_proses", "left");
+        $builder->groupBy("abx.id");
+        $builder->groupBy("dbx.kode_warna");
+        $builder->groupBy("dbx.id");
+        $builder->groupBy("bbx.kode_ukuran");
+        $builder->groupBy("bbx.id");
+        $builder->groupBy("abx.qty");
+        $builder->groupBy("abx.harga_satuan");
+        $builder->groupBy("xb.id_walkorder_proses");
+        $builder->groupBy("abx.id");
         if ($id == null or $id == "") {
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
                 $builder->groupStart();
@@ -112,7 +124,7 @@ class SalesOrderModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getDataUkuranCnt($filters = null, $params = null)
+    function getDataUkuranCnt($filters = null, $params = null, $idProses = null)
     {
         $builder = $this->db->table("trans_sales_order_ukuran abx");
 

@@ -181,7 +181,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <a href="javascript:void(0)" id="pilihUkuran" class="btn btn-success float-left">Pilih Data</a>
+        <!-- <a href="javascript:void(0)" id="pilihUkuran" class="btn btn-success float-left">Pilih Data</a> -->
       </div>
     </div>
   </div>

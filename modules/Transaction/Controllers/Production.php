@@ -120,6 +120,7 @@ class Production extends BaseController
     $order      = $this->request->getPost('sort');
     $tipeId      = $this->request->getPost('tipe_id');
     $refId      = $this->request->getPost('ref_id');
+    $id_proses      = $this->request->getPost('id_proses');
     if ($refId != "") {
       $refId = decrypt($refId);
     }
@@ -132,15 +133,15 @@ class Production extends BaseController
     if ($tipeId == 1) {
       $params = [];
       $params['id_sample'] = $refId;
-      $results = $this->mSample->getDataUkuran(null, $start, $limit, $order, $filters, $params);
+      $results = $this->mSample->getDataUkuran(null, $start, $limit, $order, $filters, $params, $id_proses);
       $totalfiltered = $this->mSample->getDataUkuranCnt($filters, $params);
       $totaldata = $this->mSample->getDataUkuranCnt(null, $params);
     } else {
       $params = [];
       $params['id_sales_order'] = $refId;
-      $results = $this->mSalesOrder->getDataUkuran(null, $start, $limit, $order, $filters, $params);
-      $totalfiltered = $this->mSalesOrder->getDataUkuranCnt($filters, $params);
-      $totaldata = $this->mSalesOrder->getDataUkuranCnt(null, $params);
+      $results = $this->mSalesOrder->getDataUkuran(null, $start, $limit, $order, $filters, $params, $id_proses);
+      $totalfiltered = $this->mSalesOrder->getDataUkuranCnt($filters, $params, $id_proses);
+      $totaldata = $this->mSalesOrder->getDataUkuranCnt(null, $params, $id_proses);
     }
 
 
@@ -164,6 +165,7 @@ class Production extends BaseController
           "kode_warna"          => ($row->kode_warna),
           "kode_ukuran"     => $row->kode_ukuran,
           "id_ukuran"     => $row->id_ukuran,
+          "id_walkorder_proses"     => $row->id_walkorder_proses,
           "id_warna"     => $row->id_warna,
           "qty"    => $row->qty,
           "harga_satuan"               => $row->harga_satuan,
