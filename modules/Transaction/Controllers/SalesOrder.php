@@ -11,6 +11,15 @@ use Modules\Referensi\Models\WarnaModel;
 use Modules\Transaction\Models\SampleModel;
 use Modules\Transaction\Models\WalkorderModel;
 use App\Models\FileModel;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\Logo\Logo;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Writer\ValidationException;
 
 class SalesOrder extends BaseController
 {
@@ -153,7 +162,7 @@ class SalesOrder extends BaseController
       "kode_sales_order" => $results->kode_sales_order,
       "tgl_deadline" => $results->tgl_deadline,
       "deskripsi" => $results->deskripsi,
-      "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
+      "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sales_order/" . $results->file_name : "",
       "detail" => $this->mSalesOrder->getDataDetailSampleWarna($id, $idSalesOrderDet),
       "detailUkuran" =>  $this->mSalesOrder->getDataDetailSampleUkuran($id, $idSalesOrderDet)
     );
@@ -465,5 +474,50 @@ class SalesOrder extends BaseController
     $build_array['status']  = $status;
     $build_array['data']    = $data;
     return $this->response->setJSON($build_array);
+  }
+
+  public function generateQRCode()
+  {
+
+    $data = $this->request->getPost('data');
+    if (empty($data)) {
+      return $this->response->setStatusCode(400)->setBody("QR Code Failed Generated");
+    }
+    $data = json_decode((string)$data);
+    $resData = $this->mSalesOrder->getDataDetailSalesOrderUkuranById($data->id);
+
+    try {
+
+      $writer = new PngWriter();
+      $qrCode = new QrCode(
+        data: encrypt($data->id),
+        encoding: new Encoding('UTF-8'),
+        errorCorrectionLevel: ErrorCorrectionLevel::Low,
+        size: 300,
+        margin: 10,
+        roundBlockSizeMode: RoundBlockSizeMode::Margin,
+        foregroundColor: new Color(0, 0, 0),
+        backgroundColor: new Color(255, 255, 255)
+      );
+
+      $result = $writer->write($qrCode);
+      // $writer->validateResult($result, 'QRcode Failed Generated');
+      $base64QrCode = base64_encode($result->getString());
+      $build_array['file_base64'] = $base64QrCode;
+      $build_array['ext']  = 'png';
+      $build_array['file_name']  = $resData->warna1 . "_" . $data->ukuran . "_" . $data->harga_satuan;
+      $build_array['status']  = true;
+      $build_array['message'] = "QR Code Behasil digenerate";
+      return $this->response->setJSON($build_array);
+    } catch (\Exception $e) {
+      $build_array['status']  = false;
+      $build_array['message'] = "QR Code Gagal digenerate";
+      return $this->response->setJSON($build_array);
+    }
+
+
+    // header('Content-Type: ' . $result->getMimeType());
+    // header('Content-Disposition: attachment; filename="qrcode.png"');
+    // echo $result->getString();
   }
 }

@@ -148,13 +148,20 @@ $(document).ready(function () {
 	});
 
     function calculateTotal(row) {
-    if(row){
-        let qty = row.qty || 0;
-        let harga = row.harga_satuan || 0;
-        return qty * harga;
+        if(row){
+            let qty = row.qty || 0;
+            let harga = row.harga_satuan || 0;
+            return qty * harga;
+        }
     }
-        
-    }
+
+    let buttonQRAction = function(cell){
+        if(cell.getData().qty != null){
+            let fmBtnQRCode = "";
+            fmBtnQRCode = ` <button type="button" class="btn btn-sm btn-info" title='qr code'><i class="fa fa-print" title='qr code'></i></button>`;
+            return fmBtnQRCode;
+         }
+     }
 
     let dtListDetailQty = new Tabulator("#dt-detail-qty", {
         pagination: true, 
@@ -162,6 +169,19 @@ $(document).ready(function () {
         paginationButtonCount: 5,
         columns:[
             {title:"ID", field:"id", visible:false},
+            {
+                headerSort: false,  
+                title: 'Aksi', 
+                formatter: buttonQRAction,
+                width: '10%', align: "center", cssClass: "text-center",
+                cellClick: function(e, cell) {
+                    let row = cell.getRow();
+                    let data_row = row.getData();
+                    if (e.target.title === 'qr code') {
+                        generateQRCode(data_row)
+                    } 
+                }
+            },
             {title:"No",formatter: "rownum",hozAlign: "center", width:"5%"},
             {title:"id_ukuran", field:"id_ukuran", hozAlign:"center",width:"7%",visible:false},
             {title:"Ukuran", field:"ukuran", hozAlign:"center",width:"23%"},
@@ -756,6 +776,84 @@ $(document).ready(function () {
             }
         }
     });
+
+    function generateQRCode(data){
+        $.ajax({
+            type: 'POST',
+            url: '/trans/sales-order/generate',
+            data:{data:JSON.stringify(data)},
+            dataType: "json",
+            beforeSend: function () {
+                Swal.fire({
+                    title: 'Loading...',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    onBeforeOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+            },
+            success: function (response) {
+    
+                if(response.status == true){
+                    Swal.fire({
+                        text: response.message,
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    const blob = base64ToBlob(response.file_base64, 'image/png');
+                    const url = URL.createObjectURL(blob);
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = url;  
+                    downloadLink.download = response.file_name; 
+
+                    downloadLink.click();
+                
+                    URL.revokeObjectURL(url);
+                    Swal.close();
+                
+                }else{
+                    Swal.fire({
+                        text: response.message,
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            },
+            error: function (e) {
+                let msg = e.responseJSON.message;
+                Swal.close();
+    
+                Swal.fire({
+                    text: msg,
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            },
+        });
+    }
+
+    function base64ToBlob(base64, contentType = '', sliceSize = 512) {
+        const byteCharacters = atob(base64); // Hapus prefix "data:image/png;base64,"
+        const byteArrays = [];
+    
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            const slice = byteCharacters.slice(offset, offset + sliceSize);
+            const byteNumbers = new Array(slice.length);
+            
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+    
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+        }
+    
+        return new Blob(byteArrays, { type: contentType });
+    }
 
 
 });
