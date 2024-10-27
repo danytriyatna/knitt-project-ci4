@@ -440,7 +440,7 @@ $(document).ready(function () {
     
 
     $("#btn-add-detail").click(function () {
-            // dtListUkuran.setData()
+            dtListUkuran.setData()
             $("#modal-list-wo").modal("show");
             dtListUkuran.deselectRow();
     });
@@ -473,6 +473,7 @@ $(document).ready(function () {
     });
 
     function simpanDataDetail() {
+    
         $.ajax({
             type: 'POST',
             url: '/trans/production/save',

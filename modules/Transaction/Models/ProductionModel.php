@@ -109,6 +109,18 @@ class ProductionModel extends \App\Models\PrModel
         return $this->_data;
     }
 
+    function getDataQuantityCurrent($id, $idUkuran)
+    {
+        $builder = $this->db->table("trans_walkorder_proses_ukuran abx");
+        $builder->select("abx.qty_prod");
+        $builder->where('abx.id_walkorder_proses', $id);
+        $builder->where('abx.id_ukuran', $idUkuran);
+        $builder->orderBy("abx.id", "ASC");
+        $this->_data = $builder->get()->getRow();
+
+        return $this->_data;
+    }
+
     function getDataOperatorProd($id)
     {
         $builder = $this->db->table("trans_produksi_operator abx");
@@ -131,6 +143,8 @@ class ProductionModel extends \App\Models\PrModel
 
             foreach ($data as $rowData) {
                 $resData = $this->getDataNextProses($idWorkOrder, $rowData['id_walkorder_proses_ukuran']);
+                $resQtyCurrent = $this->getDataQuantityCurrent($rowData['id_walkorder_proses_ukuran'], $rowData['id_ukuran']);
+
                 $arrDataUkuran = [
                     "id_produksi" => $idProduksi,
                     "id_walkorder_proses_ukuran" => !empty($rowData['id_walkorder_proses_ukuran']) ? $rowData['id_walkorder_proses_ukuran'] : null,
@@ -149,7 +163,7 @@ class ProductionModel extends \App\Models\PrModel
                 ];
                 $this->insertRecordGetid("trans_produksi_operator", $arrDataUkuran);
                 $arrUpdData = [
-                    "qty_prod" => $rowData['qty']
+                    "qty_prod" => !empty($resQtyCurrent) + $rowData['qty'] ? (float)$resQtyCurrent->qty_prod + (float)$rowData['qty'] : $rowData['qty']
                 ];
                 $arrParam =  [
                     "id_walkorder_proses" => $rowData['id_walkorder_proses_ukuran'],
@@ -157,7 +171,7 @@ class ProductionModel extends \App\Models\PrModel
                 ];
                 $this->updateRecords("trans_walkorder_proses_ukuran", $arrUpdData, $arrParam);
                 $arrUpdData2 = [
-                    "qty" => $rowData['qty']
+                    "qty" => !empty($resQtyCurrent) ?  (float)$resQtyCurrent->qty_prod + (float)$rowData['qty']  : $rowData['qty']
                 ];
                 $arrParam2 =  [
                     "id_walkorder_proses" => $resData->id,
