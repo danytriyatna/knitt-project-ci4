@@ -82,7 +82,7 @@ $(document).ready(function () {
                 },
                 {
                     title: "QTY<br>PRODUKSI", field: "qty_prod",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"10%", bottomCalc:"sum", 
+                    width:"10%", bottomCalc:"sum", visible: false
                 }
             ],
             locale: 'id',

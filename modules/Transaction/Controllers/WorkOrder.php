@@ -106,6 +106,9 @@ class WorkOrder extends BaseController
       $status = $row->status == 1 ? "Draft" : "Submit";
       $tipe = $row->tipe_id == 1 ? "Sample" : "Sales Order";
 
+      $qty = $row->qty;
+      $qty_prod = $this->mWalkorder->getCnt_produksi($row->id);
+
       array_push(
         $build_array["data"],
         array(
@@ -115,8 +118,8 @@ class WorkOrder extends BaseController
           "kode_walkorder"    => $row->kode_walkorder,
           "qty"               => $row->qty,
           "tipe"              => $tipe,
-          "qty_prod"          => 0,
-          "qty_remain"        => $row->qty - 0,
+          "qty_prod"          => $qty_prod,
+          "qty_remain"        => $qty - $qty_prod,
           "tgl_deadline"      => fdate_eng_to_ind($row->tgl_deadline),
           "tgl_transaksi"     => fdate_eng_to_ind($row->tgl_transaksi),
           "keterangan_style"  => $row->keterangan_style,
