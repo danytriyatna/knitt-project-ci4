@@ -117,7 +117,8 @@ class ProductionModel extends \App\Models\PrModel
 
                 $arrDataUkuran = [
                     "id_produksi" => $idProduksi,
-                    "id_proses" => !empty($rowData['id_walkorder_proses_ukuran']) ? $rowData['id_walkorder_proses_ukuran'] : null,
+                    "id_walkorder_proses_ukuran" => !empty($rowData['id_walkorder_proses_ukuran']) ? $rowData['id_walkorder_proses_ukuran'] : null,
+                    "id_proses" => $rowData['id_proses'],
                     "id_ukuran" => $rowData['id_ukuran'],
                     "id_warna" => $rowData['id_warna'],
                     "id_operator" => $rowData['id_operator'],
@@ -131,6 +132,14 @@ class ProductionModel extends \App\Models\PrModel
 
                 ];
                 $this->insertRecordGetid("trans_produksi_operator", $arrDataUkuran);
+                $arrUpdData = [
+                    "qty_prod" => $rowData['qty']
+                ];
+                $arrParam =  [
+                    "id_walkorder_proses" => $rowData['id_walkorder_proses_ukuran'],
+                    "id_ukuran" => $rowData['id_ukuran'],
+                ];
+                $this->updateRecords("trans_walkorder_proses_ukuran", $arrUpdData, $arrParam);
             }
             $this->db->transComplete();
 

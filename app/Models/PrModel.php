@@ -64,6 +64,11 @@ class PrModel extends Model
         $exec = $this->db->table($table)->update($data, array($column => $id));
         return $exec;
     }
+    public function updateRecords($table, $data, $arr)
+    {
+        $exec = $this->db->table($table)->update($data, $arr);
+        return $exec;
+    }
 
     public function sortParentchild($_modules)
     {
