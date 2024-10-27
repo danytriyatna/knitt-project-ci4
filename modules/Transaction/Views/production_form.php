@@ -207,6 +207,7 @@
           <input type="hidden" id="ref_id" value='<?= $ref_id; ?>'>
           <input type="hidden" id="tipe_id" value='<?= $tipe_id; ?>'>
           <input type="hidden" id="id_produksi" value='<?= $id_produksi; ?>'>
+          <input type="hidden" id="id_walkorder" value='<?= $id_walkorder; ?>'>
         </ol>
       </div>
     </div>

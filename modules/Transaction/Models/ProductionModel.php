@@ -95,6 +95,20 @@ class ProductionModel extends \App\Models\PrModel
 
         return $this->_data;
     }
+
+    function getDataNextProses($idWorkOrder, $id)
+    {
+        $builder = $this->db->table("trans_walkorder_proses abx");
+        $builder->select("abx.id");
+        $builder->where('abx.id_walkorder', $idWorkOrder);
+        $builder->where('abx.id >', $id);
+        $builder->orderBy("abx.id", "ASC");
+        $builder->limit(1);
+        $this->_data = $builder->get()->getRow();
+
+        return $this->_data;
+    }
+
     function getDataOperatorProd($id)
     {
         $builder = $this->db->table("trans_produksi_operator abx");
@@ -109,12 +123,14 @@ class ProductionModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function trxInsertUpdateRecord($data, $idProduksi)
+    function trxInsertUpdateRecord($data, $idProduksi, $idWorkOrder)
     {
         $this->db->transStart();
         try {
-            foreach ($data as $rowData) {
 
+
+            foreach ($data as $rowData) {
+                $resData = $this->getDataNextProses($idWorkOrder, $rowData['id_walkorder_proses_ukuran']);
                 $arrDataUkuran = [
                     "id_produksi" => $idProduksi,
                     "id_walkorder_proses_ukuran" => !empty($rowData['id_walkorder_proses_ukuran']) ? $rowData['id_walkorder_proses_ukuran'] : null,
@@ -140,6 +156,14 @@ class ProductionModel extends \App\Models\PrModel
                     "id_ukuran" => $rowData['id_ukuran'],
                 ];
                 $this->updateRecords("trans_walkorder_proses_ukuran", $arrUpdData, $arrParam);
+                $arrUpdData2 = [
+                    "qty" => $rowData['qty']
+                ];
+                $arrParam2 =  [
+                    "id_walkorder_proses" => $resData->id,
+                    "id_ukuran" => $rowData['id_ukuran'],
+                ];
+                $this->updateRecords("trans_walkorder_proses_ukuran", $arrUpdData2, $arrParam2);
             }
             $this->db->transComplete();
 

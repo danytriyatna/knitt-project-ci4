@@ -328,14 +328,14 @@ $(document).ready(function () {
             });
         }
 
-        if (dtListProd.getData().some(x => x.id_ukuran == data.id_ukuran && x.id_walkorder_proses_ukuran == data.id_walkorder_proses_ukuran)){
-            return Swal.fire({
-                text: "Data sudah dipilih, silahkan pilih data yang lain",
-                icon: 'error',
-                showConfirmButton: false,
-                timer: 2000
-            });
-        }
+        // if (dtListProd.getData().some(x => x.id_ukuran == data.id_ukuran && x.id_walkorder_proses_ukuran == data.id_walkorder_proses_ukuran)){
+        //     return Swal.fire({
+        //         text: "Data sudah dipilih, silahkan pilih data yang lain",
+        //         icon: 'error',
+        //         showConfirmButton: false,
+        //         timer: 2000
+        //     });
+        // }
 
         if(!data.harga_satuan){
             return Swal.fire({
@@ -478,6 +478,7 @@ $(document).ready(function () {
             url: '/trans/production/save',
             data: {
                 idProduksi:$("#id_produksi").val(),
+                idWorkOrder:$("#id_walkorder").val(),
                 data:dtListProd.getData().filter(x => x.flag == 0),
             },
             dataType: "json",

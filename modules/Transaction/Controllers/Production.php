@@ -218,6 +218,7 @@ class Production extends BaseController
       $this->data['listProd']    = json_encode($detailProd);
       $this->data['row']    = $resData;
       $this->data['id_produksi'] = encrypt($resData->id);
+      $this->data['id_walkorder'] = encrypt($resData->id_walkorder);
       $this->data['tipe_id'] = encrypt($stdData->tipe_id);
       $this->data['ref_id'] = encrypt($stdData->ref_id);
       $this->data['detail'] = json_encode($list_detail);
@@ -235,12 +236,16 @@ class Production extends BaseController
     $msg    = "Data gagal disimpan !";
     $status = false;
     $idProduksi = $this->request->getPost('idProduksi');
+    $idWorkOrder = $this->request->getPost('idWorkOrder');
     if ($idProduksi != "") {
       $idProduksi = decrypt($idProduksi);
     }
+    if ($idWorkOrder != "") {
+      $idWorkOrder = decrypt($idWorkOrder);
+    }
     $data = $this->request->getPost('data');
 
-    $res = $this->mProduksi->trxInsertUpdateRecord($data, $idProduksi);
+    $res = $this->mProduksi->trxInsertUpdateRecord($data, $idProduksi, $idWorkOrder);
     if ($res) {
       $status = true;
       $msg = "Data berhasil disimpan!";
