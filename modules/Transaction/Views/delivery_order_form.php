@@ -48,8 +48,8 @@
                 </div>
                 <div class="col-sm-6">
                   <div class="form-group row">
-                    <label class="control-label text-start text-md-end col-md-3 col-form-label" for="tgl_do">DO Date</label>
-                    <div class="col-md-9">
+                    <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tgl_do">DO Date</label>
+                    <div class="col-md-8">
                       <input type="text" id="tgl_do" name="tgl_do" class="form-control datepicker" placeholder="Pilih tanggal DO" value="01 Oktober 2024">
                     </div>
                   </div>
