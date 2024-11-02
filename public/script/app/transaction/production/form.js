@@ -114,7 +114,7 @@ $(document).ready(function () {
             paginationDataSent: {
                 sorters: "order",
             },
-            selectable: false
+            selectableRows: false
 	});
 
     let detail_data = $("#data-details").val().replace(/&quot;/ig,'"');

@@ -91,7 +91,7 @@ $(document).ready(function () {
         dataSendParams: {
             sorters: "order"
         },
-        selectable: false,
+        selectableRows: false,
 	});
 
     
