@@ -103,7 +103,7 @@ $(document).ready(function () {
         dataSendParams: {
             sorters: "order"
         },
-        selectable: false,
+        selectableRows: false,
 	});
 
     let dtListDetail = new Tabulator("#dt-detail", {
