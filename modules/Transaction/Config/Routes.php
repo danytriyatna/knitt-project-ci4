@@ -46,6 +46,7 @@ $routes->group('trans/production', ['namespace' => 'Modules\Transaction\Controll
   $routes->post('save', 'Production::save');
   $routes->post('list', 'Production::lists');
   $routes->post('list_ukuran', 'Production::lists_ukuran');
+  $routes->post('list_detail', 'Production::getDataListProd');
 });
 
 $routes->group('trans/sales-invoice', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {

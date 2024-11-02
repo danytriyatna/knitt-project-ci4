@@ -9,6 +9,7 @@ use Modules\Transaction\Models\WalkorderModel;
 use Modules\Transaction\Models\SalesOrderModel;
 use Modules\Transaction\Models\SampleModel;
 use Modules\Referensi\Models\ProsesProduksiModel;
+use Modules\Referensi\Models\OperatorModel;
 
 class Production extends BaseController
 {
@@ -19,6 +20,7 @@ class Production extends BaseController
   protected $mSalesOrder;
   protected $mWalkorder;
   protected $mPproduksi;
+  protected $mOperator;
 
   function __construct()
   {
@@ -28,6 +30,7 @@ class Production extends BaseController
     $this->mSalesOrder = new SalesOrderModel();
     $this->mWalkorder = new WalkorderModel();
     $this->mPproduksi = new ProsesProduksiModel();
+    $this->mOperator = new OperatorModel();
   }
 
   public function index()
@@ -214,11 +217,20 @@ class Production extends BaseController
         }
       }
       $dataProses = $this->mProduksi->getDataProsesProd($resData->id_walkorder);
-      $detailProd = $this->mProduksi->getDataOperatorProd($id);
+
+      $sort = [
+        [
+          'field' => 'nama_operator',
+          'dir' => 'ASC'
+        ]
+      ];
+
+      $dataOperator = $this->mOperator->getData(null, 0, 99999, $sort);
 
 
       $this->data['proses']    = $dataProses;
-      $this->data['listProd']    = json_encode($detailProd);
+      $this->data['operator']    = $dataOperator;
+      // $this->data['listProd']    = json_encode($detailProd);
       $this->data['row']    = $resData;
       $this->data['id_produksi'] = encrypt($resData->id);
       $this->data['id_walkorder'] = encrypt($resData->id_walkorder);
@@ -256,6 +268,25 @@ class Production extends BaseController
 
     $build_array['message'] = $msg;
     $build_array['status']  = $status;
+
+    return $this->response->setJSON($build_array);
+  }
+
+  public function getDataListProd()
+  {
+    $build_array['message'] = "data tidak ditemukan";
+    $build_array['status']  = false;
+    $id = $this->request->getPost('id');
+    if ($id != "") {
+      $id = decrypt($id);
+    }
+    $tglTransaksi = $this->request->getPost('tglTransaksi');
+    $detailProd = $this->mProduksi->getDataOperatorProd($id, $tglTransaksi);
+    if (!empty($detailProd)) {
+      $build_array['message'] = "data ditemukan";
+      $build_array['status']  = true;
+      $build_array['data'] = json_encode($detailProd);
+    }
 
     return $this->response->setJSON($build_array);
   }

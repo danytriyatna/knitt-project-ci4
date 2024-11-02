@@ -22,3 +22,10 @@ $routes->group("master-data/konsumen", ['namespace' => 'Modules\Referensi\Contro
     $routes->post('simpan', 'RefKonsumen::save');
     $routes->get('delete/(:any)', 'RefKonsumen::deactivate/$1');
 });
+$routes->group("master-data/operator", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefOperator::index');
+
+    $routes->post('list', 'RefOperator::lists');
+    $routes->post('simpan', 'RefOperator::save');
+    $routes->get('delete/(:any)', 'RefOperator::deactivate/$1');
+});

@@ -203,7 +203,7 @@
           <li class="breadcrumb-item">Transaksi</li>
           <li class="breadcrumb-item active"><?= $titlehead ?></li>
           <input type="hidden" id="data-details" value='<?= $detail; ?>'>
-          <input type="hidden" id="data-prods" value='<?= $listProd; ?>'>
+
           <input type="hidden" id="ref_id" value='<?= $ref_id; ?>'>
           <input type="hidden" id="tipe_id" value='<?= $tipe_id; ?>'>
           <input type="hidden" id="id_produksi" value='<?= $id_produksi; ?>'>
@@ -277,10 +277,9 @@
                     <label class="control-label text-start text-md-end m-e-8" for="filter_operator">Operator</label>
                     <select id="filter_operator" name="filter_operator" class="form-control custom-select select2">
                       <option value="">-</option>
-                      <option value="1">Teh Endok</option>
-                      <option value="2">Amih</option>
-                      <option value="3">Pak Juju</option>
-                      <option value="4">Pak Iyang</option>
+                      <?php foreach ($operator as $rowData) : ?>
+                        <option value="<?= $rowData->id . ";" . $rowData->harga ?>"><?= $rowData->nama_operator ?></option>
+                      <?php endforeach ?>
                     </select>
                   </div>
                 </div>
