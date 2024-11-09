@@ -83,7 +83,7 @@ $(document).ready(function () {
         dataSendParams: {
             sorters: "sort"
         },
-        selectable: false
+        selectableRows: false
     });
 
     let searchThread = null;

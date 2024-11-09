@@ -93,7 +93,7 @@ $(document).ready(function () {
             paginationDataSent: {
                 sorters: "order",
             },
-            selectable: false
+            selectableRows: false
 	});
 
     let detail_data = $("#data-details").val().replace(/&quot;/ig,'"');
@@ -257,7 +257,7 @@ $(document).ready(function () {
         dataSendParams: {
             sorters: "order"
         },
-        selectable: false,
+        selectableRows: false,
     });
     
 
@@ -354,7 +354,7 @@ $(document).ready(function () {
             paginationDataSent: {
                 sorters: "order",
             },
-            selectable: false
+            selectableRows: false
 	});
 
 

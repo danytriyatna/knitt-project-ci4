@@ -2,10 +2,11 @@
 
 $(document).ready(function () {
     let inpData         = $('#data_id');
-    let inpNamaKonsumen = $('#nama_konsumen');
+    let inpNamaOperator = $('#nama_operator');
     let inpAlamat       = $('#alamat');
     let inpNoHP         = $('#no_hp');
-    let inpEmail        = $('#email');
+    let inpTglBergabung        = $('#tgl_bergabung');
+    let inpHarga        = $('#harga');
 
     let isModal       = $("#modal-form-add-po");
 
@@ -29,21 +30,26 @@ $(document).ready(function () {
                     let data_row = row.getData();
                     if (e.target.title === 'delete') {
                         if (confirm("Anda yakin akan menghapus data?")) {
-                            window.location.replace(baseUrl + "/master-data/konsumen/delete/" + data_row.id);
+                            window.location.replace(baseUrl + "/master-data/operator/delete/" + data_row.id);
                         }
                     }else if(e.target.title === 'edit'){
                         inpData.val(data_row.id)
-                        inpNamaKonsumen.val(data_row.nama)
+                        inpNamaOperator.val(data_row.nama_operator)
                         inpAlamat.val(data_row.alamat)
                         inpNoHP.val(data_row.no_hp)
-                        inpEmail.val(data_row.email)
+                        inpHarga.val(data_row.harga)
+                        inpTglBergabung.val(data_row.tgl_bergabung)
 
                         isModal.modal("show");
                     }   
                 }
             },
             {
-                title: "Nama Konsumen", field: "nama", headerSort: false,
+                title: "Nama Operator", field: "nama_operator", headerSort: false,
+                width: "20%"
+            },
+            {
+                title: "No HP", field: "no_hp", headerSort: false,
                 width: "20%"
             },
             {
@@ -51,17 +57,22 @@ $(document).ready(function () {
                 
             },
             {
-                title: "Email", field: "email", headerSort: false,
+                title: "Tgl Bergabung", field: "tgl_bergabung", headerSort: false,
                 width: "20%", cssClass : 'text-center'
             },
             {
-                title: "No. HP", field: "no_hp", headerSort: false,
-                width: "20%", cssClass : 'text-center'
+                title: "Harga", field: "harga", headerSort: false,
+                width: "20%", cssClass : 'text-center',formatter: "money",formatterParams: {
+                    decimal: ",",
+                    thousand: ".",
+                    symbol: "Rp",  // Simbol mata uang Rupiah
+                    precision: 0,   // Tidak ada desimal
+                }, hozAlign:"right"
             },
         ],
         locale: 'id',    
         layout: 'fitColumns',
-        ajaxURL: "/master-data/konsumen/list",
+        ajaxURL: "/master-data/operator/list",
         ajaxConfig: "POST",
         sortMode: "remote",
         filterMode: "remote",
@@ -103,7 +114,7 @@ $(document).ready(function () {
         dataSendParams: {
             sorters: "order"
         },
-        selectableRows: false,
+        selectable: false,
 	});
 
     
@@ -123,10 +134,11 @@ $(document).ready(function () {
 
     $("#btn-add").on("click", function(){
         inpData.val("")
-        inpNamaKonsumen.val("")
+        inpNamaOperator.val("")
         inpAlamat.val("")
         inpNoHP.val("")
-        inpEmail.val("")
+        inpHarga.val("")
+        inpTglBergabung.val("")
 
         isModal.modal("show");
     });
@@ -136,24 +148,66 @@ $(document).ready(function () {
         simpanData()
     });
 
+    inpHarga.on("input", function(e){
+        let value = e.target.value.replace(/[^,\d]/g, '').toString();
+
+        // Pisahkan angka menjadi ribuan
+        let split = value.split(',');
+        let sisa = split[0].length % 3;
+        let rupiah = split[0].substr(0, sisa);
+        let ribuan = split[0].substr(sisa).match(/\d{3}/g);
+
+        // Tambahkan titik jika ada ribuan
+        if (ribuan) {
+            let separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        // Gabungkan dengan bagian desimal, jika ada
+        rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+
+        e.target.value = rupiah ? 'Rp ' + rupiah : '';
+    })
+
+    inpNoHP.on('input', function (e) {
+        let value = e.target.value;
+
+        // Jika pengguna mencoba menghapus "+62", tambahkan kembali
+        if (!value.startsWith('+62')) {
+            e.target.value = '+62' + value.replace(/\D/g, ''); // Pastikan hanya angka setelah "+62"
+        } else {
+            // Batasi input hanya angka setelah "+62"
+            e.target.value = value.replace(/[^0-9\+]/g, '').replace(/^62\+/, '+62');
+        }
+    });
+
+    // Mencegah pengguna memindahkan cursor ke prefix
+    inpNoHP.on('keydown', function (e) {
+        if (inpNoHP.selectionStart < 3) {
+            e.preventDefault();
+            inpNoHP.setSelectionRange(inpNoHP.value.length, inpNoHP.value.length);
+        }
+    });
+
     
     function simpanData() {
         
         let validation = true
-        if(inpNamaKonsumen.val().length == 0) validation = false
+        if(inpNamaOperator.val().length == 0) validation = false
         if(inpNoHP.val().length == 0) validation = false
-        if(inpEmail.val().length == 0) validation = false
+        if(inpHarga.val().length == 0) validation = false
         if(inpAlamat.val().length == 0) validation = false
     
         if(validation){
             $.ajax({
                 type: 'POST',
-                url: '/master-data/konsumen/simpan',
+                url: '/master-data/operator/simpan',
                 data: {
                     dataId : inpData.val(),
-                    nama   : inpNamaKonsumen.val(),
+                    nama_operator   : inpNamaOperator.val(),
                     alamat : inpAlamat.val(),
-                    email  : inpEmail.val(),
+                    harga  : inpHarga.val(),
+                    tgl_bergabung  : inpTglBergabung.val(),
                     no_hp  : inpNoHP.val(),
                 },
                 dataType: "json",

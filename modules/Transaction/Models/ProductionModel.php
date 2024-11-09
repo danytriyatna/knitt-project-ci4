@@ -125,14 +125,18 @@ class ProductionModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getDataOperatorProd($id)
+    function getDataOperatorProd($id, $tgl_transaksi = null)
     {
         $builder = $this->db->table("trans_produksi_operator abx");
-        $builder->select("abx.flag, abx.id_proses as id_walkorder_proses_ukuran, abx.qty, CASE WHEN id_operator = 1 THEN 'Teh Endok' WHEN id_operator = 2 THEN 'Amih' WHEN id_operator = 3 THEN 'Pak Juju' ELSE 'Pak Iyang' END as operator, dbx.kode_warna,  abx.harga_total, abx.harga, abx.tgl_transaksi as date,bbx.nama as process,cbx.kode_ukuran");
+        $builder->select("abx.flag, abx.id_proses as id_walkorder_proses_ukuran, abx.qty, ebx.nama_operator as operator, dbx.kode_warna,  abx.harga_total, abx.harga, abx.tgl_transaksi as date,bbx.nama as process,cbx.kode_ukuran");
         $builder->join("_jenis_proses_produksi bbx", "abx.id_proses = bbx.id", "inner");
         $builder->join("ref_ukuran cbx", "abx.id_ukuran = cbx.id", "inner");
         $builder->join("ref_warna dbx", "abx.id_warna = dbx.id", "inner");
+        $builder->join("ref_operator ebx", "abx.id_operator = ebx.id", "inner");
         $builder->where('abx.id_produksi', $id);
+        if (!empty($tgl_transaksi)) {
+            $builder->where('abx.tgl_transaksi', $tgl_transaksi);
+        }
         $builder->orderBy("abx.id", "ASC");
         $this->_data = $builder->get()->getResult();
 

@@ -114,7 +114,7 @@ $(document).ready(function () {
             paginationDataSent: {
                 sorters: "order",
             },
-            selectable: false
+            selectableRows: false
 	});
 
     let detail_data = $("#data-details").val().replace(/&quot;/ig,'"');
@@ -220,22 +220,6 @@ $(document).ready(function () {
         // layout: 'fitColumns',
         placeholder: "Tidak ada data",
 	});
-
-    let listProd = $("#data-prods").val().replace(/&quot;/ig,'"');
-
-    if(listProd.length > 0){
-        setTimeout(() => {
-            try {
-                let isdata = JSON.parse(listProd);
-                
-                // Set data ke Tabulator
-                dtListProd.setData(isdata);
-            } catch (e) {
-                console.error("Error parsing JSON:", e);
-            }
-        }, 1000);
-    } 
-
     
 
     // Table Penguji
@@ -408,6 +392,8 @@ $(document).ready(function () {
   
     dtListUkuran.on("rowClick", function(e, row){
         let data =  row.getData()
+        let arrOperator = operator.val().split(";")
+   
 
         if (statusProses.val().length == 0){
             return Swal.fire({
@@ -420,6 +406,14 @@ $(document).ready(function () {
         if (operator.val().length == 0){
             return Swal.fire({
                 text: "Operator harus dipilih",
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+        if(!isNumeric(arrOperator[1])){
+            return Swal.fire({
+                text: "Harga Operator harus ditentukan direferensi",
                 icon: 'error',
                 showConfirmButton: false,
                 timer: 2000
@@ -500,7 +494,9 @@ $(document).ready(function () {
             }, 600);
         });
     }
-
+    function isNumeric(value) {
+        return !isNaN(value) && !isNaN(parseFloat(value));
+    }
 
     function updateTotal(cell) {
         let row = cell.getRow();
@@ -547,7 +543,67 @@ $(document).ready(function () {
         return `${year}-${month}-${day}`;
     }
 
+    tglTransaksi.change(function(e){
+        let date = formatLocaleDate(e.target.value)
+        let idProduksi =  $("#id_produksi").val()
+        $.ajax({
+            type: 'POST',
+            url: '/trans/production/list_detail',
+            data: {
+                id:idProduksi,
+                tglTransaksi:date,
+            },
+            dataType: "json",
+            beforeSend: function () {
+                Swal.fire({
+                    title: 'Loading...',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    onBeforeOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+            },
+            success: function (response) {
     
+                if(response.status == true){
+                    let listProd = response.data
+                    if(listProd.length > 0){
+                            setTimeout(() => {
+                                try {
+                                    let isdata = JSON.parse(listProd);
+                                    
+                                    // Set data ke Tabulator
+                                    dtListProd.setData(isdata);
+                                } catch (e) {
+                                    console.error("Error parsing JSON:", e);
+                                }
+                            }, 0);
+                        } 
+                        
+                }else{
+                    Swal.fire({
+                        text: response.message,
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+                Swal.close();
+            },
+            error: function (e) {
+                let msg = e.responseJSON.message;
+                Swal.close();
+    
+                Swal.fire({
+                    text: msg,
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            },
+        });
+    })
 
     $("#btn-add-detail").click(function () {
             // dtListUkuran.setData()
