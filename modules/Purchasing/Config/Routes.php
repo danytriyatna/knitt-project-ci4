@@ -5,7 +5,7 @@ $routes->group('purchasing/purchase-order', ['namespace' => 'Modules\Purchasing\
   $routes->get('form', 'PurchaseOrder::form');
 });
 
-$routes->group('purchasing/receipt-order', ['namespace' => 'Modules\Purchasing\Controllers'], static function ($routes) {
-  $routes->get('/', 'ReceiptOrder::index');
-  $routes->get('form', 'ReceiptOrder::form');
+$routes->group('purchasing/receive-item', ['namespace' => 'Modules\Purchasing\Controllers'], static function ($routes) {
+  $routes->get('/', 'ReceiveItem::index');
+  $routes->get('form', 'ReceiveItem::form');
 });
