@@ -27,36 +27,21 @@
     <div class="col-lg-12">
       <div class="card">
         <div class="card-body">
-          <div class="row">
-            <div class="col-sm-3">
-              <div class="form-group m-b-0 d-flex align-items-center">
-                <label class="control-label text-start text-md-end m-e-8" for="filter_status">Status</label>
-                <select id="filter_status" name="filter_status" class="form-control custom-select select2">
-                  <option value="0">All</option>
-                  <option value="1">Draft</option>
-                  <option value="2">Process</option>
-                  <option value="3">Done</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <hr>
           <div class="table-responsive">
             <table class="table table-striped datatable">
               <thead>
                 <tr>
                   <th style="min-width: 105px; width: 105px;">
-                    <a href="trans/customer-receipt/form" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Tambah</a>
+                    <a href="purchasing/purchase-order/form" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Tambah</a>
                   </th>
-                  <th>CR NO.</th>
-                  <th>CR DATE</th>
-                  <th>SI NO.</th>
-                  <th>BUYER</th>
-                  <th>SI AMOUNT</th>
-                  <th>PAID AMOUNT</th>
+                  <th>PO NO.</th>
+                  <th>PO DATE</th>
+                  <th>VENDOR NAME</th>
+                  <th>TERM</th>
+                  <th>QTY STATUS</th>
+                  <th>TOTAL</th>
                   <th>PAYMENT</th>
-                  <th>REMAIN AMOUNT</th>
-                  <th>DO STATUS</th>
+                  <th>REMAIN</th>
                 </tr>
               </thead>
               <tbody>
@@ -69,23 +54,20 @@
                         <i class="fas fa-cog"></i> Aksi <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu dropdown-menu-act" role="menu">
-                        <li><a href="trans/customer-receipt/form" title="Edit"><i class="fa fa-fw fa-edit"></i> Edit</a></li>
+                        <li><a href="purchasing/purchase-order/form" title="Edit"><i class="fa fa-fw fa-edit"></i> Edit</a></li>
                         <li><a href="javascript:void(0)" title="Hapus"><i class="fa fa-fw fa-trash"></i> Hapus</a>
                         </li>
                       </ul>
                     </div>
                   </td>
-                  <td>CRC24100001</td>
-                  <td>06-10-2024</td>
-                  <td>SIV24100001</td>
-                  <td>YUSUF</td>
-                  <td class="text-nowrap">1.800.000,00</td>
-                  <td class="text-nowrap">0,00</td>
-                  <td class="text-nowrap">1.800.000,00</td>
-                  <td class="text-nowrap">0,00</td>
-                  <td>
-                    <span class="badge bg-secondary">DRAFT</span>
-                  </td>
+                  <td>POD24100001</td>
+                  <td>01-11-2024</td>
+                  <td>Vendot Citraknitt 0<?= 3 - $i; ?></td>
+                  <td>30 Days</td>
+                  <td>50/100</td>
+                  <td class="text-nowrap">2.500.000,00</td>
+                  <td class="text-nowrap">1.000.000,00</td>
+                  <td class="text-nowrap">1.500.000,00</td>
                 </tr>
                 <?php endfor; ?>
               </tbody>
