@@ -192,10 +192,10 @@
 
               <div class="row">
                 <div class="col-sm-10">
-                  <a href="trans/customer-receipt" class="btn btn-default m-e-5">
+                  <a href="purchasing/purchase-order" class="btn btn-default m-e-5">
                     <span class="fa fa-arrow-left"></span> Kembali
                   </a>
-                  <a href="trans/customer-receipt" class='btn btn-success'>
+                  <a href="purchasing/purchase-order" class='btn btn-success'>
                     <span class="fa fa-save"></span> Simpan
                   </a>
                 </div>
