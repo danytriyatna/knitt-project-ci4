@@ -2,6 +2,37 @@
 
 <?= $this->section('modal') ?>
 
+
+<div id="modal-list-produksi" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title ipendix-penguji-preview-title">List Data Produksi</h5>
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12 mb-3">
+            <div class="col-md-4" style="float: right; position: relative; right: 15px;">
+              <div class="homeSearch w-100" style="width: 100%; margin-left: 5%; margin-top: 0;">
+                <input type="text" id="tb-produksi" class="form-control" placeholder="Pencarian . . .">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div id="dt-list-produksi" class="table-striped table-centered"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <!-- <a href="javascript:void(0)" id="pilihUkuran" class="btn btn-success float-left">Pilih Data</a> -->
+      </div>
+    </div>
+  </div>
+</div>
+
 <?= $this->endSection('modal') ?>
 
 <?= $this->section('content'); ?>
@@ -23,170 +54,183 @@
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-lg-12">
-      <div class="card">
-        <div class="card-body">
-          <div class="row">
-            <div class="col-sm-6">
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="form-group row">
-                    <label class="control-label text-start text-md-end col-md-3 col-form-label" for="do_no">DO No.</label>
-                    <div class="col-md-9">
-                      <input type="text" id="do_no" name="do_no" class="form-control" placeholder="Ketikkan nomor DO" value="DOD2410001">
+  <form action="<?= base_url().'/'.uri_string(); ?>" id="fmain" method="post" enctype='multipart/form-data' class="form-horizontal">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="row">
+                  <div class="col-sm-6">
+                    <div class="form-group row">
+                      <label class="control-label text-start text-md-end col-md-3 col-form-label" for="do_no">DO No.</label>
+                      <div class="col-md-9">
+                        <input type="text" id="do_no" name="do_no" class="form-control" placeholder="Ketikkan nomor DO" value="<?= $row->delivery_kode;?>">
+                        <input type="hidden" name="id_produksi" id="id_produksi" value="<?= $row->id_produksi;?>" >
+                        <input type="hidden" name="id_walkorder" id="id_walkorder" value="<?= $row->id_walkorder;?>" >
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="control-label text-start text-md-end col-md-3 col-form-label" for="so_no">Ref No.</label>
+                      <div class="col-md-8">
+                        <input type="text" name="kode_produksi" id="kode_produksi" class="form-control" value="<?= $row->kode_produksi;?>" > 
+                      </div>
+                      <div class="col-md-1">
+                        <button type="button" id="list_prod" class="btn btn-sm btn-primary"><i class="fa fa-search"></i></button>
+                      </div>
                     </div>
                   </div>
-                  <div class="form-group row">
-                    <label class="control-label text-start text-md-end col-md-3 col-form-label" for="so_no">SO NO.</label>
-                    <div class="col-md-9">
-                      <select id="so_no" name="so_no" class="form-select select2" data-placeholder="-- Pilih nomor SO --">
-                        <option value="1">SOD2410001</option>
-                      </select>
+                  <div class="col-sm-6">
+                    <div class="form-group row">
+                      <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tgl_do">DO Date</label>
+                      <div class="col-md-8">
+                        <input type="text" id="tgl_do" name="tgl_do" class="form-control datepicker" placeholder="Pilih tanggal DO" value="<?= $row->tgl_do;?>">
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div class="col-sm-6">
-                  <div class="form-group row">
-                    <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tgl_do">DO Date</label>
-                    <div class="col-md-8">
-                      <input type="text" id="tgl_do" name="tgl_do" class="form-control datepicker" placeholder="Pilih tanggal DO" value="01 Oktober 2024">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="form-group row">
+                      <label class="control-label text-start text-md-end col-md-2 col-form-label custom-col-md-2" for="select_style">Style</label>
+                      <div class="col-md-10">
+                        <input type="text" name="keterangan_style" id="keterangan_style" class="form-control" value="<?= $row->keterangan_style;?>" readonly>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-sm-12">
-                  <div class="form-group row">
-                    <label class="control-label text-start text-md-end col-md-2 col-form-label custom-col-md-2" for="select_style">Style</label>
-                    <div class="col-md-10">
-                      <select id="select_style" name="select_style" class="form-select select2" data-placeholder="-- Pilih Style --" disabled>
-                        <option value="1">K-17 (CARDIGAN PITA)</option>
-                      </select>
-                    </div>
+              <div class="col-sm-6">
+                <div class="form-group row">
+                  <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_buyer">Buyer</label>
+                  <div class="col-md-9">
+                    <select id="select_buyer" name="select_buyer" class="form-select select2" data-placeholder="-- Pilih Buyer --" value="<?= $row->select_buyer;?>" >
+                      <option value=""> - Pilih Buyer - </option>
+                      <?php foreach ($buyer as $item) { ?>
+                        <option value="<?= $item['id']; ?>"><?= $item['nama']; ?></option> 
+                      <?php } ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="control-label text-start text-md-end col-md-2 col-form-label" for="alamat_buyer">Alamat</label>
+                  <div class="col-md-9">
+                    <textarea rows="3" id="alamat_buyer" name="alamat_buyer" class="form-control" placeholder="Ketikkan alamat">
+                        <?= $row->alamat_buyer;?>
+                    </textarea>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-sm-6">
-              <div class="form-group row">
-                <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_buyer">Buyer</label>
-                <div class="col-md-9">
-                  <select id="select_buyer" name="select_buyer" class="form-select select2" data-placeholder="-- Pilih Buyer --" disabled>
-                    <option value="1">Yusuf</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group row">
-                <label class="control-label text-start text-md-end col-md-2 col-form-label" for="alamat_buyer">Alamat</label>
-                <div class="col-md-9">
-                  <textarea rows="3" id="alamat_buyer" name="alamat_buyer" class="form-control" placeholder="Ketikkan alamat" disabled>Bandung</textarea>
+
+            <hr>
+
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="table-responsive">
+                  <div class="table-striped table-centered" id="dt-prod"></div>
+                  <!-- <table class="table table-striped table-centered">
+                    <thead>
+                      <tr>
+                        <th>No.</th>
+                        <th>COLOUR</th>
+                        <th style="min-width: 80px;">S</th>
+                        <th style="min-width: 80px;">M</th>
+                        <th style="min-width: 80px;">L</th>
+                        <th style="min-width: 80px;">XL</th>
+                        <th style="min-width: 80px;">2XL</th>
+                        <th style="min-width: 80px;">ALL</th>
+                        <th rowspan="2">ORDER QTY</th>
+                        <th rowspan="2">DO QTY</th>
+                        <th rowspan="2">REMAIN</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>1</td>
+                        <td class="text-nowrap">M38 - MINT- HITAM- OFF WHITE</td>
+                        <td>1511</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>1511</td>
+                        <td>36</td>
+                        <td>1475</td>
+                      </tr>
+                    </tfoot>
+                  </table> -->
                 </div>
               </div>
             </div>
-          </div>
 
-          <hr>
+            <hr>
 
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="table-responsive">
-                <table class="table table-striped table-centered">
-                  <thead>
-                    <tr>
-                      <th>No.</th>
-                      <th>COLOUR</th>
-                      <th style="min-width: 80px;">S</th>
-                      <th style="min-width: 80px;">M</th>
-                      <th style="min-width: 80px;">L</th>
-                      <th style="min-width: 80px;">XL</th>
-                      <th style="min-width: 80px;">2XL</th>
-                      <th style="min-width: 80px;">ALL</th>
-                      <th rowspan="2">ORDER QTY</th>
-                      <th rowspan="2">DO QTY</th>
-                      <th rowspan="2">REMAIN</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td class="text-nowrap">M38 - MINT- HITAM- OFF WHITE</td>
-                      <td>1511</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td>1511</td>
-                      <td>36</td>
-                      <td>1475</td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
-          </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="input-group my-2">
+                  <span class="input-group-text" id="basic-addon1"><i class="fa fa-qrcode"></i></span>
+                  <input type="text" class="form-control bg-info bg-opacity-25" placeholder="Scan" aria-label="Scan" aria-describedby="basic-addon1" id="text_barcode">
+                </div>
 
-          <br>
+                <div class="table-responsive">
+                  <!-- <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th>DATE</th>
+                        <th>COLOUR</th>
+                        <th>SIZE</th>
+                        <th>AVAILABLE QTY</th>
+                        <th>DO QTY</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <button type="button" class="btn btn-sm btn-danger"> <i class="fa fa-trash"></i></button>
+                        </td>
+                        <td>01-10-2024</td>
+                        <td>M38 - MINT- HITAM- OFF WHITE</td>
+                        <td>M</td>
+                        <td>12</td>
+                        <td>
+                          <input type="text" class="form-control" value="12">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <button type="button" class="btn btn-sm btn-danger"> <i class="fa fa-trash"></i></button>
+                        </td>
+                        <td>05-10-2024</td>
+                        <td>M38 - MINT- HITAM- OFF WHITE</td>
+                        <td>M</td>
+                        <td>24</td>
+                        <td>
+                          <input type="text" class="form-control" value="24">
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table> -->
+                  <div class="table-striped" id="dt-list-detail"></div>
+                </div>
+                
+                <br>
 
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="input-group my-2">
-                <span class="input-group-text" id="basic-addon1"><i class="fa fa-qrcode"></i></span>
-                <input type="text" class="form-control bg-info bg-opacity-25" placeholder="Scan" aria-label="Scan" aria-describedby="basic-addon1" disabled>
-              </div>
-
-              <div class="table-responsive">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>DATE</th>
-                      <th>COLOUR</th>
-                      <th>SIZE</th>
-                      <th>AVAILABLE QTY</th>
-                      <th>DO QTY</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <button type="button" class="btn btn-sm btn-danger"> <i class="fa fa-trash"></i></button>
-                      </td>
-                      <td>01-10-2024</td>
-                      <td>M38 - MINT- HITAM- OFF WHITE</td>
-                      <td>M</td>
-                      <td>12</td>
-                      <td>
-                        <input type="text" class="form-control" value="12">
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <button type="button" class="btn btn-sm btn-danger"> <i class="fa fa-trash"></i></button>
-                      </td>
-                      <td>05-10-2024</td>
-                      <td>M38 - MINT- HITAM- OFF WHITE</td>
-                      <td>M</td>
-                      <td>24</td>
-                      <td>
-                        <input type="text" class="form-control" value="24">
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              
-              <br>
-
-              <div class="row">
-                <div class="col-sm-10">
-                  <a href="trans/delivery-order" class="btn btn-default m-e-5">
-                    <span class="fa fa-arrow-left"></span> Kembali
-                  </a>
-                  <a href="trans/delivery-order" class='btn btn-success'>
-                    <span class="fa fa-save"></span> Simpan
-                  </a>
+                <div class="row">
+                  <div class="col-sm-10">
+                    <a href="trans/delivery-order" class="btn btn-default m-e-5">
+                      <span class="fa fa-arrow-left"></span> Kembali
+                    </a>
+                    <button type="button" id="btn-save" class='btn btn-success'>
+                      <span class="fa fa-save"></span> Simpan
+                    </button>
+                    <input type="hidden" name="id" id="id" value="<?= !empty($id)? $id : '' ?>">
+                    <input type="hidden" name="data-details" id="data-details" value='<?= !empty($dt_details)? $dt_details : "" ?>'>
+                    <input type="hidden" name="data-prods" id="data-prods" value='<?= !empty($dt_prods)? $dt_prods : "" ?>'>
+                  </div>
                 </div>
               </div>
             </div>
@@ -194,7 +238,10 @@
         </div>
       </div>
     </div>
-  </div>
+  </form>
 </div>
 
 <?= $this->endSection('content'); ?>
+<?= $this->section('script'); ?>
+<script src="script/app/transaction/delivery/form.js"></script>
+<?= $this->endSection('script'); ?>

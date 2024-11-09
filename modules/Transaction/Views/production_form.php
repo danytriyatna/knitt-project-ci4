@@ -165,7 +165,7 @@
         <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div class="row">
+        <div hidden class="row">
           <div class="col-md-12 mb-3">
             <div class="col-md-4" style="float: right; position: relative; right: 15px;">
               <div class="homeSearch w-100" style="width: 100%; margin-left: 5%; margin-top: 0;">
@@ -245,7 +245,7 @@
                       <div class="card">
                         <div class="card-body" style="min-height: 80px;">
                           <div class="form-check form-check-inline">
-                            <input type="hidden" id="proses_<?= $r->id ?>" value="<?= $r->qty ?>" />
+                            <input type="hidden" id="proses_<?= $r->id ?>" value="<?= $r->qty - $r->qty_prod ?>" />
                             <h5 class="form-check-h1" for="proses_<?= $r->seq ?>"><?= $r->nama ?></h5>
                             <label class="form-check-label" for="proses_<?= $r->seq ?>"><?= $r->qty - $r->qty_prod ?></label>
                           </div>
@@ -292,7 +292,8 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-sm-3">
+
+                <div hidden class="col-sm-3">
                   <div class="form-group row">
                     <label class="control-label text-start text-md-end col-md-3 col-form-label" for="name_prod">Nama</label>
                     <div class="col-md-9">
@@ -300,6 +301,7 @@
                     </div>
                   </div>
                 </div>
+
               </div>
 
               <div class="row mt-1">
@@ -329,7 +331,7 @@
                   <a href="trans/production" class="btn btn-default m-e-5">
                     <span class="fa fa-arrow-left"></span> Kembali
                   </a>
-                  <button type="button" class="m-s-5 btn btn-success" id="btn-save-ukuran"> <i class="fa fa-save"></i> Submit</button>
+                  <button type="button" class="m-s-5 btn btn-success" id="btn-save-ukuran"> <i class="fa fa-save"></i> Simpan</button>
                 </div>
               </div>
             </div>

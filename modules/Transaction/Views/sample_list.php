@@ -15,11 +15,20 @@
         </div>
 
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_style">Description<span class="text-danger">*</span></label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="no_sample">Sample No.</label>
           <div class="col-md-9">
-            <input type="text" id="desc_style" name="desc_style" class="form-control" placeholder="Ketikkan sample description" value="" required>
+            <input type="text" id="no_sample" readonly name="no_sample" class="form-control" placeholder="Tidak perlu di isi nomor didapat dari Sistem" value="">
             <div class="invalid-feedback">
-              Sample Description tidak valid
+              Sample No. tidak valid
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="tgl_sample">Date<span class="text-danger">*</span></label>
+          <div class="col-md-9">
+            <input type="text" id="tgl_sample" name="tgl_sample" class="form-control datepicker" placeholder="Pilih tanggal sample" value="" required>
+            <div class="invalid-feedback">
+              Date tidak valid
             </div>
           </div>
         </div>
@@ -38,11 +47,11 @@
           </div>
         </div>
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="tgl_sample">Date<span class="text-danger">*</span></label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_style">Description<span class="text-danger">*</span></label>
           <div class="col-md-9">
-            <input type="text" id="tgl_sample" name="tgl_sample" class="form-control datepicker" placeholder="Pilih tanggal sample" value="" required>
+            <input type="text" id="desc_style" name="desc_style" class="form-control" placeholder="Ketikkan sample description" value="" required>
             <div class="invalid-feedback">
-              Date tidak valid
+              Sample Description tidak valid
             </div>
           </div>
         </div>
@@ -85,7 +94,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="m-s-5 btn btn-success" id="btn-draft"> <i class="fa fa-save"></i> Simpan</button>
-        <button type="button" class="m-s-5 btn btn-info" id="btn-save"> <i class="fa fa-paper-plane"></i> Submit</button>
+        <button type="button" class="m-s-5 btn btn-info" id="btn-save"> <i class="fa fa-paper-plane"></i> Approval</button>
       </div>
     </div>
   </div>

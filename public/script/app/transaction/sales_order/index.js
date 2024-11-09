@@ -1,13 +1,17 @@
 
 
 $(document).ready(function () {
-    let inpData         = $('#data_id');
-    let inpNoSalesOrder = $('#no_sales_order');
-    let inpDeskripsi       = $('#desc_style');
-    let inpBuyer         = $('#select_buyer');
-    let inpTglTransaksi       = $('#tgl_sales_order');
-    let inpTglDeadline       = $('#tgl_deadline');
-    let inpKetSalesOrder       = $('#ket_sales_order');
+
+    $("[data-politespace]").politespace();
+
+    let inpData           = $('#data_id');
+    let inpNoSalesOrder   = $('#no_sales_order');
+    let inpDeskripsi      = $('#desc_style');
+    let inpBuyer          = $('#select_buyer');
+    let inpTglTransaksi   = $('#tgl_sales_order');
+    let inpTglDeadline    = $('#tgl_deadline');
+    let inpKetSalesOrder  = $('#ket_sales_order');
+    let inpUangDP         = $('#uang_dp');
     let inpPoWarna1       = $('#po_warna1');
     let inpPoWarna2       = $('#po_warna2');
     let inpPoWarna3       = $('#po_warna3');
@@ -17,23 +21,23 @@ $(document).ready(function () {
     let inpPoWarna7       = $('#po_warna7');
     let inpPoWarna8       = $('#po_warna8');
 
-    let fileSalesOrder       = $('#fileSalesOrder');
-    let fileSalesOrderOld       = $('#fileSalesOrderOld');
-    let linkFileSalesOrder       = $('#linkFileSalesOrder');
-    let deskripsiText       = $('#deskripsiText');
-    let tglSalesOrderText       = $('#tglSalesOrderText');
-    let buyerText       = $('#buyerText');
-    let tglDeadlineText       = $('#tglDeadlineText');
-    let noSalesOrderText       = $('#noSalesOrderText');
-    let fotoText       = $('#fotoText');
-    let rowDet = $("#rowDet")
+    let fileSalesOrder     = $('#fileSalesOrder');
+    let fileSalesOrderOld  = $('#fileSalesOrderOld');
+    let linkFileSalesOrder = $('#linkFileSalesOrder');
+    let deskripsiText      = $('#deskripsiText');
+    let tglSalesOrderText  = $('#tglSalesOrderText');
+    let buyerText          = $('#buyerText');
+    let tglDeadlineText    = $('#tglDeadlineText');
+    let noSalesOrderText   = $('#noSalesOrderText');
+    let fotoText           = $('#fotoText');
+    let rowDet             = $("#rowDet")
 
-    let isModal       = $("#modal-form-add-po");
-    let isModalPO      = $("#modal-form-po");
-    var idSalesOrder = null
-    var idSalesOrderDet = null
+    let isModal            = $("#modal-form-add-po");
+    let isModalPO          = $("#modal-form-po");
+    var idSalesOrder       = null
+    var idSalesOrderDet    = null
 
-    let btnSend = $("#btn-send");
+    let btnSend            = $("#btn-send");
 
     let buttonRowAction = function(cell) {
         let fmBtnDelete = "";        
@@ -342,6 +346,7 @@ $(document).ready(function () {
         inpTglTransaksi.val("")
         inpTglDeadline.val("")
         inpKetSalesOrder.val("")
+        inpUangDP.val("0").trigger("change");
         rowDet.hide()
         btnSend.hide()
         isModal.modal("show");
@@ -423,15 +428,23 @@ $(document).ready(function () {
                 fileSalesOrderOld.val(data.gambar_id)
                 inpKetSalesOrder.val(data.keterangan)
                 inpBuyer.val(data.id_konsumen).trigger('change')
-                inpTglDeadline.val(formatterDate(data.tgl_deadline))
-                inpTglTransaksi.val(formatterDate(data.tgl_transaksi))
-                inpSample.val(data.id_sample).trigger("change")
+                
+                setTimeout(() => {
+                    inpSample.val(data.id_sample).trigger("change")
+                    setTimeout(() => {
+                        inpTglDeadline.val(formatterDate(data.tgl_deadline))
+                        inpTglTransaksi.val(formatterDate(data.tgl_transaksi))
+                    }, 600);
+                }, 300);
+                inpUangDP.val(data.uang_dp).trigger("change");
                 if(data.file_gambar){
                     fileSalesOrderOld.val(data.gambar_id)
                     linkFileSalesOrder.removeClass("d-none")
                     linkFileSalesOrder.attr('src', data.file_gambar)
                 }
                 dtListDetail.setData(data.detail)
+
+
                 
                 if(data.status == 'Draft'){
                     btnSend.show()
@@ -564,7 +577,9 @@ $(document).ready(function () {
             formData.append("tglTransaksi",formatLocaleDate(inpTglTransaksi.val()));
             formData.append("keterangan",inpKetSalesOrder.val());
             formData.append("samples", inpSample.val())
-            formData.append("submit_data", send)
+            formData.append("uang_dp", inpUangDP.val());
+            formData.append("submit_data", send);
+            
             $.ajax({
                 type: 'POST',
                 url: '/trans/sales-order/save',
@@ -765,12 +780,12 @@ $(document).ready(function () {
             inpTglTransaksi.val("")
             inpTglDeadline.val("")
             if(inpData.val().length == 0){
-                let tglTr = isSampleData[0].tgl_transaksi.split('-')
+                let tglTr = isin[0].tgl_transaksi.split('-')
                 let tglTransaksi = tglTr['2'] + '-' + tglTr['1']+ '-' + tglTr['0']
-                inpTglTransaksi.datepicker('setDate', tglTransaksi); //.val(changeTgl(isSampleData[0].tgl_transaksi))
-                let tglD = isSampleData[0].tgl_deadline.split('-')
+                inpTglTransaksi.datepicker('setDate', tglTransaksi); //.val(changeTgl(isin[0].tgl_transaksi))
+                let tglD = isin[0].tgl_deadline.split('-')
                 let tglDead = tglD['2'] + '-' + tglD['1']+ '-' + tglD['0']
-                inpTglDeadline.datepicker('setDate', tglDead); //.val(changeTgl(isSampleData[0].tgl_transaksi))
+                inpTglDeadline.datepicker('setDate', tglDead); //.val(changeTgl(isin[0].tgl_transaksi))
                 inpKetSalesOrder.val(isin[0].deskripsi)
                 inpDeskripsi.val(isin[0].deskripsi)
             }

@@ -47,6 +47,13 @@ class BaseController extends Controller
 	protected $validation;
 	protected $data;
 
+	protected $_userid;
+	protected $_username;
+	protected $_useremail;
+	protected $_userfullname;
+	protected $_roleid;
+	protected $_rolename;
+
 	/**
 	 * Constructor.
 	 *
@@ -98,6 +105,14 @@ class BaseController extends Controller
 				$isAuthorized = true;
 			}
 		}
+
+		$this->_userid = $user_id; //$this->session->get('user_id');
+		$this->_username = $this->session->get('identity');
+		$this->_useremail = $this->session->get('email');
+		$this->_roleid = $this->session->get('role_id');
+		$this->_rolename = $this->session->get('role_name ');
+
+
 
 		if (!$isAuthorized) {
 			return redirect()->to('/');
@@ -170,4 +185,36 @@ class BaseController extends Controller
 
 		return $validasi_error;
 	}
+
+
+	public function get_userid()
+	{
+		return $this->_userid;
+	}
+
+	public function get_username()
+	{
+		return $this->_username;
+	}
+
+	public function get_useremail()
+	{
+		return $this->_useremail;
+	}
+
+	public function get_userfullname()
+	{
+		return $this->_userfullname;
+	}
+
+	public function get_roleid()
+	{
+		return $this->_roleid;
+	}
+
+	public function get_rolename()
+	{
+		return $this->_rolename;
+	}
+
 }

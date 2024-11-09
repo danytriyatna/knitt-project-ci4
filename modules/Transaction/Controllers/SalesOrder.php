@@ -106,7 +106,7 @@ class SalesOrder extends BaseController
       // $aktif =  ($row->active) ? "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/deactivate/".$id."' data-confirm-message='Anda yakin ingin menonaktifkan user ini?'><i class='fa fa-check text-success'>&nbsp;</i></a>" :
       //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
 
-      $status = $row->status == 1 ? "Draft" : "Submit";
+      $status = $row->status == 1 ? "Draft" : "Approved";
 
       array_push(
         $build_array["data"],
@@ -118,6 +118,7 @@ class SalesOrder extends BaseController
           "kode_sales_order" => $row->kode_sales_order,
           "tgl_deadline" => $row->tgl_deadline,
           "deskripsi" => $row->deskripsi,
+          "uang_dp" => !empty($row->uang_dp) ? \format_angka($row->uang_dp) : 0,
           "status"  => $status,
           "file_gambar" => !empty($row->file_name) ? base_url() . "uploads/sales_order/"  . $row->file_name : "",
           "detail" => $this->mSalesOrder->getDataDetailSalesOrder($row->id)
@@ -131,7 +132,7 @@ class SalesOrder extends BaseController
   {
     $id = decrypt($id);
     $results = $this->mSalesOrder->getData($id);
-    $status = $results->status == 1 ? "Draft" : "Submit";
+    $status = $results->status == 1 ? "Draft" : "Approved";
     $build_array =  array(
       "id"   => encrypt($results->id),
       "keterangan" => $results->keterangan,
@@ -144,6 +145,7 @@ class SalesOrder extends BaseController
       "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sales_order/" . $results->file_name : "",
       "id_sample" => $results->id_sample,
       "status" => $status,
+      "uang_dp" =>  !empty($results->uang_dp) ? $results->uang_dp : 0,
       "detail" => $this->mSalesOrder->getDataDetailSalesOrder($results->id)
     );
     return $this->response->setJSON($build_array);
@@ -182,6 +184,7 @@ class SalesOrder extends BaseController
     $noSalesOrder = $this->request->getPost('noSalesOrder');
     $sampleId = $this->request->getPost('samples');
     $submit_data = $this->request->getPost('submit_data');
+    $uang_dp = $this->request->getPost('uang_dp');
 
 
     $this->validation->setRules([
@@ -235,6 +238,7 @@ class SalesOrder extends BaseController
       'deskripsi' => $deskripsi,
       'tgl_transaksi' => $tglTransaksi,
       'tgl_deadline' => $tglDeadline,
+      'id_sample' => $sampleId,
       // 'kode_sales_order' => $noSalesOrder,
       'active' => 1,
       // 'status' => 1,

@@ -129,7 +129,7 @@
                       <span class="fa fa-save"></span> Simpan
                     </button>
                     <button type="button" id="btn-send" class='btn btn-info'>
-                      <span class="fa fa-paper-plane"></span> Submit
+                      <span class="fa fa-paper-plane"></span> Approval
                     </button>
                   <?php } ?>
                 </div>

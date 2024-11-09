@@ -87,7 +87,7 @@ class Production extends BaseController
       // $aktif =  ($row->active) ? "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/deactivate/".$id."' data-confirm-message='Anda yakin ingin menonaktifkan user ini?'><i class='fa fa-check text-success'>&nbsp;</i></a>" :
       //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
 
-      $status = $row->status == 1 ? "Draft" : "Submit";
+      $status = $row->status == 1 ? "Draft" : "Approved";
       $tipe = $row->tipe_id == 1 ? "Sample" : "Sales Order";
 
       $qty = $row->qty;
@@ -254,6 +254,48 @@ class Production extends BaseController
       $msg = "Data berhasil disimpan!";
     }
 
+    $build_array['message'] = $msg;
+    $build_array['status']  = $status;
+
+    return $this->response->setJSON($build_array);
+  }
+
+  function getDataProduksiUkuran(){
+    $id_walkorder = $this->request->getPost('walkorders');
+    $id_proses = $this->request->getPost('proses');
+
+    $id_walkorder = \decrypt($id_walkorder);
+    $params['id_walkorder'] = $id_walkorder;
+    $params['id_proses'] = $id_proses;
+    $result = $this->mWalkorder->getListProduksiUkuran($params);
+
+    $data    = [];
+    $msg     = "Penambilan data berhasil";
+    $status  = true;
+
+    foreach ($result as $row) {
+      $id = encrypt($row->id);
+      
+      $qty_prod = !empty($row->qty_prod) ? $row->qty_prod : 0;
+      $qty = $row->qty - $qty_prod;
+
+      array_push(
+        $data,
+        array(
+          "id"                  => ($id),
+          "kode_warna"          => ($row->kode_warna),
+          "kode_ukuran"         => $row->kode_ukuran,
+          "id_ukuran"           => $row->id_ukuran,
+          "id_walkorder_proses" => $row->id_walkorder_proses,
+          "id_warna"            => $row->id_warna,
+          "ref_detail_id"       => $row->ref_detail_id,
+          "qty"                 => $qty,
+          "harga_satuan"        => $row->harga,
+        )
+      );
+    }
+
+    $build_array['data']    = $data;
     $build_array['message'] = $msg;
     $build_array['status']  = $status;
 

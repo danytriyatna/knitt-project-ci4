@@ -103,7 +103,7 @@ class WorkOrder extends BaseController
       // $aktif =  ($row->active) ? "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/deactivate/".$id."' data-confirm-message='Anda yakin ingin menonaktifkan user ini?'><i class='fa fa-check text-success'>&nbsp;</i></a>" :
       //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
 
-      $status = $row->status == 1 ? "Draft" : "Submit";
+      $status = $row->status == 1 ? "Draft" : "Approved";
       $tipe = $row->tipe_id == 1 ? "Sample" : "Sales Order";
 
       $qty = $row->qty;
@@ -286,8 +286,8 @@ class WorkOrder extends BaseController
             'total'        => $r['total'],
             'kuota'        => $r['kuota'],
             'kuota_tambah' => $r['kuota_tambah'],
-            'loss'    => $detail_loss,
-            'updated_at' => date('Y-m-d H:i:s')
+            'loss'         => $detail_loss,
+            'updated_at'   => date('Y-m-d H:i:s')
           ];
 
           $this->mWalkorder->updateRecord($this->mWalkorder->table5, $warna_isi, 'id', $warna_id);
@@ -351,7 +351,7 @@ class WorkOrder extends BaseController
     $builder_proses = $this->db->table($this->mWalkorder->table3);
     $builder_proses->where("id_walkorder", $dataid);
     $builder_proses->delete();
-
+    
     $i = 1;
     $list_proses = json_decode($list_proses, true);
     foreach ($list_proses as $item) {
@@ -364,21 +364,42 @@ class WorkOrder extends BaseController
       $proses_id = $this->mWalkorder->insertRecordGetid($this->mWalkorder->table3, $isiProses);
 
       if (!empty($status_data)) {
-        foreach ($data_ukuran as $x) {
-          $isiProses_det = [
-            'id_walkorder_proses' => $proses_id,
-            'id_ukuran' => $x->id,
-            'created_at' => date('Y-m-d H:i:s')
-          ];
+        // foreach ($data_ukuran as $x) {
+        //   $isiProses_det = [
+        //     'id_walkorder_proses' => $proses_id,
+        //     'id_ukuran'           => $x->id,
+        //     'created_at'          => date('Y-m-d H:i:s')
+        //   ];
 
-          $key_ukuran = $x->key_ukuran;
-          if ($i == 1) {
-            $isiProses_det['qty'] = !empty($data_ukuran_input['bottom'][$x->key_ukuran]) ? $data_ukuran_input['bottom'][$x->key_ukuran] : 0;
-          } else {
-            $isiProses_det['qty'] = 0;
+        //   $key_ukuran = $x->key_ukuran;
+        //   if ($i == 1) {
+        //     $isiProses_det['qty'] = !empty($data_ukuran_input['bottom'][$x->key_ukuran]) ? $data_ukuran_input['bottom'][$x->key_ukuran] : 0;
+        //   } else {
+        //     $isiProses_det['qty'] = 0;
+        //   }
+
+        //   $this->mWalkorder->insertRecordGetid($this->mWalkorder->table4, $isiProses_det);
+        // }
+
+        foreach ($data_ukuran_warna as $xuk) {
+          foreach ($data_ukuran as $x) {
+            $isiProses_det = [
+              'id_walkorder_proses' => $proses_id,
+              'id_ukuran'           => $x->id,
+              'ref_detail_id'       => $xuk['id'],
+              'created_at'          => date('Y-m-d H:i:s')
+            ];
+  
+            $key_ukuran = $x->key_ukuran;
+            if ($i == 1) {
+              // $isiProses_det['qty'] = !empty($data_ukuran_input['bottom'][$x->key_ukuran]) ? $data_ukuran_input['bottom'][$x->key_ukuran] : 0;
+              $isiProses_det['qty'] = !empty($xuk[$x->key_ukuran]) ? $xuk[$x->key_ukuran] : 0;
+            } else {
+              $isiProses_det['qty'] = 0;
+            }
+            
+            $this->mWalkorder->insertRecordGetid($this->mWalkorder->table4, $isiProses_det);
           }
-
-          $this->mWalkorder->insertRecordGetid($this->mWalkorder->table4, $isiProses_det);
         }
       }
 
