@@ -29,8 +29,15 @@ $routes->group("master-data/operator", ['namespace' => 'Modules\Referensi\Contro
     $routes->post('simpan', 'RefOperator::save');
     $routes->get('delete/(:any)', 'RefOperator::deactivate/$1');
 });
+$routes->group("master-data/gudang", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefGudang::index');
+
+    $routes->post('list', 'RefGudang::lists');
+    $routes->post('simpan', 'RefGudang::save');
+    $routes->get('delete/(:any)', 'RefGudang::deactivate/$1');
+});
 
 $routes->group('master-data/produk', ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
     $routes->get('/', 'RefProduk::index');
     $routes->get('form', 'RefProduk::form');
-  });
+});
