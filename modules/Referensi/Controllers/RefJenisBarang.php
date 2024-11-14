@@ -166,10 +166,10 @@ class RefJenisBarang extends BaseController
         $data = ['active' => 0];
         $deactivate = $this->mJenisBarang->updateRecord($this->mJenisBarang->table, $data, 'id', $id);
         if ($deactivate) {
-            $this->mcommon->setLog($this->currentUser->user_id, $this->MOD_ALIAS, $id, "Data Ukuran Dinonaktifkan");
-            $this->session->setFlashdata('message', "Data Ukuran berhasil di Hapus ");
+            $this->mcommon->setLog($this->currentUser->user_id, $this->MOD_ALIAS, $id, "Data Jenis Barang Dinonaktifkan");
+            $this->session->setFlashdata('message', "Data Jenis Barang berhasil di Hapus ");
         } else {
-            $this->session->setFlashdata('err', "Data Ukuran gagal di Hapus !");
+            $this->session->setFlashdata('err', "Data Jenis Barang gagal di Hapus !");
         }
         return redirect()->to($this->urlv);
     }
@@ -191,10 +191,10 @@ class RefJenisBarang extends BaseController
 
         $res = $this->mJenisBarang->deleteUser($id);
         if ($res) {
-            $this->mcommon->setLog($this->currentUser->user_id, $this->MOD_ALIAS, $id, "Master Ukuran Dihapus");
-            $this->session->setFlashdata('message', "Master Ukuran berhasil dihapus");
+            $this->mcommon->setLog($this->currentUser->user_id, $this->MOD_ALIAS, $id, "Master Jenis Barang Dihapus");
+            $this->session->setFlashdata('message', "Master Jenis Barang berhasil dihapus");
         } else {
-            $this->session->setFlashdata('err', "Master Ukuran gagal dihapus");
+            $this->session->setFlashdata('err', "Master Jenis Barang gagal dihapus");
         }
         return redirect()->to($this->urlv);
     }

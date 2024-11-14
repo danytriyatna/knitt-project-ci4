@@ -166,10 +166,10 @@ class RefGudang extends BaseController
         $data = ['active' => 0];
         $deactivate = $this->mGudang->updateRecord($this->mGudang->table, $data, 'id', $id);
         if ($deactivate) {
-            $this->mcommon->setLog($this->currentUser->user_id, $this->MOD_ALIAS, $id, "Data Ukuran Dinonaktifkan");
-            $this->session->setFlashdata('message', "Data Ukuran berhasil di Hapus ");
+            $this->mcommon->setLog($this->currentUser->user_id, $this->MOD_ALIAS, $id, "Data Gudang Dinonaktifkan");
+            $this->session->setFlashdata('message', "Data Gudang berhasil di Hapus ");
         } else {
-            $this->session->setFlashdata('err', "Data Ukuran gagal di Hapus !");
+            $this->session->setFlashdata('err', "Data Gudang gagal di Hapus !");
         }
         return redirect()->to($this->urlv);
     }
@@ -191,10 +191,10 @@ class RefGudang extends BaseController
 
         $res = $this->mGudang->deleteUser($id);
         if ($res) {
-            $this->mcommon->setLog($this->currentUser->user_id, $this->MOD_ALIAS, $id, "Master Ukuran Dihapus");
-            $this->session->setFlashdata('message', "Master Ukuran berhasil dihapus");
+            $this->mcommon->setLog($this->currentUser->user_id, $this->MOD_ALIAS, $id, "Master Gudang Dihapus");
+            $this->session->setFlashdata('message', "Master Gudang berhasil dihapus");
         } else {
-            $this->session->setFlashdata('err', "Master Ukuran gagal dihapus");
+            $this->session->setFlashdata('err', "Master Gudang gagal dihapus");
         }
         return redirect()->to($this->urlv);
     }
