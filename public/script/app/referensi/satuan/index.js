@@ -128,7 +128,6 @@ $(document).ready(function () {
         
         let validation = true
         if(inpNamaSatuan.val().length == 0) validation = false
-        if(inpKeterangan.val().length == 0) validation = false
     
         if(validation){
             $.ajax({

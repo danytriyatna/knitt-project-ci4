@@ -2,7 +2,7 @@
 
 $(document).ready(function () {
     let inpData         = $('#data_id');
-    let inpNamaGudang = $('#nama_gudang');
+    let inpNamaJenisBarang = $('#nama_jenis_barang');
     let inpKeterangan       = $('#keterangan');
 
     let isModal       = $("#modal-form-add-po");
@@ -27,11 +27,11 @@ $(document).ready(function () {
                     let data_row = row.getData();
                     if (e.target.title === 'delete') {
                         if (confirm("Anda yakin akan menghapus data?")) {
-                            window.location.replace(baseUrl + "/master-data/gudang/delete/" + data_row.id);
+                            window.location.replace(baseUrl + "/master-data/jenis_barang/delete/" + data_row.id);
                         }
                     }else if(e.target.title === 'edit'){
                         inpData.val(data_row.id)
-                        inpNamaGudang.val(data_row.nama_gudang)
+                        inpNamaJenisBarang.val(data_row.nama_jenis_barang)
                         inpKeterangan.val(data_row.keterangan)
 
                         isModal.modal("show");
@@ -39,7 +39,7 @@ $(document).ready(function () {
                 }
             },
             {
-                title: "Nama Gudang", field: "nama_gudang", headerSort: false,
+                title: "Nama Jenis Barang", field: "nama_jenis_barang", headerSort: false,
                 width: "20%"
             },
            
@@ -50,7 +50,7 @@ $(document).ready(function () {
         ],
         locale: 'id',    
         layout: 'fitColumns',
-        ajaxURL: "/master-data/gudang/list",
+        ajaxURL: "/master-data/jenis_barang/list",
         ajaxConfig: "POST",
         sortMode: "remote",
         filterMode: "remote",
@@ -112,7 +112,7 @@ $(document).ready(function () {
 
     $("#btn-add").on("click", function(){
         inpData.val("")
-        inpNamaGudang.val("")
+        inpNamaJenisBarang.val("")
         inpKeterangan.val("")
 
         isModal.modal("show");
@@ -127,15 +127,15 @@ $(document).ready(function () {
     function simpanData() {
         
         let validation = true
-        if(inpNamaGudang.val().length == 0) validation = false
+        if(inpNamaJenisBarang.val().length == 0) validation = false
     
         if(validation){
             $.ajax({
                 type: 'POST',
-                url: '/master-data/gudang/simpan',
+                url: '/master-data/jenis_barang/simpan',
                 data: {
                     dataId : inpData.val(),
-                    nama_gudang   : inpNamaGudang.val(),
+                    nama_jenis_barang   : inpNamaJenisBarang.val(),
                     keterangan : inpKeterangan.val(),
                 },
                 dataType: "json",
