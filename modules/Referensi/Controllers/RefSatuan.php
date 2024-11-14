@@ -185,9 +185,9 @@ class RefSatuan extends BaseController
         }
 
         $id = (int)$id;
-        if ($id == 1) {
-            return redirect()->to($this->urlv);
-        }
+        // if ($id == 1) {
+        //     return redirect()->to($this->urlv);
+        // }
 
         $res = $this->mSatuan->deleteUser($id);
         if ($res) {

@@ -160,9 +160,9 @@ class RefJenisBarang extends BaseController
         }
 
         $id = (int)$id;
-        if ($id == 1) {
-            return redirect()->to($this->urlv);
-        }
+        // if ($id == 1) {
+        //     return redirect()->to($this->urlv);
+        // }
         $data = ['active' => 0];
         $deactivate = $this->mJenisBarang->updateRecord($this->mJenisBarang->table, $data, 'id', $id);
         if ($deactivate) {
