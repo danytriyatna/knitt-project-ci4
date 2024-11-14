@@ -50,6 +50,13 @@ $routes->group("master-data/jenis_barang", ['namespace' => 'Modules\Referensi\Co
     $routes->post('simpan', 'RefJenisBarang::save');
     $routes->get('delete/(:any)', 'RefJenisBarang::deactivate/$1');
 });
+$routes->group("master-data/barang", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefBarang::index');
+
+    $routes->post('list', 'RefBarang::lists');
+    $routes->post('simpan', 'RefBarang::save');
+    $routes->get('delete/(:any)', 'RefBarang::deactivate/$1');
+});
 
 $routes->group('master-data/produk', ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
     $routes->get('/', 'RefProduk::index');
