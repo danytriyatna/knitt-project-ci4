@@ -36,6 +36,20 @@ $routes->group("master-data/gudang", ['namespace' => 'Modules\Referensi\Controll
     $routes->post('simpan', 'RefGudang::save');
     $routes->get('delete/(:any)', 'RefGudang::deactivate/$1');
 });
+$routes->group("master-data/satuan", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefSatuan::index');
+
+    $routes->post('list', 'RefSatuan::lists');
+    $routes->post('simpan', 'RefSatuan::save');
+    $routes->get('delete/(:any)', 'RefSatuan::deactivate/$1');
+});
+$routes->group("master-data/jenis_barang", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefJenisBarang::index');
+
+    $routes->post('list', 'RefJenisBarang::lists');
+    $routes->post('simpan', 'RefJenisBarang::save');
+    $routes->get('delete/(:any)', 'RefJenisBarang::deactivate/$1');
+});
 
 $routes->group('master-data/produk', ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
     $routes->get('/', 'RefProduk::index');
