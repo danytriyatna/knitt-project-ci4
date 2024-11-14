@@ -108,10 +108,14 @@ class RefJenisBarang extends BaseController
 
 
         if (empty($id)) {
+            $arr_isi['created_at'] = date("Y-m-d H:i:s");
+            $arr_isi['created_by'] = $this->get_userid();
             $this->mJenisBarang->insertRecordGetid($this->mJenisBarang->table, $arr_isi);
             $msg    = "Data berhasil ditambahkan !";
             $status = true;
         } else {
+            $arr_isi['updated_at'] = date("Y-m-d H:i:s");
+            $arr_isi['updated_by'] = $this->get_userid();
             $id = decrypt($id);
             $this->mJenisBarang->updateRecord($this->mJenisBarang->table, $arr_isi, 'id', $id);
             $msg    = "Data berhasil diupdate !";
