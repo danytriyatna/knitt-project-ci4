@@ -9,3 +9,8 @@ $routes->group('purchasing/receive-item', ['namespace' => 'Modules\Purchasing\Co
   $routes->get('/', 'ReceiveItem::index');
   $routes->get('form', 'ReceiveItem::form');
 });
+
+$routes->group('purchasing/purchase-payment', ['namespace' => 'Modules\Purchasing\Controllers'], static function ($routes) {
+  $routes->get('/', 'PurchasePayment::index');
+  $routes->get('form', 'PurchasePayment::form');
+});
