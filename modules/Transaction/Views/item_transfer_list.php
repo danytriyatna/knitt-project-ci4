@@ -16,7 +16,7 @@
       <div class="d-flex justify-content-end align-items-center">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><?= $name_app ?></li>
-          <li class="breadcrumb-item">Pembelian</li>
+          <li class="breadcrumb-item">Transaksi</li>
           <li class="breadcrumb-item active"><?= $titlehead ?></li>
         </ol>
       </div>
@@ -32,16 +32,13 @@
               <thead>
                 <tr>
                   <th style="min-width: 105px; width: 105px;">
-                    <a href="purchasing/purchase-order/form" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Tambah</a>
+                    <a href="trans/item-transfer/form" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Tambah</a>
                   </th>
-                  <th>PO NO.</th>
-                  <th>PO DATE</th>
-                  <th>VENDOR NAME</th>
-                  <th>TERM</th>
-                  <th>QTY STATUS</th>
-                  <th>TOTAL</th>
-                  <th>PAYMENT</th>
-                  <th>REMAIN</th>
+                  <th>TRANSFER NO.</th>
+                  <th>DATE</th>
+                  <th>TRANSFER FROM</th>
+                  <th>TRANSFER TO</th>
+                  <th>TRANSFER STATUS</th>
                 </tr>
               </thead>
               <tbody>
@@ -54,20 +51,19 @@
                         <i class="fas fa-cog"></i> Aksi <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu dropdown-menu-act" role="menu">
-                        <li><a href="purchasing/purchase-order/form" title="Edit"><i class="fa fa-fw fa-edit"></i> Edit</a></li>
+                        <li><a href="trans/item-transfer/form" title="Edit"><i class="fa fa-fw fa-edit"></i> Edit</a></li>
                         <li><a href="javascript:void(0)" title="Hapus"><i class="fa fa-fw fa-trash"></i> Hapus</a>
                         </li>
                       </ul>
                     </div>
                   </td>
-                  <td>POD24100001</td>
+                  <td>TRF24100001</td>
                   <td>01-11-2024</td>
-                  <td>Vendor Citraknitt 0<?= 3 - $i; ?></td>
-                  <td>30 Days</td>
-                  <td>50/100</td>
-                  <td class="text-nowrap">2.500.000,00</td>
-                  <td class="text-nowrap">1.000.000,00</td>
-                  <td class="text-nowrap">1.500.000,00</td>
+                  <td>GUDANG UTAMA</td>
+                  <td>GUDANG PRODUKSI</td>
+                  <td>
+                    <span class="badge bg-secondary">DRAFT</span>
+                  </td>
                 </tr>
                 <?php endfor; ?>
               </tbody>

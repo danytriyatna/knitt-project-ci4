@@ -66,3 +66,8 @@ $routes->group('trans/customer-receipt', ['namespace' => 'Modules\Transaction\Co
   $routes->get('/', 'CustomerReceipt::index');
   $routes->get('form', 'CustomerReceipt::form');
 });
+
+$routes->group('trans/item-transfer', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
+  $routes->get('/', 'ItemTransfer::index');
+  $routes->get('form', 'ItemTransfer::form');
+});
