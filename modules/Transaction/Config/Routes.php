@@ -71,3 +71,8 @@ $routes->group('trans/item-transfer', ['namespace' => 'Modules\Transaction\Contr
   $routes->get('/', 'ItemTransfer::index');
   $routes->get('form', 'ItemTransfer::form');
 });
+
+$routes->group('trans/receive-item', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
+  $routes->get('/', 'ReceiveItem::index');
+  $routes->get('form', 'ReceiveItem::form');
+});
