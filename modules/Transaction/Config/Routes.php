@@ -81,3 +81,13 @@ $routes->group('trans/issue-item', ['namespace' => 'Modules\Transaction\Controll
   $routes->get('/', 'IssueItem::index');
   $routes->get('form', 'IssueItem::form');
 });
+$routes->group('trans/incoming-goods', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
+  $routes->get('/', 'IncomingGoods::index');
+  $routes->post('list', 'IncomingGoods::lists');
+  $routes->get('form', 'IncomingGoods::form');
+});
+$routes->group('trans/outgoing-goods', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
+  $routes->get('/', 'OutgoingGoods::index');
+  $routes->post('list', 'OutgoingGoods::lists');
+  $routes->get('form', 'OutgoingGoods::form');
+});
