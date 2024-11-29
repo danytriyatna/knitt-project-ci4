@@ -411,14 +411,16 @@ $(document).ready(function () {
                 timer: 2000
             });
         }
-        if(!isNumeric(arrOperator[1])){
-            return Swal.fire({
-                text: "Harga Operator harus ditentukan direferensi",
-                icon: 'error',
-                showConfirmButton: false,
-                timer: 2000
-            });
-        }
+
+        // if(!isNumeric(arrOperator[1])){
+        //     return Swal.fire({
+        //         text: "Harga Operator harus ditentukan direferensi",
+        //         icon: 'error',
+        //         showConfirmButton: false,
+        //         timer: 2000
+        //     });
+        // }
+
         if (tglTransaksi.val().length == 0){
             return Swal.fire({
                 text: "Tanggal harus diisi",
@@ -544,7 +546,11 @@ $(document).ready(function () {
     }
 
     tglTransaksi.change(function(e){
-        let date = formatLocaleDate(e.target.value)
+        get_detailData(e.target.value)
+    })
+    get_detailData();
+    function get_detailData(tgl){
+        let date = tgl != undefined ? formatLocaleDate(tgl) : ''
         let idProduksi =  $("#id_produksi").val()
         $.ajax({
             type: 'POST',
@@ -603,7 +609,7 @@ $(document).ready(function () {
                 });
             },
         });
-    })
+    }
 
     $("#btn-add-detail").click(function () {
             // dtListUkuran.setData()

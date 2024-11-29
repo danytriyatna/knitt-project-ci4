@@ -84,16 +84,19 @@ class ProductionModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getDataProsesProd($id)
+    function getDataProsesProd($params)
     {
         $builder = $this->db->table("trans_walkorder_proses abx");
         $builder->select("bbx.seq,bbx.nama,bbx.id ,SUM(COALESCE(qty, 0)) AS qty, SUM(COALESCE(qty_prod, 0)) AS qty_prod");
         $builder->join("_jenis_proses_produksi bbx", "abx.id_proses = bbx.id", "inner");
         $builder->join("trans_walkorder_proses_ukuran cbx", "cbx.id_walkorder_proses = abx.id", "inner");
-        $builder->where('abx.id_walkorder', $id);
-        $builder->groupBy("bbx.nama");
-        $builder->groupBy("bbx.seq");
-        $builder->groupBy("bbx.id");
+        if(!empty($params['id_walkorder'])){
+            $builder->where('abx.id_walkorder', $params['id_walkorder']);
+        }
+        if(!empty($params['last_proses']) && !empty($params['id_walkorder'])){
+            $builder->where('abx.id_proses = (select max(tx.id_proses) from trans_walkorder_proses tx where tx.id_walkorder = '.$params['id_walkorder'].')');
+        }
+        $builder->groupBy("bbx.nama, bbx.seq, bbx.id");
         $builder->orderBy("bbx.seq", "ASC");
         $this->_data = $builder->get()->getResult();
 
@@ -134,9 +137,11 @@ class ProductionModel extends \App\Models\PrModel
         $builder->join("ref_warna dbx", "abx.id_warna = dbx.id", "inner");
         $builder->join("ref_operator ebx", "abx.id_operator = ebx.id", "inner");
         $builder->where('abx.id_produksi', $id);
+
         if (!empty($tgl_transaksi)) {
             $builder->where('abx.tgl_transaksi', $tgl_transaksi);
         }
+        
         $builder->orderBy("abx.id", "ASC");
         $this->_data = $builder->get()->getResult();
 
