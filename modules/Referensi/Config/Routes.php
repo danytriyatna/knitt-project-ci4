@@ -62,3 +62,10 @@ $routes->group('master-data/produk', ['namespace' => 'Modules\Referensi\Controll
     $routes->get('/', 'RefProduk::index');
     $routes->get('form', 'RefProduk::form');
 });
+$routes->group("master-data/vendor", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefVendor::index');
+
+    $routes->post('list', 'RefVendor::lists');
+    $routes->post('simpan', 'RefVendor::save');
+    $routes->get('delete/(:any)', 'RefVendor::deactivate/$1');
+});
