@@ -8,6 +8,7 @@ use Modules\Referensi\Models\BarangModel;
 use Modules\Referensi\Models\JenisBarangModel;
 use Modules\Referensi\Models\SatuanModel;
 use Modules\Transaction\Models\IncomingGoodsModel;
+use Modules\Referensi\Models\GudangModel;
 
 class IncomingGoods extends BaseController
 {
@@ -15,6 +16,7 @@ class IncomingGoods extends BaseController
     protected $mJenisBarang;
     protected $mSatuan;
     protected $mBarangMasuk;
+    protected $mGudang;
 
     protected $views = '\Modules\Transaction\Views';
     protected $urlv  = 'trans/incoming-goods';
@@ -26,6 +28,7 @@ class IncomingGoods extends BaseController
         $this->mJenisBarang = new JenisBarangModel();
         $this->mSatuan = new SatuanModel();
         $this->mBarangMasuk = new IncomingGoodsModel();
+        $this->mGudang = new GudangModel();
         $this->files  = new FileModel();
     }
 
@@ -100,7 +103,7 @@ class IncomingGoods extends BaseController
             if ($atr_edit || $atr_del)
                 $btnAction = btn_action_group($id, $atr_edit, $atr_del);
 
-            if ($row->id_kategori == 1) {
+            if ($row->id_kategori == 10) {
                 $informasi = "Gudang Tujuan: $row->gudang_tujuan<br>";
                 $informasi .= "Gudang Asal: $row->gudang_asal";
             } else if ($row->id_kategori == 2) {
@@ -126,6 +129,7 @@ class IncomingGoods extends BaseController
                     "kode_barang" => $row->kode_barang,
                     "nama_satuan" => $row->nama_satuan,
                     "kode_transaksi" => $row->kode_transaksi,
+                    "jumlah" => $row->jumlah,
                     "informasi" => $informasi,
                     "tanggal" => fdate_eng_to_ind($row->tanggal),
                     "kategori" => $row->kategori,
@@ -136,49 +140,112 @@ class IncomingGoods extends BaseController
         return $this->response->setJSON($build_array);
     }
 
+    public function form($id = null)
+    {
+        if (!$this->auth->loggedIn()) {
+            return redirect()->to('/auth/login');
+        }
+
+        $this->data['id'] = $id;
+        if ($id != "") {
+            $id = decrypt($id);
+        }
+
+        if (!empty($id)) {
+            $data_detail = [];
+            $resData = $this->mBarangMasuk->getData($id);
+            $this->data['data']    = $resData;
+        }
+        $reDataKategori = $this->mBarangMasuk->getRefKategoriPersedian();
+        $sortGudang = [
+            [
+                'field' => 'nama_gudang',
+                'dir' => 'ASC'
+            ]
+        ];
+        $resDataGudang = $this->mGudang->getData(null, 0, 99999, $sortGudang);
+        $this->data['kategori']    = $reDataKategori;
+        $this->data['gudang']    = $resDataGudang;
+
+        $this->data['titlehead'] = "Form Barang Masuk";
+
+        return view($this->views . '\incoming_goods_form', $this->data);
+    }
+
     function save()
     {
-        $id         = $this->request->getPost('dataId');
-        $nama_barang = $this->request->getPost('nama_barang');
-        $id_jenis_barang = $this->request->getPost('id_jenis_barang');
-        $id_satuan = $this->request->getPost('id_satuan');
-        $harga_satuan = $this->request->getPost('harga_satuan');
-        $stok_minimum = $this->request->getPost('stok_minimum');
+
+        $idBarang = $this->request->getPost('idBarang');
+        $idBarang = decrypt($idBarang);
         $keterangan = $this->request->getPost('keterangan');
+        $namaKonsumen = $this->request->getPost('namaKonsumen');
+        $namaVendor = $this->request->getPost('namaVendor');
+        $jmlMasuk = $this->request->getPost('jmlMasuk');
+        $totalStok = $this->request->getPost('totalStok');
+        $tanggal = $this->request->getPost('tanggal');
+        $idGudangAsal = $this->request->getPost('idGudangAsal');
+        $idGudangTujuan = $this->request->getPost('idGudangTujuan');
+        $idKategori = $this->request->getPost('idKategori');
 
         $msg    = "Data gagal ditambahkan !";
         $status = false;
+        $nama = "";
+        if (!empty($namaKonsumen)) {
+            $nama = $namaKonsumen;
+        } else if (!empty($namaVendor)) {
+            $nama = $namaVendor;
+        }
 
-        $arr_isi = [
-            'nama_barang' => $nama_barang,
-            'id_jenis_barang' => $id_jenis_barang,
-            'id_satuan' => $id_satuan,
-            'harga_satuan' => $harga_satuan,
-            'stok_minimum' => $stok_minimum,
-            'keterangan' => $keterangan,
+
+        $arrData = [
+            "id_barang" => $idBarang,
+            "jenis_transaksi" => 1,
+            "jumlah" => $jmlMasuk,
+            "tanggal" => $tanggal,
+            "id_gudang_asal" => !empty($idGudangAsal) ? $idGudangAsal : null,
+            "id_gudang_tujuan" =>  !empty($idGudangTujuan) ? $idGudangTujuan : null,
+            "nama" => $nama,
+            "id_kategori" => $idKategori,
+            "keterangan" => $keterangan,
+            "stok" => $totalStok,
+            "active" => 1,
+            "tipe" => 1,
+            "kode_transaksi" => $this->mBarangMasuk->generateKodePersediaan(),
         ];
 
+        $arrData['created_at'] = date("Y-m-d H:i:s");
+        $arrData['created_by'] = $this->get_userid();
 
-        if (empty($id)) {
-            $arr_isi['created_at'] = date("Y-m-d H:i:s");
-            $arr_isi['created_by'] = $this->get_userid();
-            $arr_isi['kode_barang'] = $this->mBarang->generateKodeBarang();
-            $this->mBarang->insertRecordGetid($this->mBarang->table, $arr_isi);
+
+        $res = $this->mBarangMasuk->trxInsertUpdateRecord($arrData);
+        if ($res) {
             $msg    = "Data berhasil ditambahkan !";
             $status = true;
-        } else {
-            $arr_isi['updated_at'] = date("Y-m-d H:i:s");
-            $arr_isi['updated_by'] = $this->get_userid();
-            $id = decrypt($id);
-            $this->mBarang->updateRecord($this->mBarang->table, $arr_isi, 'id', $id);
-            $msg    = "Data berhasil diupdate !";
-            $status = true;
         }
+
 
         $build_array['message'] = $msg;
         $build_array['status']  = $status;
 
         return $this->response->setJSON($build_array);
+    }
+
+    function getLastStock()
+    {
+        $idGudangTujuan = $this->request->getPost("idGudangTujuan");
+        $idGudangAsal = $this->request->getPost("idGudangAsal");
+        $idBarang = $this->request->getPost("idBarang");
+        $data = [];
+        $idBarang = decrypt($idBarang);
+        $results = $this->mBarangMasuk->getLastStokBarang($idBarang, $idGudangTujuan);
+        if (!empty($idGudangAsal)) {
+            $resGudangAsal = $this->mBarangMasuk->getLastStokBarang($idBarang, $idGudangAsal);
+        }
+        $data['status'] = true;
+        $data['stok'] = !empty($results) ? $results->stok : 0;
+        $data['stokAsal'] = !empty($resGudangAsal) ? $resGudangAsal->stok : 0;
+
+        return $this->response->setJSON($data);
     }
 
     public function activate($id)

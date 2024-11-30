@@ -7,7 +7,7 @@ $(document).ready(function () {
             },
             
 			{
-				title: 'No. Barang Masuk', field: 'kode_transaksi', headerSort:false, sorter: 'string',
+				title: 'No. Barang Keluar', field: 'kode_transaksi', headerSort:false, sorter: 'string',
 				width: 160, formatter : "html"
 			}, 
 				

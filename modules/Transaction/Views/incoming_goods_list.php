@@ -47,7 +47,7 @@
               <?php } ?>
             </div>
             <div class="col-sm-3">
-              <button type="button" class="btn btn-sm btn-success" id="btn-add"> <i class="fa fa-plus"></i> Tambah</button>
+              <a href="trans/incoming-goods/form" type="button" class="btn btn-sm btn-success" id="btn-add"> <i class="fa fa-plus"></i> Tambah</a>
             </div>
             <div class="col-sm-4 offset-md-5">
               <div class="form-group">

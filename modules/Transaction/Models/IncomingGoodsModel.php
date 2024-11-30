@@ -114,4 +114,88 @@ class IncomingGoodsModel extends \App\Models\PrModel
         // hasilnya SOD24100001 dst.
         return $kodejadi;
     }
+
+    function getRefKategoriPersedian()
+    {
+        $builder = $this->db->table("ref_kategori_persediaan");
+        $builder->select("*");
+        $builder->where('jenis', $this->kd);
+        $this->_data = $builder->get()->getResultArray();
+        return $this->_data;
+    }
+
+    function getLastStokBarang($idBarang, $idGudang)
+    {
+        $builder = $this->db->table("trans_persediaan");
+        $builder->select("stok");
+        $builder->where('id_barang', $idBarang);
+        $builder->where('id_gudang', $idGudang);
+        $this->_data = $builder->get()->getRow();
+        return $this->_data;
+    }
+
+    function trxInsertUpdateRecord($data)
+    {
+        $this->db->transStart();
+        try {
+
+
+            $this->insertRecordGetid("trans_barang", $data);
+            $arrPersediaan = [
+                "id_barang" => $data['id_barang'],
+                "id_gudang" => $data['id_gudang_tujuan'],
+                "stok" => $data['stok'],
+                "created_at" =>  $data['created_at'],
+                "created_by" =>  $data['created_by'],
+                "active" => 1,
+            ];
+            $arrParam =  [
+                "id_barang" => $data['id_barang'],
+                "id_gudang" => $data['id_gudang_tujuan'],
+            ];
+            $resData = $this->getLastStokBarang($data['id_barang'], $data['id_gudang_tujuan']);
+            if (!empty($resData)) {
+                $this->updateRecords("trans_persediaan", $arrPersediaan, $arrParam);
+            } else {
+                $this->insertRecordGetid("trans_persediaan", $arrPersediaan);
+            }
+
+            if ($data['id_kategori'] == 1) {
+                $data['tipe'] = 2;
+                $data['id_kategori'] = 4;
+                $data['jenis_transaksi'] = 2;
+                $this->insertRecordGetid("trans_barang", $data);
+                $resDataKeluar = $this->getLastStokBarang($data['id_barang'], $data['id_gudang_asal']);
+                $arrPersediaanKeluar = [
+                    "id_barang" => $data['id_barang'],
+                    "id_gudang" => $data['id_gudang_asal'],
+                    "stok" => $data['stok'],
+                    "created_at" =>  $data['created_at'],
+                    "created_by" =>  $data['created_by'],
+                    "active" => 1,
+                ];
+                $arrParamKeluar =  [
+                    "id_barang" => $data['id_barang'],
+                    "id_gudang" => $data['id_gudang_asal'],
+                ];
+                $resDataKeluar = $this->getLastStokBarang($data['id_barang'], $data['id_gudang_asal']);
+                if (!empty($resDataKeluar)) {
+                    $this->updateRecords("trans_persediaan", $arrPersediaanKeluar, $arrParamKeluar);
+                } else {
+                    $this->insertRecordGetid("trans_persediaan", $arrPersediaanKeluar);
+                }
+            }
+
+            $this->db->transComplete();
+
+            if ($this->db->transStatus() === TRUE) {
+                return true;
+            } else {
+                throw new \Exception("Transaction failed");
+            }
+        } catch (\Exception $e) {
+            $this->db->transRollback();
+            throw $e;
+        }
+    }
 }

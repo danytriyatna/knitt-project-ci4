@@ -8,13 +8,17 @@ use Modules\Referensi\Models\BarangModel;
 use Modules\Referensi\Models\JenisBarangModel;
 use Modules\Referensi\Models\SatuanModel;
 use Modules\Transaction\Models\OutgoingGoodsModel;
+use Modules\Transaction\Models\IncomingGoodsModel;
+use Modules\Referensi\Models\GudangModel;
 
 class OutgoingGoods extends BaseController
 {
     protected $mBarang;
     protected $mJenisBarang;
     protected $mSatuan;
+    protected $mBarangKeluar;
     protected $mBarangMasuk;
+    protected $mGudang;
 
     protected $views = '\Modules\Transaction\Views';
     protected $urlv  = 'trans/outgoing-goods';
@@ -25,7 +29,9 @@ class OutgoingGoods extends BaseController
         $this->mBarang = new BarangModel();
         $this->mJenisBarang = new JenisBarangModel();
         $this->mSatuan = new SatuanModel();
-        $this->mBarangMasuk = new OutgoingGoodsModel();
+        $this->mBarangKeluar = new OutgoingGoodsModel();
+        $this->mBarangMasuk = new IncomingGoodsModel();
+        $this->mGudang = new GudangModel();
         $this->files  = new FileModel();
     }
 
@@ -68,9 +74,9 @@ class OutgoingGoods extends BaseController
 
         $params = [];
 
-        $results = $this->mBarangMasuk->getData(null, $start, $limit, $order, $filters, $params);
-        $totalfiltered = $this->mBarangMasuk->getDataCnt($filters, $params);
-        $totaldata = $this->mBarangMasuk->getDataCnt(null, $params);
+        $results = $this->mBarangKeluar->getData(null, $start, $limit, $order, $filters, $params);
+        $totalfiltered = $this->mBarangKeluar->getDataCnt($filters, $params);
+        $totaldata = $this->mBarangKeluar->getDataCnt(null, $params);
         $maxpage = ceil($totalfiltered / $limit);
 
         $build_array = array(
@@ -134,6 +140,7 @@ class OutgoingGoods extends BaseController
                     "informasi" => $informasi,
                     "tanggal" => fdate_eng_to_ind($row->tanggal),
                     "kategori" => $row->kategori,
+                    "jumlah" => $row->jumlah,
                     "keterangan" => $row->keterangan,
                 )
             );
@@ -141,44 +148,90 @@ class OutgoingGoods extends BaseController
         return $this->response->setJSON($build_array);
     }
 
+    public function form($id = null)
+    {
+        if (!$this->auth->loggedIn()) {
+            return redirect()->to('/auth/login');
+        }
+
+        $this->data['id'] = $id;
+        if ($id != "") {
+            $id = decrypt($id);
+        }
+
+        if (!empty($id)) {
+            $data_detail = [];
+            $resData = $this->mBarangKeluar->getData($id);
+            $this->data['data']    = $resData;
+        }
+        $reDataKategori = $this->mBarangKeluar->getRefKategoriPersedian();
+        $sortGudang = [
+            [
+                'field' => 'nama_gudang',
+                'dir' => 'ASC'
+            ]
+        ];
+        $resDataGudang = $this->mGudang->getData(null, 0, 99999, $sortGudang);
+        $this->data['kategori']    = $reDataKategori;
+        $this->data['gudang']    = $resDataGudang;
+
+        $this->data['titlehead'] = "Form Barang Keluar";
+
+        return view($this->views . '\outgoing_goods_form', $this->data);
+    }
+
     function save()
     {
-        $id         = $this->request->getPost('dataId');
-        $nama_barang = $this->request->getPost('nama_barang');
-        $id_jenis_barang = $this->request->getPost('id_jenis_barang');
-        $id_satuan = $this->request->getPost('id_satuan');
-        $harga_satuan = $this->request->getPost('harga_satuan');
-        $stok_minimum = $this->request->getPost('stok_minimum');
+
+        $idBarang = $this->request->getPost('idBarang');
+        $idBarang = decrypt($idBarang);
         $keterangan = $this->request->getPost('keterangan');
+        $namaKonsumen = $this->request->getPost('namaKonsumen');
+        $namaVendor = $this->request->getPost('namaVendor');
+        $jmlMasuk = $this->request->getPost('jmlMasuk');
+        $totalStok = $this->request->getPost('totalStok');
+        $tanggal = $this->request->getPost('tanggal');
+        $idGudangAsal = $this->request->getPost('idGudangAsal');
+        $idGudangTujuan = $this->request->getPost('idGudangTujuan');
+        $idKategori = $this->request->getPost('idKategori');
 
         $msg    = "Data gagal ditambahkan !";
         $status = false;
+        $nama = "";
+        if (!empty($namaKonsumen)) {
+            $nama = $namaKonsumen;
+        } else if (!empty($namaVendor)) {
+            $nama = $namaVendor;
+        }
 
-        $arr_isi = [
-            'nama_barang' => $nama_barang,
-            'id_jenis_barang' => $id_jenis_barang,
-            'id_satuan' => $id_satuan,
-            'harga_satuan' => $harga_satuan,
-            'stok_minimum' => $stok_minimum,
-            'keterangan' => $keterangan,
+
+        $arrData = [
+            "id_barang" => $idBarang,
+            "jenis_transaksi" => 2,
+            "jumlah" => $jmlMasuk,
+            "tanggal" => $tanggal,
+            "id_gudang_asal" => !empty($idGudangAsal) ? $idGudangAsal : null,
+            "id_gudang_tujuan" =>  !empty($idGudangTujuan) ? $idGudangTujuan : null,
+            "nama" => $nama,
+            "id_kategori" => $idKategori,
+            "keterangan" => $keterangan,
+            "stok" => $totalStok,
+            "active" => 1,
+            "tipe" => 2,
+            "kode_transaksi" => $this->mBarangKeluar->generateKodePersediaan(),
+            "kode_transaksi_masuk" => $this->mBarangMasuk->generateKodePersediaan(),
         ];
 
+        $arrData['created_at'] = date("Y-m-d H:i:s");
+        $arrData['created_by'] = $this->get_userid();
 
-        if (empty($id)) {
-            $arr_isi['created_at'] = date("Y-m-d H:i:s");
-            $arr_isi['created_by'] = $this->get_userid();
-            $arr_isi['kode_barang'] = $this->mBarang->generateKodeBarang();
-            $this->mBarang->insertRecordGetid($this->mBarang->table, $arr_isi);
+
+        $res = $this->mBarangKeluar->trxInsertUpdateRecord($arrData);
+        if ($res) {
             $msg    = "Data berhasil ditambahkan !";
             $status = true;
-        } else {
-            $arr_isi['updated_at'] = date("Y-m-d H:i:s");
-            $arr_isi['updated_by'] = $this->get_userid();
-            $id = decrypt($id);
-            $this->mBarang->updateRecord($this->mBarang->table, $arr_isi, 'id', $id);
-            $msg    = "Data berhasil diupdate !";
-            $status = true;
         }
+
 
         $build_array['message'] = $msg;
         $build_array['status']  = $status;
@@ -186,6 +239,23 @@ class OutgoingGoods extends BaseController
         return $this->response->setJSON($build_array);
     }
 
+    function getLastStock()
+    {
+        $idGudangTujuan = $this->request->getPost("idGudangTujuan");
+        $idGudangAsal = $this->request->getPost("idGudangAsal");
+        $idBarang = $this->request->getPost("idBarang");
+        $data = [];
+        $idBarang = decrypt($idBarang);
+        $results = $this->mBarangKeluar->getLastStokBarang($idBarang, $idGudangAsal);
+        if (!empty($idGudangTujuan)) {
+            $resGudangTujuan = $this->mBarangKeluar->getLastStokBarang($idBarang, $idGudangTujuan);
+        }
+        $data['status'] = true;
+        $data['stok'] = !empty($results) ? $results->stok : 0;
+        $data['stokTujuan'] = !empty($resGudangTujuan) ? $resGudangTujuan->stok : 0;
+
+        return $this->response->setJSON($data);
+    }
     public function activate($id)
     {
         if (!$this->auth->loggedIn() or (!$this->auth->isAdmin() && !$this->auth->isSuperadmin())) {
