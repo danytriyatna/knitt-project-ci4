@@ -66,17 +66,17 @@
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-3 col-form-label" for="do_no">DO No.</label>
                       <div class="col-md-9">
-                        <input type="text" id="do_no" name="do_no" class="form-control" placeholder="Ketikkan nomor DO" value="<?= $row->delivery_kode;?>">
-                        <input type="hidden" name="id_produksi" id="id_produksi" value="<?= $row->id_produksi;?>" >
-                        <input type="hidden" name="id_walkorder" id="id_walkorder" value="<?= $row->id_walkorder;?>" >
+                        <input <?=  ($view_read) ? 'disabled' : ''; ?> type="text" id="do_no" name="do_no" class="form-control" placeholder="Ketikkan nomor DO" value="<?= !empty($row) ? $row->delivery_kode: '' ; ?>">
+                        <input type="hidden" name="id_produksi" id="id_produksi" value="<?= !empty($row->id_produksi)? $row->id_produksi : ''; ?>" >
+                        <input type="hidden" name="id_walkorder" id="id_walkorder" value="<?= !empty($row->id_walkorder)? $row->id_walkorder : ''; ?>" >
                       </div>
                     </div>
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-3 col-form-label" for="so_no">Ref No.</label>
                       <div class="col-md-8">
-                        <input type="text" name="kode_produksi" id="kode_produksi" class="form-control" value="<?= $row->kode_produksi;?>" > 
+                        <input type="text" <?=  ($view_read) ? 'disabled' : ''; ?> name="kode_produksi" id="kode_produksi" class="form-control" value="<?= !empty($row) ? $row->kode_produksi : '' ;?>" > 
                       </div>
-                      <div class="col-md-1">
+                      <div <?=  ($view_read) ? 'hidden' : ''; ?> class="col-md-1">
                         <button type="button" id="list_prod" class="btn btn-sm btn-primary"><i class="fa fa-search"></i></button>
                       </div>
                     </div>
@@ -85,7 +85,7 @@
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tgl_do">DO Date</label>
                       <div class="col-md-8">
-                        <input type="text" id="tgl_do" name="tgl_do" class="form-control datepicker" placeholder="Pilih tanggal DO" value="<?= $row->tgl_do;?>">
+                        <input <?=  ($view_read) ? 'disabled' : ''; ?> type="text" id="tgl_do" name="tgl_do" class="form-control datepicker" placeholder="Pilih tanggal DO" value="<?= !empty($row) ? $row->tgl_do : '' ;?>">
                       </div>
                     </div>
                   </div>
@@ -95,7 +95,7 @@
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-2 col-form-label custom-col-md-2" for="select_style">Style</label>
                       <div class="col-md-10">
-                        <input type="text" name="keterangan_style" id="keterangan_style" class="form-control" value="<?= $row->keterangan_style;?>" readonly>
+                        <input <?=  ($view_read) ? 'disabled' : ''; ?> type="text" name="keterangan_style" id="keterangan_style" class="form-control" value="<?= !empty($row) ? $row->keterangan_style : '' ;?>" readonly>
                       </div>
                     </div>
                   </div>
@@ -105,7 +105,7 @@
                 <div class="form-group row">
                   <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_buyer">Buyer</label>
                   <div class="col-md-9">
-                    <select id="select_buyer" name="select_buyer" class="form-select select2" data-placeholder="-- Pilih Buyer --" value="<?= $row->select_buyer;?>" >
+                    <select <?=  ($view_read) ? 'disabled' : ''; ?> id="select_buyer" name="select_buyer" class="form-select select2" data-placeholder="-- Pilih Buyer --" value="<?= !empty($row) ? $row->select_buyer : '' ;?>" >
                       <option value=""> - Pilih Buyer - </option>
                       <?php foreach ($buyer as $item) { ?>
                         <option value="<?= $item['id']; ?>"><?= $item['nama']; ?></option> 
@@ -116,8 +116,8 @@
                 <div class="form-group row">
                   <label class="control-label text-start text-md-end col-md-2 col-form-label" for="alamat_buyer">Alamat</label>
                   <div class="col-md-9">
-                    <textarea rows="3" id="alamat_buyer" name="alamat_buyer" class="form-control" placeholder="Ketikkan alamat">
-                        <?= $row->alamat_buyer;?>
+                    <textarea <?=  ($view_read) ? 'disabled' : ''; ?> rows="3" id="alamat_buyer" name="alamat_buyer" class="form-control" placeholder="Ketikkan alamat">
+                        <?= !empty($row) ? $row->alamat_buyer : '' ;?>
                     </textarea>
                   </div>
                 </div>
@@ -170,7 +170,7 @@
 
             <div class="row">
               <div class="col-sm-12">
-                <div class="input-group my-2">
+                <div <?=  ($view_read) ? 'hidden' : ''; ?> class="input-group my-2">
                   <span class="input-group-text" id="basic-addon1"><i class="fa fa-qrcode"></i></span>
                   <input type="text" class="form-control bg-info bg-opacity-25" placeholder="Scan" aria-label="Scan" aria-describedby="basic-addon1" id="text_barcode">
                 </div>
@@ -224,9 +224,17 @@
                     <a href="trans/delivery-order" class="btn btn-default m-e-5">
                       <span class="fa fa-arrow-left"></span> Kembali
                     </a>
-                    <button type="button" id="btn-save" class='btn btn-success'>
-                      <span class="fa fa-save"></span> Simpan
-                    </button>
+                    <?php if($status == 1) { ?>
+                      <button type="button" id="btn-save" class='btn btn-success'>
+                        <span class="fa fa-save"></span> Simpan
+                      </button>
+                      <?php if(!empty($id)) { ?>
+                      <button type="button" id="btn-send" class='btn btn-info'>
+                        <span class="fa fa-paper-plane"></span> Approval
+                      </button>
+                      <?php } ?>
+                    <?php } ?>
+                    <input type="hidden" name="actionf" id="actionf">
                     <input type="hidden" name="id" id="id" value="<?= !empty($id)? $id : '' ?>">
                     <input type="hidden" name="data-details" id="data-details" value='<?= !empty($dt_details)? $dt_details : "" ?>'>
                     <input type="hidden" name="data-prods" id="data-prods" value='<?= !empty($dt_prods)? $dt_prods : "" ?>'>

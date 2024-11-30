@@ -519,4 +519,26 @@ $(document).ready(function () {
         $("#actionf").val('save');
         $("#fmain").submit();
     });
+
+
+    $("#btn-send").on("click", function(e) {
+        e.preventDefault();
+        
+
+        Swal.fire({
+            title: "Apakah anda ingin meng Approve data pengiriman ?",
+            icon: 'question',
+            confirmButtonText: 'Simpan',
+            confirmButtonColor: '#198754',
+            showCancelButton: true,
+            cancelButtonText: 'Batal',
+            cancelButtonColor: '#6C757D'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                setDataInputTable();
+                $("#actionf").val('kirim');
+                $("#fmain").submit();
+            }
+        })
+    });
 });

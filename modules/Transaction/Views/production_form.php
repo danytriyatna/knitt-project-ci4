@@ -254,6 +254,30 @@
                     </div>
                   <?php } ?>
 
+                  <div class="col">
+                    <div class="card">
+                      <div class="card-body" style="min-height: 80px;">
+                        <div class="form-check form-check-inline">
+                          <h5 class="form-check-h1" for="proses_ready">Ready</h5>
+                          <label class="form-check-label" for="proses_ready" id="qty_ready">
+                            <?= !empty($last_data) ? ($last_data->qty_prod - $qty_kirim) : []; ?>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col">
+                    <div class="card">
+                      <div class="card-body" style="min-height: 80px;">
+                        <div class="form-check form-check-inline">
+                          <h5 class="form-check-h1" for="proses_kirim">Kirim</h5>
+                          <label class="form-check-label" for="proses_kirim" id="qty_kirim"><?= !empty($qty_kirim) ? $qty_kirim : 0; ?></label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </div>
 

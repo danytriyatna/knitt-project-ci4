@@ -10,6 +10,7 @@ use Modules\Transaction\Models\SalesOrderModel;
 use Modules\Transaction\Models\SampleModel;
 use Modules\Referensi\Models\ProsesProduksiModel;
 use Modules\Referensi\Models\OperatorModel;
+use Modules\Transaction\Models\DeliveryModel;
 
 class Production extends BaseController
 {
@@ -21,6 +22,7 @@ class Production extends BaseController
   protected $mWalkorder;
   protected $mPproduksi;
   protected $mOperator;
+  protected $mdelivery;
 
   function __construct()
   {
@@ -31,6 +33,7 @@ class Production extends BaseController
     $this->mWalkorder = new WalkorderModel();
     $this->mPproduksi = new ProsesProduksiModel();
     $this->mOperator = new OperatorModel();
+    $this->mdelivery = new DeliveryModel();
   }
 
   public function index()
@@ -216,18 +219,38 @@ class Production extends BaseController
           $list_detail[$i]->qty_prod = 0;
         }
       }
+
+      $prms['id_walkorder'] = $resData->id_walkorder;
       $dataProses = $this->mProduksi->getDataProsesProd($resData->id_walkorder);
 
+      // get last qty ( untuk mengambil data yang suddah dikirim )
+      $parms['last_proses'] = 1;
+      $parms['id_walkorder'] = $resData->id_walkorder;
+      $dataLast = $this->mProduksi->getDataProsesProd($parms);
+      $this->data['last_data'] = !empty($dataLast) ? $dataLast[0] : [];
+
+      $qty_kirim = 0;
+      if(!empty($id)){
+        $param_dlv['id_produksi'] = $id;
+        $data_pengirimasn = $this->mdelivery->getData(null, 0, 9999, null, null, $param_dlv);
+
+        if(!empty($data_pengirimasn)){
+            foreach ($data_pengirimasn as $rd) {
+              $qty_kirim += $rd->qty_delv;
+            }
+        }
+      }
+      
       $sort = [
         [
           'field' => 'nama_operator',
           'dir' => 'ASC'
         ]
       ];
-
+ 
       $dataOperator = $this->mOperator->getData(null, 0, 99999, $sort);
 
-
+      $this->data['qty_kirim'] = $qty_kirim;
       $this->data['proses']    = $dataProses;
       $this->data['operator']    = $dataOperator;
       // $this->data['listProd']    = json_encode($detailProd);
@@ -301,7 +324,7 @@ class Production extends BaseController
     $result = $this->mWalkorder->getListProduksiUkuran($params);
 
     $data    = [];
-    $msg     = "Penambilan data berhasil";
+    $msg     = "Pengambilan data berhasil";
     $status  = true;
 
     foreach ($result as $row) {

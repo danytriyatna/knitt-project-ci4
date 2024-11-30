@@ -158,7 +158,7 @@ class DeliveryOrder extends BaseController
       $stdData->keterangan_style = $stdData->keterangan_style;
       $stdData->select_buyer =  $stdData->id_konsumen;
       $stdData->alamat_buyer  =  $stdData->alamat;
-
+      $status = $stdData->status;
       
 
       $this->data['row']    = $stdData;
@@ -234,6 +234,7 @@ class DeliveryOrder extends BaseController
 
     if (!empty($_POST)) {
       if(true){
+
         $stdData->do_no = trim($this->request->getPost('do_no'));
         $stdData->id_produksi = trim($this->request->getPost('id_produksi'));
         $stdData->id_walkorder = trim($this->request->getPost('id_walkorder'));
@@ -248,12 +249,17 @@ class DeliveryOrder extends BaseController
         $dt_details = json_decode($dt_details, true);
         $dt_prods = json_decode($dt_prods, true);
 
+        $action = $this->request->getPost('actionf');
+
+        
+
         $data['tgl_transaksi'] = $stdData->tgl_do;
         $data['id_produksi'] = $stdData->id_produksi;
         $data['produksi_kode'] = $stdData->kode_produksi;
         $data['alamat'] = $stdData->alamat_buyer;
         $data['id_konsumen'] = $stdData->select_buyer;
         $data['id_walkorder'] = $stdData->id_walkorder;
+        $data['status'] =  $action == "kirim" ? 2 : 1;
 
         if(!empty($id)){
           $data['updated_at'] = date('Y-m-d H:i:s');
@@ -281,11 +287,17 @@ class DeliveryOrder extends BaseController
           $this->data['errmsg'] = $this->_get_message("ERROR_VALIDATION", $this->validation->listErrors());
       }
     }
+
+    $view_read = false;
+    if($status != 1){
+      $view_read = true;
+    }
     
+    $this->data['view_read'] = $view_read;
     $this->data['buyer'] = $this->mkonsumen->where("active", 1)->findAll();
     $this->data['dt_details'] = $dt_details;// = json_decode($dt_details, true);
     $this->data['dt_prods'] = $dt_prods;// = json_decode($dt_prods, true);
-
+    $this->data['status'] = $status;
 
     return view($this->views . '\delivery_order_form', $this->data);
   }
