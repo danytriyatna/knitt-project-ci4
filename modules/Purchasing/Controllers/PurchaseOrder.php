@@ -11,6 +11,11 @@ class PurchaseOrder extends BaseController
 
   public function index()
   {
+    if (!$this->auth->loggedIn()) {
+        return redirect()->to('/auth/login');
+    }
+
+    
     $this->data['titlehead'] = "Purchase Order";
     
     return view($this->views . '\purchase_order_list', $this->data);

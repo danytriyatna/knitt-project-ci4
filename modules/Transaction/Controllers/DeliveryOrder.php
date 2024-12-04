@@ -45,6 +45,10 @@ class DeliveryOrder extends BaseController
 
   public function index()
   {
+
+    if (!$this->auth->loggedIn()) {
+      return redirect()->to('/auth/login');
+    }
     $this->data['titlehead'] = "Delivery Order";
 
     

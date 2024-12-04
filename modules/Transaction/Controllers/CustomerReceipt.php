@@ -19,6 +19,10 @@ class CustomerReceipt extends BaseController
 
   public function index()
   {
+    if (!$this->auth->loggedIn()) {
+      return redirect()->to('/auth/login');
+    }
+
     $this->data['titlehead'] = "Customer Receipt";
     
     return view($this->views . '\customer_receipt_list', $this->data);

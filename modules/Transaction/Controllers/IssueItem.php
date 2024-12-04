@@ -11,6 +11,11 @@ class IssueItem extends BaseController
 
   public function index()
   {
+
+    if (!$this->auth->loggedIn()) {
+      return redirect()->to('/auth/login');
+    }
+    
     $this->data['titlehead'] = "Issue Item";
     
     return view($this->views . '\issue_item_list', $this->data);

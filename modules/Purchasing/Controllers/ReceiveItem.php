@@ -11,6 +11,10 @@ class ReceiveItem extends BaseController
 
   public function index()
   {
+    if (!$this->auth->loggedIn()) {
+        return redirect()->to('/auth/login');
+    }
+
     $this->data['titlehead'] = "Receive Item";
     
     return view($this->views . '\receive_item_list', $this->data);

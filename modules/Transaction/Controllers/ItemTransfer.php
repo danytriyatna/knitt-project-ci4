@@ -11,6 +11,12 @@ class ItemTransfer extends BaseController
 
   public function index()
   {
+
+    if (!$this->auth->loggedIn()) {
+      return redirect()->to('/auth/login');
+    }
+
+    
     $this->data['titlehead'] = "Item Transfer";
     
     return view($this->views . '\item_transfer_list', $this->data);

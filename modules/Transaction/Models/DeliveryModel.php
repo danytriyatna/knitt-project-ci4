@@ -44,6 +44,10 @@ class DeliveryModel extends \App\Models\PrModel
                 $builder->where('abx.id_produksi', $params['id_produksi']);
             }
 
+            if (!empty($params['id_walkorder'])) {
+                $builder->where('abx.id_walkorder', $params['id_walkorder']);
+            }
+
             if (!empty($order)) {
                 $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
             } else {

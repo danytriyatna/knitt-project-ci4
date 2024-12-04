@@ -59,7 +59,14 @@ $routes->group('trans/production', ['namespace' => 'Modules\Transaction\Controll
 
 $routes->group('trans/sales-invoice', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'SalesInvoice::index');
-  $routes->get('form', 'SalesInvoice::form');
+  $routes->post('list', 'SalesInvoice::lists');
+  $routes->post('list_produksi', 'SalesInvoice::lists_produksi');
+  $routes->get('add', 'SalesInvoice::form');
+  $routes->post('add', 'SalesInvoice::form');
+  $routes->get('form/(:any)', 'SalesInvoice::form/$1');
+  $routes->post('form/(:any)', 'SalesInvoice::form/$1');
+  $routes->post('get_order', 'SalesInvoice::walkorder_user');
+  $routes->post('cari_produk', 'SalesInvoice::getDataProduksiItem');
 });
 
 $routes->group('trans/customer-receipt', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {

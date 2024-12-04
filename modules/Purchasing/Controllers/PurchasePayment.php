@@ -11,6 +11,11 @@ class PurchasePayment extends BaseController
 
   public function index()
   {
+
+    if (!$this->auth->loggedIn()) {
+        return redirect()->to('/auth/login');
+    }
+
     $this->data['titlehead'] = "Purchase Payment";
     
     return view($this->views . '\purchase_payment_list', $this->data);
