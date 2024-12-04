@@ -35,9 +35,119 @@ $(document).ready(function () {
         return s.join(dec);
     }
 
+    let fmView = function(value, data, cell, row, options) {
+		let row_data = value._cell.row.data;
+		let fmBtnEdit = "<button class='btn btn-sm btn-info' type='button' title='view'><i class='fa fa-info-circle' title='view'></i></button>";
+		
+		let btnRes = fmBtnEdit;
+		return btnRes; //+ "&nbsp;" + fmBtnDelete;
+	};
+
+    // detail pop pup 
+    let detModal = $("#modal-view-detail-do");
+    let detRefKode = $("#det_ref_so");
+    let detRefTgl = $("#det_ref_tgl");
+    let detRefKonsumen = $("#det_konsumen");
+    let detStyle = $("#det_style");
+    let detAlamat = $("#alamat_buyer");
+
+    let dtList_detail1 = new Tabulator("#dt-list-delivery", {
+        columns: [
+            
+			{
+				title: 'No.', formatter: "rownum", headerSort:false, sorter: 'string',
+			}, 
+				
+			{
+				title: 'DO NO.', field: 'delivery_kode', headerSort:false, sorter: 'string',
+				width: 140,			}, 
+				
+			{
+				title: 'COLOUR', field: 'kode_warna	', headerSort:false, sorter: 'string',
+				width: 140,
+			}, 
+
+            {
+				title: 'S', field: 's', formatter : "html", align: "center", cssClass: "text-center", headerSort:false,
+                width: 140,
+			} ,
+
+            {
+				title: 'M', field: 'm', formatter : "html", align: "center", cssClass: "text-center", headerSort:false,
+                width: 140,
+			},
+
+            {
+				title: 'L', field: 'l', headerSort:false, sorter: 'string',
+				width: 140,
+			},
+
+            {
+				title: 'XL', field: 'xl', headerSort:false, sorter: 'string',
+				width: 140,
+			},
+            
+            {
+				title: '2XL', field: 'xxl', headerSort:false, sorter: 'string',
+				width: 140,
+			},
+
+            {
+				title: '3XL', field: 'xxxl', headerSort:false, sorter: 'string',
+				width: 140,
+			},
+
+            {
+				title: 'ALL', field: 'all_', headerSort:false, sorter: 'string',
+				width: 140,
+			},
+
+            {
+				title: 'DO QTY', field: 'qty', headerSort:false, sorter: 'string',
+				width: 140,
+			},
+
+            {
+				title: 'AMOUNT', field: 'total_harga', headerSort:false, sorter: 'string',
+				width: 140,
+			},
+				
+        ],
+        locale: 'id',
+        placeholder: "Tidak ada data",
+        pagination: false,
+        paginationSize: 99,
+        paginationButtonCount: 2,
+        paginationDataSent: {
+            sorters: "order",
+        },
+        selectableRows: false
+    });
+
     // table detail 
     let dtListDetail = new Tabulator("#dt-detail", {
         columns: [
+                {
+                    title: "Aksi.", formatter: fmView,  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
+                    width:"7%",
+                    cellClick: function(e, cell) {
+                        if (e.target.title === 'view') {
+                            let rowData = cell.getRow().getData();
+
+                            detRefKode.val(rowData.ref_kode);
+                            detRefTgl.val(rowData.tgl_transaksi);
+                            detRefKonsumen.val(rowData.konsumen_nama);
+                            detStyle.val(rowData.keterangan_style);
+                            detAlamat.val("");
+
+                            dtList_detail1.setData(rowData.detail_data);
+                            setTimeout(() => {
+                                dtList_detail1.redraw(true)
+                            }, 500);
+                            detModal.modal("show");
+                        }
+                    }
+                },
                 {
                     title: "No.", formatter: "rownum",  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
                     width:"5%"
@@ -47,33 +157,33 @@ $(document).ready(function () {
                     width:"20%", 
                 },
                 {
-                    title: "Ref Tgl", field: "keterangan_style",  sorter: "string", headerSort:false, align: "center", cssClass: "text-start",
-                    width:"10%", 
+                    title: "Ref Tgl", field: "tgl_transaksi",  sorter: "string", headerSort:false, align: "center", cssClass: "text-start",
+                    width:"7%", 
                 },
 
                 {
                     title: "Style", field: "keterangan_style",  sorter: "string ", headerSort:false, align: "center", cssClass: "text-start",
-                    width:"17%", 
+                    width:"13%", 
                 },
 
                 {
                     title: "Ref Qty", field: "ref_qty",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"12%", bottomCalc:"sum", 
+                    width:"12%", //bottomCalc:"sum", 
                 },
 
                 {
                     title: "Amount", field: "ref_total",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"12%", bottomCalc:"sum", 
+                    width:"12%", //bottomCalc:"sum", 
                 },
 
                 {
                     title: "DP", field: "ref_dp",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"12%", bottomCalc:"sum", 
+                    width:"12%", //bottomCalc:"sum", 
                 },
 
                 {
                     title: "INV. TOTAL", field: "totals",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"12%", bottomCalc:"sum", 
+                    width:"12%", //bottomCalc:"sum", 
                 },
                 
             ],
@@ -192,133 +302,18 @@ $(document).ready(function () {
 
 
     // start detail 
-    let btnSaveWarna = $("#btn-save-warna");
-    let textTitleWarna = $("#text-title-warna")
-    let textQtyWarna = $("#text-qty-warna")
-    let mdDetail = $("#modal-form-wo");
-    let textDetId = $("#detail_id");
-    let fmEditDetail = function(value, data, cell, row, options) {
-		let row_data = value._cell.row.data;
-		let fmBtnEdit = "<button class='btn btn-xs btn-warning' type='button' title='edit'><i class='fa fa-edit' title='edit'></i></button>";
+
+    
+
+    // let fmEditDetail = function(value, data, cell, row, options) {
+	// 	let row_data = value._cell.row.data;
+	// 	let fmBtnEdit = "<button class='btn btn-xs btn-warning' type='button' title='edit'><i class='fa fa-edit' title='edit'></i></button>";
 		
-		let btnRes = fmBtnEdit;
-		return btnRes; //+ "&nbsp;" + fmBtnDelete;
-	};
+	// 	let btnRes = fmBtnEdit;
+	// 	return btnRes; //+ "&nbsp;" + fmBtnDelete;
+	// };
 
-    let dtList_detail1 = new Tabulator("#dt-list-warna", {
-        columns: [
-            {
-                title: " ", field: "aksi", headerSort: false, formatter: fmEditDetail,
-                width: 100,
-                cellClick: function(e, cell) {
-                    if (e.target.title === 'edit') {
-                        let rowData = cell.getRow().getData();
-                        textDetId.val(rowData.id);
-                        textTitleWarna.html(rowData.wdasar);
-                        textQtyWarna.html(rowData.qty);
-                        inpDetailLoss.val(rowData.loss);
-                        
-                        dtListDetailWarna.setData(rowData.details)
-                        mdDetail.modal("show");
-                    }
-                }
-            },
-            
-			{
-				title: 'Colour', field: 'wdasar', headerSort:false, sorter: 'string',
-				formatter : "html"
-			}, 
-				
-			{
-				title: 'Qty', field: 'qty', headerSort:false, sorter: 'string',
-				width: 140, bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney
-			}, 
-				
-			{
-				title: 'Gram', field: 'gram', headerSort:false, sorter: 'string',
-				width: 140, bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney 
-			}, 
-
-            {
-				title: 'Needs', field: 'gram_nd', formatter : "html", align: "center", cssClass: "text-center", headerSort:false,
-                width: 140, bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney 
-			} ,
-
-            {
-				title: 'KG', field: 'kg', formatter : "html", align: "center", cssClass: "text-center", headerSort:false,
-                width: 140, bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney 
-			},
-
-            {
-				title: 'Loss (KG)', field: 'kg_loss', headerSort:false, sorter: 'string',
-				width: 140, bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney 
-			},
-
-            {
-				title: 'NFP (KG)', field: 'total', headerSort:false, sorter: 'string',
-				width: 140, bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney 
-			},
-            
-            {
-				title: 'Stock', field: 'kuota', headerSort:false, sorter: 'string',
-				width: 140, bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney 
-			},
-
-            {
-				title: 'Margin', field: 'kuota_tambah', headerSort:false, sorter: 'string',
-				width: 140, bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney 
-			},
-				
-        ],
-        layout: 'fitColumns',
-        ajaxURL: "/trans/work-order/list_warna",
-        placeholder: "Tidak ada data",
-        ajaxConfig: "POST",
-        ajaxSorting: true,
-        ajaxFiltering: false,
-        sortMode: "remote",
-        filterMode: "remote",
-        minHeight: 300,
-        ajaxRequesting: function (url, params) {
-            params.start = params.size * (params.page - 1);
-            params.length = params.size;
-            params.woid = $("#dataid").val();
-        },
-        ajaxResponse: function (url, params, response) {
-            let pageSize = dtList_detail1.getPageSize();
-            let pageNo = dtList_detail1.getPage();
-            let startRow = (pageSize * (pageNo - 1)) + 1;
-            let endRow = response.data.length + startRow - 1;
-            if (response.data.length === 0) {
-                startRow = 0; endRow = 0;
-            }
-            let recordsFiltered = parseInt(response.recordsFiltered);
-            let recordsTotal = parseInt(response.recordsTotal);
-
-            $("#table-footer-det .tabulator-startrow").text(startRow);
-            $("#table-footer-det .tabulator-endrow").text(endRow);
-            $("#table-footer-det .tabulator-totalrow").text(recordsFiltered);
-
-            let elTotalFilteredRow = $("#table-footer-det .tabulator-totalfilteredrow");
-            elTotalFilteredRow.text("");
-            if (recordsTotal > recordsFiltered) {
-                elTotalFilteredRow.text(" (disaring dari " + recordsTotal
-                    + " entri keseluruhan)");
-            }
-            return response;
-        },
-        footerElement: '<div id="table-footer-det" class="pull-left tabulator-info">'
-            + 'Menampilkan <span class="tabulator-startrow"></span> - <span class="tabulator-endrow"></span> dari '
-            + '<span class="tabulator-totalrow"></span> entri<span class="tabulator-totalfilteredrow"></span></div>',
-        pagination: true,
-        paginationMode: "remote",
-        paginationSize: 25,
-        paginationButtonCount: 10,
-        dataSendParams: {
-            sorters: "order"
-        },
-        selectableRows: false,
-    });
+    
     
 
 
@@ -501,6 +496,8 @@ $(document).ready(function () {
     //     })
     // });
 
+
+    
 
 
     $("#btn-save").on("click", function(e) {

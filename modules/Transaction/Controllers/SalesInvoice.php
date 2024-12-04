@@ -470,7 +470,8 @@ class SalesInvoice extends BaseController
          $isi = [
           'id_walkorder'      => $x->id,
           'tgl_transaksi'     => $x->tgl_transaksi,
-          'keterangan_style	' => $x->keterangan_style,
+          'keterangan_style'  => $x->keterangan_style,
+          'konsumen_nama'     => $x->konsumen_nama,
 
           'ref_id'            => ($x->tipe_id == 1) ? $x->sample_id : $x->so_id,
           'ref_kode'          => ($x->tipe_id == 1) ? $x->kode_sample : $x->kode_sales_order,
@@ -484,7 +485,7 @@ class SalesInvoice extends BaseController
          $do_harga = 0;
          $do_harga = 0;
 
-         $det_isi = [];
+         $det_list = [];
 
          $paramx['id_konsumen']  = $konsumen_id;
          $paramx['id_walkorder'] = $x->id;
@@ -502,6 +503,7 @@ class SalesInvoice extends BaseController
           $det_isi = [
             'ref_detail_id' => $d->ref_detail_id,
             'id_delivery' => $d->id_delivery,
+            'delivery_kode' => $d->delivery_kode,
             'kode_warna' => $d->kode_warna,
             'tipe_id' => $d->tipe_id,
           ];
@@ -516,8 +518,10 @@ class SalesInvoice extends BaseController
               $det_isi[$keyUkuran] = !empty($d->$keyUkuran) ? $d->$keyUkuran : 0;
             }
           }
+
+          $det_list[] = $det_isi;
          }
-         $isi['detail_data'] = $det_isi;
+         $isi['detail_data'] = $det_list;
          $xdata[] = $isi;
       }
 

@@ -208,6 +208,7 @@ class InvoiceModel extends \App\Models\PrModel
                      'select 
                         twpu.ref_detail_id,
                         twpu.id_delivery,
+                        twp.delivery_kode,
                         rw.kode_warna,
                         tw.tipe_id,
                         rk.key_ukuran,
@@ -222,7 +223,7 @@ class InvoiceModel extends \App\Models\PrModel
                     where tw.id = {$id_walkorder}
                     order by twpu.ref_detail_id, twpu.id_ukuran',
                 'select key_ukuran from ref_ukuran rx where rx.active = 1 order by rx.seq asc'
-            ) as tbl (ref_detail_id int, id_delivery int, kode_warna varchar, tipe_id int, {$col2})
+            ) as tbl (ref_detail_id int, id_delivery int, delivery_kode varchar, kode_warna varchar, tipe_id int, {$col2})
         ";
 
         $query = $this->db->query($sql);

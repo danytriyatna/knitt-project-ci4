@@ -14,17 +14,17 @@
             <div class="row">
               <div class="col-sm-6">
                 <div class="form-group my-0 row">
-                  <label class="control-label text-start text-md-end col-md-3 col-form-label">SO. No.</label>
+                  <label class="control-label text-start text-md-end col-md-3 col-form-label">Ref. No.</label>
                   <div class="col-md-9">
-                    <input type="text" class="form-control-plaintext" value="SOD24100001" disabled>
+                    <input type="text" class="form-control-plaintext" id="det_ref_so" disabled>
                   </div>
                 </div>
               </div>
               <div class="col-sm-6">
                 <div class="form-group my-0 row">
-                  <label class="control-label text-start text-md-end col-md-4 col-form-label">SO. Date</label>
+                  <label class="control-label text-start text-md-end col-md-4 col-form-label">Ref. Date</label>
                   <div class="col-md-8">
-                    <input type="text" class="form-control-plaintext" value="01-10-2024" disabled>
+                    <input type="text" class="form-control-plaintext" id="det_ref_tgl" disabled>
                   </div>
                 </div>
               </div>
@@ -34,19 +34,13 @@
                 <div class="form-group my-0 row">
                   <label class="control-label text-start text-md-end col-md-2 custom-col-md-2 col-form-label">Buyer</label>
                   <div class="col-md-10">
-                    <input type="text" class="form-control-plaintext" value="Yusuf" disabled>
+                    <input type="text" class="form-control-plaintext" id="det_konsumen" disabled>
                   </div>
                 </div>
                 <div class="form-group my-0 row">
                   <label class="control-label text-start text-md-end col-md-2 custom-col-md-2 col-form-label">Style</label>
                   <div class="col-md-10">
-                    <input type="text" class="form-control-plaintext" value="K-17 (CARDIGAN PITA)" disabled>
-                  </div>
-                </div>
-                <div class="form-group my-0 row">
-                  <label class="control-label text-start text-md-end col-md-2 custom-col-md-2 col-form-label">Desc</label>
-                  <div class="col-md-10">
-                    <input type="text" class="form-control-plaintext" value="K-17 (CARDIGAN PITA)" disabled>
+                    <input type="text" class="form-control-plaintext" id="det_style" disabled>
                   </div>
                 </div>
               </div>
@@ -56,7 +50,7 @@
             <div class="form-group my-0 row">
               <label class="control-label text-start text-md-end col-md-2 col-form-label" for="alamat_buyer">Alamat</label>
               <div class="col-md-9">
-                <textarea rows="3" id="alamat_buyer" name="alamat_buyer" class="form-control" placeholder="Ketikkan alamat" disabled>Bandung</textarea>
+                <textarea rows="3" id="alamat_buyer" name="alamat_buyer" class="form-control" placeholder="Ketikkan alamat" disabled></textarea>
               </div>
             </div>
           </div>
@@ -67,7 +61,8 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="table-responsive">
-              <table class="table table-striped table-centered">
+              <div class="table-striped table-centered" id="dt-list-delivery"></div>
+              <!-- <table class="table table-striped table-centered">
                 <thead>
                   <tr>
                     <th>No.</th>
@@ -100,7 +95,7 @@
                     <td>4.500.000,00</td>
                   </tr>
                 </tfoot>
-              </table>
+              </table> -->
             </div>
           </div>
         </div>
