@@ -29,8 +29,43 @@ $routes->group("master-data/operator", ['namespace' => 'Modules\Referensi\Contro
     $routes->post('simpan', 'RefOperator::save');
     $routes->get('delete/(:any)', 'RefOperator::deactivate/$1');
 });
+$routes->group("master-data/gudang", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefGudang::index');
+
+    $routes->post('list', 'RefGudang::lists');
+    $routes->post('simpan', 'RefGudang::save');
+    $routes->get('delete/(:any)', 'RefGudang::deactivate/$1');
+});
+$routes->group("master-data/satuan", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefSatuan::index');
+
+    $routes->post('list', 'RefSatuan::lists');
+    $routes->post('simpan', 'RefSatuan::save');
+    $routes->get('delete/(:any)', 'RefSatuan::deactivate/$1');
+});
+$routes->group("master-data/jenis_barang", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefJenisBarang::index');
+
+    $routes->post('list', 'RefJenisBarang::lists');
+    $routes->post('simpan', 'RefJenisBarang::save');
+    $routes->get('delete/(:any)', 'RefJenisBarang::deactivate/$1');
+});
+$routes->group("master-data/barang", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefBarang::index');
+
+    $routes->post('list', 'RefBarang::lists');
+    $routes->post('simpan', 'RefBarang::save');
+    $routes->get('delete/(:any)', 'RefBarang::deactivate/$1');
+});
 
 $routes->group('master-data/produk', ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
     $routes->get('/', 'RefProduk::index');
     $routes->get('form', 'RefProduk::form');
-  });
+});
+$routes->group("master-data/vendor", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefVendor::index');
+
+    $routes->post('list', 'RefVendor::lists');
+    $routes->post('simpan', 'RefVendor::save');
+    $routes->get('delete/(:any)', 'RefVendor::deactivate/$1');
+});

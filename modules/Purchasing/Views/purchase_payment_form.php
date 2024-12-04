@@ -32,17 +32,17 @@
               <div class="row">
                 <div class="col-sm-6">
                   <div class="form-group row">
-                    <label class="control-label text-start text-md-end col-md-3 col-form-label" for="cr_no">CR No.</label>
+                    <label class="control-label text-start text-md-end col-md-3 col-form-label" for="pp_no">PP No.</label>
                     <div class="col-md-9">
-                      <input type="text" id="cr_no" name="cr_no" class="form-control" placeholder="Ketikkan nomor CR" value="CRC2410001">
+                      <input type="text" id="pp_no" name="pp_no" class="form-control" placeholder="Ketikkan nomor PP" value="PPT24100001">
                     </div>
                   </div>
                 </div>
                 <div class="col-sm-6">
                   <div class="form-group row">
-                    <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tgl_cr">CR Date</label>
+                    <label class="control-label text-start text-md-end col-md-4 col-form-label" for="pp_cr">PP Date</label>
                     <div class="col-md-8">
-                      <input type="text" id="tgl_cr" name="tgl_cr" class="form-control datepicker" placeholder="Pilih tanggal CR" value="01 Oktober 2024">
+                      <input type="text" id="pp_cr" name="pp_cr" class="form-control datepicker" placeholder="Pilih tanggal PP" value="01 Oktober 2024">
                     </div>
                   </div>
                 </div>
@@ -50,10 +50,10 @@
               <div class="row">
                 <div class="col-sm-12">
                   <div class="form-group row">
-                    <label class="control-label text-start text-md-end col-md-2 col-form-label custom-col-md-2" for="select_buyer">Buyer</label>
+                    <label class="control-label text-start text-md-end col-md-2 col-form-label custom-col-md-2" for="select_vendor">Buyer</label>
                     <div class="col-md-10">
-                      <select id="select_buyer" name="select_buyer" class="form-select select2" data-placeholder="-- Pilih Buyer --">
-                        <option value="1">Yusuf</option>
+                      <select id="select_vendor" name="select_vendor" class="form-select select2" data-placeholder="-- Pilih Vendor --">
+                        <option value="1">Vendor Citraknitt 001</option>
                       </select>
                     </div>
                   </div>
@@ -80,10 +80,11 @@
                 <table class="table table-striped">
                   <thead>
                     <tr>
-                      <th>SI NO.</th>
-                      <th>SI DATE</th>
+                      <th>PO NO.</th>
+                      <th>PO DATE</th>
                       <th>DUE DATE</th>
-                      <th>INV. AMOUNT</th>
+                      <th>PO QTY STATUS</th>
+                      <th>PO. AMOUNT</th>
                       <th>PAID</th>
                       <th>REMAINING AMOUNT</th>
                       <th>PAYMENT AMOUNT</th>
@@ -91,9 +92,10 @@
                   </thead>
                   <tbody>
                     <tr>
-                      <td>SIV24100001</td>
+                      <td>POD24100001</td>
                       <td>01-10-2024</td>
                       <td>31-10-2024</td>
+                      <td>100/100</td>
                       <td class="text-nowrap">1.800.000,00</td>
                       <td class="text-nowrap">0,00</td>
                       <td class="text-nowrap">1.800.000,00</td>
@@ -109,10 +111,10 @@
 
               <div class="row">
                 <div class="col-sm-10">
-                  <a href="trans/customer-receipt" class="btn btn-default m-e-5">
+                  <a href="purchasing/purchase-payment" class="btn btn-default m-e-5">
                     <span class="fa fa-arrow-left"></span> Kembali
                   </a>
-                  <a href="trans/customer-receipt" class='btn btn-success'>
+                  <a href="purchasing/purchase-payment" class='btn btn-success'>
                     <span class="fa fa-save"></span> Simpan
                   </a>
                 </div>

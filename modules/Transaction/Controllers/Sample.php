@@ -108,8 +108,9 @@ class Sample extends BaseController
           "kode_sample" => $row->kode_sample,
           "tgl_deadline" => $row->tgl_deadline,
           "deskripsi" => $row->deskripsi,
-          "status" => $row->status == 0 ? "Draft" : "Submit",
+          "status" => $row->status == 0 ? "Draft" : "Approval",
           "file_gambar" => !empty($row->file_name) ? base_url() . "uploads/sample/"  . $row->file_name : "",
+          "uang_dp" => !empty($row->uang_dp) ? \format_angka($row->uang_dp) : 0,
           "detail" => $this->mSample->getDataDetailSample($row->id)
         )
       );
@@ -131,6 +132,7 @@ class Sample extends BaseController
       "deskripsi" => $results->deskripsi,
       "gambar_id" => $results->gambar_id,
       "status" => $results->status,
+      "uang_dp" =>  !empty($results->uang_dp) ? $results->uang_dp : 0,
       "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
       "detail" => $this->mSample->getDataDetailSample($results->id)
     );

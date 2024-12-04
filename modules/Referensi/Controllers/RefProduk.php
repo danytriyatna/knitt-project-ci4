@@ -11,6 +11,11 @@ class RefProduk extends BaseController
 
   public function index()
   {
+
+    if (!$this->auth->loggedIn()) {
+        return redirect()->to('/auth/login');
+    }
+
     $this->data['titlehead'] = "Produk";
     
     return view($this->views . '\produk\index', $this->data);

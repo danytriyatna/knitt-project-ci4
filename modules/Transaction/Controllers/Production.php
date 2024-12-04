@@ -10,6 +10,7 @@ use Modules\Transaction\Models\SalesOrderModel;
 use Modules\Transaction\Models\SampleModel;
 use Modules\Referensi\Models\ProsesProduksiModel;
 use Modules\Referensi\Models\OperatorModel;
+use Modules\Transaction\Models\DeliveryModel;
 
 class Production extends BaseController
 {
@@ -21,6 +22,7 @@ class Production extends BaseController
   protected $mWalkorder;
   protected $mPproduksi;
   protected $mOperator;
+  protected $mdelivery;
 
   function __construct()
   {
@@ -31,6 +33,7 @@ class Production extends BaseController
     $this->mWalkorder = new WalkorderModel();
     $this->mPproduksi = new ProsesProduksiModel();
     $this->mOperator = new OperatorModel();
+    $this->mdelivery = new DeliveryModel();
   }
 
   public function index()
@@ -90,7 +93,7 @@ class Production extends BaseController
       // $aktif =  ($row->active) ? "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/deactivate/".$id."' data-confirm-message='Anda yakin ingin menonaktifkan user ini?'><i class='fa fa-check text-success'>&nbsp;</i></a>" :
       //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
 
-      $status = $row->status == 1 ? "Draft" : "Submit";
+      $status = $row->status == 1 ? "Draft" : "Approved";
       $tipe = $row->tipe_id == 1 ? "Sample" : "Sales Order";
 
       $qty = $row->qty;
@@ -216,18 +219,38 @@ class Production extends BaseController
           $list_detail[$i]->qty_prod = 0;
         }
       }
+
+      $prms['id_walkorder'] = $resData->id_walkorder;
       $dataProses = $this->mProduksi->getDataProsesProd($resData->id_walkorder);
 
+      // get last qty ( untuk mengambil data yang suddah dikirim )
+      $parms['last_proses'] = 1;
+      $parms['id_walkorder'] = $resData->id_walkorder;
+      $dataLast = $this->mProduksi->getDataProsesProd($parms);
+      $this->data['last_data'] = !empty($dataLast) ? $dataLast[0] : [];
+
+      $qty_kirim = 0;
+      if(!empty($id)){
+        $param_dlv['id_produksi'] = $id;
+        $data_pengirimasn = $this->mdelivery->getData(null, 0, 9999, null, null, $param_dlv);
+
+        if(!empty($data_pengirimasn)){
+            foreach ($data_pengirimasn as $rd) {
+              $qty_kirim += $rd->qty_delv;
+            }
+        }
+      }
+      
       $sort = [
         [
           'field' => 'nama_operator',
           'dir' => 'ASC'
         ]
       ];
-
+ 
       $dataOperator = $this->mOperator->getData(null, 0, 99999, $sort);
 
-
+      $this->data['qty_kirim'] = $qty_kirim;
       $this->data['proses']    = $dataProses;
       $this->data['operator']    = $dataOperator;
       // $this->data['listProd']    = json_encode($detailProd);
@@ -288,6 +311,47 @@ class Production extends BaseController
       $build_array['data'] = json_encode($detailProd);
     }
 
+    return $this->response->setJSON($build_array);
+  }
+
+  function getDataProduksiUkuran(){
+    $id_walkorder = $this->request->getPost('walkorders');
+    $id_proses = $this->request->getPost('proses');
+
+    $id_walkorder = \decrypt($id_walkorder);
+    $params['id_walkorder'] = $id_walkorder;
+    $params['id_proses'] = $id_proses;
+    $result = $this->mWalkorder->getListProduksiUkuran($params);
+
+    $data    = [];
+    $msg     = "Pengambilan data berhasil";
+    $status  = true;
+
+    foreach ($result as $row) {
+      $id = encrypt($row->id);
+      
+      $qty_prod = !empty($row->qty_prod) ? $row->qty_prod : 0;
+      $qty = $row->qty - $qty_prod;
+
+      array_push(
+        $data,
+        array(
+          "id"                  => ($id),
+          "kode_warna"          => ($row->kode_warna),
+          "kode_ukuran"         => $row->kode_ukuran,
+          "id_ukuran"           => $row->id_ukuran,
+          "id_walkorder_proses" => $row->id_walkorder_proses,
+          "id_warna"            => $row->id_warna,
+          "ref_detail_id"       => $row->ref_detail_id,
+          "qty"                 => $qty,
+          "harga_satuan"        => $row->harga,
+        )
+      );
+    }
+
+    $build_array['data']    = $data;
+    $build_array['message'] = $msg;
+    $build_array['status']  = $status;
     return $this->response->setJSON($build_array);
   }
 }

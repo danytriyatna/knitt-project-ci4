@@ -346,6 +346,68 @@ class WalkorderModel extends \App\Models\PrModel
 
         return $this->_data;
     }
+
+    function getListProduksiUkuran($params){
+        $builder =  $this->db->table($this->table4 . ' twpu');
+        $builder->select("
+                            twpu.id, twpu.id_walkorder_proses, twpu.id_ukuran, twpu.qty, twpu.qty_prod, twpu.ref_detail_id,
+                            rk.kode_ukuran, rk.keterangan, rk.key_ukuran,
+                            twp.id_walkorder, tw.tipe_id,
+                            rw.kode_warna, rw.id as id_warna,
+                            (
+                                case when tw.tipe_id = 1 then 
+                                                    (select x.harga_satuan from trans_sample_ukuran x where x.id_sample_det = twpu.ref_detail_id and x.id_ukuran = twpu.id_ukuran)
+                                        when tw.tipe_id = 2 then 
+                                                    (select x.harga_satuan from trans_sales_order_ukuran x where x.id_sales_order_det = twpu.ref_detail_id and x.id_ukuran = twpu.id_ukuran)
+                                        else 0 end
+                            ) as harga,
+                            p.seq as proses,
+                            max(p.seq) OVER  (partition by twp.id_walkorder) as proses_akhir
+                        ");
+        $builder->join("ref_ukuran rk", "twpu.id_ukuran = rk.id", "inner");
+        $builder->join("trans_walkorder_proses twp", "twpu.id_walkorder_proses = twp.id", "inner");
+        $builder->join("_jenis_proses_produksi p ", "p.id = twp.id_proses", "inner");
+        $builder->join("trans_walkorder tw", "twp.id_walkorder = tw.id", "inner");
+        $builder->join("trans_sample_det tsd", "twpu.ref_detail_id = tsd.id and tw.tipe_id = 1", "left");
+        $builder->join("trans_sales_order_det tsod", "twpu.ref_detail_id = tsod.id and tw.tipe_id = 2", "left");
+        $builder->join("ref_warna rw", "rw.id = (case when tw.tipe_id = 1 then tsd.id_warna_1 when tw.tipe_id = 2 then tsod.id_warna_1 else -1 end)", "left");
+
+        if(!empty($params['id_walkorder'])){
+            $builder->where('tw.id', $params['id_walkorder']);
+        }
+
+        if(!empty($params['id_proses'])){
+            $builder->where('twp.id_proses', $params['id_proses']);
+        }
+
+        if(!empty($params['id_ukuran'])){
+            $builder->where('twp.id_ukuran', $params['id_ukuran']);
+        }
+
+        if(!empty($params['last_proses']) && !empty($params['id_walkorder'])){
+            $builder->where('twp.id_proses = (select max(tx.id_proses) from trans_walkorder_proses tx where tx.id_walkorder = '.$params['id_walkorder'].')');
+        }
+
+        if(!empty($params['kata_kunci'])){
+            $builder->groupStart();
+            $builder->where('LOWER(rw.kode_warna) LIKE', strtolower("%{$params['kata_kunci']}%"));
+            $builder->orWhere('LOWER(rk.kode_ukuran) LIKE', strtolower("%{$params['kata_kunci']}%"));
+            $builder->groupEnd();
+        }
+
+        // if (empty($params['offset'])) $params['offset'] = 0;
+        // if (empty($params['limit']))  $params['limit'] = 10;
+
+        // $builder->limit($params['limit'], $params['offset']);
+
+        $builder->orderBy("twp.id_walkorder desc, twpu.ref_detail_id, p.seq asc, twpu.id_ukuran");
+
+        $this->_data = $builder->get()->getResult();
+
+        return $this->_data;
+    }
+
+    
     // END PROSES UKURAN 
 
     // WARNA    

@@ -26,6 +26,7 @@ $(document).ready(function () {
     let noSampleText       = $('#noSampleText');
     let fotoText       = $('#fotoText');
     let rowDet = $("#rowDet")
+    let noSample = $("#no_sample");
 
     let isModal       = $("#modal-form-add-po");
     let isModalPO      = $("#modal-form-po");
@@ -348,6 +349,7 @@ $(document).ready(function () {
         inpTglTransaksi.val("")
         inpTglDeadline.val("")
         inpKetSample.val("")
+        noSample.val("");
         rowDet.hide()
         $("#btn-save").hide()
         $("#btn-draft").show()
@@ -457,6 +459,7 @@ $(document).ready(function () {
                 fileSampleOld.val(data.gambar_id)
                 inpKetSample.val(data.keterangan)
                 inpBuyer.val(data.id_konsumen).trigger('change')
+                noSample.val(data.kode_sample);
                 inpTglDeadline.val(formatterDate(data.tgl_deadline))
                 inpTglTransaksi.val(formatterDate(data.tgl_transaksi))
                 if(data.file_gambar){
@@ -489,6 +492,7 @@ $(document).ready(function () {
                 } else{
                     $("#btn-save-detail").show()
                 }
+                console.log(data);
                 noSampleText.html(data.kode_sample)
                 deskripsiText.html(data.deskripsi)
                 tglSampleText.html(`<i class="fa fa-calendar-day f-s-11"></i>&nbsp; ${formatterDate(data.tgl_transaksi)}`)

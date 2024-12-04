@@ -42,7 +42,7 @@ class ProductionModel extends \App\Models\PrModel
             if (!empty($order)) {
                 $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
             } else {
-                $builder->orderBy('abx.id');
+                $builder->orderBy('abx.id desc');
             }
 
             if (empty($offset)) $offset = 0;
@@ -75,21 +75,28 @@ class ProductionModel extends \App\Models\PrModel
             $builder->groupEnd();
         }
 
+        if (!empty($params['id_konsumen'])) {
+            $builder->where('abx.id_konsumen', $params['id_konsumen']);
+        }
+
         $this->_data = $builder->get()->getRow()->_cnt;
 
         return $this->_data;
     }
 
-    function getDataProsesProd($id)
+    function getDataProsesProd($params)
     {
         $builder = $this->db->table("trans_walkorder_proses abx");
-        $builder->select("bbx.seq,bbx.nama,bbx.id,SUM(qty) AS qty,SUM(qty_prod) AS qty_prod");
+        $builder->select("bbx.seq,bbx.nama,bbx.id ,SUM(COALESCE(qty, 0)) AS qty, SUM(COALESCE(qty_prod, 0)) AS qty_prod");
         $builder->join("_jenis_proses_produksi bbx", "abx.id_proses = bbx.id", "inner");
         $builder->join("trans_walkorder_proses_ukuran cbx", "cbx.id_walkorder_proses = abx.id", "inner");
-        $builder->where('abx.id_walkorder', $id);
-        $builder->groupBy("bbx.nama");
-        $builder->groupBy("bbx.seq");
-        $builder->groupBy("bbx.id");
+        if(!empty($params['id_walkorder'])){
+            $builder->where('abx.id_walkorder', $params['id_walkorder']);
+        }
+        if(!empty($params['last_proses']) && !empty($params['id_walkorder'])){
+            $builder->where('abx.id_proses = (select max(tx.id_proses) from trans_walkorder_proses tx where tx.id_walkorder = '.$params['id_walkorder'].')');
+        }
+        $builder->groupBy("bbx.nama, bbx.seq, bbx.id");
         $builder->orderBy("bbx.seq", "ASC");
         $this->_data = $builder->get()->getResult();
 
@@ -130,9 +137,11 @@ class ProductionModel extends \App\Models\PrModel
         $builder->join("ref_warna dbx", "abx.id_warna = dbx.id", "inner");
         $builder->join("ref_operator ebx", "abx.id_operator = ebx.id", "inner");
         $builder->where('abx.id_produksi', $id);
+
         if (!empty($tgl_transaksi)) {
             $builder->where('abx.tgl_transaksi', $tgl_transaksi);
         }
+        
         $builder->orderBy("abx.id", "ASC");
         $this->_data = $builder->get()->getResult();
 
@@ -160,6 +169,7 @@ class ProductionModel extends \App\Models\PrModel
                     "qty" => $rowData['qty'],
                     "harga" => $rowData['harga'],
                     "harga_total" => $rowData['harga_total'],
+                    "ref_detail_id" => $rowData['ref_detail_id'],
                     "active" => 1,
                     "flag" => 1,
                     "created_at" =>  date("Y-m-d H:i:s"),
@@ -172,16 +182,21 @@ class ProductionModel extends \App\Models\PrModel
                 $arrParam =  [
                     "id_walkorder_proses" => $rowData['id_walkorder_proses_ukuran'],
                     "id_ukuran" => $rowData['id_ukuran'],
+                    "ref_detail_id" => $rowData['ref_detail_id'],
                 ];
                 $this->updateRecords("trans_walkorder_proses_ukuran", $arrUpdData, $arrParam);
-                $arrUpdData2 = [
-                    "qty" => !empty($resQtyCurrent) ?  (float)$resQtyCurrent->qty_prod + (float)$rowData['qty']  : $rowData['qty']
-                ];
-                $arrParam2 =  [
-                    "id_walkorder_proses" => $resData->id,
-                    "id_ukuran" => $rowData['id_ukuran'],
-                ];
-                $this->updateRecords("trans_walkorder_proses_ukuran", $arrUpdData2, $arrParam2);
+               
+                if(!empty($resData)){
+                    $arrUpdData2 = [
+                        "qty" => !empty($resQtyCurrent) ?  (float)$resQtyCurrent->qty_prod + (float)$rowData['qty']  : $rowData['qty']
+                    ];
+                    $arrParam2 =  [
+                        "id_walkorder_proses" => $resData->id,
+                        "id_ukuran" => $rowData['id_ukuran'],
+                        "ref_detail_id" => $rowData['ref_detail_id'],
+                    ];
+                    $this->updateRecords("trans_walkorder_proses_ukuran", $arrUpdData2, $arrParam2);
+                }
             }
             $this->db->transComplete();
 
@@ -195,4 +210,52 @@ class ProductionModel extends \App\Models\PrModel
             throw $e;
         }
     }
+
+    function getProduksilast($params){
+        $id_walkorder = $params['id_walkorder'];
+         // Dynamic Columns
+         $col1 = "";
+         $col2 = "";
+         $col3 = "";
+         $ukuranArr = explode(",", $params['ukuran']);
+         foreach ($ukuranArr as $item) {
+             $col1 .= ($col1 == "") ? "coalesce(tbl.$item,0) as $item" : ",coalesce(tbl.$item,0) as $item";
+             $col2 .= ($col2 == "") ? "$item Int" : ",$item Int";
+         }
+
+        $sql = "
+            select 
+                tbl.ref_detail_id,
+                tbl.id_walkorder,
+                tbl.id_proses,
+                tw.tipe_id,
+                rw.kode_warna,
+                {$col1}
+            from
+                CROSSTAB(
+                    'select 
+                        twpu.ref_detail_id,
+                        twp.id_walkorder,
+                        twp.id_proses,
+                        rk.key_ukuran,
+                        COALESCE(twpu.qty_prod, 0) as qty_prod
+                    from trans_walkorder_proses_ukuran twpu
+                    inner join trans_walkorder_proses twp on twp.id = twpu.id_walkorder_proses
+                    inner join ref_ukuran rk on rk.id = twpu.id_ukuran
+                    where twp.id_walkorder = ".$id_walkorder." and  twp.id_proses = (select max(tx.id_proses) from trans_walkorder_proses tx where tx.id_walkorder = ".$id_walkorder.")
+                    order by twpu.ref_detail_id, twp.id_proses asc, twpu.id_ukuran',
+                'select key_ukuran from ref_ukuran rx where rx.active = 1 order by rx.seq asc'
+            ) as tbl (ref_detail_id int, id_walkorder int, id_proses int, {$col2})
+            inner join trans_walkorder tw on tbl.id_walkorder = tw.id
+            left join trans_sample_det tsd on tbl.ref_detail_id = tsd.id and tw.tipe_id = 1
+            left join trans_sales_order_det tsod on tbl.ref_detail_id = tsod.id and tw.tipe_id = 2
+            left join ref_warna rw on rw.id = (case when tw.tipe_id = 1 then tsd.id_warna_1 when tw.tipe_id = 2 then tsod.id_warna_1 else -1 end)
+        ";
+
+        $query = $this->db->query($sql);
+
+        $this->_data = $query->getResult();
+
+        return $this->_data;
+    }   
 }

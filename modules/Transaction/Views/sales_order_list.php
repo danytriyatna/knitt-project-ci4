@@ -79,6 +79,19 @@
             </div>
           </div>
         </div>
+
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="tgl_deadline">DownPayment</label>
+          <div class="col-md-9">
+            <input type="number" name="uang_dp" value="" id="uang_dp" min="0" step="1" pattern="[0-9]*" class="form-control" 
+                 placeholder="[0-9]" data-politespace="" data-politespace-grouplength="3" data-politespace-delimiter="," 
+                 data-politespace-reverse="" data-politespace-decimal-mark=".">
+            <div class="invalid-feedback">
+              Deadline tidak valid
+            </div>
+          </div>
+        </div>
+
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="ket_sales_order">Keterangan</label>
           <div class="col-md-9">
@@ -109,7 +122,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="m-s-5 btn btn-success" id="btn-save"> <i class="fa fa-save"></i> Simpan</button>
-        <button type="button" class="m-s-5 btn btn-info" id="btn-send"> <i class="fa fa-paper-plane"></i> Submit</button>
+        <button type="button" class="m-s-5 btn btn-info" id="btn-send"> <i class="fa fa-paper-plane"></i> Approval</button>
       </div>
     </div>
   </div>

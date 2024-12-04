@@ -28,6 +28,12 @@
   <!-- Bootstrap Datepicker - https://bootstrap-datepicker.readthedocs.io/en/latest/index.html -->
   <link href="assets/node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
   <!-- Custom CSS, generated from /sass -->
+ <!-- politespace - https://github.com/filamentgroup/politespace -->
+ <link href="assets/node_modules/politespace/dist/politespace.css" rel="stylesheet">
+
+ <link href="assets/node_modules/jquery-ui-bundle/jquery-ui.min.css" rel="stylesheet">
+ <link href="assets/node_modules/jquery-ui-bundle/jquery-ui.theme.min.css" rel="stylesheet">
+
   <link href="assets/css/custom.min.css" rel="stylesheet">
   <script>
     var baseUrl = '<?= base_url() ?>'
@@ -96,13 +102,20 @@
   <!-- Bootstrap Datepicker - https://bootstrap-datepicker.readthedocs.io/en/latest/index.html -->
   <script src="assets/node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
   <script src="assets/node_modules/bootstrap-datepicker/js/locales/bootstrap-datepicker.id.js"></script>
+  <!-- politespace - https://github.com/filamentgroup/politespace -->
+  <script src="assets/node_modules/politespace/dist/politespace.js"></script>
+  <script src="assets/node_modules/politespace/dist/politespace-init.js"></script>
+
   <!-- Theme JS -->
   <script src="assets/js/perfect-scrollbar.jquery.min.js"></script>
   <script src="assets/js/waves.js"></script>
   <script src="assets/js/sidebarmenu.js"></script>
   <script src="assets/js/script.min.js"></script>
-  <!-- Custom JS -->
   <script src="assets/js/custom.js"></script>
+  <script src="assets/js/jquery.mask.min.js"></script>
+  <script src="assets/node_modules/jquery-ui-bundle/jquery-ui.min.js"></script>
+  <!-- Custom JS -->
+
   <script>
     showWelcomeToast("<?= $currentUser->full_name ?>");
   </script>

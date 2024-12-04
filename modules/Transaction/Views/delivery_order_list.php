@@ -29,20 +29,20 @@
         <div class="card-body">
           <div class="row">
             <div class="col-sm-3">
-              <div class="form-group m-b-0 d-flex align-items-center">
-                <label class="control-label text-start text-md-end m-e-8" for="filter_status">Status</label>
-                <select id="filter_status" name="filter_status" class="form-control custom-select select2">
-                  <option value="0">All</option>
-                  <option value="1">Draft</option>
-                  <option value="2">Process</option>
-                  <option value="3">Done</option>
-                </select>
+              <a href="/trans/delivery-order/add" class="btn btn-success"><i class="fa fa-plus"></i> Tambah</a>
+            </div>
+            <div class="col-sm-4 offset-md-5">
+              <div class="form-group">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-white" id="basic-addon11" style="border-right-width: 0px;"><i class="ti-search"></i></span>
+                  <input type="text" id="tb-search" class="form-control p-s-0" id="tb-search" placeholder="Pencarian" aria-describedby="basic-addon11" style="border-left-width: 0px;">
+                </div>
               </div>
             </div>
           </div>
           <hr>
           <div class="table-responsive">
-            <table class="table table-striped datatable">
+            <!-- <table class="table table-striped datatable">
               <thead>
                 <tr>
                   <th style="min-width: 105px; width: 105px;">
@@ -89,7 +89,8 @@
                 </tr>
                 <?php endfor; ?>
               </tbody>
-            </table>
+            </table> -->
+            <div class="table-striped" id="dt-list"></div>
           </div>
         </div>
       </div>
@@ -98,3 +99,6 @@
 </div>
 
 <?= $this->endSection('content'); ?>
+<?= $this->section('script'); ?>
+<script src="script/app/transaction/delivery/index.js"></script>
+<?= $this->endSection('script'); ?>

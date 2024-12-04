@@ -1,0 +1,235 @@
+<?php
+
+namespace Modules\Transaction\Models;
+
+class InvoiceModel extends \App\Models\PrModel
+{
+
+    protected $table = "trans_invoice";
+    protected $table2 = "trans_invoice_detail";
+    protected $table3 = "trans_invoice_delivery";
+    protected $_data = null;
+    protected $primaryKey = 'id';
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    function getData($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
+    {
+        $builder = $this->db->table($this->table . " abx");
+
+        $builder->select("abx.id, abx.tgl_transaksi,  abx.kode_invoice, abx.keterangan, abx.id_konsumen,
+                            abx.status, abx.total, abx.diskon,  abx.pph, abx.pph_total, abx.grand_total,
+                            bbx.nama as konsumen_nama");
+
+        $builder->join("ref_konsumen bbx", "abx.id_konsumen = bbx.id", "inner");
+
+        if ($id == null or $id == "") {
+            $builder->where('abx.active = 1');
+            if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+                $builder->groupStart();
+                    $builder->where('LOWER(abx.kode_invoice) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(bbx.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->groupEnd();
+            }
+
+            if (!empty($params['id_konsumen'])) {
+                $builder->where('abx.id_konsumen', $params['id_konsumen']);
+            }
+
+            if (!empty($order)) {
+                $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
+            } else {
+                $builder->orderBy('abx.id desc');
+            }
+
+            if (empty($offset)) $offset = 0;
+            if (empty($limit)) $limit = 10;
+
+            $builder->limit($limit, $offset);
+
+            $this->_data = $builder->get()->getResult();
+        } else {
+            $builder->where("abx.id", $id);
+
+            $this->_data = $builder->get()->getRow();
+        }
+
+        return $this->_data;
+    }
+
+    function getDataCnt($filters = null, $params = null)
+    {
+        $builder = $this->db->table($this->table . " abx");
+        
+        $builder->select("count(1) as _cnt");
+        $builder->join("ref_konsumen bbx", "abx.id_konsumen = bbx.id", "inner");
+        $builder->where('abx.active = 1');
+
+        if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+            $builder->groupStart();
+                $builder->where('LOWER(abx.kode_invoice) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(bbx.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->groupEnd();
+        }
+
+        $this->_data = $builder->get()->getRow()->_cnt;
+
+        return $this->_data;
+    }
+
+    function getDataDetail($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
+    {
+        $builder = $this->db->table($this->table2 . " abx");
+
+        $builder->select(" abx.id, abx.id_invoice,  abx.id_ref, abx.kode_ref, abx.tipe_id,
+                            abx.qty, abx.qty_do,  abx.total, abx.down_payment, abx.grand_total
+                            (case when abx.tipe_id = 1 then ts.kode_sample else tso.kode_sales_order end) as ref_kode,
+                            (case when abx.tipe_id = 1 then ts.tgl_transaksi else tso.tgl_transaksi end) as ref_tgl");
+
+        $builder->join("trans_sample_det ts", "ts.id = abx.id_ref and abx.tipe_id = 1", "left");
+        $builder->join("trans_sales_order_det tso", "tso.id = abx.id_ref and abx.tipe_id = 2", "left");
+
+        if ($id == null or $id == "") {
+            $builder->where('abx.active = 1');
+            if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+                $builder->groupStart();
+                    $builder->where('LOWER(abx.kode_sample) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(bbx.kode_sales_order) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->groupEnd();
+            }
+
+            if (!empty($params['id_invoice'])) {
+                $builder->where('abx.id_invoice', $params['id_invoice']);
+            }
+
+            if (!empty($order)) {
+                $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
+            } else {
+                $builder->orderBy('abx.id desc');
+            }
+
+            if (empty($offset)) $offset = 0;
+            if (empty($limit)) $limit = 10;
+
+            $builder->limit($limit, $offset);
+
+            $this->_data = $builder->get()->getResult();
+        } else {
+            $builder->where("abx.id", $id);
+
+            $this->_data = $builder->get()->getRow();
+        }
+
+        return $this->_data;
+    }
+
+    function getDataDetailCnt($filters = null, $params = null)
+    {
+        $builder = $this->db->table($this->table2 . " abx");
+        
+        $builder->select("count(1) as _cnt");
+        $builder->join("trans_sample_det ts", "ts.id = abx.id_ref and abx.tipe_id = 1", "left");
+        $builder->join("trans_sales_order_det tso", "tso.id = abx.id_ref and abx.tipe_id = 2", "left");
+        $builder->where('abx.active = 1');
+
+        $builder->groupStart();
+            $builder->where('LOWER(abx.kode_sample) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(bbx.kode_sales_order) LIKE', strtolower("%{$filters[0]['value']}%"));
+        $builder->groupEnd();
+
+        $this->_data = $builder->get()->getRow()->_cnt;
+
+        return $this->_data;
+    }
+
+    function get_walkorder_konsumen($params){
+        $builder = $this->db->table('trans_walkorder tw');
+        $builder->select("  tw.id,
+                            tw.tgl_transaksi,
+                            tw.kode_walkorder,
+                            tw.tipe_id,
+                            tw.ref_kode,
+                            tw.status,
+                            tw.keterangan_style,
+                            tw.qty,
+                            rk.nama as konsumen_nama,
+                            
+                            ts.id as sample_id,
+                            ts.kode_sample,
+                            ts.qty as qty_sample,
+                            ts.total_harga as total_sample,
+                            ts.uang_dp as dp_sample,
+
+                            tso.id as so_id,
+                            tso.kode_sales_order,
+                            (
+                                SELECT SUM(xx.qty)
+                                FROM trans_sales_order_ukuran xx
+                                INNER JOIN trans_sales_order_det x ON x.id = xx.id_sales_order_det
+                                WHERE x.id_sales_order = tso.id
+                                GROUP BY x.id_sales_order
+                            ) AS qty_so,
+                            tso.total_harga as total_so,
+                            tso.uang_dp as dp_so,
+                            SUM(td.qty) FILTER (WHERE td.id IS NOT NULL) OVER (PARTITION BY tw.id) AS deliver_qty
+                        ");
+        $builder->join("trans_sample ts", "ts.id = tw.ref_id and tw.tipe_id = 1", "left");
+        $builder->join("trans_sales_order tso", "tso.id = tw.ref_id and tw.tipe_id = 2", "left");
+        $builder->join("ref_konsumen rk", "tw.id_konsumen = rk.id", "inner");
+        $builder->join("trans_delivery td", "td.id_walkorder = tw.id", "left");
+
+        $builder->where("tw.id_konsumen", $params['konsumen_id']);
+
+        $builder->orderBy('tw.id desc');
+        $this->_data = $builder->get()->getResult();
+        return $this->_data;
+    }
+
+    function getDetail_delivery($params){
+        $id_walkorder = $params['id_walkorder'];
+         // Dynamic Columns
+         $col1 = "";
+         $col2 = "";
+         $col3 = "";
+         $ukuranArr = explode(",", $params['ukuran']);
+         foreach ($ukuranArr as $item) {
+             $col1 .= ($col1 == "") ? "coalesce(tbl.$item,0) as $item" : ",coalesce(tbl.$item,0) as $item";
+             $col2 .= ($col2 == "") ? "$item Int" : ",$item Int";
+         }
+
+        $sql = "
+            select 
+                *
+            from
+                CROSSTAB(
+                     'select 
+                        twpu.ref_detail_id,
+                        twpu.id_delivery,
+                        twp.delivery_kode,
+                        rw.kode_warna,
+                        tw.tipe_id,
+                        rk.key_ukuran,
+                        COALESCE(twpu.qty, 0) as qty_prod
+                    from trans_delivery_detail twpu
+                    inner join trans_delivery twp on twp.id = twpu.id_delivery
+                    inner join trans_walkorder tw on tw.id = twp.id_walkorder
+                    inner join ref_ukuran rk on rk.id = twpu.id_ukuran
+                    LEFT JOIN trans_sample_det ts ON ts.id = twpu.ref_detail_id AND tw.tipe_id = 1
+                    LEFT JOIN trans_sales_order_det tso ON tso.id = twpu.ref_detail_id AND tw.tipe_id = 2
+                    left join ref_warna rw on rw.id = (case when tw.tipe_id = 1 then ts.id_warna_1 when tw.tipe_id = 2 then tso.id_warna_1 else -1 end)
+                    where tw.id = {$id_walkorder}
+                    order by twpu.ref_detail_id, twpu.id_ukuran',
+                'select key_ukuran from ref_ukuran rx where rx.active = 1 order by rx.seq asc'
+            ) as tbl (ref_detail_id int, id_delivery int, delivery_kode varchar, kode_warna varchar, tipe_id int, {$col2})
+        ";
+
+        $query = $this->db->query($sql);
+
+        $this->_data = $query->getResult();
+
+        return $this->_data;
+    }
+}

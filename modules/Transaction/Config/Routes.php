@@ -27,7 +27,14 @@ $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Control
 
 $routes->group('trans/delivery-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'DeliveryOrder::index');
-  $routes->get('form', 'DeliveryOrder::form');
+  $routes->post('list', 'DeliveryOrder::lists');
+  $routes->post('list_produksi', 'DeliveryOrder::lists_produksi');
+  $routes->get('add', 'DeliveryOrder::form');
+  $routes->post('add', 'DeliveryOrder::form');
+  $routes->get('form/(:any)', 'DeliveryOrder::form/$1');
+  $routes->post('form/(:any)', 'DeliveryOrder::form/$1');
+  $routes->post('det_produksi', 'DeliveryOrder::getDataProduksi');
+  $routes->post('cari_produk', 'DeliveryOrder::getDataProduksiItem');
 });
 
 $routes->group('trans/work-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
@@ -46,15 +53,52 @@ $routes->group('trans/production', ['namespace' => 'Modules\Transaction\Controll
   $routes->post('save', 'Production::save');
   $routes->post('list', 'Production::lists');
   $routes->post('list_ukuran', 'Production::lists_ukuran');
+  $routes->post('list_ukuran_prod', 'Production::getDataProduksiUkuran');
   $routes->post('list_detail', 'Production::getDataListProd');
 });
 
 $routes->group('trans/sales-invoice', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'SalesInvoice::index');
-  $routes->get('form', 'SalesInvoice::form');
+  $routes->post('list', 'SalesInvoice::lists');
+  $routes->post('list_produksi', 'SalesInvoice::lists_produksi');
+  $routes->get('add', 'SalesInvoice::form');
+  $routes->post('add', 'SalesInvoice::form');
+  $routes->get('form/(:any)', 'SalesInvoice::form/$1');
+  $routes->post('form/(:any)', 'SalesInvoice::form/$1');
+  $routes->post('get_order', 'SalesInvoice::walkorder_user');
+  $routes->post('cari_produk', 'SalesInvoice::getDataProduksiItem');
 });
 
 $routes->group('trans/customer-receipt', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'CustomerReceipt::index');
   $routes->get('form', 'CustomerReceipt::form');
+});
+
+$routes->group('trans/item-transfer', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
+  $routes->get('/', 'ItemTransfer::index');
+  $routes->get('form', 'ItemTransfer::form');
+});
+
+$routes->group('trans/receive-item', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
+  $routes->get('/', 'ReceiveItem::index');
+  $routes->get('form', 'ReceiveItem::form');
+});
+
+$routes->group('trans/issue-item', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
+  $routes->get('/', 'IssueItem::index');
+  $routes->get('form', 'IssueItem::form');
+});
+$routes->group('trans/incoming-goods', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
+  $routes->get('/', 'IncomingGoods::index');
+  $routes->post('list', 'IncomingGoods::lists');
+  $routes->get('form', 'IncomingGoods::form');
+  $routes->post('last-stock', 'IncomingGoods::getLastStock');
+  $routes->post('simpan', 'IncomingGoods::save');
+});
+$routes->group('trans/outgoing-goods', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
+  $routes->get('/', 'OutgoingGoods::index');
+  $routes->post('list', 'OutgoingGoods::lists');
+  $routes->get('form', 'OutgoingGoods::form');
+  $routes->post('last-stock', 'OutgoingGoods::getLastStock');
+  $routes->post('simpan', 'OutgoingGoods::save');
 });

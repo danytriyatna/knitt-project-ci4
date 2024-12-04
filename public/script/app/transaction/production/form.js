@@ -183,12 +183,32 @@ $(document).ready(function () {
             {title:"Operator", field:"operator", hozAlign:"left",width:"15%"},
             {title:"Size", field:"kode_ukuran", hozAlign:"left",width:"5%"},
             {title:"QTY", field:"qty", hozAlign:"center",width:"10%",editor: "number",cellEdited: updateTotal},
-            {title:"Price", field:"harga", hozAlign:"right",width:"15%",formatter: "money",formatterParams: {
-                decimal: ",",
-                thousand: ".",
-                symbol: "Rp",  // Simbol mata uang Rupiah
-                precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right"},
+            {title:"Price", field:"harga", hozAlign:"right",width:"15%",formatter: "money", editor:"number",formatterParams: {
+                    decimal: ",",
+                    thousand: ".",
+                    symbol: "Rp",  // Simbol mata uang Rupiah
+                    precision: 0,   // Tidak ada desimal
+                }, hozAlign:"right",
+                cellEdited: function (cell) {
+
+                    let rowData = cell.getRow().getData();
+                    let tableColumn = cell._cell.column.cells;
+                    let total_harga = 0;
+
+                    let val_qty   = rowData.qty ? rowData.qty : 0;
+                    let val_harga = rowData.harga ? rowData.harga : 0;
+                    // let val_persen = total_gram > 0 ? (rowData.gram/total_gram) * 100 : 0;
+                    //     val_persen = val_persen > 0 ? val_persen.toFixed(2) : 0;
+                    total_harga = val_harga * val_qty;
+        
+                    // Set nilai total di baris yang sama
+                    cell.getRow().update({ 
+                        // persen: val_persen,
+                        harga       : val_harga,
+                        harga_total : total_harga
+                     });
+                },
+            },
             {title:"Total", width:"15%", field:"harga_total",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
@@ -203,79 +223,109 @@ $(document).ready(function () {
     
 
     // Table Penguji
+    // let dtListUkuran = new Tabulator("#dt-list-ukuran", {
+    //     columns: [
+    //     {title:"ID", field:"id", visible:false},
+    //     {field:"id_ukuran", visible:false},
+    //     {field:"id_warna", visible:false},
+    //     {field:"id_walkorder_proses", visible:false},
+    //     {
+    //         title: 'Colour', field: 'kode_warna', headerSort:true, formatter: "html", sorter: 'string',
+    //         width: '30%'
+    //     }, 
+  
+    //     {
+    //         title: 'Size', field: 'kode_ukuran', headerSort:false, formatter: "html", sorter: 'string',
+    //         width: '30%'
+    //     }, 
+  
+    //     {
+    //         title: 'QTY', field: 'qty', headerSort:false, formatter: "html", sorter: 'string', visible:false,
+    //         width: '15%'
+    //     }, 
+  
+    //     {
+    //         title: 'Amount', field: 'harga_satuan', headerSort:false, formatter: "html",
+    //         width: '40%',formatter: "money", formatterParams: {
+    //             decimal: ",",
+    //             thousand: ".",
+    //             symbol: "Rp",  // Simbol mata uang Rupiah
+    //             precision: 0,   // Tidak ada desimal
+    //         }, hozAlign:"right"
+    //     }, 
+    //     ],
+    //     ajaxURL: "trans/production/list_ukuran",
+    //     ajaxConfig: "POST",
+    //     sortMode: "remote",
+    //     filterMode: "remote",
+    //     dataTree:true,
+    //     dataTreeStartExpanded:true,
+    //     ajaxRequesting: function (url, params) {
+    //         params.start = params.size * (params.page - 1);
+    //         params.length = params.size;
+    //         params.tipe_id = $("#tipe_id").val()
+    //         params.ref_id = $("#ref_id").val()
+    //         params.id_proses = statusProses.val()
+    //     },
+    //     ajaxResponse: function (url, params, response) {
+    //         let pageSize = dtListUkuran.getPageSize();
+    //         let pageNo = dtListUkuran.getPage();
+    //         let startRow = (pageSize * (pageNo - 1)) + 1;
+    //         let endRow = response.data.length + startRow - 1;
+  
+    //         if (response.data.length === 0) {
+    //             startRow = 0; endRow = 0;
+    //         }
+    //         let recordsFiltered = parseInt(response.recordsFiltered);
+    //         let recordsTotal = parseInt(response.recordsTotal);
+  
+    //         $("#table-footer2 .tabulator-startrow").text(startRow);
+    //         $("#table-footer2 .tabulator-endrow").text(endRow);
+    //         $("#table-footer2 .tabulator-totalrow").text(recordsFiltered);
+  
+    //         let elTotalFilteredRow = $("#table-footer2 .tabulator-totalfilteredrow");
+    //         elTotalFilteredRow.text("");
+    //         if (recordsTotal > recordsFiltered) {
+    //             elTotalFilteredRow.text(" (disaring dari " + recordsTotal
+    //                 + " entri keseluruhan)");
+    //         }
+    //         return response;
+    //     },
+    //     footerElement: '<div id="table-footer2" class="pull-left tabulator-info">'
+    //         + 'Menampilkan <span class="tabulator-startrow"></span> - <span class="tabulator-endrow"></span> dari '
+    //         + '<span class="tabulator-totalrow"></span> entri<span class="tabulator-totalfilteredrow"></span></div>',
+    //     pagination: true,
+    //     paginationMode: "remote",
+    //     paginationSize: 10,
+    //     paginationButtonCount: 10,
+    //     dataSendParams: {
+    //         sorters: "order"
+    //     },
+    //     selectableRows: true,
+    // });
+
     let dtListUkuran = new Tabulator("#dt-list-ukuran", {
         columns: [
-        {title:"ID", field:"id", visible:false},
-        {field:"id_ukuran", visible:false},
-        {field:"id_warna", visible:false},
-        {field:"id_walkorder_proses", visible:false},
-        {
-            title: 'Colour', field: 'kode_warna', headerSort:true, formatter: "html", sorter: 'string',
-            width: '30%'
-        }, 
-  
-        {
-            title: 'Size', field: 'kode_ukuran', headerSort:false, formatter: "html", sorter: 'string',
-            width: '30%'
-        }, 
-  
-        {
-            title: 'QTY', field: 'qty', headerSort:false, formatter: "html", sorter: 'string', visible:false,
-            width: '15%'
-        }, 
-  
-        {
-            title: 'Amount', field: 'harga_satuan', headerSort:false, formatter: "html",
-            width: '40%',formatter: "money", formatterParams: {
-                decimal: ",",
-                thousand: ".",
-                symbol: "Rp",  // Simbol mata uang Rupiah
-                precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right"
-        }, 
+            {
+                title: 'Colour', field: 'kode_warna', headerSort:true, formatter: "html", sorter: 'string',
+                width: '40%', headerFilter:"input"
+            }, 
+    
+            {
+                title: 'Size', field: 'kode_ukuran', headerSort:false, formatter: "html", sorter: 'string',
+                width: '30%'
+            }, 
+    
+            {
+                title: 'QTY', field: 'qty', headerSort:false, formatter: "html", sorter: 'string',
+                width: '30%', hozAlign: 'center'
+            }, 
         ],
-        ajaxURL: "trans/production/list_ukuran",
-        ajaxConfig: "POST",
-        sortMode: "remote",
-        filterMode: "remote",
-        dataTree:true,
-        dataTreeStartExpanded:true,
-        ajaxRequesting: function (url, params) {
-            params.start = params.size * (params.page - 1);
-            params.length = params.size;
-            params.tipe_id = $("#tipe_id").val()
-            params.ref_id = $("#ref_id").val()
-            params.id_proses = statusProses.val()
-        },
-        ajaxResponse: function (url, params, response) {
-            let pageSize = dtListUkuran.getPageSize();
-            let pageNo = dtListUkuran.getPage();
-            let startRow = (pageSize * (pageNo - 1)) + 1;
-            let endRow = response.data.length + startRow - 1;
-  
-            if (response.data.length === 0) {
-                startRow = 0; endRow = 0;
-            }
-            let recordsFiltered = parseInt(response.recordsFiltered);
-            let recordsTotal = parseInt(response.recordsTotal);
-  
-            $("#table-footer2 .tabulator-startrow").text(startRow);
-            $("#table-footer2 .tabulator-endrow").text(endRow);
-            $("#table-footer2 .tabulator-totalrow").text(recordsFiltered);
-  
-            let elTotalFilteredRow = $("#table-footer2 .tabulator-totalfilteredrow");
-            elTotalFilteredRow.text("");
-            if (recordsTotal > recordsFiltered) {
-                elTotalFilteredRow.text(" (disaring dari " + recordsTotal
-                    + " entri keseluruhan)");
-            }
-            return response;
-        },
-        footerElement: '<div id="table-footer2" class="pull-left tabulator-info">'
-            + 'Menampilkan <span class="tabulator-startrow"></span> - <span class="tabulator-endrow"></span> dari '
-            + '<span class="tabulator-totalrow"></span> entri<span class="tabulator-totalfilteredrow"></span></div>',
+        // layout: 'fitColumns',
+        locale: 'id',
+        placeholder: "Tidak ada data",
         pagination: true,
-        paginationMode: "remote",
+        paginationMode: "local",
         paginationSize: 10,
         paginationButtonCount: 10,
         dataSendParams: {
@@ -283,6 +333,62 @@ $(document).ready(function () {
         },
         selectableRows: true,
     });
+
+    function load_ukuran_data(){
+        let inpWO  = $("#id_walkorder").val()
+        let inpPro = $("#filter_status").val();
+
+        $.ajax({
+            type: 'POST',
+            url: '/trans/production/list_ukuran_prod',
+            data: {
+                proses     : inpPro,
+                walkorders : inpWO,
+            },
+            dataType: "json",
+            beforeSend: function () {
+                Swal.fire({
+                    title: 'Loading...',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    onBeforeOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+            },
+            success: function (response) {
+                Swal.close();
+                if(response.status == true){
+                    dtListUkuran.setData(response.data);
+                    
+                    setTimeout(() => {
+                        $("#modal-list-wo").modal("show");
+                        setTimeout(() => {
+                            dtListUkuran.redraw(true);
+                        }, 600);
+                    }, 500);
+                }else{
+                    Swal.fire({
+                        text: response.message,
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            },
+            error: function (e) {
+                let msg = e.responseJSON.message;
+                Swal.close();
+    
+                Swal.fire({
+                    text: msg,
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            },
+        });
+    }
   
     dtListUkuran.on("rowClick", function(e, row){
         let data =  row.getData()
@@ -305,14 +411,16 @@ $(document).ready(function () {
                 timer: 2000
             });
         }
-        if(!isNumeric(arrOperator[1])){
-            return Swal.fire({
-                text: "Harga Operator harus ditentukan direferensi",
-                icon: 'error',
-                showConfirmButton: false,
-                timer: 2000
-            });
-        }
+
+        // if(!isNumeric(arrOperator[1])){
+        //     return Swal.fire({
+        //         text: "Harga Operator harus ditentukan direferensi",
+        //         icon: 'error',
+        //         showConfirmButton: false,
+        //         timer: 2000
+        //     });
+        // }
+
         if (tglTransaksi.val().length == 0){
             return Swal.fire({
                 text: "Tanggal harus diisi",
@@ -350,22 +458,25 @@ $(document).ready(function () {
             });
         }
 
+        // console.log(data.id_walkorder_proses_ukuran)
+
         dtListProd.addRow({
-            id:data.id,
-            kode_warna:data.kode_warna,
-            kode_ukuran:data.kode_ukuran,
-            id_ukuran:data.id_ukuran,
-            id_warna:data.id_warna,
-            harga:arrOperator[1],
-            qty:1,
-            harga_total:arrOperator[1],
-            flag:0,
-            id_walkorder_proses_ukuran:data.id_walkorder_proses,
-            id_proses:statusProses.val(),
-            id_operator:arrOperator[0],
-            operator:$('#filter_operator option:selected').text(),
-            process:$('#filter_status option:selected').text(),
-            date:formatLocaleDate(tglTransaksi.val())
+            id                          : data.id,
+            kode_warna                  : data.kode_warna,
+            kode_ukuran                 : data.kode_ukuran,
+            id_ukuran                   : data.id_ukuran,
+            id_warna                    : data.id_warna,
+            ref_detail_id               : data.ref_detail_id,
+            harga                       : 0,
+            qty                         : 1,
+            harga_total                 : 0,
+            flag                        : 0,
+            id_walkorder_proses_ukuran  : data.id_walkorder_proses,
+            id_proses                   : statusProses.val(),
+            id_operator                 : operator.val(),
+            operator                    : $('#filter_operator option:selected').text(),
+            process                     : $('#filter_status option:selected').text(),
+            date                        : formatLocaleDate(tglTransaksi.val())
             
         });
       
@@ -393,7 +504,8 @@ $(document).ready(function () {
         let row = cell.getRow();
         if (row) { 
             const selectedProses = prosesMap[statusProses.val()];
-            if (selectedProses && row.getData().qty >= $(selectedProses).val()) {
+            
+            if (!(row.getData().qty <= $(selectedProses).val())) {
                 cell.restoreOldValue();
                 Swal.fire({
                     text: "Quantity tidak boleh melebihi stok.",
@@ -401,9 +513,11 @@ $(document).ready(function () {
                     showConfirmButton: false,
                     timer: 2000
                 });
+            }else{
+                let newTotal = calculateTotal(row.getData());
+                row.update({ harga_total: newTotal });
             }
-            let newTotal = calculateTotal(row.getData());
-            row.update({ harga_total: newTotal });
+            
         } 
     }
     function formatLocaleDate(localeDate) {
@@ -432,7 +546,11 @@ $(document).ready(function () {
     }
 
     tglTransaksi.change(function(e){
-        let date = formatLocaleDate(e.target.value)
+        get_detailData(e.target.value)
+    })
+    get_detailData();
+    function get_detailData(tgl){
+        let date = tgl != undefined ? formatLocaleDate(tgl) : ''
         let idProduksi =  $("#id_produksi").val()
         $.ajax({
             type: 'POST',
@@ -491,12 +609,13 @@ $(document).ready(function () {
                 });
             },
         });
-    })
+    }
 
     $("#btn-add-detail").click(function () {
-            dtListUkuran.setData()
-            $("#modal-list-wo").modal("show");
-            dtListUkuran.deselectRow();
+            // dtListUkuran.setData()
+            // $("#modal-list-wo").modal("show");
+            load_ukuran_data();
+            // dtListUkuran.deselectRow();
     });
 
     $("#btn-save-ukuran").on("click", function(e){
