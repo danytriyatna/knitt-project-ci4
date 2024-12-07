@@ -89,6 +89,32 @@ class RefKonsumen extends BaseController
         return $this->response->setJSON($build_array);
     }
 
+    public function getStyle_data(){
+        $id_konsumen = $this->request->getPost('konsumen');
+
+        $status = false;
+        $msg    = "Konsumen belum memiliki style";
+        $data   = [];
+        try {
+            $id_konsumen = \decrypt($id_konsumen);
+            $params['id_konsumen'] = $id_konsumen;
+            $style_data = $this->mkonsumen->getDataStyle(null, 0, 999, null, null, $params);
+            if(!empty($style_data)){
+                $data   = $style_data;
+                $status = false;
+                $msg    = "Berhasil mengambil data Styke Konsumen !";
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+            $msg    = "Gagal mengambil data Style Konsumen !";
+        }
+
+        $build_array['status']  = $status;
+        $build_array['message'] = $msg;
+        $build_array['data']    = $data;
+        return $this->response->setJSON($build_array);
+    }
+
     // public function form()
     // {
     //     if (!$this->auth->loggedIn()) {
@@ -396,6 +422,8 @@ class RefKonsumen extends BaseController
         $alamat       = $this->request->getPost('alamat');
         $email        = $this->request->getPost('email');
         $no_hp        = $this->request->getPost('no_hp');
+        $dataStyle    = $this->request->getPost('data_style');
+        $npwp         = $this->request->getPost('npwp');
 
 
         $msg    = "Data gagal ditambahkan !";
@@ -406,11 +434,12 @@ class RefKonsumen extends BaseController
             'alamat' => $alamat,
             'email'  => $email,
             'no_hp'  => $no_hp,
+            'npwp'   => $npwp
         ];
 
-        
+        $style_data = json_decode($dataStyle, true);
         if(empty($id)){
-            $this->mkonsumen->insertRecordGetid($this->mkonsumen->table, $arr_isi);
+            $id = $this->mkonsumen->insertRecordGetid($this->mkonsumen->table, $arr_isi);
             $msg    = "Data berhasil ditambahkan !";
             $status = true;
         }else{

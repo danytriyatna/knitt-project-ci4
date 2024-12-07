@@ -302,7 +302,7 @@
                     <select id="filter_operator" name="filter_operator" class="form-control custom-select select2">
                       <option value="">-</option>
                       <?php foreach ($operator as $rowData) : ?>
-                        <option value="<?= $rowData->id . ";" . $rowData->harga ?>"><?= $rowData->nama_operator ?></option>
+                        <option value="<?= $rowData->id ?>"><?= $rowData->nama_operator ?></option>
                       <?php endforeach ?>
                     </select>
                   </div>

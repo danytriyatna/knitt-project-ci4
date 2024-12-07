@@ -85,7 +85,7 @@
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tgl_do">DO Date</label>
                       <div class="col-md-8">
-                        <input <?=  ($view_read) ? 'disabled' : ''; ?> type="text" id="tgl_do" name="tgl_do" class="form-control datepicker" placeholder="Pilih tanggal DO" value="<?= !empty($row) ? $row->tgl_do : '' ;?>">
+                        <input <?=  ($view_read) ? 'disabled' : ''; ?> type="text" id="tgl_do" name="tgl_do" class="form-control" placeholder="Pilih tanggal DO" value="<?= !empty($row) ? $row->tgl_do : '' ;?>">
                       </div>
                     </div>
                   </div>

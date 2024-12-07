@@ -39,11 +39,30 @@
         </div>
 
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="no_hp">No. HP<span class="text-danger">*</span></label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="no_hp">No. Whatsapp<span class="text-danger">*</span></label>
           <div class="col-md-9">
-            <input type="text" id="no_hp" name="no_hp" class="form-control" placeholder="Ketik No. HP" required>
+            <input type="text" id="no_hp" name="no_hp" class="form-control" placeholder="Ketik No. Whatsapp" required>
             <div class="invalid-feedback">
-              No. Hp Konsumen tidak valid
+              No. Whatsapp Konsumen tidak valid
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="npwp">NPWP<span class="text-danger">*</span></label>
+          <div class="col-md-9">
+            <input type="text" id="npwp" name="npwp" class="form-control" placeholder="Ketik NPWP" required>
+            <div class="invalid-feedback">
+              NPWP Konsumen tidak valid
+            </div>
+          </div>
+        </div>
+
+        <div id="div_komsumen">
+          <hr>
+          <div class="row">
+            <div class="col-sm-12">
+              <div id="dt-detail-style" class="table-responsive table-striped"></div>
             </div>
           </div>
         </div>
