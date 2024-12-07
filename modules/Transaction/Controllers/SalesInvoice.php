@@ -301,12 +301,15 @@ class SalesInvoice extends BaseController
     if($status != 1){
       $view_read = true;
     }
+
+    $show_save_btn = true;
     
-    $this->data['view_read']  = $view_read;
-    $this->data['buyer']      = $this->mkonsumen->where("active", 1)->findAll();
-    $this->data['dt_details'] = $dt_details;// = json_decode($dt_details, true);
-    $this->data['dt_prods']   = $dt_prods;// = json_decode($dt_prods, true);
-    $this->data['status']     = $status;
+    $this->data['view_read']     = $view_read;
+    $this->data['buyer']         = $this->mkonsumen->where("active", 1)->findAll();
+    $this->data['dt_details']    = $dt_details;// = json_decode($dt_details, true);
+    $this->data['dt_prods']      = $dt_prods;// = json_decode($dt_prods, true);
+    $this->data['status']        = $status;
+    $this->data['show_save_btn'] = $show_save_btn;
 
     return view($this->views . '\sales_invoice_form', $this->data);
   }
@@ -477,9 +480,9 @@ class SalesInvoice extends BaseController
           'ref_kode'          => ($x->tipe_id == 1) ? $x->kode_sample : $x->kode_sales_order,
           'ref_qty'           => ($x->tipe_id == 1) ? $x->qty_sample : $x->qty_so,
           'ref_dp'            => $uang_dp,
-          'ref_total'         => $total,
-          'deliver_qty'       => $x->deliver_qty,
-          'totals'            => $total - $uang_dp ,
+          // 'ref_total'         => $total,
+          // 'deliver_qty'       => $x->deliver_qty,
+          // 'totals'            => $total - $uang_dp ,
         ];
 
          $do_harga = 0;
@@ -491,6 +494,10 @@ class SalesInvoice extends BaseController
          $paramx['id_walkorder'] = $x->id;
          $paramx['ukuran'] = $ukuran;
          $idDetail = $this->mInvoice->getDetail_delivery($paramx);
+
+         $qty_do = 0;
+         $total_harga = 0;
+
          foreach ($idDetail as $d) {
           
           $qty = 0;
@@ -499,6 +506,8 @@ class SalesInvoice extends BaseController
           $ref_total = 0;
           $ref_dp = 0;
 
+          $qty_do = $qty_do  + $d->qty_do;
+          $total_harga = $total_harga  + $d->total_harga;
 
           $det_isi = [
             'ref_detail_id' => $d->ref_detail_id,
@@ -506,6 +515,8 @@ class SalesInvoice extends BaseController
             'delivery_kode' => $d->delivery_kode,
             'kode_warna' => $d->kode_warna,
             'tipe_id' => $d->tipe_id,
+            'qty_do' => !empty($d->qty_do) ? $d->qty_do : 0,
+            'total_harga' => !empty($d->total_harga) ? $d->total_harga : 0,
           ];
 
           foreach ($rukuran as $iu) {
@@ -521,6 +532,9 @@ class SalesInvoice extends BaseController
 
           $det_list[] = $det_isi;
          }
+         $isi['deliver_qty'] = $qty_do;
+         $isi['ref_total'] = $total_harga;
+         $isi['totals'] = $total_harga - $uang_dp;
          $isi['detail_data'] = $det_list;
          $xdata[] = $isi;
       }
@@ -540,59 +554,64 @@ class SalesInvoice extends BaseController
       $id_produksi  = $this->request->getPost("produkds");
 
       $status = false;
-      $msg    = "Gagal mengambil data produksi !";
+      $msg    = "Konsumen belum mempunyai data pengiriman !";
       $data   = [];
 
-      $results = $this->mProduksi->getData($id_produksi);
+      try {
+        $results = $this->mProduksi->getData($id_produksi);
 
-      if(!empty($results)){
-        $data['produksi']         = $results;
+        if(!empty($results)){
+          $data['produksi']         = $results;
 
 
-        $prm['id_walkorder'] = $id_walkorder;
-        $rukuran = $this->mUkuran->getData(0, 0, 999);
-        $ukuran = "";
-        foreach ($rukuran as $iu) {
-          $keyUkuran = $iu->key_ukuran;
-          if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
-          $ukuran .= ($ukuran == "") ? $keyUkuran : ", ". $keyUkuran;
-        }
-        $prm['ukuran'] = $ukuran;
-
-        $dataProd = [];
-        $rsProd = $this->mProduksi->getProduksilast($prm); 
-        
-        if(!empty($rsProd)){
-          foreach ($rsProd as $item) {
-            $isi = array(
-              "ref_detail_id" => ($item->ref_detail_id),
-              "id_walkorder"  => ($item->id_walkorder),
-              "colordasar"    => ($item->kode_warna)
-            );
-            
-            $qty = 0;
-            foreach ($rukuran as $iu) {
-              $keyUkuran = $iu->key_ukuran;
-              $indx      = $iu->key_ukuran;
-              if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
-
-              $isi[$indx] = $item->$keyUkuran;
-
-              $qty = $qty +  $item->$keyUkuran;
-            }
-            $isi['qty'] = $qty;
-            $isi['qty_prod'] = 0;
-            $isi['qty_remain'] = $qty;
-            array_push(
-              $dataProd, $isi
-            );
+          $prm['id_walkorder'] = $id_walkorder;
+          $rukuran = $this->mUkuran->getData(0, 0, 999);
+          $ukuran = "";
+          foreach ($rukuran as $iu) {
+            $keyUkuran = $iu->key_ukuran;
+            if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
+            $ukuran .= ($ukuran == "") ? $keyUkuran : ", ". $keyUkuran;
           }
+          $prm['ukuran'] = $ukuran;
+
+          $dataProd = [];
+          $rsProd = $this->mProduksi->getProduksilast($prm); 
+          
+          if(!empty($rsProd)){
+            foreach ($rsProd as $item) {
+              $isi = array(
+                "ref_detail_id" => ($item->ref_detail_id),
+                "id_walkorder"  => ($item->id_walkorder),
+                "colordasar"    => ($item->kode_warna)
+              );
+              
+              $qty = 0;
+              foreach ($rukuran as $iu) {
+                $keyUkuran = $iu->key_ukuran;
+                $indx      = $iu->key_ukuran;
+                if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
+
+                $isi[$indx] = $item->$keyUkuran;
+
+                $qty = $qty +  $item->$keyUkuran;
+              }
+              $isi['qty'] = $qty;
+              $isi['qty_prod'] = 0;
+              $isi['qty_remain'] = $qty;
+              array_push(
+                $dataProd, $isi
+              );
+            }
+          }
+
+          $data['detail_produksi']  = $dataProd;
+
+          $status = true;
+          $msg    = "Berhasil mengambil data produksi !";
         }
-
-        $data['detail_produksi']  = $dataProd;
-
-        $status = true;
-        $msg    = "Berhasil mengambil data produksi !";
+      } catch (\Throwable $th) {
+        //throw $th;
+        $msg    = "Gagal mengambil data produksi !";
       }
 
       $build_array['status']  = $status;

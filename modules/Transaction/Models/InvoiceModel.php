@@ -179,7 +179,7 @@ class InvoiceModel extends \App\Models\PrModel
         $builder->join("trans_sample ts", "ts.id = tw.ref_id and tw.tipe_id = 1", "left");
         $builder->join("trans_sales_order tso", "tso.id = tw.ref_id and tw.tipe_id = 2", "left");
         $builder->join("ref_konsumen rk", "tw.id_konsumen = rk.id", "inner");
-        $builder->join("trans_delivery td", "td.id_walkorder = tw.id", "left");
+        $builder->join("trans_delivery td", "td.id_walkorder = tw.id", "inner join");
 
         $builder->where("tw.id_konsumen", $params['konsumen_id']);
 
@@ -202,7 +202,11 @@ class InvoiceModel extends \App\Models\PrModel
 
         $sql = "
             select 
-                *
+                *,
+                (select sum(xt.qty) from trans_delivery_detail xt where xt.id_delivery = tbl.id_delivery and xt.ref_detail_id = tbl.ref_detail_id) as qty_do,
+                (select sum(xt.harga_satuan * xd.qty) from trans_delivery_prod xt 
+                                             inner join trans_delivery_detail xd ON xt.id_delivery = xd.id_delivery  and xt.id_ukuran = xd.id_ukuran and xt.ref_detail_id = xd.ref_detail_id 
+                                             where xt.id_delivery = tbl.id_delivery and xt.ref_detail_id = tbl.ref_detail_id) as total_harga
             from
                 CROSSTAB(
                      'select 
@@ -213,7 +217,7 @@ class InvoiceModel extends \App\Models\PrModel
                         tw.tipe_id,
                         rk.key_ukuran,
                         COALESCE(twpu.qty, 0) as qty_prod
-                    from trans_delivery_detail twpu
+                    from trans_delivery_prod twpu
                     inner join trans_delivery twp on twp.id = twpu.id_delivery
                     inner join trans_walkorder tw on tw.id = twp.id_walkorder
                     inner join ref_ukuran rk on rk.id = twpu.id_ukuran

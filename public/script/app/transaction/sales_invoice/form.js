@@ -1,6 +1,6 @@
 
 $(document).ready(function () {
-
+    let ppn = 11;
 
     // conf function 
     let cellMoney = function(cell, formatterParams){
@@ -51,6 +51,15 @@ $(document).ready(function () {
     let detStyle = $("#det_style");
     let detAlamat = $("#alamat_buyer");
 
+
+    // set footer calculation
+    let ttlText      = $("#ttl_text");
+    let pajakText    = $("#pajak_text");
+    let ttlHargaText = $("#ttl_harga_text");
+    let ttlInp       = $("ttl_inp");
+    let pajakInp     = $("pajak_tinp");
+    let ttlHargaInp  = $("ttl_harga_inp");
+
     let dtList_detail1 = new Tabulator("#dt-list-delivery", {
         columns: [
             
@@ -60,56 +69,57 @@ $(document).ready(function () {
 				
 			{
 				title: 'DO NO.', field: 'delivery_kode', headerSort:false, sorter: 'string',
-				width: 140,			}, 
+				width: 140,
+            }, 
 				
 			{
-				title: 'COLOUR', field: 'kode_warna	', headerSort:false, sorter: 'string',
-				width: 140,
+				title: 'COLOUR', field: 'kode_warna', headerSort:false, sorter: 'string',
+				width: 200,
 			}, 
 
             {
-				title: 'S', field: 's', formatter : "html", align: "center", cssClass: "text-center", headerSort:false,
-                width: 140,
+				title: 'S', field: 's', align: "center", cssClass: "text-center", headerSort:false,
+                width: 120, bottomCalc: 'sum'
 			} ,
 
             {
-				title: 'M', field: 'm', formatter : "html", align: "center", cssClass: "text-center", headerSort:false,
-                width: 140,
+				title: 'M', field: 'm', align: "center", cssClass: "text-center", headerSort:false,
+                width: 120,  bottomCalc: 'sum'
 			},
 
             {
-				title: 'L', field: 'l', headerSort:false, sorter: 'string',
-				width: 140,
+				title: 'L', field: 'l', headerSort:false, align: "center", cssClass: "text-end", sorter: 'string',
+				width: 120,  bottomCalc: 'sum'
 			},
 
             {
-				title: 'XL', field: 'xl', headerSort:false, sorter: 'string',
-				width: 140,
+				title: 'XL', field: 'xl', headerSort:false, align: "center", cssClass: "text-end", sorter: 'string',
+				width: 120,  bottomCalc: 'sum'
 			},
             
             {
-				title: '2XL', field: 'xxl', headerSort:false, sorter: 'string',
-				width: 140,
+				title: '2XL', field: 'xxl', headerSort:false, align: "center", cssClass: "text-end", sorter: 'string',
+				width: 120,  bottomCalc: 'sum'
 			},
 
             {
-				title: '3XL', field: 'xxxl', headerSort:false, sorter: 'string',
-				width: 140,
+				title: '3XL', field: 'xxxl', headerSort:false, align: "center", cssClass: "text-end", sorter: 'string',
+				width: 120,  bottomCalc: 'sum'
 			},
 
             {
-				title: 'ALL', field: 'all_', headerSort:false, sorter: 'string',
-				width: 140,
+				title: 'ALL', field: 'all_', headerSort:false, align: "center", cssClass: "text-end", sorter: 'string',
+				width: 120,  bottomCalc: 'sum'
 			},
 
             {
-				title: 'DO QTY', field: 'qty', headerSort:false, sorter: 'string',
-				width: 140,
+				title: 'DO QTY', field: 'qty_do', headerSort:false, align: "center", cssClass: "text-end", sorter: 'string',
+				width: 140,  bottomCalc: 'sum'
 			},
 
             {
-				title: 'AMOUNT', field: 'total_harga', headerSort:false, sorter: 'string',
-				width: 140,
+				title: 'AMOUNT', field: 'total_harga', formatter : "money", headerSort:false, align: "center", cssClass: "text-end", sorter: 'string',
+				width: 140,  bottomCalc: 'sum', bottomCalcFormatter: "money",
 			},
 				
         ],
@@ -154,11 +164,11 @@ $(document).ready(function () {
                 },
                 {
                     title: "Ref No.", field: "ref_kode",  sorter: "string", headerSort:false, align: "center", cssClass: "text-start",
-                    width:"20%", 
+                    width:"17%", 
                 },
                 {
                     title: "Ref Tgl", field: "tgl_transaksi",  sorter: "string", headerSort:false, align: "center", cssClass: "text-start",
-                    width:"7%", 
+                    width:"10%", 
                 },
 
                 {
@@ -167,23 +177,23 @@ $(document).ready(function () {
                 },
 
                 {
-                    title: "Ref Qty", field: "ref_qty",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                    title: "Ref Qty", field: "deliver_qty",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
                     width:"12%", //bottomCalc:"sum", 
                 },
 
                 {
                     title: "Amount", field: "ref_total",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"12%", //bottomCalc:"sum", 
+                    width:"12%", formatter : "money"
                 },
 
                 {
                     title: "DP", field: "ref_dp",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"12%", //bottomCalc:"sum", 
+                    width:"12%", formatter : "money"
                 },
 
                 {
                     title: "INV. TOTAL", field: "totals",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"12%", //bottomCalc:"sum", 
+                    width:"12%", formatter : "money"
                 },
                 
             ],
@@ -255,6 +265,9 @@ $(document).ready(function () {
                     }).then((result) => {
                         // similar behavior as clicking on a link
                         dtListDetail.setData(res.data)
+                        setTimeout(() => {
+                            setFooterHarga();
+                        }, 1000);
                     });
                 }else{
                     Swal.fire({
@@ -282,223 +295,54 @@ $(document).ready(function () {
         });
     }
 
-    let detailp = $("#data-psaved").val().replace(/&quot;/ig,'"');
-    if(detailp.length > 0){
+    let detail_data = $("input[name='dt_details']");
+
+    if(detail_data.val().length > 0){
         setTimeout(() => {
             try {
-                let isdatap = JSON.parse(detailp);
-                
-                for (const item of isdatap) {
-                    let idw = 'proses_' + item.id_proses;
-                    $('#' + idw).attr("checked", true);
-                }
+                let dataDetail = detail_data.val().replace(/&quot;/ig,'"');
+                let isdata = JSON.parse(dataDetail);
+                // Set data ke Tabulator
+                dtListDetail.setData(isdata);
             } catch (e) {
                 console.error("Error parsing JSON:", e);
             }
         }, 1000);
+    } 
+    
+
+    function setFooterHarga(){
+        let detailList = dtListDetail.getData();
+        let harga      = 0;
+
+        for (const inv of detailList) {
+            harga = harga + inv.totals;
+        }
+
+        let pajak = (harga * ppn) / 100;
+        let total = harga + pajak;
+
+        ttlText.html(number_format(harga, 2, ',', '.'));
+        pajakText.html(number_format(pajak, 2, ',', '.'));
+        ttlHargaText.html(number_format(total, 2, ',', '.'));
+
+        ttlInp.val(harga);
+        pajakInp.val(pajak);
+        ttlHargaInp.val(total);
     }
 
-    // end config ukuran size 
+    // save form
+	function setDataInputTable() {
+        let dataItem = dtListDetail.getData();
+        if (dataItem && dataItem.length > 0) {
+            $("#data-details").val(JSON.stringify(dataItem));
+        }
 
-
-    // start detail 
-
-    
-
-    // let fmEditDetail = function(value, data, cell, row, options) {
-	// 	let row_data = value._cell.row.data;
-	// 	let fmBtnEdit = "<button class='btn btn-xs btn-warning' type='button' title='edit'><i class='fa fa-edit' title='edit'></i></button>";
-		
-	// 	let btnRes = fmBtnEdit;
-	// 	return btnRes; //+ "&nbsp;" + fmBtnDelete;
-	// };
-
-    
-    
-
-
-    // start table detail warna 
-    // let inpDetailLoss = $("#loss_perc");
-    // let dtListDetailWarna = new Tabulator("#dt-warna", {
-    //     columns: [
-    //             {
-    //                 title: "Colour", field: "kode_warna",  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
-    //                 width:"15%"
-    //             },
-    //             {
-    //                 title: "%", field: "persen",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-    //                 width:"11%"
-    //             },
-              
-    //             {
-    //                 title: "NEEDS<br>(GRAM)", field: "gram_nd",  sorter: "string", headerSort:false,  align: "center", cssClass: "text-end",
-    //                 width:"11%", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
-    //             },
-
-    //             {
-    //                 title: "IN KG", field: "kg",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-    //                 width:"11%", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
-    //             },
-
-    //             {
-    //                 title: "LOSS<br>(KG)", field: "kg_loss",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-    //                 width:"11%", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
-    //             },
-
-    //             {
-    //                 title: "NFP (KG)", field: "total",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-    //                 width:"11%", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
-    //             },
-
-    //             {
-    //                 title: "QTY<br>ON HAND", field: "kuota",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-    //                 width:"12%", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
-    //             },
-
-    //             {
-    //                 title: " (+/-) ", field: "kuota_tambah",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-    //                 width:"9%", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
-    //             }
-    //         ],
-    //         locale: 'id',
-    //         placeholder: "Tidak ada data",
-    //         pagination: false,
-    //         paginationSize: 99,
-    //         paginationButtonCount: 2,
-    //         paginationDataSent: {
-    //             sorters: "order",
-    //         },
-    //         selectableRows: false
-	// });
-
-
-    // function updateRow(data, total){
-    //     let rows = dtListDetailWarna.getRows();
-    //     rows.forEach(row => {
-    //         let rowData = row.getData();
-    //         let val_persen = total > 0 ? (rowData.gram/total) * 100 : 0;
-    //                          val_persen = val_persen > 0 ? val_persen.toFixed(2) : 0;
-    //         row.update({ persen: val_persen });
-    //     });
-    // }   
-
-    // inpDetailLoss.on("change", function(){
-    //     let val = $(this).val()
-    //     let rows = dtListDetailWarna.getRows();
-    //     rows.forEach(row => {
-    //         let rowData = row.getData();
-    //         let val_kg = rowData.kg;
-
-    //         let val_kg_loss = val.length > 0 ? (val_kg * val) / 100 : 0
-    //             val_kg_loss = val_kg_loss > 0 ? val_kg_loss.toFixed(2) : 0;
-
-    //         let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
-    //             val_total = val_total > 0 ? val_total.toFixed(2) : 0
-
-    //         let val_kuota = 0;//parseFloat(val_kg) - parseFloat(val_kg_loss);
-    //             val_kuota    = val_kuota    > 0 ? val_kuota   .toFixed(2) : 0
-
-    //         let val_kuota_tambah = val_kuota - val_total;
-
-    //         row.update({
-    //             kg_loss: val_kg_loss,
-    //             total: val_total,
-    //             kuota: val_kuota,
-    //             kuota_tambah: val_kuota_tambah,
-    //         });
-    //     });
-    // });
-
-    // function save_warna(){
-    //     let inpQty = textQtyWarna.html();
-    //     let inLoss = inpDetailLoss.val();
-    //     let inDetailID = textDetId.val();
-    //     let inData = dtListDetailWarna.getData().length > 0 ? JSON.stringify(dtListDetailWarna.getData()) : "[]";
-
-    //     let form_data = new FormData();
-    //     form_data.append('detail_qty', inpQty);
-    //     form_data.append('detail_loss', inLoss);
-    //     form_data.append('detail', inDetailID);
-    //     form_data.append('warna_data', inData);
-        
-    //     $.ajax({
-    //         url: "/trans/work-order/save-warna", // point to server-side controller method
-    //         dataType: "json", // what to expect back from the server
-    //         data: form_data,
-    //         type: "post",
-    //         cache: false,
-    //         contentType: false,
-    //         processData: false,
-    //         beforeSend: function () {
-    //             Swal.fire({
-    //                 title: 'Loading...',
-    //                 allowOutsideClick: false,
-    //                 showConfirmButton: false,
-    //                 onBeforeOpen: () => {
-    //                     Swal.showLoading();
-    //                 }
-    //             });
-    //         },
-    //         success: function (res) {
-    //             Swal.close();
-
-    //             if(res.status){
-    //                 Swal.fire({
-    //                     text: res.message,
-    //                     icon: 'success',
-    //                     showConfirmButton: false,
-    //                     timer: 2500
-    //                 }).then((result) => {
-    //                     dtList_detail1.setData();
-    //                     mdDetail.modal("hide");
-    //                 });
-    //             }else{
-    //                 Swal.fire({
-    //                     text: res.message,
-    //                     icon: 'error',
-    //                     showConfirmButton: false,
-    //                     timer: 2000
-    //                 });
-
-    //             }
-                
-    //         },
-    //         error: function (res) {
-    //             Swal.close();
-    //             Swal.fire({
-    //                 text: "Gagal simpan data",
-    //                 icon: 'error',
-    //                 showConfirmButton: false,
-    //                 timer: 2000
-    //             }).then((result) => {
-                    
-    //             });
-                
-    //         },
-    //     });
-    // }
-
-    // $("#btn-save-warna").on("click", function(e) {
-    //     e.preventDefault();
-
-    //     Swal.fire({
-    //         title: "Apakah anda ingin menyimpan data ?",
-    //         icon: 'question',
-    //         confirmButtonText: 'Simpan',
-    //         confirmButtonColor: '#198754',
-    //         showCancelButton: true,
-    //         cancelButtonText: 'Batal',
-    //         cancelButtonColor: '#6C757D'
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             save_warna();
-    //         }
-    //     })
-    // });
-
-
-    
-
+		$('select').prop('disabled', false);
+		$('input').prop('disabled', false);
+		$("textarea").prop('disabled', false);
+		$("checkbox").prop('disabled', false);
+    }
 
     $("#btn-save").on("click", function(e) {
         e.preventDefault();

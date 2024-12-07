@@ -287,11 +287,25 @@ class ProductionModel extends \App\Models\PrModel
                             END AS column_name,
                             CASE 
                                 WHEN subquery.is_qty THEN COALESCE(twpu.qty_prod, 0)
-                                ELSE COALESCE(
-                                    (SELECT xt.harga_satuan 
-                                    FROM trans_sample_ukuran xt 
-                                    WHERE xt.id_ukuran = twpu.id_ukuran 
-                                    AND xt.id_sample_det = twpu.ref_detail_id), 0)
+                                ELSE 
+                                    CASE 
+                                        WHEN tw.tipe_id = 1 THEN
+                                            (
+                                                SELECT xt.harga_satuan 
+                                                FROM trans_sample_ukuran xt 
+                                                WHERE xt.id_ukuran = twpu.id_ukuran 
+                                                AND xt.id_sample_det = twpu.ref_detail_id
+                                            )
+                                        WHEN tw.tipe_id = 2 THEN
+                                            (
+                                                SELECT xt.harga_satuan 
+                                                FROM trans_sales_order_ukuran xt 
+                                                WHERE xt.id_ukuran = twpu.id_ukuran 
+                                                AND xt.id_sales_order_det = twpu.ref_detail_id
+                                            )
+                                        ELSE
+                                            0
+                                    END
                             END AS value
                         FROM trans_walkorder_proses_ukuran twpu
                         INNER JOIN trans_walkorder_proses twp 
@@ -309,11 +323,11 @@ class ProductionModel extends \App\Models\PrModel
                             FROM ref_ukuran 
                             WHERE active = 1
                         ) subquery
-                        WHERE twp.id_walkorder = 31
+                        WHERE twp.id_walkorder = {$id_walkorder}
                         AND twp.id_proses = (
                             SELECT MAX(tx.id_proses) 
                             FROM trans_walkorder_proses tx 
-                            WHERE tx.id_walkorder = 31
+                            WHERE tx.id_walkorder = {$id_walkorder}
                         )
                         ORDER BY twpu.ref_detail_id, twp.id_proses, column_name
                         $$,

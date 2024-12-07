@@ -310,7 +310,6 @@ class DeliveryOrder extends BaseController
   }
 
   function insert($dataIn, $detail, $produksi){
-    dd($detail, $produksi);
     $tgl = date('Y-m-d H:i:s');
     $userId = $this->get_userid();
     
@@ -339,21 +338,32 @@ class DeliveryOrder extends BaseController
 
     $dataIn['qty'] = $qty;
     $this->mDelivery->updateRecord($this->mDelivery->table, $dataIn, 'id', $id);
+    
     if(!empty($produksi)){
-      $builderx = $this->mDelivery->table($this->mDelivery->table3);
-      $builderx->where("id_delivery", $id);
-      $builderx->delete();
 
-      $data_uk = $this->mUkuran->getData(0, 0, 9999);
+      $rukuran = $this->mUkuran->getData(0, 0, 999);
       foreach ($produksi as $itemx) {
-        $ddata = [];
-        $ddata['ref_detail_id'] = $itemx['ref_detail_id'];
-        $ddata['id_ukuran'] = $itemx['id_ukuran'];
-        $ddata['qty'] = $itemx['qty'];
-        $ddata['qty_do'] = $itemx['qty_prod'];
-        $ddata['created_at'] = $tgl;
-        $ddata['created_by'] = $userId;
-        $this->mDelivery->insertRecordGetid($this->mDelivery->table3,$ddata);
+        // dd($itemx);
+        $xdata = [];
+        $xdata['id_delivery']   = $id;
+        $xdata['ref_detail_id'] = $itemx['ref_detail_id'];
+       
+        $xdata['created_at']    = $tgl;
+        $xdata['created_by']    = $userId;
+        foreach ($rukuran as $iu) {
+          $keyUkuran = $iu->key_ukuran;
+          $indx      = $iu->key_ukuran;
+
+
+          $xdata['qty']          = $itemx[$keyUkuran];
+          if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
+          $xharga    = $keyUkuran.'_hrg';
+
+          $xdata['id_ukuran']    = $iu->id;
+          $xdata['harga_satuan'] = $itemx[$xharga];
+         
+          $this->mDelivery->insertRecordGetid($this->mDelivery->table3,$xdata);
+        }
       }
     }
 
@@ -407,11 +417,9 @@ class DeliveryOrder extends BaseController
 
       $rukuran = $this->mUkuran->getData(0, 0, 999);
 
-      $builderx = $this->mDelivery->table($this->mDelivery->table3);
-      $builderx->where("id_delivery", $id);
-      $builderx->delete();
-
-      $data_uk = $this->mUkuran->getData(0, 0, 9999);
+      $builderv = $this->mDelivery->table($this->mDelivery->table3);
+      $builderv->where("id_delivery", $id);
+      $builderv->delete();
       foreach ($produksi as $itemx) {
         // dd($itemx);
         $xdata = [];
