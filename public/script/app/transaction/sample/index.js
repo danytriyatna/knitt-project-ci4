@@ -830,6 +830,7 @@ $(document).ready(function () {
     }
 
     $('#desc_style').autocomplete({
+        appendTo: '#modal-form-add-po',
 		source: function( request, response ) {
             console.log(inpBuyer.val())
 		  if(inpBuyer.val() != ''){
