@@ -554,8 +554,9 @@ class DeliveryOrder extends BaseController
             foreach ($rukuran as $iu) {
               $keyUkuran = $iu->key_ukuran;
               $indx      = $iu->key_ukuran;
-              $xharga    = $iu->key_ukuran.'_hrg';
+              
               if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
+              $xharga    = $keyUkuran.'_hrg';
 
               $isi[$indx]   = $item->$keyUkuran;
               $isi[$xharga] = $item->$xharga;
