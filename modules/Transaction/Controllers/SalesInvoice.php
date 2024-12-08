@@ -522,6 +522,7 @@ class SalesInvoice extends BaseController
          $paramx['id_konsumen']  = $konsumen_id;
          $paramx['id_walkorder'] = $x->id;
          $paramx['ukuran'] = $ukuran;
+         $paramx['get'] =  1;
          $idDetail = $this->mInvoice->getDetail_delivery($paramx);
 
          $qty_do = 0;

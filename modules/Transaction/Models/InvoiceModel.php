@@ -200,6 +200,11 @@ class InvoiceModel extends \App\Models\PrModel
              $col2 .= ($col2 == "") ? "$item Int" : ",$item Int";
          }
 
+         $whr = "";
+         if(!empty($params['get'])){
+            $whr = "AND tbl.id_delivery NOT IN (SELECT cx.id_delivery FROM trans_invoice_delivery cx)";
+         }
+
         $sql = "
             select 
                 *,
@@ -228,7 +233,10 @@ class InvoiceModel extends \App\Models\PrModel
                     order by twpu.ref_detail_id, twpu.id_ukuran',
                 'select key_ukuran from ref_ukuran rx where rx.active = 1 order by rx.seq asc'
             ) as tbl (ref_detail_id int, id_delivery int, delivery_kode varchar, kode_warna varchar, tipe_id int, {$col2})
+             WHERE 1 = 1 {$whr}
         ";
+
+
 
         $query = $this->db->query($sql);
 
