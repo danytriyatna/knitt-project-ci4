@@ -56,9 +56,9 @@ $(document).ready(function () {
     let ttlText      = $("#ttl_text");
     let pajakText    = $("#pajak_text");
     let ttlHargaText = $("#ttl_harga_text");
-    let ttlInp       = $("ttl_inp");
-    let pajakInp     = $("pajak_tinp");
-    let ttlHargaInp  = $("ttl_harga_inp");
+    let ttlInp       = $("#ttl_inp");
+    let pajakInp     = $("#pajak_inp");
+    let ttlHargaInp  = $("#ttl_harga_inp");
 
     let dtList_detail1 = new Tabulator("#dt-list-delivery", {
         columns: [
@@ -267,7 +267,7 @@ $(document).ready(function () {
                         dtListDetail.setData(res.data)
                         setTimeout(() => {
                             setFooterHarga();
-                        }, 1000);
+                        }, 500);
                     });
                 }else{
                     Swal.fire({
@@ -296,7 +296,7 @@ $(document).ready(function () {
     }
 
     let detail_data = $("input[name='dt_details']");
-
+    // console.log(detail_data.val());
     if(detail_data.val().length > 0){
         setTimeout(() => {
             try {
@@ -304,6 +304,9 @@ $(document).ready(function () {
                 let isdata = JSON.parse(dataDetail);
                 // Set data ke Tabulator
                 dtListDetail.setData(isdata);
+                setTimeout(() => {
+                    setFooterHarga()
+                }, 500);
             } catch (e) {
                 console.error("Error parsing JSON:", e);
             }
@@ -335,7 +338,7 @@ $(document).ready(function () {
 	function setDataInputTable() {
         let dataItem = dtListDetail.getData();
         if (dataItem && dataItem.length > 0) {
-            $("#data-details").val(JSON.stringify(dataItem));
+            detail_data.val(JSON.stringify(dataItem));
         }
 
 		$('select').prop('disabled', false);
@@ -357,7 +360,10 @@ $(document).ready(function () {
             cancelButtonColor: '#6C757D'
         }).then((result) => {
             if (result.isConfirmed) {
-                saved(0)
+                setDataInputTable();
+
+                // $("#actionf").val('save');
+                $("#fmain").submit();
             }
         })
     });

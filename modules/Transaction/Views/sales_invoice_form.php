@@ -147,7 +147,7 @@
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tgl_si">SI Date</label>
                       <div class="col-md-8">
-                        <input type="text" id="tgl_si" name="tgl_si" class="form-control datepicker" placeholder="Pilih tanggal SI" value="<?= !empty($row) ? $row->tgl_transaksi : ""; ?>">
+                        <input <?= ($view_read) ? 'disabled' : '' ?> type="text" id="tgl_si" name="tgl_si" class="form-control" placeholder="Pilih tanggal SI" value="<?= !empty($row) ? $row->tgl_transaksi : ""; ?>">
                       </div>
                     </div>
                   </div>
@@ -157,7 +157,7 @@
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-3 col-form-label" for="select_buyer">Buyer</label>
                       <div class="col-md-9">
-                        <select id="select_buyer" name="select_buyer" value="<?= !empty($row) ? $row->konsumen_id : ""; ?>" class="form-select select2" data-placeholder="-- Pilih Buyer --">
+                        <select <?= ($view_read) ? 'disabled' : '' ?> id="select_buyer" name="select_buyer" value="<?= !empty($row) ? $row->id_konsumen : ""; ?>" class="form-select select2" data-placeholder="-- Pilih Buyer --">
                           <option value=""> - Pilih Buyer - </option>
                           <?php foreach ($buyer as $item) { ?>
                             <option value="<?= $item['id']; ?>"><?= $item['nama']; ?></option> 
@@ -180,7 +180,7 @@
                 <div class="form-group row">
                   <label class="control-label text-start text-md-end col-md-2 col-form-label" for="notes_si">Notes</label>
                   <div class="col-md-9">
-                    <textarea rows="3" id="notes_si" name="notes_si" class="form-control" placeholder="Ketikkan notes">-</textarea>
+                    <textarea <?= ($view_read) ? 'disabled' : '' ?> rows="3" id="notes_si" name="notes_si" class="form-control" placeholder="Ketikkan notes">-</textarea>
                   </div>
                 </div>
               </div>
@@ -234,8 +234,8 @@
                       <span class="fa fa-arrow-left"></span> Kembali
                     </a>
                     
-                    <?php echo isset($dt_details) ? form_hidden($dt_details) : ""; ?>
-                    <?php echo isset($id) ? form_hidden('id', $id) : ""; ?>
+                    <input type="hidden" name="dt_details" value='<?= !empty($dt_details) ? $dt_details : ""?>'>
+                    <input type="hidden" name="id" value="<?= !empty($id) ? $id : ""?>">
                     <?php if (isset($show_save_btn) && $show_save_btn === TRUE): ?>
                         <button id="btn-save" type="button" name="actionf" value="save"
                                 class='btn btn-primary float-left text-white m-l-5'>
