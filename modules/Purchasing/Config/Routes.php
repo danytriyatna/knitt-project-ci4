@@ -2,6 +2,7 @@
 
 $routes->group('purchasing/purchase-order', ['namespace' => 'Modules\Purchasing\Controllers'], static function ($routes) {
   $routes->get('/', 'PurchaseOrder::index');
+  $routes->post('list', 'PurchaseOrder::lists');
   $routes->get('form', 'PurchaseOrder::form');
 });
 

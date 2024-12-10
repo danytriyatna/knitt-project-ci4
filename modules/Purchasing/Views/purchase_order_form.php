@@ -12,27 +12,30 @@
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_item">Item</label>
           <div class="col-md-9">
-            <select id="select_item" name="select_item" class="form-select select2" data-placeholder="-- Pilih Item --">
-              <option value="1">W-001 WHITE NEW 001</option>
-            </select>
+            <div class="input-group">
+              <input type="text" id="namaBarang" readonly name="namaBarang" class="form-control" placeholder="Pilih Barang" required>
+              <input type="hidden" id="idBarang" name="idBarang" class="form-control" required>
+              <input type="hidden" id="kodeBarang" name="kodeBarang" class="form-control" required>
+              <span id="spanBarang" class="input-group-text bg-white" id="basic-addon11"><i class="ti-search"></i></span>
+            </div>
           </div>
         </div>
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_unit">Unit</label>
           <div class="col-md-9">
-            <input type="text" id="select_unit" name="select_unit" class="form-control" placeholder="Terisi otomatis oleh sistem" value="KGM" disabled>
+            <input type="text" id="unit" name="unit" class="form-control" placeholder="Terisi otomatis oleh sistem" value="" readonly>
           </div>
         </div>
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="qty_item">Qty</label>
           <div class="col-md-9">
-            <input type="text" id="qty_item" name="qty_item" class="form-control" placeholder="Ketikkan qty item" value="100">
+            <input type="text" id="qty_item" name="qty_item" class="form-control" placeholder="Ketikkan qty item">
           </div>
         </div>
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="unit_price">Unit Price</label>
           <div class="col-md-9">
-            <input type="text" id="unit_price" name="unit_price" class="form-control form-idr" placeholder="Ketikkan unit price" value="300000">
+            <input type="text" id="unit_price" name="unit_price" class="form-control" placeholder="Ketikkan unit price" value="">
             <small class="form-text">Hanya menerima input berupa angka, penulisan koma bisa menggunakan titik ( . ), contoh: 100000.50, 8500.99</small>
           </div>
         </div>
@@ -43,7 +46,8 @@
           </div>
           <div class="col-md-4">
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="" id="check_tax" checked>
+              <input type="hidden" id="tax" name="tax" value="<?= !empty($tax->nilai) ? $tax->nilai : 0 ?>" class="form-control" required>
+              <input class="form-check-input" type="checkbox" value="" id="check_tax">
               <label class="form-check-label" for="check_tax">
                 Tax
               </label>
@@ -53,8 +57,58 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Simpan</button>
+        <button type="button" class="btn btn-success" id="btn-simpan-det">Simpan</button>
       </div>
+    </div>
+  </div>
+</div>
+<div id="modal-vendor" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">List Vendor</h5>
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12 mb-3">
+            <div class="col-md-4" style="float: right; position: relative; right: 15px;">
+              <div class="homeSearch w-100" style="width: 100%; margin-left: 5%; margin-top: 0;">
+                <input type="text" id="tb-search2" class="form-control" placeholder="Pencarian . . .">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div id="dt-list-vendor" class="table-responsive table-striped"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div id="modal-barang" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">List Barang</h5>
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12 mb-3">
+            <div class="col-md-4" style="float: right; position: relative; right: 15px;">
+              <div class="homeSearch w-100" style="width: 100%; margin-left: 5%; margin-top: 0;">
+                <input type="text" id="tb-search" class="form-control" placeholder="Pencarian . . .">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div id="dt-list" class="table-responsive table-striped"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -90,7 +144,8 @@
                   <div class="form-group row">
                     <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_no">PO No.</label>
                     <div class="col-md-9">
-                      <input type="text" id="po_no" name="po_no" class="form-control" placeholder="Ketikkan nomor PO" value="POD2410001">
+                      <input type="hidden" id="status" name="status" value="<?= $status ?>" class="form-control" required>
+                      <input type="text" id="po_no" name="po_no" class="form-control" readonly placeholder="Diisi otomatis oleh sistem">
                     </div>
                   </div>
                 </div>
@@ -117,11 +172,9 @@
                     <label class="control-label text-start text-md-end col-md-4 col-form-label" for="select_term">Term</label>
                     <div class="col-md-8">
                       <select id="select_term" name="select_term" class="form-select select2" data-placeholder="-- Pilih Term --">
-                        <option value="1" selected>7 Days</option>
-                        <option value="2">14 Days</option>
-                        <option value="3">21 Days</option>
-                        <option value="4">30 Days</option>
-                        <option value="5">60 Days</option>
+                        <?php foreach ($term as $row) : ?>
+                          <option value="<?= $row['id'] ?>"><?= $row['name'] ?></option>
+                        <?php endforeach ?>
                       </select>
                     </div>
                   </div>
@@ -132,11 +185,11 @@
               <div class="form-group row">
                 <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_vendor">Vendor</label>
                 <div class="col-md-10">
-                  <select id="select_vendor" name="select_vendor" class="form-select select2" data-placeholder="-- Pilih Vendor --">
-                    <option value="1" selected>Vedor Citraknitt 01</option>
-                    <option value="2">Vedor Citraknitt 02</option>
-                    <option value="3">Vedor Citraknitt 03</option>
-                  </select>
+                  <div class="input-group">
+                    <input type="text" id="namaVendor" readonly name="namaVendor" class="form-control" placeholder="Pilih Vendor" required>
+                    <input type="hidden" id="idVendor" name="idVendor" class="form-control" required>
+                    <span id="spanVendor" class="input-group-text bg-white" id="basic-addon11"><i class="ti-search"></i></span>
+                  </div>
                 </div>
               </div>
               <div class="form-group row">
@@ -151,43 +204,15 @@
           <hr>
 
           <div class="row">
+            <div class="col-sm-3 mb-2">
+              <button type="button" class="btn btn-sm btn-primary" id="btn-add"> <i class="fa fa-plus"></i></button>
+            </div>
             <div class="col-sm-12">
-              <div class="table-responsive">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th style="min-width: 95px; width: 95px;">
-                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-detail-item"><i class="fa fa-plus"></i></button>
-                      </th>
-                      <th>ITEM CODE</th>
-                      <th>ITEM DESCRIPTION</th>
-                      <th>QTY</th>
-                      <th>UNIT</th>
-                      <th>UNIT PRICE</th>
-                      <th>DISC (%)</th>
-                      <th>TAX (%)</th>
-                      <th>AMOUNT</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modal-detail-item"><i class="fa fa-edit"></i></button>
-                        <button type="button" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
-                      </td>
-                      <td>W-001</td>
-                      <td>WHITE NEW 001</td>
-                      <td>100</td>
-                      <td>KGM</td>
-                      <td class="text-nowrap text-end">300.000,00</td>
-                      <td></td>
-                      <td></td>
-                      <td class="text-nowrap text-end">1.800.000,00</td>
-                    </tr>
-                  </tbody>
-                </table>
+
+              <div class="row">
+                <div id="dt-list-po" class="table-responsive table-striped"></div>
               </div>
-              
+
               <br>
 
               <div class="row">
@@ -209,3 +234,6 @@
 </div>
 
 <?= $this->endSection('content'); ?>
+<?= $this->section('script'); ?>
+<script src="script/app/purchasing/order/form.js"></script>
+<?= $this->endSection('script'); ?>

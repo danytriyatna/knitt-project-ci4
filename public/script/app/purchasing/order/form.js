@@ -1,0 +1,477 @@
+let spanVendor = $('#spanVendor');
+let inpVendor = $('#namaVendor');
+let inpIdVendor = $('#idVendor');
+let inpBarang = $('#namaBarang');
+let inpIdBarang = $('#idBarang');
+let inpKodeBarang = $('#kodeBarang');
+let inpQty = $('#qty_item');
+let inpDisc = $('#disc_item');
+let inpCheckTax = $('#check_tax');
+let inpUnitPrice = $('#unit_price');
+let spanBarang = $('#spanBarang');
+let selectTerm = $('#select_term');
+let inpUnit = $('#unit');
+let inpStatus = $('#status');
+let inpTax = $('#tax');
+let btnAdd = $('#btn-add');
+let btnSimpanDetail = $('#btn-simpan-det');
+let modalDet = $('#modal-detail-item');
+
+
+let dtList = new Tabulator("#dt-list", {
+    columns: [
+        {
+            title: "ID Barang", field: "id", headerSort: false,
+            width: "15%",visible:false
+        },
+        {
+            title: "Kode Barang", field: "kode_barang", headerSort: false,
+            width: "20%"
+        },
+        {
+            title: "Nama Barang", field: "nama_barang", headerSort: false,
+            width: "30%"
+        },
+        {
+            title: "Jenis Barang", field: "nama_jenis_barang", headerSort: false,
+            width: "25%"
+        },
+        {
+            title: "Stok Minimum", field: "stok_minimum", headerSort: false,
+            width: "15%",visible:false
+        },
+        {
+            title: "Satuan", field: "nama_satuan", headerSort: false,
+            width: "10%"
+        },
+        {
+            title: "Harga Satuan",visible:false, field: "harga_satuan", headerSort: false,
+            width: "15%",formatter: "money", formatterParams: {
+                decimal: ",",
+                thousand: ".",
+                symbol: "Rp",  // Simbol mata uang Rupiah
+                precision: 0,   // Tidak ada desimal
+            }, hozAlign:"right",
+        },
+       
+        {
+            title: "Keterangan", field: "keterangan", formatter: "html", headerSort: false,
+            width:"15%"
+        },
+    ],
+    locale: 'id',    
+    ajaxURL: "/master-data/barang/list",
+    ajaxConfig: "POST",
+    sortMode: "remote",
+    filterMode: "remote",
+    selectableRows: true,
+    placeholder: "Tidak ada data",
+    ajaxRequesting: function (url, params) {
+        params.start = params.size * (params.page - 1);
+        params.length = params.size;
+    },
+    ajaxResponse: function (url, params, response) {
+        let pageSize = dtList.getPageSize();
+        let pageNo = dtList.getPage();
+        let startRow = (pageSize * (pageNo - 1)) + 1;
+        let endRow = response.data.length + startRow - 1;
+        if (response.data.length === 0) {
+            startRow = 0; endRow = 0;
+        }
+        let recordsFiltered = parseInt(response.recordsFiltered);
+        let recordsTotal = parseInt(response.recordsTotal);
+
+        $("#table-footer .tabulator-startrow").text(startRow);
+        $("#table-footer .tabulator-endrow").text(endRow);
+        $("#table-footer .tabulator-totalrow").text(recordsFiltered);
+
+        let elTotalFilteredRow = $("#table-footer .tabulator-totalfilteredrow");
+        elTotalFilteredRow.text("");
+        if (recordsTotal > recordsFiltered) {
+            elTotalFilteredRow.text(" (disaring dari " + recordsTotal
+                + " entri keseluruhan)");
+        }
+        return response;
+    },
+    footerElement: '<div id="table-footer" class="pull-left tabulator-info">'
+        + 'Menampilkan <span class="tabulator-startrow"></span> - <span class="tabulator-endrow"></span> dari '
+        + '<span class="tabulator-totalrow"></span> entri<span class="tabulator-totalfilteredrow"></span></div>',
+    pagination: true,
+    paginationMode: "remote",
+    paginationSize: 25,
+    paginationButtonCount: 10,
+    dataSendParams: {
+        sorters: "order"
+    },
+    selectable: false,
+});
+
+
+let searchThread = null;
+let elSearch = $("#tb-search");
+if (elSearch != null) {
+    elSearch.on("keyup", function (e) {
+        if ($(this).val().length < 3 && e.keyCode > 13) {
+            return;
+        }
+        clearTimeout(searchThread);
+        searchThread = setTimeout(function () {
+            dtList.setFilter("", "like", elSearch.val());
+        }, 600);
+    });
+}
+
+let dtListVendor = new Tabulator("#dt-list-vendor", {
+    columns: [
+        
+        {
+            title: "Nama Vendor", field: "nama", headerSort: false,
+            width: "25%"
+        },
+        {
+            title: "Alamat", field: "alamat", formatter: "html", headerSort: false,
+             width: "45%"
+            
+        },
+        {
+            title: "Email", field: "email", headerSort: false,
+            width: "15%", cssClass : 'text-center'
+        },
+        {
+            title: "No. HP", field: "no_hp", headerSort: false,
+            width: "15%", cssClass : 'text-center'
+        },
+    ],
+    locale: 'id',    
+    ajaxURL: "/master-data/vendor/list",
+    ajaxConfig: "POST",
+    sortMode: "remote",
+    filterMode: "remote",
+    placeholder: "Tidak ada data",
+    ajaxRequesting: function (url, params) {
+        params.start = params.size * (params.page - 1);
+        params.length = params.size;
+    },
+    ajaxResponse: function (url, params, response) {
+        let pageSize = dtListVendor.getPageSize();
+        let pageNo = dtListVendor.getPage();
+        let startRow = (pageSize * (pageNo - 1)) + 1;
+        let endRow = response.data.length + startRow - 1;
+        if (response.data.length === 0) {
+            startRow = 0; endRow = 0;
+        }
+        let recordsFiltered = parseInt(response.recordsFiltered);
+        let recordsTotal = parseInt(response.recordsTotal);
+
+        $("#table-footer2 .tabulator-startrow").text(startRow);
+        $("#table-footer2 .tabulator-endrow").text(endRow);
+        $("#table-footer2 .tabulator-totalrow").text(recordsFiltered);
+
+        let elTotalFilteredRow = $("#table-footer2 .tabulator-totalfilteredrow");
+        elTotalFilteredRow.text("");
+        if (recordsTotal > recordsFiltered) {
+            elTotalFilteredRow.text(" (disaring dari " + recordsTotal
+                + " entri keseluruhan)");
+        }
+        return response;
+    },
+    footerElement: '<div id="table-footer2" class="pull-left tabulator-info">'
+        + 'Menampilkan <span class="tabulator-startrow"></span> - <span class="tabulator-endrow"></span> dari '
+        + '<span class="tabulator-totalrow"></span> entri<span class="tabulator-totalfilteredrow"></span></div>',
+    pagination: true,
+    paginationMode: "remote",
+    paginationSize: 25,
+    paginationButtonCount: 10,
+    dataSendParams: {
+        sorters: "order"
+    },
+    selectableRows: false,
+});
+
+
+let searchThreadVendor = null;
+let elSearchVendor = $("#tb-search2");
+if (elSearchVendor != null) {
+    elSearchVendor.on("keyup", function (e) {
+        if ($(this).val().length < 3 && e.keyCode > 13) {
+            return;
+        }
+        clearTimeout(searchThreadVendor);
+        searchThreadVendor = setTimeout(function () {
+            dtListVendor.setFilter("", "like", elSearchVendor.val());
+        }, 600);
+    });
+}
+
+dtList.on("rowClick", function(e, row){
+  
+    var kodeBarang = row._row.data.kode_barang.replace(/<[^>]*>/g, '');
+    var idBarang = row._row.data.id;
+    var namaBarang = row._row.data.nama_barang.replace(/<[^>]*>/g, '');
+    var namaSatuan = row._row.data.nama_satuan.replace(/<[^>]*>/g, '');
+
+    inpUnit.val(namaSatuan)
+    inpIdBarang.val(idBarang)
+    inpKodeBarang.val(kodeBarang)
+    inpBarang.val(`${namaBarang}`)
+    $("#modal-barang").modal("hide");
+})
+
+dtListVendor.on("rowClick", function(e, row){
+    var namaVendor = row._row.data.nama.replace(/<[^>]*>/g, '');
+    var idVendor = row._row.data.id;
+    inpVendor.val(namaVendor)
+    inpIdVendor.val(idVendor)
+    $("#modal-vendor").modal("hide");
+})
+
+spanVendor.click(function () {
+    setTimeout(() => {
+        dtListVendor.redraw(true)
+    }, 500);
+    $("#modal-vendor").modal("show");
+    dtListVendor.deselectRow();
+});
+spanBarang.click(function () {
+    setTimeout(() => {
+        dtList.redraw(true)
+    }, 500);
+    $("#modal-barang").modal("show");
+    dtList.deselectRow();
+});
+
+btnAdd.click(function(){
+    openModalDetail()
+})
+
+
+
+function openModalDetail(row = null){
+    if(row){
+        let data = row.getData()
+        inpBarang.val(data.nama_barang)
+        inpIdBarang.val(data.id_barang)
+        inpUnit.val(data.nama_unit)
+        inpQty.val(data.qty)
+        if(data.tax){
+            $('input[type=checkbox]').prop('checked',true);
+        } else{
+            $('input[type=checkbox]').prop('checked',false);
+        }
+        inpUnitPrice.val(data.price)
+        inpDisc.val(data.disc)
+    } else{
+        inpBarang.val("")
+        inpIdBarang.val("")
+        inpUnit.val("")
+        $('input[type=checkbox]').prop('checked',false);
+        inpQty.val("")
+        inpDisc.val("")
+        inpUnitPrice.val("")
+    }
+    modalDet.modal("show")
+
+    btnSimpanDetail.off("click").on("click",function(){
+        let grandPrice = 0;
+        let discPrice = 0;
+        let taxAfterPrice = 0;
+        let priceAfterDisc = 0;
+        let tax = "";
+        let disc = "";
+        const regex = /^[0-9]+(\.[0-9]+)?$/; // Hanya angka dan desimal
+    
+        if(inpBarang.val().length == 0){
+            return Swal.fire({
+                text: "Barang harus dipilih",
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+    
+        
+        
+        if(inpQty.val().length == 0 || inpQty.val() <= 0){
+            return Swal.fire({
+                text: "Quantity tidak boleh kosong",
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+    
+        if(inpUnitPrice.val().length == 0 || inpUnitPrice.val() <= 0){
+            return Swal.fire({
+                text: "Unit Price tidak boleh kosong",
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+    
+        if(!regex.test(inpQty.val())){
+            return Swal.fire({
+                text: "Quantity harus berupa angka",
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+        if(!regex.test(inpUnitPrice.val())){
+            return Swal.fire({
+                text: "Unit Price harus berupa angka",
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+        if(inpDisc.val().length > 0 && !regex.test(inpDisc.val())){
+            return Swal.fire({
+                text: "Discon harus berupa angka",
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+    
+        if(inpCheckTax.is(':checked') && inpDisc.val().length > 0){
+            grandPrice = parseFloat(inpQty.val()) * parseFloat(inpUnitPrice.val())
+            discPrice = grandPrice * (inpDisc.val()/100) 
+            priceAfterDisc = grandPrice - discPrice;
+            taxAfterPrice = priceAfterDisc * (inpTax.val()/100)
+            grandPrice = priceAfterDisc + taxAfterPrice
+            tax = inpTax.val()
+            disc = inpDisc.val()
+        } else if(inpCheckTax.is(':checked')){
+            grandPrice = parseFloat(inpQty.val()) * parseFloat(inpUnitPrice.val())
+            taxAfterPrice = grandPrice * (inpTax.val()/100)
+            grandPrice = grandPrice + taxAfterPrice
+            tax = inpTax.val()
+            disc =""
+        } else if(inpDisc.val().length > 0){
+            grandPrice = parseFloat(inpQty.val()) * parseFloat(inpUnitPrice.val())
+            discPrice = grandPrice * (inpDisc.val()/100) 
+            grandPrice = grandPrice - discPrice
+            tax = ""
+            disc = inpDisc.val()
+        } else{
+            grandPrice = parseFloat(inpQty.val()) * parseFloat(inpUnitPrice.val())
+            tax = ""
+            disc = ""
+        }
+    
+        if(row){
+            row.update({
+                nama_barang                 : inpBarang.val(),
+                kode_barang                 : inpKodeBarang.val(),
+                id_barang                   : inpIdBarang.val(),
+                qty                         : inpQty.val(),
+                price                       : inpUnitPrice.val(),
+                grand_price                 : grandPrice,
+                disc_price:discPrice,
+                tax_price:taxAfterPrice,
+                disc                 : disc,
+                tax                 : tax,
+                nama_unit                 : inpUnit.val(),
+            });
+            // modalDet.modal("hide")
+        } else{
+
+            dtListDetailPO.addRow({
+                
+                nama_barang                 : inpBarang.val(),
+                kode_barang                 : inpKodeBarang.val(),
+                id_barang                   : inpIdBarang.val(),
+                qty                         : inpQty.val(),
+                price                       : inpUnitPrice.val(),
+                grand_price                 : grandPrice,
+                disc_price:discPrice,
+                tax_price:taxAfterPrice,
+                disc                 : disc,
+                tax                 : tax,
+                nama_unit                 : inpUnit.val(),
+            });
+            // modalDet.modal("hide")
+        }
+        modalDet.modal("hide")
+        
+    })
+
+}
+
+let buttonRowAction = function(cell) {
+    let fmBtnDelete = "";        
+    let fmBtnEdit = "";        
+
+    if (inpStatus.val() == 0){
+        fmBtnDelete = `<button type="button" class="btn btn-sm btn-danger" title='delete'><i class="fa fa-trash" title='delete'></i></button>`;
+        fmBtnEdit = ` <button type="button" class="btn btn-sm btn-warning text-dark" title='edit'><i class="fa fa-edit" title='edit'></i></button>`;
+    }
+   
+
+    return fmBtnEdit + " " + fmBtnDelete;
+};
+
+let dtListDetailPO = new Tabulator("#dt-list-po", {
+    pagination: true, 
+    paginationSize: 10,
+    paginationButtonCount: 5,
+    columns:[
+        {field:"id", visible:false},
+        {field:"id_barang", visible:false},
+        {field:"id_header", visible:false},
+        {field:"tax_price", visible:false},
+        {field:"disc_price", visible:false},
+        {field:"nama_unit", visible:false},
+        {
+            headerSort: false,  
+            title: '#', 
+            formatter: buttonRowAction,
+            width: '10%', align: "center", cssClass: "text-center",
+            cellClick: function(e, cell) {
+                let row = cell.getRow();
+                if (e.target.title === 'delete') {
+                    Swal.fire({
+                        title: "Apakah anda yakin ingin menghapus data?",
+                        icon: 'question',
+                        confirmButtonText: 'Hapus',
+                        confirmButtonColor: '#dc3545',
+                        showCancelButton: true,
+                        cancelButtonText: 'Batal',
+                        cancelButtonColor: '#6C757D'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            row.delete(); 
+                        }
+                    })
+                } else if(e.target.title === 'edit'){
+                
+                    openModalDetail(row)
+                    
+                } 
+            
+            }
+        },
+        {title:"ITEM CODE", field:"kode_barang",hozAlign:"left", width:"15%"},
+        {title:"ITEM DESCRIPTION", field:"nama_barang", hozAlign:"left",width:"20%"},
+        {title:"QTY", field:"qty", hozAlign:"center",width:"10%",editor: "number"},
+        {title:"UNIT PRICE", field:"price", hozAlign:"right",width:"15%",formatter: "money",formatterParams: {
+                decimal: ",",
+                thousand: ".",
+                symbol: "Rp",  // Simbol mata uang Rupiah
+                precision: 0,   // Tidak ada desimal
+            }, hozAlign:"right",
+        },
+        {title:"DISC (%)", field:"disc", hozAlign:"center",width:"10%"},
+        {title:"TAX (%)", field:"tax", hozAlign:"center",width:"10%"},
+        {title:"AMOUNT", width:"15%", field:"grand_price",formatter: "money", formatterParams: {
+            decimal: ",",
+            thousand: ".",
+            symbol: "Rp",  // Simbol mata uang Rupiah
+            precision: 0,   // Tidak ada desimal
+        }, hozAlign:"right"},
+    ],
+    locale: 'id',    
+    // layout: 'fitColumns',
+    placeholder: "Tidak ada data",
+});

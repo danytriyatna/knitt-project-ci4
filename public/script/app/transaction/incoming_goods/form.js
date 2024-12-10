@@ -234,8 +234,8 @@ let dtListVendor = new Tabulator("#dt-list-vendor", {
         params.length = params.size;
     },
     ajaxResponse: function (url, params, response) {
-        let pageSize = dtList.getPageSize();
-        let pageNo = dtList.getPage();
+        let pageSize = dtListVendor.getPageSize();
+        let pageNo = dtListVendor.getPage();
         let startRow = (pageSize * (pageNo - 1)) + 1;
         let endRow = response.data.length + startRow - 1;
         if (response.data.length === 0) {
@@ -321,8 +321,8 @@ let dtListKonsumen = new Tabulator("#dt-list-konsumen", {
         params.length = params.size;
     },
     ajaxResponse: function (url, params, response) {
-        let pageSize = dtList.getPageSize();
-        let pageNo = dtList.getPage();
+        let pageSize = dtListKonsumen.getPageSize();
+        let pageNo = dtListKonsumen.getPage();
         let startRow = (pageSize * (pageNo - 1)) + 1;
         let endRow = response.data.length + startRow - 1;
         if (response.data.length === 0) {
