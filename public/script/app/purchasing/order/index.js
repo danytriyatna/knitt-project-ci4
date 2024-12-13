@@ -3,48 +3,70 @@ $(document).ready(function () {
         columns: [
             {
                 title: " ", field: "aksi", headerSort: false, formatter: "html",
-                width: 100
+                width: "10%"
             },
             
 			{
-				title: 'SI No.', field: 'kode_invoice', headerSort:false, sorter: 'string',
-				width: 160, formatter : "html"
+				title: 'PO NO.', field: 'po_no',hozAlign:"left", headerSort:false, sorter: 'string',
+				width: "10%", formatter : "html"
 			}, 
 				
 			{
-				title: 'Tgl Transaksi', field: 'tgl_transaksi', headerSort:false, sorter: 'string',
-				width: 140
+				title: 'PO DATE', field: 'po_date',hozAlign:"left", headerSort:false, sorter: 'string',
+				width: "10%",
+			}, 
+				
+			{
+				title: 'VENDOR NAME', field: 'nama_vendor',hozAlign:"left", headerSort:false, sorter: 'string',
+				width: "20%",
 			}, 
 
             {
-				title: 'Buyer', field: 'konsumen_nama', headerSort:false, sorter: 'string',
-				formatter : "html"
-			},
-
-            {
-				title: 'SI Ammount', field: 'grand_total', headerSort:false, sorter: 'string',
-				width: 160, formatter : "money", align:'center', cssClass:'text-end'
-			},
-
-            {
-				title: 'Paid Ammount', field: 'bayar', formatter : "money", headerSort:false, sorter: 'string',
-				width: 160, align:'center', cssClass:'text-end'
-			} ,
-
-            
-            {
-				title: 'Remain Ammount', field: 'sisa_bayar', headerSort:false, sorter: 'string', align: "center",
-                width: 160, formatter : "money", align:'center', cssClass:'text-end'
+				title: 'TERM', field: 'term', formatter : "html", align: "center", hozAlign:"left", headerSort:false,
+                width: "10%",
 			} ,
 
             {
-				title: 'SI Status', field: 'status', formatter : "html", headerSort:false, sorter: 'string',
-				width: 125
+				title: 'QTY STATUS', field: 'qty', formatter : "html", align: "center",hozAlign:"right", headerSort:false,
+                width: "10%",
+			},
+
+            {
+				title: 'TOTAL', field: 'total', headerSort:false, sorter: 'string', hozAlign:"right",
+				width: "10%", formatter : "html",
+                formatterParams: {
+                    decimal: ",",
+                    thousand: ".",
+                    symbol: "Rp",  // Simbol mata uang Rupiah
+                    precision: 0,   // Tidak ada desimal
+                },
+			},
+
+            {
+				title: 'PAYMENT', field: 'total_payment', headerSort:false, sorter: 'string',
+				width: "10%", formatter: "money",
+                formatterParams: {
+                    decimal: ",",
+                    thousand: ".",
+                    symbol: "Rp",  // Simbol mata uang Rupiah
+                    precision: 0,   // Tidak ada desimal
+                },
+			},
+
+            {
+				title: 'REMAIN', field: 'sisa', formatter: "money",headerSort:false, sorter: 'string',
+				width: 120,
+                formatterParams: {
+                    decimal: ",",
+                    thousand: ".",
+                    symbol: "Rp",  // Simbol mata uang Rupiah
+                    precision: 0,   // Tidak ada desimal
+                },
 			} ,
 				
         ],
-        layout: 'fitColumns',
-        ajaxURL: "/trans/sales-invoice/list",
+        // layout: 'fitColumns',
+        ajaxURL: "/purchasing/purchase-order/list",
         placeholder: "Tidak ada data",
         ajaxConfig: "POST",
         ajaxSorting: true,

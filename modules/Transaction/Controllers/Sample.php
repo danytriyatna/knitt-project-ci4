@@ -234,6 +234,18 @@ class Sample extends BaseController
 
 
     if (empty($id)) {
+
+      // menyimpan style 
+      $prm_syle['id_konsumen'] = $idKonsumen;
+      $prm_syle['kode_style'] = $deskripsi;
+      $cek_style = $this->mkonsumen->getDataStyle(0, 0, 1, null, null, $prm_syle);
+      if(empty($cek_style)){
+        $in_style['id_konsumen'] = $idKonsumen;
+        $in_style['kode_style'] = $deskripsi;
+        $in_style['keterangan_style'] = $deskripsi;
+        $this->mSample->insertRecordGetid('ref_konsumen_style', $in_style);
+      }
+
       $arr_isi['created_at'] = date("Y-m-d H:i:s");
       $arr_isi['kode_sample'] = $this->mSample->generateNo("SPL", "trans_sample", "kode_sample");
       $this->mSample->insertRecordGetid($this->mSample->table, $arr_isi);
@@ -385,4 +397,42 @@ class Sample extends BaseController
     // header('Content-Disposition: attachment; filename="qrcode.png"');
     // echo $result->getString();
   }
+
+  // fungsi untuk autocomplete 
+  public function getDataStyleKonsumen(){
+    $kata_kunci  = $this->request->getPost("kata_kunci");
+    $id_konsumen = $this->request->getPost("id_konsumen");
+
+    $status = false;
+    $msg = "Data Style Konsumen tidak ditemukan !";
+    $slc  = [];
+
+    try {
+      $params['id_konsumen'] = $id_konsumen;
+      $params['kata_kunci']  = $kata_kunci;
+      $result = $this->mkonsumen->getDataStyle(null, 0, 9999, null, null, $params);
+      if(!empty($result)){
+          foreach ($result as $r) {
+              $isi_slc = [];
+              $isi_slc["id"]    = 0;
+              $isi_slc["idx"]   = 0;
+              $isi_slc["value"] = $r->kode_style;
+              $isi_slc["label"] = $r->keterangan_style;
+              $isi_slc["data"]  = [];
+              $slc[] = $isi_slc;
+          }
+          $status = true;
+          $msg = "Data style ditemukan !";
+      }
+    } catch (\Throwable $th) {
+      //throw $th;
+      $msg = "Gagal mengambil data Style Konsumen!";
+    }
+
+    $build_array["status"] = $status;
+    $build_array["msg"] = $msg;
+    $build_array["data"] = [];
+    $build_array["slc"] = $slc;
+    return $this->response->setJSON($build_array);
+}
 }

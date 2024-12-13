@@ -10,6 +10,7 @@ $routes->group('trans/sample', ['namespace' => 'Modules\Transaction\Controllers'
   $routes->get('delete/list(:any)', 'Sample::deleteList/$1');
   $routes->post('generate', 'Sample::generateQRCode');
   $routes->post('delete/detail', 'Sample::deleteDetailList');
+  $routes->post('get-style-konsumen', 'Sample::getDataStyleKonsumen');
 });
 
 $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {

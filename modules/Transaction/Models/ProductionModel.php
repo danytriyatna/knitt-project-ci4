@@ -214,43 +214,152 @@ class ProductionModel extends \App\Models\PrModel
     function getProduksilast($params){
         $id_walkorder = $params['id_walkorder'];
          // Dynamic Columns
-         $col1 = "";
-         $col2 = "";
+         $col11 = "";
+         $col12 = "";
+         $col21 = "";
+         $col22 = "";
          $col3 = "";
          $ukuranArr = explode(",", $params['ukuran']);
          foreach ($ukuranArr as $item) {
-             $col1 .= ($col1 == "") ? "coalesce(tbl.$item,0) as $item" : ",coalesce(tbl.$item,0) as $item";
-             $col2 .= ($col2 == "") ? "$item Int" : ",$item Int";
+             $hrg = $item . '_hrg';
+             $col11 .= ($col11 == "") ? "coalesce(tbl.$item,0) as $item" : ",coalesce(tbl.$item,0) as $item";
+             $col12 .= ($col12 == "") ? "coalesce(tbl.$hrg,0) as $hrg" : ",coalesce(tbl.$hrg,0) as $hrg";
+
+             $col21 .= ($col21 == "") ? "$item Int" : ",$item Int";
+             $col22 .= ($col22 == "") ? "$hrg Float" : ",$hrg Float";
          }
 
+        // $sql = "
+        //     select 
+        //         tbl.ref_detail_id__,
+        //         tbl.id_walkorder,
+        //         tbl.id_proses,
+        //         tw.tipe_id,
+        //         rw.kode_warna,
+        //         coalesce(tbl.harga_satuan, 0) as harga_satuan,
+        //         {$col1}
+        //     from
+        //         CROSSTAB(
+        //             'select 
+        //                 twpu.ref_detail_id,
+        //                 twp.id_walkorder,
+        //                 twp.id_proses,
+        //                 (CASE WHEN tw.tipe_id = 1 THEN 
+        //                     (select xt.harga_satuan from trans_sample_ukuran xt where xt.id_ukuran = twpu.id_ukuran and xt.id_sample_det =  twpu.ref_detail_id)
+        //                 ELSE 
+        //                     (select xt.harga_satuan from trans_sample_ukuran xt where xt.id_ukuran = twpu.id_ukuran and xt.id_sample_det =  twpu.ref_detail_id)
+        //                 END) as harga_satuan,
+        //                 rk.key_ukuran,
+        //                 COALESCE(twpu.qty_prod, 0) as qty_prod
+        //             from trans_walkorder_proses_ukuran twpu
+        //             inner join trans_walkorder_proses twp on twp.id = twpu.id_walkorder_proses
+        //             inner join trans_walkorder tw on tw.id = twp.id_walkorder
+        //             inner join ref_ukuran rk on rk.id = twpu.id_ukuran
+        //             where twp.id_walkorder = ".$id_walkorder." and  twp.id_proses = (select max(tx.id_proses) from trans_walkorder_proses tx where tx.id_walkorder = ".$id_walkorder.")
+        //             order by twpu.ref_detail_id, twp.id_proses asc, twpu.id_ukuran',
+        //         'select key_ukuran from ref_ukuran rx where rx.active = 1 order by rx.seq asc'
+        //     ) as tbl (ref_detail_id int, id_walkorder int, id_proses int, harga_satuan float, {$col2})
+        //     inner join trans_walkorder tw on tbl.id_walkorder = tw.id
+        //     left join trans_sample_det tsd on tbl.ref_detail_id = tsd.id and tw.tipe_id = 1
+        //     left join trans_sales_order_det tsod on tbl.ref_detail_id = tsod.id and tw.tipe_id = 2
+        //     left join ref_warna rw on rw.id = (case when tw.tipe_id = 1 then tsd.id_warna_1 when tw.tipe_id = 2 then tsod.id_warna_1 else -1 end)
+        // ";
+
         $sql = "
-            select 
-                tbl.ref_detail_id,
-                tbl.id_walkorder,
-                tbl.id_proses,
-                tw.tipe_id,
-                rw.kode_warna,
-                {$col1}
-            from
-                CROSSTAB(
-                    'select 
-                        twpu.ref_detail_id,
-                        twp.id_walkorder,
-                        twp.id_proses,
-                        rk.key_ukuran,
-                        COALESCE(twpu.qty_prod, 0) as qty_prod
-                    from trans_walkorder_proses_ukuran twpu
-                    inner join trans_walkorder_proses twp on twp.id = twpu.id_walkorder_proses
-                    inner join ref_ukuran rk on rk.id = twpu.id_ukuran
-                    where twp.id_walkorder = ".$id_walkorder." and  twp.id_proses = (select max(tx.id_proses) from trans_walkorder_proses tx where tx.id_walkorder = ".$id_walkorder.")
-                    order by twpu.ref_detail_id, twp.id_proses asc, twpu.id_ukuran',
-                'select key_ukuran from ref_ukuran rx where rx.active = 1 order by rx.seq asc'
-            ) as tbl (ref_detail_id int, id_walkorder int, id_proses int, {$col2})
-            inner join trans_walkorder tw on tbl.id_walkorder = tw.id
-            left join trans_sample_det tsd on tbl.ref_detail_id = tsd.id and tw.tipe_id = 1
-            left join trans_sales_order_det tsod on tbl.ref_detail_id = tsod.id and tw.tipe_id = 2
-            left join ref_warna rw on rw.id = (case when tw.tipe_id = 1 then tsd.id_warna_1 when tw.tipe_id = 2 then tsod.id_warna_1 else -1 end)
+                SELECT 
+                    tbl.ref_detail_id,
+                    tbl.id_walkorder,
+                    tbl.id_proses,
+                    tw.tipe_id,
+                    rw.kode_warna,
+                    {$col11},
+                    {$col12}
+                FROM 
+                    CROSSTAB(
+                        $$ 
+                        SELECT 
+                            twpu.ref_detail_id,
+                            twp.id_walkorder,
+                            twp.id_proses,
+                            rk.key_ukuran || CASE 
+                                WHEN subquery.is_qty THEN ''
+                                ELSE '_hrg'
+                            END AS column_name,
+                            CASE 
+                                WHEN subquery.is_qty THEN COALESCE(twpu.qty_prod, 0)
+                                ELSE 
+                                    CASE 
+                                        WHEN tw.tipe_id = 1 THEN
+                                            (
+                                                SELECT xt.harga_satuan 
+                                                FROM trans_sample_ukuran xt 
+                                                WHERE xt.id_ukuran = twpu.id_ukuran 
+                                                AND xt.id_sample_det = twpu.ref_detail_id
+                                            )
+                                        WHEN tw.tipe_id = 2 THEN
+                                            (
+                                                SELECT xt.harga_satuan 
+                                                FROM trans_sales_order_ukuran xt 
+                                                WHERE xt.id_ukuran = twpu.id_ukuran 
+                                                AND xt.id_sales_order_det = twpu.ref_detail_id
+                                            )
+                                        ELSE
+                                            0
+                                    END
+                            END AS value
+                        FROM trans_walkorder_proses_ukuran twpu
+                        INNER JOIN trans_walkorder_proses twp 
+                            ON twp.id = twpu.id_walkorder_proses
+                        INNER JOIN trans_walkorder tw 
+                            ON tw.id = twp.id_walkorder
+                        INNER JOIN ref_ukuran rk 
+                            ON rk.id = twpu.id_ukuran
+                        CROSS JOIN (
+                            SELECT DISTINCT key_ukuran, TRUE AS is_qty 
+                            FROM ref_ukuran 
+                            WHERE active = 1
+                            UNION ALL
+                            SELECT DISTINCT key_ukuran, FALSE AS is_qty 
+                            FROM ref_ukuran 
+                            WHERE active = 1
+                        ) subquery
+                        WHERE twp.id_walkorder = {$id_walkorder}
+                        AND twp.id_proses = (
+                            SELECT MAX(tx.id_proses) 
+                            FROM trans_walkorder_proses tx 
+                            WHERE tx.id_walkorder = {$id_walkorder}
+                        )
+                        ORDER BY twpu.ref_detail_id, twp.id_proses, column_name
+                        $$,
+                        $$ 
+                        SELECT key_ukuran 
+                        FROM (
+                            SELECT key_ukuran, 1 as tseq, seq  FROM ref_ukuran WHERE active = 1
+                            UNION ALL
+                            SELECT CONCAT(key_ukuran, '_hrg'), 2 as tseq, seq  FROM ref_ukuran WHERE active = 1
+                        ) AS subquery
+                        ORDER BY tseq, seq
+                        $$
+                    ) AS tbl (
+                        ref_detail_id INT,
+                        id_walkorder INT,
+                        id_proses INT,
+                        {$col21},
+                        {$col22}
+                    )
+                INNER JOIN trans_walkorder tw ON tbl.id_walkorder = tw.id
+                LEFT JOIN trans_sample_det tsd ON tbl.ref_detail_id = tsd.id AND tw.tipe_id = 1
+                LEFT JOIN trans_sales_order_det tsod ON tbl.ref_detail_id = tsod.id AND tw.tipe_id = 2
+                LEFT JOIN ref_warna rw ON rw.id = CASE 
+                    WHEN tw.tipe_id = 1 THEN tsd.id_warna_1
+                    WHEN tw.tipe_id = 2 THEN tsod.id_warna_1 
+                    ELSE -1 
+                END;
+
         ";
+
+        // -- s INT, m INT, l INT, xl INT, xxl INT, all_ INT, xxxl INT, xs INT,
+        //                 == s_hrg FLOAT, m_hrg FLOAT, l_hrg FLOAT, xl_hrg FLOAT, xxl_hrg FLOAT, all_hrg FLOAT, xxxl_hrg FLOAT, xs_hrg FLOAT
 
         $query = $this->db->query($sql);
 

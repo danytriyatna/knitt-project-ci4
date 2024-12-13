@@ -7,6 +7,7 @@ class DeliveryModel extends \App\Models\PrModel
 
     protected $table = "trans_delivery";
     protected $table2 = "trans_delivery_detail";
+    protected $table3 = "trans_delivery_prod";
     protected $_data = null;
     protected $primaryKey = 'id';
 

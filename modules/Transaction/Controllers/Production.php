@@ -221,8 +221,8 @@ class Production extends BaseController
       }
 
       $prms['id_walkorder'] = $resData->id_walkorder;
-      $dataProses = $this->mProduksi->getDataProsesProd($resData->id_walkorder);
-
+      $dataProses = $this->mProduksi->getDataProsesProd($prms);
+      // dd($resData->id_walkorder);
       // get last qty ( untuk mengambil data yang suddah dikirim )
       $parms['last_proses'] = 1;
       $parms['id_walkorder'] = $resData->id_walkorder;
@@ -281,8 +281,8 @@ class Production extends BaseController
     if ($idWorkOrder != "") {
       $idWorkOrder = decrypt($idWorkOrder);
     }
-    $data = $this->request->getPost('data');
-
+    $data = $this->request->getPost('data');  
+    // print_r($data);exit;
     $res = $this->mProduksi->trxInsertUpdateRecord($data, $idProduksi, $idWorkOrder);
     if ($res) {
       $status = true;

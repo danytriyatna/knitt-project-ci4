@@ -1,38 +1,40 @@
 
 
 $(document).ready(function () {
-    let inpData         = $('#data_id');
-    let inpDeskripsi       = $('#desc_style');
+    let inpData          = $('#data_id');
+    let inpDeskripsi     = $('#desc_style');
     let inpBuyer         = $('#select_buyer');
-    let inpTglTransaksi       = $('#tgl_sample');
-    let inpTglDeadline       = $('#tgl_deadline');
-    let inpKetSample       = $('#ket_sample');
-    let inpPoWarna1       = $('#po_warna1');
-    let inpPoWarna2       = $('#po_warna2');
-    let inpPoWarna3       = $('#po_warna3');
-    let inpPoWarna4       = $('#po_warna4');
-    let inpPoWarna5       = $('#po_warna5');
-    let inpPoWarna6       = $('#po_warna6');
-    let inpPoWarna7       = $('#po_warna7');
-    let inpPoWarna8       = $('#po_warna8');
+    let inpTglTransaksi  = $('#tgl_sample');
+    let inpTglDeadline   = $('#tgl_deadline');
+    let inpKetSample     = $('#ket_sample');
+    let inpPoWarna1      = $('#po_warna1');
+    let inpPoWarna2      = $('#po_warna2');
+    let inpPoWarna3      = $('#po_warna3');
+    let inpPoWarna4      = $('#po_warna4');
+    let inpPoWarna5      = $('#po_warna5');
+    let inpPoWarna6      = $('#po_warna6');
+    let inpPoWarna7      = $('#po_warna7');
+    let inpPoWarna8      = $('#po_warna8');
 
     let fileSample       = $('#fileSample');
-    let fileSampleOld       = $('#fileSampleOld');
-    let linkFileSample       = $('#linkFileSample');
-    let deskripsiText       = $('#deskripsiText');
-    let tglSampleText       = $('#tglSampleText');
-    let buyerText       = $('#buyerText');
-    let tglDeadlineText       = $('#tglDeadlineText');
-    let noSampleText       = $('#noSampleText');
-    let fotoText       = $('#fotoText');
-    let rowDet = $("#rowDet")
-    let noSample = $("#no_sample");
+    let fileSampleOld    = $('#fileSampleOld');
+    let linkFileSample   = $('#linkFileSample');
+    let deskripsiText    = $('#deskripsiText');
+    let tglSampleText    = $('#tglSampleText');
+    let buyerText        = $('#buyerText');
+    let tglDeadlineText  = $('#tglDeadlineText');
+    let noSampleText     = $('#noSampleText');
+    let fotoText         = $('#fotoText');
+    let rowDet           = $("#rowDet")
+    let noSample         = $("#no_sample");
 
-    let isModal       = $("#modal-form-add-po");
-    let isModalPO      = $("#modal-form-po");
-    var idSample = null
-    var idSampleDet = null
-    var status = null
+    let isModal          = $("#modal-form-add-po");
+    let isModalPO        = $("#modal-form-po");
+    var idSample         = null
+    var idSampleDet      = null
+    var status           = null
+
+    
 
     let buttonQRAction = function(cell){
        if(cell.getData().id){
@@ -826,6 +828,52 @@ $(document).ready(function () {
             });
         
     }
+
+    $('#desc_style').autocomplete({
+        appendTo: '#modal-form-add-po',
+		source: function( request, response ) {
+            console.log(inpBuyer.val())
+		  if(inpBuyer.val() != ''){
+            $.ajax({
+                url: "/trans/sample/get-style-konsumen",
+                dataType: "json",
+                data: {
+                  kata_kunci : request.term,
+                  konsumen   : inpBuyer.val(),
+                },
+                type : 'post',
+                success: function( res ) {
+                    console.log(res)
+                  if(res.status){
+                      response(res.slc);
+                  }else{
+                      console.log(res.msg);
+                  }
+                }
+              });
+          }else{
+            inpDeskripsi.val('')
+            Swal.fire({
+                text: 'Pilih Konsumen/Buyer terlebih dahulu !',
+                icon: 'warning',
+                showConfirmButton: false,
+                timer: 2000
+            });
+          }
+		},
+		minLength: 0,
+		select: function( event, ui ) {
+            console.log(ui)
+			// addItem(ui.item.data);
+		},
+		open: function() {
+		  $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+		},
+		close: function() {
+		  $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+		//   $( this ).val("");
+		}
+	});
     
 });
 

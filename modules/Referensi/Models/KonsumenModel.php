@@ -18,7 +18,7 @@ class KonsumenModel extends \App\Models\PrModel
     {
         $builder = $this->db->table($this->table . " k");
 
-        $builder->select("k.id, k.nama, k.alamat, k.no_hp, k.email");
+        $builder->select("k.id, k.nama, k.alamat, k.no_hp, k.email, k.npwp");
 
         if ($id == null or $id == "") {
             $builder->where('k.active = 1');
@@ -64,6 +64,85 @@ class KonsumenModel extends \App\Models\PrModel
             $builder->where('LOWER(k.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->orWhere('LOWER(k.alamat) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->orWhere('LOWER(k.email) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->groupEnd();
+        }
+
+        $this->_data = $builder->get()->getRow()->_cnt;
+
+        return $this->_data;
+    }
+
+
+
+    // setiap konsumen dapat memiliki style nya masing masin dari transaksi sample ataupun sale order
+    function getDataStyle($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
+    {
+        $builder = $this->db->table("ref_konsumen_style s");
+
+        $builder->select("s.id, s.kode_style, s.keterangan_style, s.id_konsumen");
+
+        if ($id == null or $id == "") {
+            $builder->where('s.active = 1');
+            if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+                $builder->groupStart();
+                $builder->where('LOWER(s.kode_style) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(s.keterangan_style) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->groupEnd();
+            }
+
+            if(!empty($params['id_konsumen'])){
+                $builder->where('s.id_konsumen', $params['id_konsumen']);
+            }
+
+            if(!empty($params['kode_style'])){
+                $builder->where('s.kode_style', $params['kode_style']);
+            }
+
+            if(!empty($params['kata_kunci'])){
+                $builder->groupStart();
+                    $builder->where('LOWER(s.kode_style) LIKE', strtolower("%{$params['kata_kunci']}%"));
+                    $builder->orWhere('LOWER(s.keterangan_style) LIKE', strtolower("%{$params['kata_kunci']}%"));
+                $builder->groupEnd();
+            }
+
+            if (!empty($order)) {
+                $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
+            } else {
+                $builder->orderBy('id');
+            }
+
+            if (empty($offset)) $offset = 0;
+            if (empty($limit)) $limit = 10;
+
+            $builder->limit($limit, $offset);
+
+            $this->_data = $builder->get()->getResult();
+        } else {
+            $builder->where("s.id", $id);
+
+            $this->_data = $builder->get()->getRow();
+        }
+
+        return $this->_data;
+    }
+    
+    function getDataStyleCnt($filters = null, $params = null)
+    {
+        $builder = $this->db->table("ref_konsumen_style s");
+
+        $builder->select("count(1) as _cnt");
+
+        $builder->where('s.active = 1');
+
+        if(!empty($params['id_konsumen'])){
+            $builder->where('s.id_konsumen', $params['id_konsumen']);
+        }
+
+        if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+            $builder->groupStart();
+            $builder->where('LOWER(k.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->where('LOWER(s.kode_style) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(s.keterangan_style) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
         }
 

@@ -47,11 +47,11 @@
           </div>
         </div>
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_style">Description<span class="text-danger">*</span></label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_style">Style<span class="text-danger">*</span></label>
           <div class="col-md-9">
             <input type="text" id="desc_style" name="desc_style" class="form-control" placeholder="Ketikkan sample description" value="" required>
             <div class="invalid-feedback">
-              Sample Description tidak valid
+              Sample Style tidak valid
             </div>
           </div>
         </div>

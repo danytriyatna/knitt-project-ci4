@@ -207,16 +207,19 @@ class DeliveryOrder extends BaseController
           $isi = array(
             "ref_detail_id" => ($item->ref_detail_id),
             "id_walkorder"  => ($item->id_walkorder),
-            "colordasar"    => ($item->kode_warna)
+            "colordasar"    => ($item->kode_warna),
           );
           
           $qty = 0;
           foreach ($rukuran as $iu) {
             $keyUkuran = $iu->key_ukuran;
             $indx      = $iu->key_ukuran;
+         
             if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
+            $xharga    = $keyUkuran.'_hrg';
 
             $isi[$indx] = $item->$keyUkuran;
+            $isi[$xharga] = $item->$xharga;
 
             $qty = $qty +  $item->$keyUkuran;
           }
@@ -247,8 +250,8 @@ class DeliveryOrder extends BaseController
         $stdData->keterangan_style = trim($this->request->getPost('keterangan_style'));
         $stdData->select_buyer = trim($this->request->getPost('select_buyer'));
         $stdData->alamat_buyer  = trim($this->request->getPost('alamat_buyer'));
-        $dt_details = trim($this->request->getPost('data-details'));
-        $dt_prods = trim($this->request->getPost('data-prods'));
+        $dt_prods   = trim($this->request->getPost('data-details'));
+        $dt_details = trim($this->request->getPost('data-prods'));
 
         $dt_details = json_decode($dt_details, true);
         $dt_prods = json_decode($dt_prods, true);
@@ -257,7 +260,7 @@ class DeliveryOrder extends BaseController
 
         
 
-        $data['tgl_transaksi'] = $stdData->tgl_do;
+        $data['tgl_transaksi'] = fdate_ind_to_eng($stdData->tgl_do);
         $data['id_produksi'] = $stdData->id_produksi;
         $data['produksi_kode'] = $stdData->kode_produksi;
         $data['alamat'] = $stdData->alamat_buyer;
@@ -309,17 +312,17 @@ class DeliveryOrder extends BaseController
   function insert($dataIn, $detail, $produksi){
     $tgl = date('Y-m-d H:i:s');
     $userId = $this->get_userid();
-
+    
     $this->db->transBegin();
 
     $id = $this->mDelivery->insertRecordGetid($this->mDelivery->table,$dataIn);
 
     $qty = 0;
-    if(!empty($produksi)){
+    if(!empty($detail)){
       $builderx = $this->mDelivery->table($this->mDelivery->table2);
       $builderx->where("id_delivery", $id);
       $builderx->delete();
-      foreach ($produksi as $item) {
+      foreach ($detail as $item) {
         $ddata = [];
         $ddata['id_delivery'] = $id;
         $ddata['ref_detail_id'] = $item['ref_detail_id'];
@@ -335,23 +338,34 @@ class DeliveryOrder extends BaseController
 
     $dataIn['qty'] = $qty;
     $this->mDelivery->updateRecord($this->mDelivery->table, $dataIn, 'id', $id);
-    // if(!empty($produksi)){
-    //   $builderx = $this->mDelivery->table($this->mDelivery->table3);
-    //   $builderx->where("id_delivery", $id);
-    //   $builderx->delete();
+    
+    if(!empty($produksi)){
 
-    //   $data_uk = $this->mUkuran->getData(0, 0, 9999);
-    //   foreach ($produksi as $itemx) {
-    //     $ddata = [];
-    //     $ddata['ref_detail_id'] = $itemx['ref_detail_id'];
-    //     $ddata['id_ukuran'] = $itemx['id_ukuran'];
-    //     $ddata['qty'] = $itemx['qty'];
-    //     $ddata['qty_do'] = $itemx['qty_prod'];
-    //     $ddata['created_at'] = $tgl;
-    //     $ddata['created_by'] = $userId;
-    //     $this->mDelivery->insertRecordGetid($this->mDelivery->table3,$ddata);
-    //   }
-    // }
+      $rukuran = $this->mUkuran->getData(0, 0, 999);
+      foreach ($produksi as $itemx) {
+        // dd($itemx);
+        $xdata = [];
+        $xdata['id_delivery']   = $id;
+        $xdata['ref_detail_id'] = $itemx['ref_detail_id'];
+       
+        $xdata['created_at']    = $tgl;
+        $xdata['created_by']    = $userId;
+        foreach ($rukuran as $iu) {
+          $keyUkuran = $iu->key_ukuran;
+          $indx      = $iu->key_ukuran;
+
+
+          $xdata['qty']          = $itemx[$keyUkuran];
+          if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
+          $xharga    = $keyUkuran.'_hrg';
+
+          $xdata['id_ukuran']    = $iu->id;
+          $xdata['harga_satuan'] = $itemx[$xharga];
+         
+          $this->mDelivery->insertRecordGetid($this->mDelivery->table3,$xdata);
+        }
+      }
+    }
 
 
 
@@ -378,12 +392,12 @@ class DeliveryOrder extends BaseController
 
     $qty = 0;
     
-    if(!empty($produksi)){
+    if(!empty($detail)){
       $builderx = $this->db->table($this->mDelivery->table2);
       $builderx->where("id_delivery", $id);
       $builderx->delete();
       
-      foreach ($produksi as $item) {
+      foreach ($detail as $item) {
         $ddata = [];
         $ddata['id_delivery'] = $id;
         $ddata['ref_detail_id'] = $item['ref_detail_id'];
@@ -399,23 +413,37 @@ class DeliveryOrder extends BaseController
 
     $dataIn['qty'] = $qty;
     $this->mDelivery->updateRecord($this->mDelivery->table, $dataIn, 'id', $id);
-    // if(!empty($produksi)){
-    //   $builderx = $this->mDelivery->table($this->mDelivery->table3);
-    //   $builderx->where("id_delivery", $id);
-    //   $builderx->delete();
+    if(!empty($produksi)){
 
-    //   $data_uk = $this->mUkuran->getData(0, 0, 9999);
-    //   foreach ($produksi as $itemx) {
-    //     $ddata = [];
-    //     $ddata['ref_detail_id'] = $itemx['ref_detail_id'];
-    //     $ddata['id_ukuran'] = $itemx['id_ukuran'];
-    //     $ddata['qty'] = $itemx['qty'];
-    //     $ddata['qty_do'] = $itemx['qty_prod'];
-    //     $ddata['created_at'] = $tgl;
-    //     $ddata['created_by'] = $userId;
-    //     $this->mDelivery->insertRecordGetid($this->mDelivery->table3,$ddata);
-    //   }
-    // }
+      $rukuran = $this->mUkuran->getData(0, 0, 999);
+
+      $builderv = $this->mDelivery->table($this->mDelivery->table3);
+      $builderv->where("id_delivery", $id);
+      $builderv->delete();
+      foreach ($produksi as $itemx) {
+        // dd($itemx);
+        $xdata = [];
+        $xdata['id_delivery']   = $id;
+        $xdata['ref_detail_id'] = $itemx['ref_detail_id'];
+       
+        $xdata['created_at']    = $tgl;
+        $xdata['created_by']    = $userId;
+        foreach ($rukuran as $iu) {
+          $keyUkuran = $iu->key_ukuran;
+          $indx      = $iu->key_ukuran;
+
+
+          $xdata['qty']          = $itemx[$keyUkuran];
+          if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
+          $xharga    = $keyUkuran.'_hrg';
+
+          $xdata['id_ukuran']    = $iu->id;
+          $xdata['harga_satuan'] = $itemx[$xharga];
+         
+          $this->mDelivery->insertRecordGetid($this->mDelivery->table3,$xdata);
+        }
+      }
+    }
 
 
 
@@ -519,16 +547,19 @@ class DeliveryOrder extends BaseController
             $isi = array(
               "ref_detail_id" => ($item->ref_detail_id),
               "id_walkorder"  => ($item->id_walkorder),
-              "colordasar"    => ($item->kode_warna)
+              "colordasar"    => ($item->kode_warna),
             );
             
             $qty = 0;
             foreach ($rukuran as $iu) {
               $keyUkuran = $iu->key_ukuran;
               $indx      = $iu->key_ukuran;
+              
               if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
+              $xharga    = $keyUkuran.'_hrg';
 
-              $isi[$indx] = $item->$keyUkuran;
+              $isi[$indx]   = $item->$keyUkuran;
+              $isi[$xharga] = $item->$xharga;
 
               $qty = $qty +  $item->$keyUkuran;
             }
@@ -555,54 +586,54 @@ class DeliveryOrder extends BaseController
   }
 
   public function getDataProduksiItem(){
-    $barcode_code = $this->request->getPost("kata_kunci");
-    $id_walkorder = $this->request->getPost("id_walkorder");
-    $id_produksi  = $this->request->getPost("id_produksi");
+      $barcode_code = $this->request->getPost("kata_kunci");
+      $id_walkorder = $this->request->getPost("id_walkorder");
+      $id_produksi  = $this->request->getPost("id_produksi");
 
-    $status = false;
-    $msg = "Data warna ukuran tidak ditemukan !";
-    $data = [];
-    $slc  = [];
+      $status = false;
+      $msg = "Data warna ukuran tidak ditemukan !";
+      $data = [];
+      $slc  = [];
 
-    // if(!empty($barcode_code)){
-        $params['last_proses']  = 1;
-        $params['id_walkorder'] = $id_walkorder;
-        $params['kata_kunci'] = $barcode_code;
-        $result = $this->mWalkorder->getListProduksiUkuran($params);
-        if(!empty($result)){
-            foreach ($result as $r) {
-                $isi = [];
-                $isi["id_walkorder"]  = $r->id_walkorder;
-                $isi["ref_detail_id"] = $r->ref_detail_id;
-                $isi["id_ukuran"]     = $r->id_ukuran;
-                $isi["id_warna"]      = $r->id_warna;
-                $isi["qty"]           = $r->qty_prod;
-                $isi["qty_prod"]      = 0;
-                $isi["kata_kunci"]    =  "(".$r->kode_warna.") " . $r->kode_ukuran;
-                $isi["kode_warna"]    = $r->kode_warna;
-                $isi["kode_ukuran"]   = $r->kode_ukuran;
-                $isi["key_ukuran"]    = $r->key_ukuran;
-                $data[] = $isi;
+      // if(!empty($barcode_code)){
+          $params['last_proses']  = 1;
+          $params['id_walkorder'] = $id_walkorder;
+          $params['kata_kunci'] = $barcode_code;
+          $result = $this->mWalkorder->getListProduksiUkuran($params);
+          if(!empty($result)){
+              foreach ($result as $r) {
+                  $isi = [];
+                  $isi["id_walkorder"]  = $r->id_walkorder;
+                  $isi["ref_detail_id"] = $r->ref_detail_id;
+                  $isi["id_ukuran"]     = $r->id_ukuran;
+                  $isi["id_warna"]      = $r->id_warna;
+                  $isi["qty"]           = $r->qty_prod;
+                  $isi["qty_prod"]      = 0;
+                  $isi["kata_kunci"]    =  "(".$r->kode_warna.") " . $r->kode_ukuran;
+                  $isi["kode_warna"]    = $r->kode_warna;
+                  $isi["kode_ukuran"]   = $r->kode_ukuran;
+                  $isi["key_ukuran"]    = $r->key_ukuran;
+                  $data[] = $isi;
 
 
-                $isi_slc = [];
-                $isi_slc["id"]    = $r->ref_detail_id;
-                $isi_slc["idx"]   = $r->kode_warna;
-                $isi_slc["label"] = "(".$r->kode_warna.") " . $r->kode_ukuran;
-                $isi_slc["value"] = $r->ref_detail_id;
-                $isi_slc["data"]  = $isi;
-                $slc[] = $isi_slc;
-            }
-            $status = true;
-            $msg = "Data produk ditemukan !";
-        }
-       
-    // }
+                  $isi_slc = [];
+                  $isi_slc["id"]    = $r->ref_detail_id;
+                  $isi_slc["idx"]   = $r->kode_warna;
+                  $isi_slc["label"] = "(".$r->kode_warna.") " . $r->kode_ukuran;
+                  $isi_slc["value"] = $r->ref_detail_id;
+                  $isi_slc["data"]  = $isi;
+                  $slc[] = $isi_slc;
+              }
+              $status = true;
+              $msg = "Data produk ditemukan !";
+          }
+        
+      // }
 
-    $build_array["status"] = $status;
-    $build_array["msg"] = $msg;
-    $build_array["data"] = $data;
-    $build_array["slc"] = $slc;
-    return $this->response->setJSON($build_array);
-}
+      $build_array["status"] = $status;
+      $build_array["msg"] = $msg;
+      $build_array["data"] = $data;
+      $build_array["slc"] = $slc;
+      return $this->response->setJSON($build_array);
+  }
 }
