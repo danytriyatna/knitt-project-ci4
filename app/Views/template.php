@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,10 +8,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="title" property="og:title" content="<?= $name_app ?>">
   <meta name="image" property="og:image" content="assets/images/og-image.webp">
-  <meta name="description" property="og:description" content="<?= $deskripsi?>">
+  <meta name="description" property="og:description" content="<?= $deskripsi ?>">
   <meta name="author" property="og:author" content="Pejuang Rupiah">
   <link rel="icon" type="image/png" sizes="64x64" href="assets/images/favicon.png">
-  <title><?=(isset($titlehead) ? $titlehead : ""); ?> &mdash; <?= $judul ?></title>
+  <title><?= (isset($titlehead) ? $titlehead : ""); ?> &mdash; <?= $judul ?></title>
   <link href="assets/css/style.min.css" rel="stylesheet">
   <!-- Tabulator - https://tabulator.info/docs/5.4 -->
   <link href="assets/node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
@@ -28,11 +27,11 @@
   <!-- Bootstrap Datepicker - https://bootstrap-datepicker.readthedocs.io/en/latest/index.html -->
   <link href="assets/node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
   <!-- Custom CSS, generated from /sass -->
- <!-- politespace - https://github.com/filamentgroup/politespace -->
- <link href="assets/node_modules/politespace/dist/politespace.css" rel="stylesheet">
+  <!-- politespace - https://github.com/filamentgroup/politespace -->
+  <link href="assets/node_modules/politespace/dist/politespace.css" rel="stylesheet">
 
- <link href="assets/node_modules/jquery-ui-bundle/jquery-ui.min.css" rel="stylesheet">
- <link href="assets/node_modules/jquery-ui-bundle/jquery-ui.theme.min.css" rel="stylesheet">
+  <link href="assets/node_modules/jquery-ui-bundle/jquery-ui.min.css" rel="stylesheet">
+  <link href="assets/node_modules/jquery-ui-bundle/jquery-ui.theme.min.css" rel="stylesheet">
 
   <link href="assets/css/custom.min.css" rel="stylesheet">
   <script>
@@ -58,7 +57,7 @@
     </header>
 
     <?= $this->include('layout/_sidebar') ?>
-    
+
     <div class="page-wrapper">
       <main role="main" class="flex-shrink-0">
         <div class="preloader iloader d-none">
@@ -75,7 +74,7 @@
     <a href="javascript:void(0)" class="scroll-top" style="display: none;">
       <i class="fa fa-chevron-up"></i>
     </a>
-    
+
   </div>
   <script>
     const BASE_URL = '<?= base_url(); ?>';
@@ -118,6 +117,40 @@
 
   <script>
     showWelcomeToast("<?= $currentUser->full_name ?>");
+
+    function formatLocaleDate(localeDate) {
+
+      var months = {
+        "Januari": "01",
+        "January": "01",
+        "Februari": "02",
+        "February": "02",
+        "Maret": "03",
+        "March": "03",
+        "April": "04",
+        "Mei": "05",
+        "May": "05",
+        "Juni": "06",
+        "June": "06",
+        "Juli": "07",
+        "July": "07",
+        "Agustus": "08",
+        "August": "08",
+        "September": "09",
+        "Oktober": "10",
+        "October": "10",
+        "November": "11",
+        "Desember": "12",
+        "December": "12",
+      };
+
+      var parts = localeDate.split(" ");
+      var day = parts[0].padStart(2, '0');
+      var month = months[parts[1]];
+      var year = parts[2];
+
+      return `${year}-${month}-${day}`;
+    }
   </script>
 
   <?= $this->renderSection('script') ?>

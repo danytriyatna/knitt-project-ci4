@@ -3,7 +3,9 @@
 $routes->group('purchasing/purchase-order', ['namespace' => 'Modules\Purchasing\Controllers'], static function ($routes) {
   $routes->get('/', 'PurchaseOrder::index');
   $routes->post('list', 'PurchaseOrder::lists');
+  $routes->post('save', 'PurchaseOrder::save');
   $routes->get('form', 'PurchaseOrder::form');
+  $routes->get('form/(:any)', 'PurchaseOrder::form/$1');
 });
 
 $routes->group('purchasing/receive-item', ['namespace' => 'Modules\Purchasing\Controllers'], static function ($routes) {

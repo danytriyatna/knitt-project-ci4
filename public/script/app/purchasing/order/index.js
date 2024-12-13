@@ -33,7 +33,7 @@ $(document).ready(function () {
 
             {
 				title: 'TOTAL', field: 'total', headerSort:false, sorter: 'string', hozAlign:"right",
-				width: "10%", formatter : "html",
+				width: "10%", formatter : "money",
                 formatterParams: {
                     decimal: ",",
                     thousand: ".",
@@ -55,7 +55,7 @@ $(document).ready(function () {
 
             {
 				title: 'REMAIN', field: 'sisa', formatter: "money",headerSort:false, sorter: 'string',
-				width: 120,
+                width: "10%", 
                 formatterParams: {
                     decimal: ",",
                     thousand: ".",
@@ -63,6 +63,10 @@ $(document).ready(function () {
                     precision: 0,   // Tidak ada desimal
                 },
 			} ,
+            {
+				title: 'PAYMENY STATUS', field: 'status', formatter : "html", align: "center", headerSort:false,
+                width: "10%",
+			},
 				
         ],
         // layout: 'fitColumns',
