@@ -73,7 +73,13 @@ $routes->group('trans/sales-invoice', ['namespace' => 'Modules\Transaction\Contr
 
 $routes->group('trans/customer-receipt', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'CustomerReceipt::index');
-  $routes->get('form', 'CustomerReceipt::form');
+  $routes->post('list', 'CustomerReceipt::lists');
+  $routes->get('add', 'CustomerReceipt::form');
+  $routes->post('add', 'CustomerReceipt::form');
+  $routes->get('form/(:any)', 'CustomerReceipt::form/$1');
+  $routes->post('form/(:any)', 'CustomerReceipt::form/$1');
+  $routes->post('getInvoice', 'CustomerReceipt::get_invoice');
+  $routes->get('delete/(:any)', 'CustomerReceipt::delete/$1');
 });
 
 $routes->group('trans/item-transfer', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {

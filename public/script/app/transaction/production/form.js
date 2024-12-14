@@ -329,7 +329,7 @@ $(document).ready(function () {
         }
         if (operator.val().length == 0){
             return Swal.fire({
-                text: "Operator harus dipilih",
+                text: "CMT harus dipilih",
                 icon: 'error',
                 showConfirmButton: false,
                 timer: 2000
@@ -648,7 +648,7 @@ $(document).ready(function () {
                 }
               });
           }else{
-            alert("Pilih Operator terlebih dahulu !");
+            alert("Pilih CMT terlebih dahulu !");
           }
         },
         minLength: 2,

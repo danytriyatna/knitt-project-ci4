@@ -139,7 +139,7 @@
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-3 col-form-label" for="si_no">SI No.</label>
                       <div class="col-md-9">
-                        <input type="text" id="si_no" name="si_no" class="form-control" placeholder="Ketikkan nomor SI" value="<?= !empty($row) ? $row->kode_invoice : ""; ?>">
+                        <input type="text" id="si_no" readonly name="si_no" class="form-control" placeholder="Ketikkan nomor SI" value="<?= !empty($row) ? $row->kode_invoice : ""; ?>">
                       </div>
                     </div>
                   </div>
