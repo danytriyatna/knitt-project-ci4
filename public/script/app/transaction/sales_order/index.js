@@ -7,6 +7,7 @@ $(document).ready(function () {
     let inpData           = $('#data_id');
     let inpNoSalesOrder   = $('#no_sales_order');
     let inpDeskripsi      = $('#desc_style');
+    let inpStyle          = $('#style');
     let inpBuyer          = $('#select_buyer');
     let inpTglTransaksi   = $('#tgl_sales_order');
     let inpTglDeadline    = $('#tgl_deadline');
@@ -346,6 +347,7 @@ $(document).ready(function () {
         inpTglTransaksi.val("")
         inpTglDeadline.val("")
         inpKetSalesOrder.val("")
+        inpSample.val("").trigger("change")
         inpUangDP.val("0").trigger("change");
         rowDet.hide()
         btnSend.hide()
@@ -430,12 +432,12 @@ $(document).ready(function () {
                 inpBuyer.val(data.id_konsumen).trigger('change')
                 
                 setTimeout(() => {
-                    inpSample.val(data.id_sample).trigger("change")
+                    inpSample.attr('value', data.id_sample)
                     setTimeout(() => {
                         inpTglDeadline.val(formatterDate(data.tgl_deadline))
                         inpTglTransaksi.val(formatterDate(data.tgl_transaksi))
                     }, 600);
-                }, 300);
+                }, 1000);
                 inpUangDP.val(data.uang_dp).trigger("change");
                 if(data.file_gambar){
                     fileSalesOrderOld.val(data.gambar_id)
@@ -578,6 +580,7 @@ $(document).ready(function () {
             formData.append("keterangan",inpKetSalesOrder.val());
             formData.append("samples", inpSample.val())
             formData.append("uang_dp", inpUangDP.val());
+            formData.append("style", inpStyle.val());
             formData.append("submit_data", send);
             
             $.ajax({
@@ -738,13 +741,12 @@ $(document).ready(function () {
                   'buyers': inpBuyer.val(),
               },
             success: function (res) {
-              
+              inpSample.empty()
               if(res.status){
                 isSampleData = res.data
-                inpSample.empty()
                 inpSample.append($("<option></option>").attr("value", 0).text("- Pilih Sample -"));
                 $.each(isSampleData, function(key,value) {
-                    inpSample.append($("<option></option>").attr("value", value.id).text(value.kode_sample + " : " + value.keterangan));
+                    inpSample.append($("<option></option>").attr("value", value.id).text(value.kode_sample + " : " + value.style));
                 });
 
                 if(inpData.val().length == 0){
@@ -753,6 +755,11 @@ $(document).ready(function () {
                     // // inpTglDeadline.val(changeTgl(isSampleData[0].tgl_deadline))
                     // inpKetSalesOrder.val(isSampleData[0].deskripsi)
                     // inpDeskripsi.val(isSampleData[0].deskripsi)
+                }else{
+                    setTimeout(() => {
+                        // console.log(inpSample.attr('value'))
+                        inpSample.attr('value') != undefined ? inpSample.val(inpSample.attr('value')).trigger('change') : ''
+                    }, 500);
                 }
                 
                 
@@ -775,17 +782,23 @@ $(document).ready(function () {
 
     inpSample.on("change", function(){
         let val = $(this).val()
+        $(this).val(val)
         let isin = isSampleData.filter((isi) => val == isi.id);
         if(isin.length > 0){
-            inpTglTransaksi.val("")
-            inpTglDeadline.val("")
             if(inpData.val().length == 0){
+                inpTglTransaksi.val("")
+                inpTglDeadline.val("")
                 let tglTr = isin[0].tgl_transaksi.split('-')
                 let tglTransaksi = tglTr['2'] + '-' + tglTr['1']+ '-' + tglTr['0']
-                inpTglTransaksi.datepicker('setDate', tglTransaksi); //.val(changeTgl(isin[0].tgl_transaksi))
+                // inpTglTransaksi.datepicker('setDate', tglTransaksi); //.val(changeTgl(isin[0].tgl_transaksi))
                 let tglD = isin[0].tgl_deadline.split('-')
                 let tglDead = tglD['2'] + '-' + tglD['1']+ '-' + tglD['0']
-                inpTglDeadline.datepicker('setDate', tglDead); //.val(changeTgl(isin[0].tgl_transaksi))
+                // inpTglDeadline.datepicker('setDate', tglDead); //.val(changeTgl(isin[0].tgl_transaksi))
+                inpStyle.val(isin[0].style)
+                setTimeout(() => {
+                    inpTglDeadline.val(formatterDate(isin[0].tgl_deadline))
+                    inpTglTransaksi.val(formatterDate(isin[0].tgl_transaksi))
+                }, 600);
                 inpKetSalesOrder.val(isin[0].deskripsi)
                 inpDeskripsi.val(isin[0].deskripsi)
             }

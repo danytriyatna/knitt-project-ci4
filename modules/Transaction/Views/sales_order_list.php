@@ -56,12 +56,23 @@
               <option value=""></option>
             </select>
             <div class="invalid-feedback">
-                Style/Sample tidak valid
+                Sample tidak valid
             </div>
           </div>
         </div>
+
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_style">Description<span class="text-danger">*</span></label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="style">Style<span class="text-danger">*</span></label>
+          <div class="col-md-9">
+            <input type="text" id="style" name="style" class="form-control" placeholder="Ketikkan Sales Order Style" value="" required>
+            <div class="invalid-feedback">
+              Sales Order Style tidak valid
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_style">Deskripsi<span class="text-danger">*</span></label>
           <div class="col-md-9">
             <input type="text" id="desc_style" name="desc_style" class="form-control" placeholder="Ketikkan sales_order description" value="" required>
             <div class="invalid-feedback">
