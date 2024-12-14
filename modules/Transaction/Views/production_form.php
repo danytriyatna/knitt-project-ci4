@@ -235,51 +235,49 @@
 
           <div class="row">
             <div class="col-sm-12">
-              <hr>
               <h5><b>PRODUCTION PROCESS</b></h5>
-              <div class="container">
                 <div class="row">
-
-                  <?php foreach ($proses as $r) { ?>
-                    <div class="col">
-                      <div class="card">
-                        <div class="card-body" style="min-height: 80px;">
-                          <div class="form-check form-check-inline">
-                            <input type="hidden" id="proses_<?= $r->id ?>" value="<?= $r->qty - $r->qty_prod ?>" />
-                            <h5 class="form-check-h1" for="proses_<?= $r->seq ?>"><?= $r->nama ?></h5>
-                            <label class="form-check-label" for="proses_<?= $r->seq ?>"><?= $r->qty - $r->qty_prod ?></label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  <?php } ?>
-
-                  <div class="col">
-                    <div class="card">
-                      <div class="card-body" style="min-height: 80px;">
-                        <div class="form-check form-check-inline">
-                          <h5 class="form-check-h1" for="proses_ready">Ready</h5>
-                          <label class="form-check-label" for="proses_ready" id="qty_ready">
-                            <?= !empty($last_data) ? ($last_data->qty_prod - $qty_kirim) : []; ?>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col">
-                    <div class="card">
-                      <div class="card-body" style="min-height: 80px;">
-                        <div class="form-check form-check-inline">
-                          <h5 class="form-check-h1" for="proses_kirim">Kirim</h5>
-                          <label class="form-check-label" for="proses_kirim" id="qty_kirim"><?= !empty($qty_kirim) ? $qty_kirim : 0; ?></label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <table class="table table-striped datatable dataTable no-footer">
+                      <thead>
+                        <tr>
+                          <th>Proses</th>
+                          <th style="text-align:right;">Qty</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          <?php foreach ($proses as $r) { ?>
+                            <tr>
+                              <td> 
+                                  <h5 class="form-check-h1" for="proses_<?= $r->seq ?>"><?= $r->nama ?></h5>
+                                  <input type="hidden" id="proses_<?= $r->id ?>" value="<?= $r->qty - $r->qty_prod ?>" />
+                              </td>
+                              <td style="text-align:right;">
+                                <label class="form-check-label" for="proses_<?= $r->seq ?>"><?= $r->qty - $r->qty_prod ?></label>
+                              </td>
+                            </tr>
+                          <?php } ?>
+                            <tr>
+                              <td> 
+                                  <h5 class="form-check-h1" for="proses_ready">Ready</h5>
+                              </td>
+                              <td style="text-align:right;">
+                                <label class="form-check-label" for="proses_ready" id="qty_ready">
+                                  <?= !empty($last_data) ? ($last_data->qty_prod - $qty_kirim) : []; ?>
+                                </label>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td> 
+                                 <h5 class="form-check-h1" for="proses_kirim">Kirim</h5>
+                              </td>
+                              <td style="text-align:right;">
+                                <label class="form-check-label" for="proses_kirim" id="qty_kirim"><?= !empty($qty_kirim) ? $qty_kirim : 0; ?></label>
+                              </td>
+                            </tr>
+                      </tbody>
+                  </table>
 
                 </div>
-              </div>
 
               <hr>
 
@@ -328,15 +326,15 @@
               </div>
 
               <div class="row mt-1">
-                <div class="col-sm-2">
-                  <button type="button" class="btn btn-sm btn-info text-white mb-2" id="btn-add-detail"> Tambah <i class="fa fa-plus"></i></button>
-                </div>
-                <div class="col-sm-5 d-none">
-                  <div class="form-group row">
-                    <label class="control-label text-start text-md-end col-md-2 col-form-label" for="foto_style">Upload File QR Code</label>
-                    <div class="col-md-9">
-                      <input type="file" id="fileQR" onchange="readURL(this,'#fileQR')" name="fileQR" class="form-control file-drag-drop" accept=".jpg, .jpeg, .png">
-                    </div>
+                <!-- <div class="col-sm-2"> -->
+                  <!-- <button type="button" class="btn btn-sm btn-info text-white mb-2" id="btn-add-detail"> Tambah <i class="fa fa-plus"></i></button> -->
+
+                <!-- </div> -->
+                <div class="col-sm-12">
+                  <div class="input-group my-2">
+                    <span class="input-group-text" id="basic-addon1"><i class="fa fa-qrcode"></i></span>
+                    <input type="text" class="form-control bg-info bg-opacity-25 ui-autocomplete-input" placeholder="Scan" aria-label="Scan" aria-describedby="basic-addon1" id="text_barcode" autocomplete="off">
+                    <button type="button" class="btn btn-info text-white" id="btn-add-detail"><i class="fa fa-plus"></i></button> 
                   </div>
                 </div>
               </div>
