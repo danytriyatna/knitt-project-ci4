@@ -82,6 +82,7 @@ class RefKaryawan extends BaseController
                     "nip" => $row->nip,
                     "full_name" => $row->full_name,
                     "email" => $row->email,
+                    "alamat" => $row->alamat,
                     "posisi" => $row->posisi,
                     "tgl_bergabung" => !empty($row->tgl_bergabung) ? \fdate_eng_to_ind($row->tgl_bergabung) : "",
                     "jenis_kelamin" => $row->jenis_kelamin,
@@ -108,6 +109,7 @@ class RefKaryawan extends BaseController
         $tgl_bergabung =  $this->request->getPost('tgl_bergabung');
         $jenis_kelamin =  $this->request->getPost('jenis_kelamin');
         $jenis_kelamint =  $this->request->getPost('jenis_kelamint');
+        $alamat =  $this->request->getPost('alamat');
         $tgl_lahir =  $this->request->getPost('tgl_lahir');
         $tempat_lahir =  $this->request->getPost('tempat_lahir');
         $no_hp =  $this->request->getPost('no_hp');
@@ -129,6 +131,7 @@ class RefKaryawan extends BaseController
             'posisi' => $posisi,
             'tgl_bergabung' => $tgl_bergabung,
             'jenis_kelamin' => $jenis_kelamin,
+            'alamat' => $alamat,
             // 'tgl_lahir' => $tgl_lahir,
             // 'tempat_lahir' => $tempat_lahir,
             'no_hp' => $no_hp,

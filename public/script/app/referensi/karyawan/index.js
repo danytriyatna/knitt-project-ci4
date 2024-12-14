@@ -41,6 +41,8 @@ $(document).ready(function () {
                             window.location.replace(baseUrl + "/master-data/karyawan/delete/" + data_row.id);
                         }
                     }else if(e.target.title === 'edit'){
+
+
                         inpData.val(data_row.id)
                         
                         // inpNamaKonsumen.val(data_row.nama)
@@ -48,17 +50,17 @@ $(document).ready(function () {
                         // inpNoHP.val(data_row.no_hp)
                         // inpEmail.val(data_row.email)
                         
-                        inpNip.val(data.nip)
-                        inpNama.val(data.nama)
-                        inpEmail.val(data.email)
-                        inpAlamat.val(data.alamat)
-                        inpNoHP.val(data.no_hp)
-                        inpPosisi.val(data.posisi)
-                        inpTglBergabung.val(data.tgl_bergabung)
-                        inpJenisKelamin.val(data.jenis_kelamin).trigger('change');
-                        inpUpahHarian.val(data.upah_harian).trigger('change');
-                        inpUpahLembur.val(data.upah_lembur).trigger('change');
-                        inpUpahLemburWe.val(data.upah_lembur_we).trigger('change');
+                        inpNip.val(data_row.nip)
+                        inpNama.val(data_row.full_name)
+                        inpEmail.val(data_row.email)
+                        inpAlamat.val(data_row.alamat)
+                        inpNoHP.val(data_row.no_hp)
+                        inpPosisi.val(data_row.posisi)
+                        inpTglBergabung.val(data_row.tgl_bergabung)
+                        inpJenisKelamin.val(data_row.jenis_kelamin).trigger('change');
+                        inpUpahHarian.val(data_row.upah_harian).trigger('change');
+                        inpUpahLembur.val(data_row.upah_lembur).trigger('change');
+                        inpUpahLemburWe.val(data_row.upah_lembur_we).trigger('change');
 
                         isModal.modal("show");
                     }   
@@ -69,7 +71,7 @@ $(document).ready(function () {
                 width: "10%"
             },
             {
-                title: "Nama", field: "full_name	", headerSort: false,
+                title: "Nama", field: "full_name", headerSort: false,
                 
             },
             {
@@ -201,6 +203,7 @@ $(document).ready(function () {
                     full_name : inpNama.val(),
                     email : inpEmail.val(),
                     posisi : inpPosisi.val(),
+                    alamat : inpAlamat.val(),
                     tgl_bergabung : inpTglBergabung.val(),
                     jenis_kelamin : inpJenisKelamin.val(),
                     no_hp : inpNoHP.val(),
