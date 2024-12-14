@@ -5,7 +5,7 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Form Master Operator</h5>
+        <h5 class="modal-title">Form Master CMT</h5>
         <input type="hidden" id="data_id">
         <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -14,11 +14,11 @@
           <i>*) Wajib diisi</i>
         </div>
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="nama_operator">Nama Operator<span class="text-danger">*</span></label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="nama_operator">Nama CMT<span class="text-danger">*</span></label>
           <div class="col-md-9">
-            <input type="text" id="nama_operator" name="nama_operator" class="form-control" placeholder="Ketik Nama Operator" required>
+            <input type="text" id="nama_operator" name="nama_operator" class="form-control" placeholder="Ketik Nama CMT" required>
             <div class="invalid-feedback">
-              Nama Operator tidak valid
+              Nama CMT tidak valid
             </div>
           </div>
         </div>
@@ -31,7 +31,7 @@
             </div>
           </div>
         </div>
-        <div class="form-group row">
+        <div hidden class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="no_hp">Tanggal Bergabung<span class="text-danger">*</span></label>
           <div class="col-md-9">
             <input type="text" id="tgl_bergabung" name="tgl_bergabung" class="form-control datepicker" placeholder="Pilih tanggal" value="">

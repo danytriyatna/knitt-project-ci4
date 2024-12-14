@@ -108,7 +108,7 @@ class ProductionModel extends \App\Models\PrModel
         $builder = $this->db->table("trans_walkorder_proses abx");
         $builder->select("abx.id");
         $builder->where('abx.id_walkorder', $idWorkOrder);
-        $builder->where('abx.id >', $id);
+        $builder->where('abx.id_proses >', $id);
         $builder->orderBy("abx.id", "ASC");
         $builder->limit(1);
         $this->_data = $builder->get()->getRow();
@@ -131,13 +131,15 @@ class ProductionModel extends \App\Models\PrModel
     function getDataOperatorProd($id, $tgl_transaksi = null)
     {
         $builder = $this->db->table("trans_produksi_operator abx");
-        $builder->select("abx.flag, abx.id_proses as id_walkorder_proses_ukuran, abx.qty, ebx.nama_operator as operator, dbx.kode_warna,  abx.harga_total, abx.harga, abx.tgl_transaksi as date,bbx.nama as process,cbx.kode_ukuran");
+        $builder->select("abx.flag, abx.id_proses as id_walkorder_proses_ukuran, abx.qty, ebx.nama_operator as operator, dbx.kode_warna, 
+                          abx.harga_total, abx.harga, abx.tgl_transaksi as date,bbx.nama as process,cbx.kode_ukuran");
+
         $builder->join("_jenis_proses_produksi bbx", "abx.id_proses = bbx.id", "inner");
         $builder->join("ref_ukuran cbx", "abx.id_ukuran = cbx.id", "inner");
         $builder->join("ref_warna dbx", "abx.id_warna = dbx.id", "inner");
         $builder->join("ref_operator ebx", "abx.id_operator = ebx.id", "inner");
-        $builder->where('abx.id_produksi', $id);
 
+        $builder->where('abx.id_produksi', $id);
         if (!empty($tgl_transaksi)) {
             $builder->where('abx.tgl_transaksi', $tgl_transaksi);
         }
@@ -155,7 +157,7 @@ class ProductionModel extends \App\Models\PrModel
 
 
             foreach ($data as $rowData) {
-                $resData = $this->getDataNextProses($idWorkOrder, $rowData['id_walkorder_proses_ukuran']);
+                $resData = $this->getDataNextProses($idWorkOrder, $rowData['id_proses']);
                 $resQtyCurrent = $this->getDataQuantityCurrent($rowData['id_walkorder_proses_ukuran'], $rowData['id_ukuran']);
 
                 $arrDataUkuran = [
@@ -165,7 +167,7 @@ class ProductionModel extends \App\Models\PrModel
                     "id_ukuran" => $rowData['id_ukuran'],
                     "id_warna" => $rowData['id_warna'],
                     "id_operator" => $rowData['id_operator'],
-                    "tgl_transaksi" => $rowData['date'],
+                    "tgl_transaksi" => !empty($rowData['date']) ? \fdate_ind_to_eng($rowData['date']) : null,
                     "qty" => $rowData['qty'],
                     "harga" => $rowData['harga'],
                     "harga_total" => $rowData['harga_total'],
@@ -177,15 +179,15 @@ class ProductionModel extends \App\Models\PrModel
                 ];
                 $this->insertRecordGetid("trans_produksi_operator", $arrDataUkuran);
                 $arrUpdData = [
-                    "qty_prod" => !empty($resQtyCurrent) + $rowData['qty'] ? (float)$resQtyCurrent->qty_prod + (float)$rowData['qty'] : $rowData['qty']
+                    "qty_prod" => !empty($resQtyCurrent) ? (float)$resQtyCurrent->qty_prod + (float)$rowData['qty'] : $rowData['qty']
                 ];
                 $arrParam =  [
-                    "id_walkorder_proses" => $rowData['id_walkorder_proses_ukuran'],
+                    "id" => $rowData['id_walkorder_proses_ukuran'],
                     "id_ukuran" => $rowData['id_ukuran'],
                     "ref_detail_id" => $rowData['ref_detail_id'],
                 ];
-                $this->updateRecords("trans_walkorder_proses_ukuran", $arrUpdData, $arrParam);
-               
+                $ups = $this->updateRecords("trans_walkorder_proses_ukuran", $arrUpdData, $arrParam);
+                // print_r($arrDataUkuran);exit;
                 if(!empty($resData)){
                     $arrUpdData2 = [
                         "qty" => !empty($resQtyCurrent) ?  (float)$resQtyCurrent->qty_prod + (float)$rowData['qty']  : $rowData['qty']
@@ -199,8 +201,8 @@ class ProductionModel extends \App\Models\PrModel
                 }
             }
             $this->db->transComplete();
-
             if ($this->db->transStatus() === TRUE) {
+               
                 return true;
             } else {
                 throw new \Exception("Transaction failed");

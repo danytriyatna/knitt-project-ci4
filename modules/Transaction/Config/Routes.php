@@ -56,6 +56,7 @@ $routes->group('trans/production', ['namespace' => 'Modules\Transaction\Controll
   $routes->post('list_ukuran', 'Production::lists_ukuran');
   $routes->post('list_ukuran_prod', 'Production::getDataProduksiUkuran');
   $routes->post('list_detail', 'Production::getDataListProd');
+  $routes->post('cari_produk', 'Production::getDataProduksiItem');
 });
 
 $routes->group('trans/sales-invoice', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
