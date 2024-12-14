@@ -1,12 +1,20 @@
 
 
 $(document).ready(function () {
+    $("[data-politespace]").politespace();
     let inpData         = $('#data_id');
-    let inpNamaKonsumen = $('#nama_konsumen');
+    let inpNip = $('#nip');
+    let inpNama = $('#nama_konsumen');
+    let inpEmail        = $('#email');
     let inpAlamat       = $('#alamat');
     let inpNoHP         = $('#no_hp');
-    let inpEmail        = $('#email');
-    let inpNpwp         = $('#npwp');
+
+    let inpPosisi        = $('#posisi');
+    let inpTglBergabung  = $('#tgl_bergabung');
+    let inpJenisKelamin  = $('#jenis_kelamin');
+    let inpUpahHarian    = $('#upah_harian');
+    let inpUpahLembur    = $('#upah_lembur');
+    let inpUpahLemburWe  = $('#upah_lembur_we');
 
     let isModal       = $("#modal-form-add-po");
 
@@ -30,30 +38,48 @@ $(document).ready(function () {
                     let data_row = row.getData();
                     if (e.target.title === 'delete') {
                         if (confirm("Anda yakin akan menghapus data?")) {
-                            window.location.replace(baseUrl + "/master-data/konsumen/delete/" + data_row.id);
+                            window.location.replace(baseUrl + "/master-data/karyawan/delete/" + data_row.id);
                         }
                     }else if(e.target.title === 'edit'){
                         inpData.val(data_row.id)
-                        inpNamaKonsumen.val(data_row.nama)
-                        inpAlamat.val(data_row.alamat)
-                        inpNoHP.val(data_row.no_hp)
-                        inpEmail.val(data_row.email)
-                        setTimeout(() => {
-                            getKonsumenStyle()
-                            dtListStyle.redraw(true)
-                        }, 400);
+                        
+                        // inpNamaKonsumen.val(data_row.nama)
+                        // inpAlamat.val(data_row.alamat)
+                        // inpNoHP.val(data_row.no_hp)
+                        // inpEmail.val(data_row.email)
+                        
+                        inpNip.val(data.nip)
+                        inpNama.val(data.nama)
+                        inpEmail.val(data.email)
+                        inpAlamat.val(data.alamat)
+                        inpNoHP.val(data.no_hp)
+                        inpPosisi.val(data.posisi)
+                        inpTglBergabung.val(data.tgl_bergabung)
+                        inpJenisKelamin.val(data.jenis_kelamin).trigger('change');
+                        inpUpahHarian.val(data.upah_harian).trigger('change');
+                        inpUpahLembur.val(data.upah_lembur).trigger('change');
+                        inpUpahLemburWe.val(data.upah_lembur_we).trigger('change');
+
                         isModal.modal("show");
                     }   
                 }
             },
             {
-                title: "Nama Konsumen", field: "nama", headerSort: false,
-                width: "20%"
+                title: "NIP", field: "nip", headerSort: false,
+                width: "10%"
             },
             {
-                title: "Alamat", field: "alamat", formatter: "html", headerSort: false,
+                title: "Nama", field: "full_name	", headerSort: false,
                 
             },
+            {
+                title: "Posisi", field: "posisi", headerSort: false,
+                width: "20%"
+            },
+            // {
+            //     title: "Alamat", field: "alamat", formatter: "html", headerSort: false,
+                
+            // },
             {
                 title: "Email", field: "email", headerSort: false,
                 width: "20%", cssClass : 'text-center'
@@ -65,7 +91,7 @@ $(document).ready(function () {
         ],
         locale: 'id',    
         layout: 'fitColumns',
-        ajaxURL: "/master-data/konsumen/list",
+        ajaxURL: "/master-data/karyawan/list",
         ajaxConfig: "POST",
         sortMode: "remote",
         filterMode: "remote",
@@ -127,10 +153,17 @@ $(document).ready(function () {
 
     $("#btn-add").on("click", function(){
         inpData.val("")
-        inpNamaKonsumen.val("")
+        inpNip.val("")
+        inpNama.val("")
+        inpEmail.val("")
         inpAlamat.val("")
         inpNoHP.val("")
-        inpEmail.val("")
+        inpPosisi.val("")
+        inpTglBergabung.val("")
+        inpJenisKelamin.val("")
+        inpUpahHarian.val("")
+        inpUpahLembur.val("")
+        inpUpahLemburWe.val("")
 
         isModal.modal("show");
     });
@@ -144,22 +177,36 @@ $(document).ready(function () {
     function simpanData() {
         
         let validation = true
-        if(inpNamaKonsumen.val().length == 0) validation = false
-        if(inpNoHP.val().length == 0) validation = false
+
+        if(inpNip.val().length == 0) validation = false
+        if(inpNama.val().length == 0) validation = false
         if(inpEmail.val().length == 0) validation = false
         if(inpAlamat.val().length == 0) validation = false
+        if(inpNoHP.val().length == 0) validation = false
+        if(inpPosisi.val().length == 0) validation = false
+        if(inpTglBergabung.val().length == 0) validation = false
+        if(inpJenisKelamin.val().length == 0) validation = false
+        if(inpUpahHarian.val().length == 0) validation = false
+        if(inpUpahLembur.val().length == 0) validation = false
+        if(inpUpahLemburWe.val().length == 0) validation = false
     
         if(validation){
             $.ajax({
                 type: 'POST',
-                url: '/master-data/konsumen/simpan',
+                url: '/master-data/karyawan/simpan',
                 data: {
                     dataId : inpData.val(),
-                    nama   : inpNamaKonsumen.val(),
-                    alamat : inpAlamat.val(),
-                    email  : inpEmail.val(),
-                    no_hp  : inpNoHP.val(),
-                    npwp   : inpNpwp.val()
+
+                    nip : inpNip.val(),
+                    full_name : inpNama.val(),
+                    email : inpEmail.val(),
+                    posisi : inpPosisi.val(),
+                    tgl_bergabung : inpTglBergabung.val(),
+                    jenis_kelamin : inpJenisKelamin.val(),
+                    no_hp : inpNoHP.val(),
+                    upah_lembur : inpUpahHarian.val(),
+                    upah_harian : inpUpahLembur.val(),
+                    upah_lembur_we : inpUpahLemburWe.val(),
                 },
                 dataType: "json",
                 beforeSend: function () {
@@ -213,83 +260,5 @@ $(document).ready(function () {
                 timer: 2000
             });
         }
-    }
-
-
-    // set tanle style konsumen yang didapat dari order dan sample 
-    let dtListStyle = new Tabulator("#dt-detail-style", {
-        columns: [
-            {
-                title: "No.", formatter: "rownum",  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
-                width:"10%"
-            },
-            {
-                title: "Style", field: "keterangan_style",  sorter: "string", headerSort:false, align: "center", 
-            },
-        ],
-        layout: 'fitColumns',
-        locale: 'id',
-        placeholder: "Tidak ada data",
-        pagination: false,
-        paginationSize: 99,
-        paginationButtonCount: 2,
-        paginationDataSent: {
-            sorters: "order",
-        },
-        selectable: false
-	});
-
-    function getKonsumenStyle(){
-        dtListStyle.clearData();
-        $.ajax({
-            type: 'POST',
-            url: '/master-data/konsumen/get_data_style',
-            data: {
-                konsumen : inpData.val(),
-            },
-            dataType: "json",
-            beforeSend: function () {
-                Swal.fire({
-                    title: 'Loading...',
-                    allowOutsideClick: false,
-                    showConfirmButton: false,
-                    onBeforeOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            },
-            success: function (response) {
-                Swal.close();
-                if(response.status == true){
-                    Swal.fire({
-                        text: response.message,
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                    dtListStyle.setData(response.data)
-                }else{
-                    // Swal.fire({
-                    //     text: response.message,
-                    //     icon: 'error',
-                    //     showConfirmButton: false,
-                    //     timer: 2000
-                    // });
-                    console.log(response.message)
-                }
-            },
-            error: function (e) {
-                let msg = e.responseJSON.message;
-                Swal.close();
-                console.log(msg);
-                // Swal.fire({
-                //     text: msg,
-                //     icon: 'error',
-                //     showConfirmButton: false,
-                //     timer: 2000
-                // });
-            },
-        });
-    }
-    
+    }    
 });

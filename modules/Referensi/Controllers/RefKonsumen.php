@@ -101,7 +101,7 @@ class RefKonsumen extends BaseController
             $style_data = $this->mkonsumen->getDataStyle(null, 0, 999, null, null, $params);
             if(!empty($style_data)){
                 $data   = $style_data;
-                $status = false;
+                $status = true;
                 $msg    = "Berhasil mengambil data Styke Konsumen !";
             }
         } catch (\Throwable $th) {
