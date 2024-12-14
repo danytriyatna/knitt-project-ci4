@@ -5,7 +5,7 @@ namespace Modules\Transaction\Models;
 class WalkorderModel extends \App\Models\PrModel
 {
 
-    protected $table = "trans_walkorder";
+    protected $table  = "trans_walkorder";
     protected $table2 = "trans_walkorder_detail";
     protected $table3 = "trans_walkorder_proses";
     protected $table4 = "trans_walkorder_proses_ukuran";
@@ -49,6 +49,14 @@ class WalkorderModel extends \App\Models\PrModel
 
             if (!empty($params['ref_kode'])) {
                 $builder->where('abx.ref_kode', $params['ref_kode']);
+            }
+
+            if (!empty($params['ref_id'])) {
+                $builder->where('abx.ref_id', $params['ref_id']);
+            }
+
+            if (!empty($params['tipe_id'])) {
+                $builder->where('abx.tipe_id', $params['tipe_id']);
             }
 
             if (!empty($order)) {
@@ -154,6 +162,10 @@ class WalkorderModel extends \App\Models\PrModel
 
             if (!empty($params['id_walkorder'])) {
                 $builder->where('abx.id_walkorder', $params['id_walkorder']);
+            }
+
+            if (!empty($params['ref_detail_id'])) {
+                $builder->where('abx.ref_detail_id', $params['ref_detail_id']);
             }
 
             if (!empty($order)) {
@@ -291,8 +303,8 @@ class WalkorderModel extends \App\Models\PrModel
                 $builder->groupEnd();
             }
 
-            if (!empty($params['id_walkorder'])) {
-                $builder->where('abx.id_walkorder', $params['id_walkorder']);
+            if (!empty($params['id_walkorder_proses'])) {
+                $builder->where('abx.id_walkorder_proses', $params['id_walkorder_proses']);
             }
 
             if (!empty($order)) {
@@ -433,6 +445,10 @@ class WalkorderModel extends \App\Models\PrModel
 
             if (!empty($params['id_walkorder_detail'])) {
                 $builder->where('abx.id_walkorder_detail', $params['id_walkorder_detail']);
+            }
+
+            if (!empty($params['id_warna'])) {
+                $builder->where('abx.id_warna', $params['id_warna']);
             }
 
             if (!empty($order)) {

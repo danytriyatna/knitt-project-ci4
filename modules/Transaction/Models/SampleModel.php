@@ -223,10 +223,27 @@ class SampleModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getDataDetailSample_ori($idSample)
+    function getDataDetailSample_ori($idSample, $params = null)
     {
         $builder = $this->db->table("trans_sample_det" . " abx");
         $builder->where("abx.id_sample", $idSample);
+        
+        if(!empty($params['id_warna_1'])){
+            $builder->where('id_warna_1', $params['id_warna_1']);
+        }
+
+        if(!empty($params['id_warna_2'])){
+            $builder->where('id_warna_2', $params['id_warna_2']);
+        }
+
+        if(!empty($params['id_warna_3'])){
+            $builder->where('id_warna_3', $params['id_warna_3']);
+        }
+
+        if(!empty($params['id_warna_4'])){
+            $builder->where('id_warna_4', $params['id_warna_4']);
+        }
+
         $this->_data = $builder->get()->getResult();
         return $this->_data;
     }
