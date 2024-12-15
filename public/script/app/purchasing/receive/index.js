@@ -37,7 +37,7 @@ $(document).ready(function () {
 			},
             {
 				title: 'STATUS', field: 'status', formatter : "html", align: "center", headerSort:false,
-                width: "10%",
+                width: "10%",hozAlign:"center",
 			},
 				
         ],

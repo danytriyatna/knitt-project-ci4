@@ -20,4 +20,8 @@ $routes->group('purchasing/receive-item', ['namespace' => 'Modules\Purchasing\Co
 $routes->group('purchasing/purchase-payment', ['namespace' => 'Modules\Purchasing\Controllers'], static function ($routes) {
   $routes->get('/', 'PurchasePayment::index');
   $routes->get('form', 'PurchasePayment::form');
+  $routes->post('list', 'PurchasePayment::lists');
+  $routes->post('save', 'PurchasePayment::save');
+  $routes->get('form/(:any)', 'PurchasePayment::form/$1');
+  $routes->get('list-payment', 'PurchasePayment::getDataPayment');
 });

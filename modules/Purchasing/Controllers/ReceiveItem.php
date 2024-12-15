@@ -85,9 +85,9 @@ class ReceiveItem extends BaseController
       //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
       $status = "";
       if ($row->status == 0) {
-        $status = "Draft";
+        $status = "<span class='badge bg-secondary'>Draft<br>Pembayaran</span>";
       } else if ($row->status == 1) {
-        $status = "Approved";
+        $status = "<span class='badge bg-success'>Approved</span>";
       }
 
       array_push(

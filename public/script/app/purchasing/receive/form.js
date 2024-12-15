@@ -369,11 +369,12 @@ spanBarang.click(function () {
                     timer: 2000
                 });
     }
-    setTimeout(() => {
-        dtListBarang.redraw(true)
-    }, 500);
+  
     dtListBarang.on("dataLoaded", function(data){
         Swal.close();
+        setTimeout(() => {
+            dtListBarang.redraw(true)
+        }, 500);
         $("#modal-barang").modal("show")
     });
   ;

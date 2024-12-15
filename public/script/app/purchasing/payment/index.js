@@ -7,12 +7,12 @@ $(document).ready(function () {
             },
             
 			{
-				title: 'PO NO.', field: 'po_no',hozAlign:"left", headerSort:false, sorter: 'string',
+				title: 'PP NO.', field: 'pay_no',hozAlign:"left", headerSort:false, sorter: 'string',
 				width: "12%", formatter : "html"
 			}, 
 				
 			{
-				title: 'PO DATE', field: 'po_date',hozAlign:"left", headerSort:false, sorter: 'string',
+				title: 'PP DATE', field: 'pay_date',hozAlign:"left", headerSort:false, sorter: 'string',
 				width: "10%",
 			}, 
 				
@@ -22,17 +22,7 @@ $(document).ready(function () {
 			}, 
 
             {
-				title: 'TERM', field: 'term', formatter : "html", align: "center", hozAlign:"left", headerSort:false,
-                width: "10%",
-			} ,
-
-            {
-				title: 'QTY STATUS', field: 'qty', formatter : "html", align: "center",hozAlign:"right", headerSort:false,
-                width: "10%",
-			},
-
-            {
-				title: 'TOTAL', field: 'total', headerSort:false, sorter: 'string', hozAlign:"right",
+				title: 'PO AMOUNT', field: 'hutang', headerSort:false, sorter: 'string', hozAlign:"right",
 				width: "10%", formatter : "money",
                 formatterParams: {
                     decimal: ",",
@@ -43,8 +33,20 @@ $(document).ready(function () {
 			},
 
             {
-				title: 'PAYMENT', field: 'total_payment', headerSort:false, sorter: 'string',
-				width: "10%", formatter: "money",
+				title: 'PAYMENT', field: 'total_bayar', headerSort:false, sorter: 'string', hozAlign:"right",
+				width: "10%", formatter : "money",
+                formatterParams: {
+                    decimal: ",",
+                    thousand: ".",
+                    symbol: "Rp",  // Simbol mata uang Rupiah
+                    precision: 0,   // Tidak ada desimal
+                },
+			},
+
+
+            {
+				title: 'REMAIN AMOUNT', field: 'sisa_bayar', headerSort:false, sorter: 'string', hozAlign:"right",
+				width: "13%", formatter : "money",
                 formatterParams: {
                     decimal: ",",
                     thousand: ".",
@@ -54,23 +56,13 @@ $(document).ready(function () {
 			},
 
             {
-				title: 'REMAIN', field: 'sisa', formatter: "money",headerSort:false, sorter: 'string',
-                width: "10%", 
-                formatterParams: {
-                    decimal: ",",
-                    thousand: ".",
-                    symbol: "Rp",  // Simbol mata uang Rupiah
-                    precision: 0,   // Tidak ada desimal
-                },
-			} ,
-            {
 				title: 'PAYMENT STATUS', field: 'status', formatter : "html", align: "center", headerSort:false,
                 width: "15%",hozAlign:"center",
 			},
 				
         ],
         // layout: 'fitColumns',
-        ajaxURL: "/purchasing/purchase-order/list",
+        ajaxURL: "/purchasing/purchase-payment/list",
         placeholder: "Tidak ada data",
         ajaxConfig: "POST",
         ajaxSorting: true,

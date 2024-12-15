@@ -8,6 +8,7 @@ use DateTime;
 use Modules\Purchasing\Models\PurchaseModel;
 use Modules\Purchasing\Models\PurchaseDetailModel;
 
+
 class PurchaseOrder extends BaseController
 {
   protected $views = '\Modules\Purchasing\Views';
@@ -83,11 +84,11 @@ class PurchaseOrder extends BaseController
       //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
       $status = "";
       if ($row->status == 0) {
-        $status = "Menunggu<br>Pembayaran";
+        $status = "<span class='badge bg-secondary'>Menunggu<br>Pembayaran</span>";
       } else if ($row->status == 1) {
-        $status = "Dibayar Sebagian";
+        $status = "<span class='badge bg-info'>Dibayar Sebagian</span>";
       } else if ($row->status == 2) {
-        $status = "Dibayar Penuh";
+        $status = "<span class='badge bg-success'>Dibayar Penuh</span>";
       }
       array_push(
         $build_array["data"],
@@ -177,6 +178,7 @@ class PurchaseOrder extends BaseController
       "id_term" => $id_term,
       "ship_to" => $ship_to,
       "qty_payment" => 0,
+      "total_payment" => 0,
       "total" => $total,
       "qty" => $qty,
       "status" => 0
