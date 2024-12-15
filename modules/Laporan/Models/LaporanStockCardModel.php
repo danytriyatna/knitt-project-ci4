@@ -37,6 +37,8 @@ class LaporanStockCardModel extends \App\Models\PrModel
     t.tanggal,
     kt.kategori,
     t.keterangan,
+    t.stok as saldo,
+    lt.nama_barang,
     CASE 
         WHEN t.jenis_transaksi = '1' THEN ht.nama_gudang
         WHEN t.jenis_transaksi = '2' THEN gt.nama_gudang
@@ -50,13 +52,14 @@ class LaporanStockCardModel extends \App\Models\PrModel
         WHEN t.jenis_transaksi = '2' THEN t.jumlah 
         ELSE 0 
     END AS keluar,
-    ({$subQuery->getCompiledSelect()}) AS saldo
+    ({$subQuery->getCompiledSelect()}) AS saldo_
 ", false)
             ->join('ref_kategori_persediaan kt', 't.id_kategori = kt.id', 'inner')
             ->join('ref_gudang gt', 't.id_gudang_asal = gt.id', 'left')
-            ->join('ref_gudang ht', 't.id_gudang_tujuan = ht.id', 'left');
+            ->join('ref_gudang ht', 't.id_gudang_tujuan = ht.id', 'left')
+            ->join('ref_barang lt', 't.id_barang = lt.id', 'left');
         $builder->where('t.active', 1);
-        $builder->orderBy('t.tanggal', 'ASC');
+        $builder->orderBy('t.tanggal', 'DESC');
         if (!empty($idBarang)) {
             $builder->where('t.id_barang', $idBarang);
         }

@@ -11,6 +11,10 @@ $routes->group('purchasing/purchase-order', ['namespace' => 'Modules\Purchasing\
 $routes->group('purchasing/receive-item', ['namespace' => 'Modules\Purchasing\Controllers'], static function ($routes) {
   $routes->get('/', 'ReceiveItem::index');
   $routes->get('form', 'ReceiveItem::form');
+  $routes->post('list', 'ReceiveItem::lists');
+  $routes->post('list-barang', 'ReceiveItem::listsBarang');
+  $routes->post('save', 'ReceiveItem::save');
+  $routes->get('form/(:any)', 'ReceiveItem::form/$1');
 });
 
 $routes->group('purchasing/purchase-payment', ['namespace' => 'Modules\Purchasing\Controllers'], static function ($routes) {

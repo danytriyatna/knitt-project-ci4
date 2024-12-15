@@ -145,8 +145,8 @@
                   <div class="form-group row">
                     <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_no">PO No.</label>
                     <div class="col-md-9">
-                      <input type="hidden" id="status" name="status" value="<?= $resData->status ?>" class="form-control" required>
-                      <input type="hidden" id="data-details" value='<?= $detail; ?>'>
+                      <input type="hidden" id="status" name="status" value="<?= !empty($resData->status) ? $resData->status : null ?>" class="form-control" required>
+                      <input type="hidden" id="data-details" value='<?= !empty($detail) ? $detail : null; ?>'>
                       <input type="hidden" id="id_header" name="id_header" value="<?= !empty($id) ? $id : null ?>" class="form-control" required>
                       <input type="text" id="po_no" name="po_no" class="form-control" value="<?= !empty($resData->po_no) ? $resData->po_no : null ?>" readonly placeholder="Diisi otomatis oleh sistem">
                     </div>

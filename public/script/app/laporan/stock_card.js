@@ -5,6 +5,7 @@ let dtList = new Tabulator("#dt-list", {
     columns:[
         {title:"Tanggal", field:"tanggal", width:"15%"},
         {title:"Kategori", field:"kategori", hozAlign:"center",width:"20%"},
+        {title:"Nama Barang", field:"nama_barang", hozAlign:"center",width:"20%"},
         {title:"Nama Gudang", field:"nama_gudang", hozAlign:"center",width:"20%"},
         {title:"Masuk", field:"masuk", hozAlign:"center",width:"15%"},
         {title:"Keluar", field:"keluar", hozAlign:"center",width:"15%"},

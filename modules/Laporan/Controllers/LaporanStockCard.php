@@ -56,7 +56,9 @@ class LaporanStockCard extends BaseController
         $build_array["status"] = false;
 
         $idBarang = $this->request->getGet('filter_barang_id');
-        $idBarang = decrypt($idBarang);
+        if ($idBarang != null) {
+            $idBarang = decrypt($idBarang);
+        }
         $tgl_mulai = $this->request->getGet('tgl_mulai');
         $tgl_akhir = $this->request->getGet('tgl_akhir');
 

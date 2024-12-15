@@ -6,16 +6,19 @@ use CodeIgniter\Controller;
 use App\Controllers\BaseController;
 use DateTime;
 use Modules\Purchasing\Models\PurchaseModel;
+use Modules\Purchasing\Models\PurchaseDetailModel;
 
 class PurchaseOrder extends BaseController
 {
   protected $views = '\Modules\Purchasing\Views';
   protected $mPO;
+  protected $mPODetail;
   protected $urlv  = 'purchasing/purchase-order';
   function __construct()
   {
     $this->MOD_ALIAS = "MOD_PURCHASE_ORDER";
     $this->mPO = new PurchaseModel();
+    $this->mPODetail = new PurchaseDetailModel();
   }
 
   public function index()
@@ -36,8 +39,10 @@ class PurchaseOrder extends BaseController
     $limit      = $this->request->getPost('length');
     $filters    = $this->request->getPost('filter');
     $order      = $this->request->getPost('sort');
+    $isReceive      = $this->request->getPost('isReceive');
 
     $params = [];
+    $params['isReceive'] = $isReceive;
 
     $results = $this->mPO->getData(null, $start, $limit, $order, $filters, $params);
     $totalfiltered = $this->mPO->getDataCnt($filters, $params);
@@ -78,7 +83,7 @@ class PurchaseOrder extends BaseController
       //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
       $status = "";
       if ($row->status == 0) {
-        $status = "Menunggu Pembayaran";
+        $status = "Menunggu<br>Pembayaran";
       } else if ($row->status == 1) {
         $status = "Dibayar Sebagian";
       } else if ($row->status == 2) {
@@ -93,6 +98,7 @@ class PurchaseOrder extends BaseController
           "po_no" => $row->po_no,
           "term" => $row->term,
           "po_date" => fdate_eng_to_ind($row->po_date),
+          "date_exc" => $row->date_exc,
           "qty" => $row->qty_payment . "/" . $row->qty,
           "total" => $row->total,
           "total_payment" => $row->total_payment,
@@ -110,15 +116,25 @@ class PurchaseOrder extends BaseController
       return redirect()->to('/auth/login');
     }
 
+
     $this->data['id'] = $id;
     if ($id != "") {
       $id = decrypt($id);
       $resData = $this->mPO->getData($id);
       $resData->id_vendor = encrypt($resData->id_vendor);
+      $poDate = date("d F Y", strtotime($resData->po_date));
+      $dateExc = date("d F Y", strtotime($resData->date_exc));
+      $resData->po_date = $poDate;
+      $resData->date_exc = $dateExc;
 
-      $resData->po_date = DateTime::createFromFormat('Y-m-d', $resData->po_date)->format('d F Y');
-      $resData->date_exc = DateTime::createFromFormat('Y-m-d', $resData->date_exc)->format('d F Y');
-      $resDataDetail = $this->mPO->getDataDetail($id);
+      $sort = [
+        [
+          'field' => 'uk.id',
+          'dir' => 'ASC'
+        ]
+      ];
+
+      $resDataDetail = $this->mPODetail->getData(null, 0, 99999, $sort, params: array("id_header" => $id));
       foreach ($resDataDetail as &$rowData) {
         $rowData->id_barang = encrypt($rowData->id_barang);
       }
@@ -132,7 +148,6 @@ class PurchaseOrder extends BaseController
     $resTax = $this->mPO->getRefTax();
     $this->data['term'] = $resTerm;
     $this->data['tax'] = $resTax;
-    $this->data['status'] = 0;
     return view($this->views . '\purchase_order_form', $this->data);
   }
 
