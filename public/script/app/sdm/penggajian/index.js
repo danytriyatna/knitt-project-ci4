@@ -100,8 +100,9 @@ $(document).ready(function () {
         return input;
     };
 
-    let inpTgl = $("#filter_tgl");
-    let dtList = new Tabulator("#dt-absensi", {
+    let inpTglA = $("#filter_tgl_from");
+    let inpTglS = $("#filter_tgl_to");
+    let dtList = new Tabulator("#dt-penggajian", {
         columns: [
             
 			{
@@ -120,124 +121,87 @@ $(document).ready(function () {
 			},
 
             {
-				title: 'Tanggal', field: 'tgl_absen', headerSort:false, sorter: 'string',
-				width: 100, align:'center',
+				title: 'Hadir', field: 'hadir', headerSort:false, sorter: 'string',
+				width: 100, cssClass:'text-center',
 			},
 
             {
-				title: 'Jam Masuk', field: 'jam_masuk', headerSort:false, sorter: 'string',
-				width: 120, align:'center', editor: timeEditor,
-                formatter: "time",
+				title: 'Izin', field: 'izin', headerSort:false, sorter: 'string',
+				width: 100, cssClass:'text-center',
 			},
 
             {
-				title: 'Jam Keluar', field: 'jam_keluar', headerSort:false, sorter: 'string',
-				width: 120, align:'center', editor: timeEditor,
-                formatter: "time",
+				title: 'Sakit', field: 'sakit', headerSort:false, sorter: 'string',
+				width: 100, cssClass:'text-center',
 			},
 
             {
-				title: 'Status Kehadiran', field: 'status_kehadiran', headerSort:false, sorter: 'string',
-				width: 180, align:'center', editor:"list", editorParams:{values:{"Hadir":"Hadir", "Izin":"Izin", "Sakit":"Sakit" , "Tanpa Keterangan":"Tanpa Keterangan"}}
+				title: 'Tanpa<br>Keterangan', field: 'alpha', headerSort:false, sorter: 'string',
+				width: 120, cssClass:'text-center',
+			},
+
+            {
+				title: 'Gaji/Upah', field: 'gaji_harian', headerSort:false, sorter: 'string', align: "center",
+                width: 220, formatter:"money", cssClass:"text-end"
 			} ,
 
             {
-				title: 'Kehadiran', field: 'hari_hadir', headerSort:false, sorter: 'string', align: "center",
-                width: 220, editor:"number"
-			} ,
-
-            
-            {
-				title: 'Keterangan Kehadiran', field: 'keterangan_kehadiran', headerSort:false, sorter: 'string', align: "center",
-                width: 220, editor:"input"
-			} ,
+				title: 'Lembur HK', field: 'lembur', headerSort:false, sorter: 'string',
+				width: 100, cssClass:'text-center',
+			},
 
             {
-				title: 'Status Lembur', field: 'status_lembur', headerSort:false, sorter: 'string',
-				width: 200, align:'center', editor:"list", editorParams:{values:{"-":"-", "Lembur Weekday":"Lembur Weekday", "Lembur Weekend/Hari Libur":"Lembur Weekend/Hari Libur"}}
-			} ,
+				title: 'Lembur HL', field: 'lembur_we', headerSort:false, sorter: 'string',
+				width: 100, cssClass:'text-center',
+			},
+
             {
-				title: 'Jam Lembur', field: 'jml_lembur', headerSort:false, sorter: 'string', align: "center",
-                width: 160, editor:"number"
+				title: 'Lembur', field: 'uang_lembur', headerSort:false, sorter: 'string', align: "center",
+                width: 220, formatter:"money", cssClass:"text-end"
 			} ,
 
-            
             {
-				title: 'Keterangan Lembur', field: 'keterangan_lembur', headerSort:false, sorter: 'string', align: "center",
-                width: 220, editor:"input"
+				title: 'Gaji/Upah', field: 'total', headerSort:false, sorter: 'string', align: "center",
+                width: 220, formatter:"money", cssClass:"text-end"
 			} ,
 				
         ],
-        // layout: 'fitColumns',
-        ajaxURL: "/sdm/absensi/list",
-        placeholder: "Tidak ada data",
-        ajaxConfig: "POST",
-        ajaxSorting: true,
-        ajaxFiltering: false,
-        sortMode: "remote",
-        filterMode: "remote",
-        minHeight: 300,
-        ajaxRequesting: function (url, params) {
-            params.start = params.size * (params.page - 1);
-            params.length = params.size;
-            params.tgl_absen = formatLocaleDate(inpTgl.val())
-        },
-        ajaxResponse: function (url, params, response) {
-            let pageSize = dtList.getPageSize();
-            let pageNo = dtList.getPage();
-            let startRow = (pageSize * (pageNo - 1)) + 1;
-            let endRow = response.data.length + startRow - 1;
-            if (response.data.length === 0) {
-                startRow = 0; endRow = 0;
-            }
-            let recordsFiltered = parseInt(response.recordsFiltered);
-            let recordsTotal = parseInt(response.recordsTotal);
-
-            $("#table-footer .tabulator-startrow").text(startRow);
-            $("#table-footer .tabulator-endrow").text(endRow);
-            $("#table-footer .tabulator-totalrow").text(recordsFiltered);
-
-            let elTotalFilteredRow = $("#table-footer .tabulator-totalfilteredrow");
-            elTotalFilteredRow.text("");
-            if (recordsTotal > recordsFiltered) {
-                elTotalFilteredRow.text(" (disaring dari " + recordsTotal
-                    + " entri keseluruhan)");
-            }
-            return response;
-        },
-        footerElement: '<div id="table-footer" class="pull-left tabulator-info">'
-            + 'Menampilkan <span class="tabulator-startrow"></span> - <span class="tabulator-endrow"></span> dari '
-            + '<span class="tabulator-totalrow"></span> entri<span class="tabulator-totalfilteredrow"></span></div>',
-        pagination: true,
-        paginationMode: "remote",
-        paginationSize: 9999999999,
-        paginationButtonCount: 10,
-        dataSendParams: {
-            sorters: "order"
-        },
-        selectableRows: false,
-    });
-
-    $("#btn-filter").on("click", function(){
-        dtList.setData();
+        layout: 'fitColumns',
+		locale: 'id',
+		placeholder: "Tidak ada data",
+		selectable: false
     });
 
     $("#btn-generate").on("click", function(){
         // dtList.setData();
+        const tglA = inpTglA.val();
+        const tglZ = inpTglS.val();
         $.ajax({
-            url: 'sdm/absensi/dataGenerate', // point to server-side controller method
+            url: 'sdm/penggajian/get_laporan', // point to server-side controller method
             dataType: 'json', // what to expect back from the server
-            data: {tgl_absen : formatLocaleDate(inpTgl.val())},
+            data: {tgl_mulai : tglA, tgl_akhir : tglZ},
             type : 'post',
+            beforeSend: function () {
+                Swal.fire({
+                    title: 'Loading...',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    onBeforeOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+            },
             success: function (res) {
+                Swal.close();
                if(res.status){
 				//    console.log(res.msg);
-				   dtList.setData();
+				   dtList.setData(res.data);
 			   }else{
 				   alert(res.msg)
 			   }
             },
             error: function (res) {
+                Swal.close();
                 // console.log(res);
             }
         });
@@ -254,46 +218,6 @@ $(document).ready(function () {
             searchThread = setTimeout(function () {
                 dtList.setFilter("", "like", elSearch.val());
             }, 600);
-        });
-    }
-
-    $('#btn-save').on('click', function(){
-        saveData()
-        
-    });
-
-    function saveData(){
-        const data_table = dtList.getData();
-        const tglInput = inpTgl.val()
-        // console.log("save")
-        $.ajax({
-            url: 'sdm/absensi/saveData', // point to server-side controller method
-            dataType: 'json', // what to expect back from the server
-            data: {tgl_absen : tglInput, data_list : JSON.stringify(data_table)},
-            type : 'post',
-            beforeSend: function () {
-                Swal.fire({
-                    title: 'Loading...',
-                    allowOutsideClick: false,
-                    showConfirmButton: false,
-                    onBeforeOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            },
-            success: function (res) {
-                Swal.close();
-               if(res.status){
-				   console.log(res.msg);
-				   dtList.setData();
-			   }else{
-				   alert(res.msg)
-			   }
-            },
-            error: function (res) {
-                Swal.close();
-                console.log(res);
-            }
         });
     }
 

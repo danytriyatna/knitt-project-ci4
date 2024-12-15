@@ -9,4 +9,5 @@ $routes->group('sdm/absensi', ['namespace' => 'Modules\SDM\Controllers'], static
 
 $routes->group('sdm/penggajian', ['namespace' => 'Modules\SDM\Controllers'], static function ($routes) {
 	$routes->get('/', 'Penggajian::index');
+	$routes->post('get_laporan', 'Penggajian::getDataPenggajian');
 });

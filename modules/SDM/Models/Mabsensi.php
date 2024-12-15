@@ -19,7 +19,7 @@ class Mabsensi extends \App\Models\PrModel
         $builder = $this->db->table($this->table . " sdm");
 
         $builder->select("sdm.id,  sdm.id_karyawan,  sdm.posisi,  sdm.tgl_absen,  sdm.jam_masuk,  sdm.status_kehadiran,  sdm.jam_keluar,  sdm.hari_hadir,  
-                          sdm.keterangan_kehadiran,  sdm.status_lembur,  sdm.jml_lambur,  sdm.keterangan_lembur,  sdm.active, 
+                          sdm.keterangan_kehadiran,  sdm.status_lembur,  sdm.jml_lembur,  sdm.keterangan_lembur,  sdm.active, 
                           rk.id as id_karyawan_tbl, rk.nip, rk.full_name, rk.posisi, rk.upah_lembur, rk.upah_harian, rk.upah_lembur_we");
 
         $builder->join("ref_karyawan rk", "sdm.id_karyawan = rk.id");
@@ -81,4 +81,41 @@ class Mabsensi extends \App\Models\PrModel
 
         return $this->_data;
     }
+
+
+    function laporan_penggajian($params = null){
+        $builder = $this->db->table($this->table . " sdm");
+    
+        $builder->select("rk.nip,
+                          rk.full_name,
+                          rk.posisi,
+                          COUNT(1) FILTER (WHERE sdm.status_kehadiran = 1) AS hadir,
+                          COUNT(1) FILTER (WHERE sdm.status_kehadiran = 2) AS izin,
+                          COUNT(1) FILTER (WHERE sdm.status_kehadiran = 3) AS sakit,
+                          COUNT(1) FILTER (WHERE sdm.status_kehadiran = 4) AS alpha,
+                          rk.upah_harian,
+                          (COUNT(1) FILTER (WHERE sdm.status_kehadiran = 1) * rk.upah_harian) as gaji_harian,
+                          rk.upah_lembur,
+                          rk.upah_lembur_we,
+                          SUM(COALESCE(sdm.jml_lembur, 0)) FILTER (WHERE sdm.status_lembur = 1) as lembur,
+                          SUM(COALESCE(sdm.jml_lembur , 0)) FILTER (WHERE sdm.status_lembur = 2) as lembur_we,
+                          (COALESCE(SUM(COALESCE(sdm.jml_lembur, 0)) FILTER (WHERE sdm.status_lembur = 1), 0) * rk.upah_lembur) as gaji_lembur,
+                          (COALESCE(SUM(COALESCE(sdm.jml_lembur, 0)) FILTER (WHERE sdm.status_lembur = 2), 0) * rk.upah_lembur_we) as gaji_lembur_we");
+    
+        $builder->join("ref_karyawan rk", "sdm.id_karyawan = rk.id");
+        $builder->where('sdm.active', 1);
+    
+        // Tambahkan kondisi WHERE untuk rentang tanggal jika parameter disediakan
+        if (!empty($params['tgl_mulai']) && !empty($params['tgl_akhir'])) {
+            $builder->where("sdm.tgl_absen >=", $params['tgl_mulai']);
+            $builder->where("sdm.tgl_absen <=", $params['tgl_akhir']);
+        }
+    
+        $builder->groupBy("rk.nip, rk.full_name, rk.posisi, rk.upah_harian, rk.upah_lembur, rk.upah_lembur_we");
+        $builder->orderBy("rk.nip ASC");
+    
+        $this->_data = $builder->get()->getResult();
+        return $this->_data;
+    }
+    
 }

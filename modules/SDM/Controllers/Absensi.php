@@ -127,7 +127,7 @@ class Absensi extends BaseController
                   "hari_hadir" => $row->hari_hadir,
                   "keterangan_kehadiran" => $row->keterangan_kehadiran,
                   "status_lembur" => $row->status_lembur,
-                  "jml_lambur" => $row->jml_lambur,
+                  "jml_lembur" => $row->jml_lembur,
                   "keterangan_lembur" => $row->keterangan_lembur,
               )
           );
@@ -210,7 +210,7 @@ class Absensi extends BaseController
         $isi['hari_hadir'] = $x['hari_hadir'];
         $isi['keterangan_kehadiran'] = $x['keterangan_kehadiran'];
         $isi['status_lembur'] = $status_lembur;
-        $isi['jml_lambur'] = $x['jml_lambur'];
+        $isi['jml_lembur'] = $x['jml_lembur'];
         $isi['keterangan_lembur'] = $x['keterangan_lembur'];
 
         $this->mabsen->updateRecord($this->mabsen->table, $isi, 'id', $id);
