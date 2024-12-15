@@ -151,6 +151,17 @@
 
       return `${year}-${month}-${day}`;
     }
+
+    function formatterDate($date) {
+      let newDate = new Date($date);
+      const options = {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      };
+      const formattedDate = newDate.toLocaleDateString('id-ID', options);
+      return formattedDate
+    }
   </script>
 
   <?= $this->renderSection('script') ?>

@@ -29,6 +29,13 @@ class PurchaseModel extends \App\Models\PrModel
         $builder->join($this->tblTerm . " ebx", "uk.id_term = ebx.id", "inner");
         $builder->select("uk.id, uk.status, uk.id_vendor, uk.id_term, uk.po_no,dbx.nama as nama_vendor, ebx.name as term, uk.po_date, uk.date_exc, uk.ship_to, uk.qty, uk.qty_payment, uk.total, uk.total_payment");
 
+        if (!empty($params['isReceive']) && $params['isReceive']) {
+            $builder->groupStart();
+            $builder->where("qty_payment < qty");
+            $builder->orWhere("qty_payment IS NULL");
+            $builder->groupEnd();
+        }
+
         if ($id == null or $id == "") {
             $builder->where('uk.active = 1');
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
@@ -63,6 +70,7 @@ class PurchaseModel extends \App\Models\PrModel
     {
         $builder = $this->db->table($this->table . " uk");
         $builder->select("count(1) as _cnt");
+        $builder->join($this->tblVendor . " dbx", "uk.id_vendor = dbx.id", "inner");
         $builder->where('uk.active = 1');
 
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
@@ -125,10 +133,8 @@ class PurchaseModel extends \App\Models\PrModel
     function getDataDetail($idHeader = null)
     {
         $builder = $this->db->table($this->tblDet . " uk");
-        $builder->select("uk.id, uk.id_header,uk.qty, uk.id_barang,uk.disc_price,uk.tax_price,fbx.nama_satuan as nama_unit, ebx.kode_barang, ebx.nama_barang,uk.tax,uk.disc,uk.price,uk.grand_price");
+        $builder->select("uk.id");
         $builder->where("id_header", $idHeader);
-        $builder->join($this->tblBarang . " ebx", "uk.id_barang = ebx.id", "inner");
-        $builder->join($this->tblSatuan . " fbx", "ebx.id_satuan = fbx.id", "inner");
         $this->_data = $builder->get()->getResult();
         return $this->_data;
     }
@@ -147,8 +153,11 @@ class PurchaseModel extends \App\Models\PrModel
     {
         $this->db->transStart();
         try {
-
             if (!empty($id)) {
+                $arrDelete =  [
+                    "id_header" => $id,
+                ];
+                $this->deleteRecordMultipleColumn($this->tblDet, $arrDelete);
                 $arrParam =  [
                     "id" => $id,
                 ];
@@ -160,7 +169,7 @@ class PurchaseModel extends \App\Models\PrModel
             $arrDelete =  [
                 "id_header" => $id,
             ];
-            $this->deleteRecordMultipleColumn($this->tblDet, $arrDelete);
+
             foreach ($detail as $rowData) {
                 if ($rowData['id_barang'] != "") {
                     $idBarang = decrypt($rowData['id_barang']);
@@ -174,6 +183,7 @@ class PurchaseModel extends \App\Models\PrModel
                     "grand_price" => !empty($rowData['grand_price']) ? $rowData['grand_price'] : null,
                     "disc_price" => !empty($rowData['disc_price']) ? $rowData['disc_price'] : null,
                     "id_header" => $id,
+                    "qty_receive" => 0,
                     "qty" => $rowData['qty'],
 
                 ];

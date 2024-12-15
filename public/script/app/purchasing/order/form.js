@@ -20,12 +20,19 @@ let inpStatus = $('#status');
 let inpTax = $('#tax');
 let btnAdd = $('#btn-add');
 let btnSimpan = $('#btn-simpan');
+let btnApprove = $('#btn-approve');
 let btnSimpanDetail = $('#btn-simpan-det');
 let modalDet = $('#modal-detail-item');
 let detailData = $("#data-details").val().replace(/&quot;/ig,'"');
-
+const regex = /^[0-9]+(\.[0-9]+)?$/; // Hanya angka dan desimal
    
-
+if(inpStatus.val() == 0){
+    btnAdd.show()
+    btnSimpan.show()
+} else{
+    btnAdd.hide()
+    btnSimpan.hide()
+}
 
 let dtList = new Tabulator("#dt-list", {
     columns: [
@@ -218,6 +225,14 @@ dtList.on("rowClick", function(e, row){
     var idBarang = row._row.data.id;
     var namaBarang = row._row.data.nama_barang.replace(/<[^>]*>/g, '');
     var namaSatuan = row._row.data.nama_satuan.replace(/<[^>]*>/g, '');
+    if(dtListDetailPO.getData().some(x => x.id_barang == idBarang)){
+        return Swal.fire({
+            text: "Barang sudah dipilih",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
 
     inpUnit.val(namaSatuan)
     inpIdBarang.val(idBarang)
@@ -264,6 +279,18 @@ if(detailData.length > 0){
     }, 1000);
 } 
 
+inpQty.keyup(function (e) {
+    if(!regex.test(e.target.value)){
+        e.target.value = ""
+        return Swal.fire({
+            text: "Quantity harus berupa angka",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+})
+
 function openModalDetail(row = null){
     if(row){
         let data = row.getData()
@@ -296,8 +323,10 @@ function openModalDetail(row = null){
         let priceAfterDisc = 0;
         let tax = "";
         let disc = "";
-        const regex = /^[0-9]+(\.[0-9]+)?$/; // Hanya angka dan desimal
+        
     
+     
+
         if(inpBarang.val().length == 0){
             return Swal.fire({
                 text: "Barang harus dipilih",

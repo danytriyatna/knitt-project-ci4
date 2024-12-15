@@ -7,70 +7,42 @@ $(document).ready(function () {
             },
             
 			{
-				title: 'PO NO.', field: 'po_no',hozAlign:"left", headerSort:false, sorter: 'string',
-				width: "12%", formatter : "html"
+				title: 'RECEIVE NO.', field: 'rec_no',hozAlign:"left", headerSort:false, sorter: 'string',
+				width: "15%", formatter : "html"
 			}, 
 				
 			{
-				title: 'PO DATE', field: 'po_date',hozAlign:"left", headerSort:false, sorter: 'string',
+				title: 'RECEIVE DATE', field: 'rec_date',hozAlign:"left", headerSort:false, sorter: 'string',
 				width: "10%",
 			}, 
-				
+			{
+				title: 'PO NO.', field: 'po_no',hozAlign:"left", headerSort:false, sorter: 'string',
+				width: "15%",
+			}, 
+			{
+				title: 'SHIP DATE', field: 'date_exc',hozAlign:"left", headerSort:false, sorter: 'string',
+				width: "10%",
+			}, 
+            {
+				title: 'FORM NO', field: 'form_no', formatter : "html", align: "center", hozAlign:"left", headerSort:false,
+                width: "10%",
+			} ,	
 			{
 				title: 'VENDOR NAME', field: 'nama_vendor',hozAlign:"left", headerSort:false, sorter: 'string',
 				width: "20%",
 			}, 
-
             {
-				title: 'TERM', field: 'term', formatter : "html", align: "center", hozAlign:"left", headerSort:false,
-                width: "10%",
-			} ,
-
-            {
-				title: 'QTY STATUS', field: 'qty', formatter : "html", align: "center",hozAlign:"right", headerSort:false,
+				title: 'QTY', field: 'qty', formatter : "html", align: "center",hozAlign:"right", headerSort:false,
                 width: "10%",
 			},
-
             {
-				title: 'TOTAL', field: 'total', headerSort:false, sorter: 'string', hozAlign:"right",
-				width: "10%", formatter : "money",
-                formatterParams: {
-                    decimal: ",",
-                    thousand: ".",
-                    symbol: "Rp",  // Simbol mata uang Rupiah
-                    precision: 0,   // Tidak ada desimal
-                },
-			},
-
-            {
-				title: 'PAYMENT', field: 'total_payment', headerSort:false, sorter: 'string',
-				width: "10%", formatter: "money",
-                formatterParams: {
-                    decimal: ",",
-                    thousand: ".",
-                    symbol: "Rp",  // Simbol mata uang Rupiah
-                    precision: 0,   // Tidak ada desimal
-                },
-			},
-
-            {
-				title: 'REMAIN', field: 'sisa', formatter: "money",headerSort:false, sorter: 'string',
-                width: "10%", 
-                formatterParams: {
-                    decimal: ",",
-                    thousand: ".",
-                    symbol: "Rp",  // Simbol mata uang Rupiah
-                    precision: 0,   // Tidak ada desimal
-                },
-			} ,
-            {
-				title: 'PAYMENT STATUS', field: 'status', formatter : "html", align: "center", headerSort:false,
-                width: "15%",
+				title: 'STATUS', field: 'status', formatter : "html", align: "center", headerSort:false,
+                width: "10%",
 			},
 				
         ],
         // layout: 'fitColumns',
-        ajaxURL: "/purchasing/purchase-order/list",
+        ajaxURL: "/purchasing/receive-item/list",
         placeholder: "Tidak ada data",
         ajaxConfig: "POST",
         ajaxSorting: true,

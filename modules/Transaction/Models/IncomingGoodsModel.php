@@ -132,6 +132,12 @@ class IncomingGoodsModel extends \App\Models\PrModel
         $builder->where('id_gudang', $idGudang);
         $this->_data = $builder->get()->getRow();
         return $this->_data;
+        // if ($builder->get()) {
+        //     $this->_data = $builder->get()->getRow();
+        //     return $this->_data;
+        // } else {
+        //     return null;
+        // }
     }
 
     function trxInsertUpdateRecord($data)
