@@ -396,6 +396,15 @@ if(datepickerInit != null) {
   });
 }
 
+const datepickerxInit = document.getElementsByClassName("datepickerx");
+if(datepickerxInit != null) {
+  $('.datepickerx').datepicker({
+    format: "dd-mm-yyyy",
+    language: "id",
+    autoclose: true
+  });
+}
+
 
 // PERFECT SCROLLBAR INIT
 const psInit = document.getElementsByClassName("perfect-scroll");
