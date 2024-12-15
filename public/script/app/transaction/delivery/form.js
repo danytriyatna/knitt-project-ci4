@@ -128,13 +128,37 @@ $(document).ready(function () {
     let dtListProduksi = new Tabulator("#dt-list-detail", {
         columns: [
             {
+                title: '', headerSort:false, formatter: buttonRowAction, sorter: 'string',
+                width: '10%', 
+                cellClick: function(e, cell) {
+                    let row = cell.getRow();
+                    let data_row = row.getData();
+                    if (e.target.title === 'delete') {
+                        if (confirm("Anda yakin akan menghapus data?")) {
+                            let seq = cell.getRow().getData().korp_terkait_seq;
+                            cell.getRow().delete();
+
+                            // update penyebab
+                            let dataDet = dtListProduksi.getData();
+                            addkuota(cell.getRow().getData().ref_detail_id, true)
+                            //    remove rencana pengendalian
+                            dataDet = dataDet.filter(function (item) {
+                                return parseInt(item.seq) !== seq;
+                            });
+
+                            dtListProduksi.replaceData(dataDet);
+                        }
+                    }  
+                }
+            }, 
+            {
                 title: 'Colour', field: 'kode_warna', headerSort:false, formatter: "html", sorter: 'string',
                 width: '40%',
             }, 
     
             {
                 title: 'Size', field: 'kode_ukuran', headerSort:false, formatter: "html", sorter: 'string',
-                width: '30%', hozAlign: 'right', cssClass: 'text-end'
+                width: '20%', hozAlign: 'right', cssClass: 'text-end'
             }, 
     
             {
@@ -394,12 +418,13 @@ $(document).ready(function () {
 		let dataTable = dtListProduksi.getData();
 
 		let dataOrder = dtListDetail.getData();
-		let objIndex  = dataTable.findIndex(obj => obj.id_ukuran == (data.id_ukuran));
+		let objIndex  = dataTable.findIndex(obj => obj.id_ukuran == (data.id_ukuran) && obj.id_warna == (data.id_warna));
 		let ix_order  = dataOrder.findIndex(obj => obj.ref_detail_id == (data.ref_detail_id));
 
 		// let ktQty     = isQty.findIndex(obj => obj.kategori_id == (data.kategori_id));
 		// let ktQtyO    = isQtyO.findIndex(obj => parseInt(obj.sl_order_det_id) === parseInt(isSlc.val()));
 		
+
 		if(dataOrder.length > 0){
 			if(dataOrder[ix_order] == undefined){
 				alert("Warna tidak ada dalam list produksi !");
@@ -408,7 +433,6 @@ $(document).ready(function () {
 		}
 
 		data.seq = dataTable.length + 1;
-		
 		if(data.qty > dataOrder[ix_order].qty_prod){
             if(dataTable[objIndex] == undefined){
                 // console.log(ix_order);
@@ -452,8 +476,8 @@ $(document).ready(function () {
 		
 		if(objIndex >= 0){
 			if(hapus){
-				tblDetail[objIndex].qty_prod   = parseInt(tblDetail[objIndex].qty_prod) - 1;
-				tblDetail[objIndex].qty_remain = parseInt(tblDetail[objIndex].qty_remain) + 1;
+				tblDetail[objIndex].qty_remain   = parseInt(tblDetail[objIndex].qty);
+				tblDetail[objIndex].qty_prod = 0;
 			}else{
 				tblDetail[objIndex].qty_prod   = parseInt(tblDetail[objIndex].qty_prod) + 1;
                 tblDetail[objIndex].qty_remain = parseInt(tblDetail[objIndex].qty_remain) - 1;

@@ -131,6 +131,7 @@ class Sample extends BaseController
       "tgl_deadline" => $results->tgl_deadline,
       "deskripsi" => $results->deskripsi,
       "gambar_id" => $results->gambar_id,
+      "style" => $results->style,
       "status" => $results->status,
       "uang_dp" =>  !empty($results->uang_dp) ? $results->uang_dp : 0,
       "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
@@ -172,6 +173,7 @@ class Sample extends BaseController
     $qty = $this->request->getPost('qty');
     $hargaTotal = $this->request->getPost('hargaTotal');
     $stat = $this->request->getPost('status');
+    $style = $this->request->getPost('style');
 
 
     $this->validation->setRules([
@@ -226,6 +228,7 @@ class Sample extends BaseController
       'tgl_transaksi' => $tglTransaksi,
       'tgl_deadline' => $tglDeadline,
       'total_harga' => $hargaTotal,
+      'style' => $style,
       'qty' => $qty,
       'active' => 1,
       'status' => $stat,
@@ -237,12 +240,12 @@ class Sample extends BaseController
 
       // menyimpan style 
       $prm_syle['id_konsumen'] = $idKonsumen;
-      $prm_syle['kode_style'] = $deskripsi;
+      $prm_syle['kode_style'] = $style;
       $cek_style = $this->mkonsumen->getDataStyle(0, 0, 1, null, null, $prm_syle);
       if(empty($cek_style)){
         $in_style['id_konsumen'] = $idKonsumen;
-        $in_style['kode_style'] = $deskripsi;
-        $in_style['keterangan_style'] = $deskripsi;
+        $in_style['kode_style'] = $style;
+        $in_style['keterangan_style'] = $style;
         $this->mSample->insertRecordGetid('ref_konsumen_style', $in_style);
       }
 

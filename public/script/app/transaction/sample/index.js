@@ -3,6 +3,7 @@
 $(document).ready(function () {
     let inpData          = $('#data_id');
     let inpDeskripsi     = $('#desc_style');
+    let inpStyle         = $('#style');
     let inpBuyer         = $('#select_buyer');
     let inpTglTransaksi  = $('#tgl_sample');
     let inpTglDeadline   = $('#tgl_deadline');
@@ -352,6 +353,7 @@ $(document).ready(function () {
         inpTglDeadline.val("")
         inpKetSample.val("")
         noSample.val("");
+        inpStyle.val("");
         rowDet.hide()
         $("#btn-save").hide()
         $("#btn-draft").show()
@@ -462,6 +464,7 @@ $(document).ready(function () {
                 inpKetSample.val(data.keterangan)
                 inpBuyer.val(data.id_konsumen).trigger('change')
                 noSample.val(data.kode_sample);
+                inpStyle.val(data.style);
                 inpTglDeadline.val(formatterDate(data.tgl_deadline))
                 inpTglTransaksi.val(formatterDate(data.tgl_transaksi))
                 if(data.file_gambar){
@@ -670,6 +673,7 @@ $(document).ready(function () {
             var formData = new FormData();
             formData.append("id",inpData.val());
             formData.append("status",status);
+            formData.append("style", inpStyle.val());
             formData.append("deskripsi",inpDeskripsi.val());
             formData.append("fileSample",fileSample[0].files[0] == undefined ? null : fileSample[0].files[0] );
             formData.append("fileIdSampleOld",fileSampleOld.val());
@@ -829,7 +833,7 @@ $(document).ready(function () {
         
     }
 
-    $('#desc_style').autocomplete({
+    $('#style').autocomplete({
         appendTo: '#modal-form-add-po',
 		source: function( request, response ) {
             console.log(inpBuyer.val())

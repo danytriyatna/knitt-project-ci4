@@ -170,14 +170,14 @@ class Production extends BaseController
       array_push(
         $build_array["data"],
         array(
-          "id"                => ($id),
+          "id"                  => ($id),
           "kode_warna"          => ($row->kode_warna),
-          "kode_ukuran"     => $row->kode_ukuran,
-          "id_ukuran"     => $row->id_ukuran,
-          "id_walkorder_proses"     => $row->id_walkorder_proses,
-          "id_warna"     => $row->id_warna,
-          "qty"    => $row->qty,
-          "harga_satuan"               => $row->harga_satuan,
+          "kode_ukuran"         => $row->kode_ukuran,
+          "id_ukuran"           => $row->id_ukuran,
+          "id_walkorder_proses" => $row->id_walkorder_proses,
+          "id_warna"            => $row->id_warna,
+          "qty"                 => $row->qty,
+          "harga_satuan"        => $row->harga_satuan,
         )
       );
     }
@@ -304,10 +304,15 @@ class Production extends BaseController
       $id = decrypt($id);
     }
     $tglTransaksi = $this->request->getPost('tglTransaksi');
+    
+    $tglTransaksi = !empty($tglTransaksi) ? \fdate_ind_to_eng($tglTransaksi) : '';
     $detailProd = $this->mProduksi->getDataOperatorProd($id, $tglTransaksi);
     if (!empty($detailProd)) {
       $build_array['message'] = "data ditemukan";
       $build_array['status']  = true;
+      for ($i=0; $i < count($detailProd) ; $i++) { 
+        $detailProd[$i]->date = \fdate_eng_to_ind($detailProd[$i]->date);
+      }
       $build_array['data'] = json_encode($detailProd);
     }
 
@@ -354,4 +359,64 @@ class Production extends BaseController
     $build_array['status']  = $status;
     return $this->response->setJSON($build_array);
   }
+
+
+  // fungsi untuk scan barcode atau auto complete 
+  public function getDataProduksiItem(){
+    $barcode_code = $this->request->getPost("kata_kunci");
+    $id_walkorder = $this->request->getPost("id_walkorder");
+    $id_produksi  = $this->request->getPost("id_produksi");
+    $proses  = $this->request->getPost("proses");
+
+    $id_produksi  = \decrypt($id_produksi);
+    $id_walkorder  = \decrypt($id_walkorder);
+
+
+    $status = false;
+    $msg = "Data warna ukuran tidak ditemukan !";
+    $data = [];
+    $slc  = [];
+
+    // if(!empty($barcode_code)){
+        // $params['last_proses']  = 1;
+        $params['id_walkorder'] = $id_walkorder;
+        $params['kata_kunci'] = $barcode_code;
+        $params['id_proses'] = $proses;
+        $result = $this->mWalkorder->getListProduksiUkuran($params);
+        if(!empty($result)){
+            foreach ($result as $r) {
+                $isi = [];
+                $isi["id_walkorder"]  = $r->id_walkorder;
+                $isi["id_walkorder_proses"]  = $r->id;
+                $isi["ref_detail_id"] = $r->ref_detail_id;
+                $isi["id_ukuran"]     = $r->id_ukuran;
+                $isi["id_warna"]      = $r->id_warna;
+                $isi["qty"]           = $r->qty;
+                $isi["qty_prod"]      = 0;
+                $isi["kata_kunci"]    =  "(".$r->kode_warna.") " . $r->kode_ukuran;
+                $isi["kode_warna"]    = $r->kode_warna;
+                $isi["kode_ukuran"]   = $r->kode_ukuran;
+                $isi["key_ukuran"]    = $r->key_ukuran;
+                $data[] = $isi;
+
+                $isi_slc = [];
+                $isi_slc["id"]    = $r->ref_detail_id;
+                $isi_slc["idx"]   = $r->kode_warna;
+                $isi_slc["label"] = "(".$r->kode_warna.") " . $r->kode_ukuran . " | jumlah " . $r->qty;
+                $isi_slc["value"] = $r->ref_detail_id;
+                $isi_slc["data"]  = $isi;
+                $slc[] = $isi_slc;
+            }
+            $status = true;
+            $msg = "Data produk ditemukan !";
+        }
+      
+    // }
+
+    $build_array["status"] = $status;
+    $build_array["msg"] = $msg;
+    $build_array["data"] = $data;
+    $build_array["slc"] = $slc;
+    return $this->response->setJSON($build_array);
+}
 }

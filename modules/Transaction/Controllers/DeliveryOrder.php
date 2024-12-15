@@ -198,7 +198,6 @@ class DeliveryOrder extends BaseController
         $ukuran .= ($ukuran == "") ? $keyUkuran : ", ". $keyUkuran;
       }
       $prm['ukuran'] = $ukuran;
-
       $dataProd = [];
       $rsProd = $this->mProduksi->getProduksilast($prm); 
       

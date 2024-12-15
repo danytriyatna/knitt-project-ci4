@@ -88,24 +88,30 @@
 
           <hr>
           <h5><b>PRODUCTION PROCESS</b></h5>
-          <div class="container">
+          <!-- <div class="container"> -->
             <div class="row">
-
-              <?php foreach ($proses as $r) { ?>
-                <div class="col">
-                  <div class="card">
-                    <div class="card-body" style="min-height: 80px;">
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="jenis_proses" id="proses_<?= $r->id ?>" value="<?= $r->id ?>">
-                        <label class="form-check-label" for="proses_<?= $r->id ?>"><?= $r->nama ?></label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              <?php } ?>
+              <table class="table table-striped datatable dataTable no-footer">
+                  <thead>
+                    <tr>
+                      <th>Proses</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                       <?php foreach ($proses as $r) { ?>
+                        <tr>
+                          <td>
+                            <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="jenis_proses" id="proses_<?= $r->id ?>" value="<?= $r->id ?>">
+                              <label class="form-check-label" for="proses_<?= $r->id ?>"><?= $r->nama ?></label>
+                            </div>
+                          </td>
+                        </tr>
+                        <?php } ?>
+                  </tbody>
+              </table>
 
             </div>
-          </div>
+          <!-- </div> -->
 
           <hr>
 

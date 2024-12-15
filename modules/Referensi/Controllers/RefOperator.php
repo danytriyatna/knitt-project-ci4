@@ -27,7 +27,7 @@ class RefOperator extends BaseController
             return redirect()->to('/auth/login');
         }
 
-        $this->data['titlehead'] = "Master Data Operator";
+        $this->data['titlehead'] = "Master Data CMT";
 
         return view($this->views . '\operator\index', $this->data);
     }

@@ -2,10 +2,10 @@
 
 namespace Modules\Referensi\Models;
 
-class UkuranModel extends \App\Models\PrModel
+class RekeningModel extends \App\Models\PrModel
 {
 
-    protected $table = "ref_ukuran";
+    protected $table = "ref_rekening";
     protected $_data = null;
     protected $primaryKey = 'id';
 
@@ -16,23 +16,24 @@ class UkuranModel extends \App\Models\PrModel
 
     function getData($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
     {
-        $builder = $this->db->table($this->table . " uk");
+        $builder = $this->db->table($this->table . " rk");
 
-        $builder->select("uk.id, uk.kode_ukuran, uk.keterangan, uk.key_ukuran");
+        $builder->select("rk.id, rk.rekening_no, rk.rekening_bank, rk.keterangan, rk.rekening_an");
 
         if ($id == null or $id == "") {
-            $builder->where('uk.active = 1');
+            $builder->where('rk.active = 1');
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
                 $builder->groupStart();
-                $builder->where('LOWER(uk.kode_ukuran) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(uk.keterangan) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->where('LOWER(rk.rekening_no) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(rk.rekening_bank) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(rk.rekening_an) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
             }
 
             if (!empty($order)) {
                 $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
             } else {
-                $builder->orderBy('seq asc');
+                $builder->orderBy('id');
             }
 
             if (empty($offset)) $offset = 0;
@@ -42,27 +43,27 @@ class UkuranModel extends \App\Models\PrModel
 
             $this->_data = $builder->get()->getResult();
         } else {
-            $builder->where("uk.id", $id);
+            $builder->where("rk.id", $id);
 
             $this->_data = $builder->get()->getRow();
         }
 
         return $this->_data;
     }
-    
+
     function getDataCnt($filters = null, $params = null)
     {
-        $builder = $this->db->table($this->table . " uk");
+        $builder = $this->db->table($this->table . " rk");
 
         $builder->select("count(1) as _cnt");
 
-        $builder->where('uk.active = 1');
+        $builder->where('rk.active = 1');
 
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             $builder->groupStart();
-            $builder->where('LOWER(k.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
-            $builder->where('LOWER(uk.kode_ukuran) LIKE', strtolower("%{$filters[0]['value']}%"));
-            $builder->orWhere('LOWER(uk.keterangan) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->where('LOWER(rk.rekening_no) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(rk.rekening_bank) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(rk.rekening_an) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
         }
 

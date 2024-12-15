@@ -240,6 +240,7 @@ $(document).ready(function () {
 	});
 
     function getKonsumenStyle(){
+        dtListStyle.clearData();
         $.ajax({
             type: 'POST',
             url: '/master-data/konsumen/get_data_style',
