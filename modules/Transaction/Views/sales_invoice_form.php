@@ -24,7 +24,7 @@
                 <div class="form-group my-0 row">
                   <label class="control-label text-start text-md-end col-md-4 col-form-label">Ref. Date</label>
                   <div class="col-md-8">
-                    <input type="text" class="form-control-plaintext" id="det_ref_tgl" disabled>
+                    <input type="text" class="form-control-plaintext datepickerx" id="det_ref_tgl" disabled>
                   </div>
                 </div>
               </div>
