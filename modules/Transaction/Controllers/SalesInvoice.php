@@ -198,7 +198,7 @@ class SalesInvoice extends BaseController
 
           $isi = [
             'id_walkorder'      => $x->id,
-            'tgl_transaksi'     => $x->tgl_transaksi,
+            'tgl_transaksi'     => fdate_ind_to_eng($x->tgl_transaksi),
             'keterangan_style'  => $x->keterangan_style,
             'konsumen_nama'     => $x->konsumen_nama,
             'tipe_id'           => $x->tipe_id,
