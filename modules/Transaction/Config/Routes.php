@@ -84,7 +84,10 @@ $routes->group('trans/customer-receipt', ['namespace' => 'Modules\Transaction\Co
 
 $routes->group('trans/item-transfer', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'ItemTransfer::index');
+  $routes->post('list', 'ItemTransfer::lists');
   $routes->get('form', 'ItemTransfer::form');
+  $routes->get('edit/(:any)', 'ItemTransfer::form/$1');
+  $routes->post('save', 'ItemTransfer::save');
 });
 
 $routes->group('trans/receive-item', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
