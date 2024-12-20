@@ -194,6 +194,20 @@ table
           font-weight: 700
           border-top: 1px solid #AAA
           border-bottom: 1px solid #AAA
+    .tabulator-tableholder
+      .tabulator-table
+        .tabulator-row
+          .tabulator-cell
+            &.tabulator-editable
+              background-color: #EEE
+              transition: all
+              transition-duration: .15s
+              cursor: pointer
+              margin: 0px 1px
+              &:not(.tabulator-editing)
+                border-bottom: 1px solid #DDD
+              &:hover
+                background-color: #DEDEDE
   &.custom-dt-layout
     > .tabulator-header
       border: 0
