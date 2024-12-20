@@ -3,6 +3,7 @@ $(document).ready(function () {
     
     let statusProses = $("#filter_status")
     let tglTransaksi = $("#tgl_prod")
+    let noMesin =   $("#nomesin")
     let operator = $("#filter_operator")
     const prosesMap = {
         1: "#proses_1",
@@ -176,13 +177,14 @@ $(document).ready(function () {
                     }
                 }
             },
-            {title:"Date", field:"date", width:"10%"},
+            {title:"Date", field:"date", width:"8%"},
             {title:"Colour", field:"kode_warna", hozAlign:"left",width:"15%"},
             {title:"Process", field:"process", hozAlign:"left",width:"10%"},
             {title:"Operator", field:"operator", hozAlign:"left",width:"15%"},
+            {title:"Nomor Mesin", field:"nomor_mesin", hozAlign:"left",width:"15%"},
             {title:"Size", field:"kode_ukuran", hozAlign:"left",width:"5%"},
-            {title:"QTY", field:"qty", hozAlign:"center",width:"10%", editor: "number",cellEdited: updateTotal},
-            {title:"Price", field:"harga", hozAlign:"right",width:"15%",formatter: "money", editor:"number",formatterParams: {
+            {title:"QTY", field:"qty", hozAlign:"center",width:"5%", editor: "number", cellEdited: updateTotal},
+            {title:"Price", field:"harga", hozAlign:"right",width:"12%",formatter: "money", editor:"number",formatterParams: {
                     decimal: ",",
                     thousand: ".",
                     symbol: "Rp",  // Simbol mata uang Rupiah
@@ -208,15 +210,11 @@ $(document).ready(function () {
                             harga_total : total_harga
                         });
                     }else{
-                        cell.getRow().update({ 
-                            // persen: val_persen,
-                            harga       : rowData.harga,
-                            harga_total : rowData.harga_total
-                        });
+                        cell.restoreOldValue();
                     }
                 },
             },
-            {title:"Total", width:"15%", field:"harga_total",formatter: "money", formatterParams: {
+            {title:"Total", width:"12%", field:"harga_total",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
@@ -354,6 +352,15 @@ $(document).ready(function () {
             });
         }
 
+        if(noMesin.val().length == 0){
+            return Swal.fire({
+                text: "Nomor Mesin harus diisi",
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+
         // if (dtListProd.getData().some(x => x.id_ukuran == data.id_ukuran && x.id_walkorder_proses_ukuran == data.id_walkorder_proses_ukuran)){
         //     return Swal.fire({
         //         text: "Data sudah dipilih, silahkan pilih data yang lain",
@@ -400,7 +407,8 @@ $(document).ready(function () {
             id_operator                 : operator.val(),
             operator                    : $('#filter_operator option:selected').text(),
             process                     : $('#filter_status option:selected').text(),
-            date                        : formatLocaleDate(tglTransaksi.val())
+            date                        : formatLocaleDate(tglTransaksi.val()),
+            nomor_mesin                 : noMesin.val(),
             
         });
       
@@ -426,27 +434,32 @@ $(document).ready(function () {
 
     function updateTotal(cell) {
         let row = cell.getRow();
-        if (row) { 
-            const selectedProses = prosesMap[statusProses.val()];
-            
-            if (!(row.getData().qty <= $(selectedProses).val())) {
-                cell.restoreOldValue();
-                Swal.fire({
-                    text: "Quantity tidak boleh melebihi stok.",
-                    icon: 'error',
-                    showConfirmButton: false,
-                    timer: 2000
-                });
-            }else{
-                let newTotal = calculateTotal(row.getData());
-                row.update({ harga_total: newTotal });
-            }
-            
-        } 
+        if(row.flag != 0){
+            if (row) { 
+                const selectedProses = prosesMap[statusProses.val()];
+                
+                if (!(row.getData().qty <= $(selectedProses).val())) {
+                    cell.restoreOldValue();
+                    Swal.fire({
+                        text: "Quantity tidak boleh melebihi stok.",
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }else{
+                    let newTotal = calculateTotal(row.getData());
+                    row.update({ harga_total: newTotal });
+                }
+                
+            } 
+        }
+        else{
+            cell.restoreOldValue();
+        }
     }
     function formatLocaleDate(localeDate) {
     
-        var months = {
+        let months = {
             "Januari": "01",
             "Februari": "02",
             "Maret": "03",
@@ -461,21 +474,26 @@ $(document).ready(function () {
             "Desember": "12"
         };
 
-        var parts = localeDate.split(" ");
-        var day = parts[0].padStart(2, '0'); 
-        var month = months[parts[1]]; 
-        var year = parts[2];
+        let parts = localeDate.split(" ");
+        let day = parts[0].padStart(2, '0'); 
+        let month = months[parts[1]]; 
+        let year = parts[2];
+
+        if(month == undefined){
+            month = parts[1]
+        }
 
         // return `${year}-${month}-${day}`;
         return `${day}-${month}-${year}`;
     }
 
     tglTransaksi.change(function(e){
-        get_detailData(e.target.value)
+        // get_detailData(e.target.value)
+        get_detailData()
     })
     get_detailData();
     function get_detailData(tgl){
-        let date = tgl != undefined ? formatLocaleDate(tgl) : ''
+        let date = tglTransaksi != undefined ? formatLocaleDate(tglTransaksi.val()) : ''
         let idProduksi =  $("#id_produksi").val()
         $.ajax({
             type: 'POST',
@@ -701,6 +719,15 @@ $(document).ready(function () {
             });
         }
 
+        if(noMesin.val().length == 0){
+            return Swal.fire({
+                text: "Nomor Mesin harus diisi",
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+
         // let ktQty     = isQty.findIndex(obj => obj.kategori_id == (data.kategori_id));
         // let ktQtyO    = isQtyO.findIndex(obj => parseInt(obj.sl_order_det_id) === parseInt(isSlc.val()));
 
@@ -749,7 +776,8 @@ $(document).ready(function () {
                         id_operator                 : operator.val(),
                         operator                    : $('#filter_operator option:selected').text(),
                         process                     : $('#filter_status option:selected').text(),
-                        date                        : formatLocaleDate(tglTransaksi.val())
+                        date                        : formatLocaleDate(tglTransaksi.val()),
+                        nomor_mesin                 : noMesin.val(),
                         
                     }
     

@@ -66,7 +66,7 @@
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-3 col-form-label" for="do_no">DO No.</label>
                       <div class="col-md-9">
-                        <input <?=  ($view_read) ? 'disabled' : ''; ?> type="text" id="do_no" name="do_no" class="form-control" placeholder="Ketikkan nomor DO" value="<?= !empty($row) ? $row->delivery_kode: '' ; ?>">
+                        <input <?=  ($view_read) ? 'disabled' : ''; ?> type="text" id="do_no" name="do_no" class="form-control " placeholder="Ketikkan nomor DO" value="<?= !empty($row) ? $row->delivery_kode: '' ; ?>">
                         <input type="hidden" name="id_produksi" id="id_produksi" value="<?= !empty($row->id_produksi)? $row->id_produksi : ''; ?>" >
                         <input type="hidden" name="id_walkorder" id="id_walkorder" value="<?= !empty($row->id_walkorder)? $row->id_walkorder : ''; ?>" >
                       </div>
@@ -85,7 +85,7 @@
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tgl_do">DO Date</label>
                       <div class="col-md-8">
-                        <input <?=  ($view_read) ? 'disabled' : ''; ?> type="text" id="tgl_do" name="tgl_do" class="form-control" placeholder="Pilih tanggal DO" value="<?= !empty($row) ? $row->tgl_do : '' ;?>">
+                        <input <?=  ($view_read) ? 'disabled' : ''; ?> type="text" id="tgl_do" name="tgl_do" class="form-control datepickerx" placeholder="Pilih tanggal DO" value="<?= !empty($row) ? $row->tgl_do : '' ;?>">
                       </div>
                     </div>
                   </div>

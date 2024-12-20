@@ -132,7 +132,7 @@ class ProductionModel extends \App\Models\PrModel
     {
         $builder = $this->db->table("trans_produksi_operator abx");
         $builder->select("abx.flag, abx.id_proses as id_walkorder_proses_ukuran, abx.qty, ebx.nama_operator as operator, dbx.kode_warna, 
-                          abx.harga_total, abx.harga, abx.tgl_transaksi as date,bbx.nama as process,cbx.kode_ukuran");
+                          abx.harga_total, abx.harga, abx.tgl_transaksi as date,bbx.nama as process,cbx.kode_ukuran, abx.nomor_mesin");
 
         $builder->join("_jenis_proses_produksi bbx", "abx.id_proses = bbx.id", "inner");
         $builder->join("ref_ukuran cbx", "abx.id_ukuran = cbx.id", "inner");
@@ -172,6 +172,7 @@ class ProductionModel extends \App\Models\PrModel
                     "harga" => $rowData['harga'],
                     "harga_total" => $rowData['harga_total'],
                     "ref_detail_id" => $rowData['ref_detail_id'],
+                    "nomor_mesin" => $rowData['nomor_mesin'],
                     "active" => 1,
                     "flag" => 1,
                     "created_at" =>  date("Y-m-d H:i:s"),
@@ -182,7 +183,7 @@ class ProductionModel extends \App\Models\PrModel
                     "qty_prod" => !empty($resQtyCurrent) ? (float)$resQtyCurrent->qty_prod + (float)$rowData['qty'] : $rowData['qty']
                 ];
                 $arrParam =  [
-                    "id" => $rowData['id_walkorder_proses_ukuran'],
+                    "id_walkorder_proses" => $rowData['id_walkorder_proses_ukuran'],
                     "id_ukuran" => $rowData['id_ukuran'],
                     "ref_detail_id" => $rowData['ref_detail_id'],
                 ];

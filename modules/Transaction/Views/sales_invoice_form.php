@@ -147,7 +147,7 @@
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tgl_si">SI Date</label>
                       <div class="col-md-8">
-                        <input <?= ($view_read) ? 'disabled' : '' ?> type="text" id="tgl_si" name="tgl_si" class="form-control" placeholder="Pilih tanggal SI" value="<?= !empty($row) ? $row->tgl_transaksi : ""; ?>">
+                        <input <?= ($view_read) ? 'disabled' : '' ?> type="text" id="tgl_si" name="tgl_si" class="form-control datepickerx" placeholder="Pilih tanggal SI" value="<?= !empty($row) ? $row->tgl_transaksi : ""; ?>">
                       </div>
                     </div>
                   </div>

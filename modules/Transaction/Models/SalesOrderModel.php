@@ -196,13 +196,14 @@ class SalesOrderModel extends \App\Models\PrModel
                         END 
                             ) AS colour,
                         COALESCE ( w1.kode_warna, '' ) as colorDasar");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'S' THEN bbx.qty ELSE 0 END ) AS S ");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'M' THEN bbx.qty ELSE 0 END ) AS M ");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'L' THEN bbx.qty ELSE 0 END ) AS L ");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'XL' THEN bbx.qty ELSE 0 END ) AS XL ");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'XXL' THEN bbx.qty ELSE 0 END ) AS XXL ");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = '3XL' THEN bbx.qty ELSE 0 END ) AS XXXL ");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'All' THEN bbx.qty ELSE 0 END ) AS All ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'xs' THEN bbx.qty ELSE 0 END ) AS XS ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 's' THEN bbx.qty ELSE 0 END ) AS S ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'm' THEN bbx.qty ELSE 0 END ) AS M ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'l' THEN bbx.qty ELSE 0 END ) AS L ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'xl' THEN bbx.qty ELSE 0 END ) AS XL ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'xxl' THEN bbx.qty ELSE 0 END ) AS XXL ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'xxxl' THEN bbx.qty ELSE 0 END ) AS XXXL ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'all' THEN bbx.qty ELSE 0 END ) AS All ");
         $builder->select("SUM(bbx.harga_satuan) AS harga_satuan");
         $builder->join("trans_sales_order_ukuran bbx", "abx.id = bbx.id_sales_order_det AND abx.id_sales_order = bbx.id_sales_order", "inner");
         $builder->join("ref_ukuran cbx", "bbx.id_ukuran = cbx.id", "left");
