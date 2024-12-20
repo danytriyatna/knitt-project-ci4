@@ -41,7 +41,7 @@ class BarangKeluarModel extends \App\Models\PrModel
                 $builder->groupStart();
                 $builder->Where('LOWER(uk.kode_transaksi) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->orWhere('LOWER(abx.nama_gudang) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(uk.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(ebx.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
             }
 
@@ -71,6 +71,7 @@ class BarangKeluarModel extends \App\Models\PrModel
         $builder = $this->db->table($this->table . " uk");
         $builder->join($this->tblGudang . " abx", "uk.id_gudang = abx.id", "left");
         $builder->join($this->tblKategori . " dbx", "uk.id_kategori = dbx.id", "inner");
+        $builder->join($this->tblVendor . " ebx", "uk.id_vendor = ebx.id", "left");
         $builder->select("count(1) as _cnt");
         $builder->where('uk.jenis_transaksi', $this->kd);
         $builder->where('uk.active = 1');
@@ -79,7 +80,7 @@ class BarangKeluarModel extends \App\Models\PrModel
             $builder->groupStart();
             $builder->Where('LOWER(uk.kode_transaksi) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->orWhere('LOWER(abx.nama_gudang) LIKE', strtolower("%{$filters[0]['value']}%"));
-            $builder->orWhere('LOWER(uk.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(ebx.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
         }
 

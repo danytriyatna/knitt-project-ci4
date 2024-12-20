@@ -29,7 +29,7 @@
           </div>
         </div>
         <div class="form-group row ">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="qty_item">Qty Exist</label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="qty_item">QTY Remain</label>
           <div class="col-md-9">
             <input type="text" id="qty_exist" name="qty_exist" class="form-control" placeholder="Terisi otomatis oleh sistem" value="" readonly>
           </div>
@@ -192,7 +192,7 @@
 
                         <?php foreach ($kategori as $item) : ?>
                           <?php if (!empty($resData->id_kategori) && $resData->id_kategori == $item['id']) { ?>
-                            <option checked value="<?= $item['id'] ?>"><?= $item['kategori'] ?></option>
+                            <option selected value="<?= $item['id'] ?>"><?= $item['kategori'] ?></option>
                           <?php } else { ?>
                             <option value="<?= $item['id'] ?>"><?= $item['kategori'] ?></option>
                           <?php } ?>
@@ -213,7 +213,7 @@
                       <select id="select_warehouse" name="select_warehouse" class="form-select select2" data-placeholder="-- Pilih Warehouse --">
                         <?php foreach ($gudang as $item) : ?>
                           <?php if (!empty($resData->id_gudang) && $resData->id_gudang == $item->id) { ?>
-                            <option checked value="<?= $item->id ?>"><?= $item->nama_gudang ?></option>
+                            <option selected value="<?= $item->id ?>"><?= $item->nama_gudang ?></option>
                           <?php } else { ?>
                             <option value="<?= $item->id ?>"><?= $item->nama_gudang ?></option>
                           <?php } ?>

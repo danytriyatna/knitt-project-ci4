@@ -191,7 +191,7 @@
 
                         <?php foreach ($kategori as $item) : ?>
                           <?php if (!empty($resData->id_kategori) && $resData->id_kategori == $item['id']) { ?>
-                            <option checked value="<?= $item['id'] ?>"><?= $item['kategori'] ?></option>
+                            <option selected value="<?= $item['id'] ?>"><?= $item['kategori'] ?></option>
                           <?php } else { ?>
                             <option value="<?= $item['id'] ?>"><?= $item['kategori'] ?></option>
                           <?php } ?>
@@ -212,7 +212,7 @@
                       <select id="select_warehouse" name="select_warehouse" class="form-select select2" data-placeholder="-- Pilih Warehouse --">
                         <?php foreach ($gudang as $item) : ?>
                           <?php if (!empty($resData->id_gudang) && $resData->id_gudang == $item->id) { ?>
-                            <option checked value="<?= $item->id ?>"><?= $item->nama_gudang ?></option>
+                            <option selected value="<?= $item->id ?>"><?= $item->nama_gudang ?></option>
                           <?php } else { ?>
                             <option value="<?= $item->id ?>"><?= $item->nama_gudang ?></option>
                           <?php } ?>
