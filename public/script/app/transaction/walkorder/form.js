@@ -4,7 +4,8 @@ $(document).ready(function () {
 
     // conf function 
     let cellMoney = function(cell, formatterParams){
-        let classN = "text-right tabulator-cell text-end";
+        const isEditable = cell.getElement().className.indexOf('tabulator-editable') >= 0
+        let classN = `text-right tabulator-cell text-end${isEditable ? ' tabulator-editable' : ''}`;
         cell.getElement().className = classN;
     
         let isVal = number_format(cell.getValue(), 2, ',', '.'); 
@@ -275,7 +276,7 @@ $(document).ready(function () {
                     width:"11%"
                 },
                 {
-                    title: "GRAM", field: "gram",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                    title: "GRAM", field: "gram",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end tabulator-editable",
                     width:"11%", editor: "number", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
                     cellEdited: function (cell) {
 
