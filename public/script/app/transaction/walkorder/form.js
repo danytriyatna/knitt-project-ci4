@@ -538,8 +538,11 @@ $(document).ready(function () {
         let ukuran_data = dtListDetail.getData();
         let ukuran_calc = dtListDetail.getCalcResults();
 
+        let id_gudang = $("#select_gudang").val()
+
         let form_data = new FormData();
         form_data.append('dataid', dataid);
+        form_data.append('id_gudang', id_gudang);
         form_data.append('listproses', JSON.stringify(listJenis));
         form_data.append('status_data', isstataus);
         form_data.append('data_ukuran_warna', JSON.stringify(ukuran_data));
@@ -601,5 +604,7 @@ $(document).ready(function () {
             },
         });
     }
+
+    $("#select_gudang").val($("#select_gudang").attr('value')).trigger('change');
 
 });

@@ -2,16 +2,29 @@
 
 namespace Modules\Transaction\Models;
 
+use Modules\Referensi\Models\BarangModel; 
+use Modules\Referensi\Models\UkuranModel; 
+use Modules\Referensi\Models\SatuanModel; 
+// use  Modules\Transaction\Models\WalkorderModel;
+
 class ProductionModel extends \App\Models\PrModel
 {
 
     protected $table = "trans_produksi";
     protected $_data = null;
     protected $primaryKey = 'id';
+    protected $mBarang;
+    protected $mWalkorder;
+
+    protected $tblTrxBarang = "trans_barang";
+    protected $tblTrxLots = "trans_lots";
+    protected $tblTrxBalances = "trans_barang_balances";
 
     public function __construct()
     {
         parent::__construct();
+        $this->mBarang = new BarangModel();
+        $this->mWalkorder = new WalkorderModel();
     }
 
     function getData($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
@@ -155,7 +168,7 @@ class ProductionModel extends \App\Models\PrModel
         $this->db->transStart();
         try {
 
-
+            $proses_last = $this->getlast_proses($idWorkOrder);
             foreach ($data as $rowData) {
                 $resData = $this->getDataNextProses($idWorkOrder, $rowData['id_proses']);
                 $resQtyCurrent = $this->getDataQuantityCurrent($rowData['id_walkorder_proses_ukuran'], $rowData['id_ukuran']);
@@ -199,6 +212,102 @@ class ProductionModel extends \App\Models\PrModel
                         "ref_detail_id" => $rowData['ref_detail_id'],
                     ];
                     $this->updateRecords("trans_walkorder_proses_ukuran", $arrUpdData2, $arrParam2);
+                }else{
+
+                    $dtWo = $this->mWalkorder->getData($idWorkOrder);
+
+                    $mukuran = new UkuranModel();
+
+                    $dataUkuran = $mukuran->getData($rowData['id_ukuran']);
+
+                    $msatuan = new SatuanModel();
+                    $prm_satuan['nama_satuan'] = $dataUkuran->kode_ukuran;
+                    $dtSatuan = $msatuan->getData(null, 0,1, null, null, $prm_satuan);
+
+                    $params_b['nama_barang'] = $dtWo->keterangan_style;
+                    $dtBarang = $this->mBarang->getData(null, 0, 1, null, null, $params_b);
+                    if(empty($dtBarang)){
+                        $arr_isi = [
+                            'nama_barang'     => $dtWo->keterangan_style,
+                            'id_jenis_barang' => 3,
+                            'id_satuan'       => $dtSatuan[0]->id,
+                            'harga_satuan'    => 0,
+                            'stok_minimum'    => 1,
+                            'keterangan'      => 'Generate dari produksi',
+                        ];
+                        $arr_isi['created_at'] = date("Y-m-d H:i:s");
+                        $arr_isi['created_by'] = 1;
+                        $arr_isi['kode_barang'] = $this->mBarang->generateKodeBarang();
+                        $id_barang = $this->insertRecordGetid($this->mBarang->table, $arr_isi);
+                    }else{
+                        $id_barang = $dtBarang[0]->id;
+                    }
+
+                    $id_gudang = $dtWo->id_gudang;
+                    $qty = $rowData['qty'];
+
+                    // $dtLot['id_barang'] = $id_barang;
+                    // $dtLot['id_gudang'] = $id_gudang;
+                    // $dtLot['lot_no']    = $this->generateRandomNumber(10);
+                    // $dtLot['qty']       = $qty;
+                    // $id_lot = $this->insertRecordGetid($this->tblTrxLots, $dtLot);
+                    $noLot = $this->generateRandomNumber(10);
+                    $mBarangMasuk = new IncomingGoodsModel();
+                    $arrParam =  [
+                        "id_barang" => $id_barang,
+                        "id_gudang" => $id_gudang,
+                    ];
+                    $resLotNo = $mBarangMasuk->getLotNo($noLot, $id_barang);
+                    $dataLots = [
+                        "id_barang" => $id_barang,
+                        "id_gudang" => !empty($id_gudang) ? $id_gudang : null,
+                        "tanggal" => date("Y-m-d H:i:s"),
+                        "lot_no" => $noLot,
+                        "qty" => $qty,
+                        "active" => 1,
+                        "created_at" =>  date("Y-m-d H:i:s"),
+                    ];
+                    if (!empty($resLotNo)) {
+                        $idLots = $resLotNo->id;
+                        $this->updateRecords($this->tblTrxLots, array("qty" => $resLotNo->qty + $qty), array("id" => $idLots));
+                    } else {
+                        $idLots = $this->insertRecordGetid($this->tblTrxLots, $dataLots);
+                    }
+
+                    $resData = $mBarangMasuk->getLastStokBarangBalances($id_barang, $id_gudang, $idLots);
+
+                    // $stokAwal = !empty($resData) ? $resData->stok : 0;
+                    $dataBarang = [
+                        "id_barang" => $id_barang,
+                        "jenis_transaksi" => 1,
+                        "jumlah" =>  $qty,
+                        "tanggal" => date("Y-m-d H:i:s"),
+                        "id_gudang_tujuan" =>  !empty($id_gudang) ? $id_gudang : null,
+                        "nama" => 'Produksi',
+                        "id_kategori" => 11,
+                        "keterangan" => "Barang Masuk Dari Produksi",
+                        "active" => 1,
+                        "tipe" => 1,
+                        "created_at" =>  date("Y-m-d H:i:s"),
+                        "lot_id" => $idLots,
+                        "kode_transaksi" => $mBarangMasuk->generateKodePersediaan(),
+                    ];
+                    $this->insertRecordGetid($this->tblTrxBarang, $dataBarang);
+                    $arrStockBalances = [
+                        "id_barang" => $id_barang,
+                        "id_gudang" => !empty($id_gudang) ? $id_gudang : null,
+                        "tanggal" => date("Y-m-d H:i:s"),
+                        "lot_id" => $idLots,
+                        "saldo_awal" => 0,
+                        "saldo_akhir" => $qty,
+                        "active" => 1,
+                        "created_at" =>  date("Y-m-d H:i:s"),
+                    ];
+                    if (!empty($resData)) {
+                        $this->updateRecords($this->tblTrxBalances, array("saldo_akhir" => $resLotNo->qty + $qty), array("id" => $resData->id));
+                    } else {
+                        $this->insertRecordGetid($this->tblTrxBalances, $arrStockBalances);
+                    }
                 }
             }
             $this->db->transComplete();
@@ -370,4 +479,23 @@ class ProductionModel extends \App\Models\PrModel
 
         return $this->_data;
     }   
+
+
+    function getlast_proses($id_walkorder){
+        $builder = $this->db->table('trans_walkorder_proses tp');
+        $builder->select('max(tp.id_proses) as id_proses');
+        $builder->where('tp.id_walkorder', $id_walkorder);
+        $this->_data = $builder->get()->getRow();
+
+        return $this->_data;
+    }
+
+    function generateRandomNumber($length = 10) {
+        $randomNumber = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomNumber .= rand(0, 9); // Menghasilkan angka acak antara 0 dan 9
+        }
+        return $randomNumber;
+    }
+     
 }

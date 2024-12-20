@@ -22,7 +22,8 @@ class BarangModel extends \App\Models\PrModel
         $builder = $this->db->table($this->table . " uk");
         $builder->join($this->tblJenisBarang . " abx", "uk.id_jenis_barang = abx.id", "inner");
         $builder->join($this->tblSatuan . " bbx", "uk.id_satuan = bbx.id", "inner");
-        $builder->select("uk.id, uk.nama_barang, uk.keterangan, uk.id_satuan, uk.id_jenis_barang, uk.stok_minimum, uk.harga_satuan, uk.kode_barang, abx.nama_jenis_barang, bbx.nama_satuan");
+        $builder->select("uk.id, uk.nama_barang, uk.keterangan, uk.id_satuan, uk.id_jenis_barang, uk.stok_minimum, uk.harga_satuan,
+                          uk.kode_barang, abx.nama_jenis_barang, bbx.nama_satuan");
 
         if ($id == null or $id == "") {
             $builder->where('uk.active = 1');
@@ -33,6 +34,10 @@ class BarangModel extends \App\Models\PrModel
                 $builder->orWhere('LOWER(uk.nama_jenis_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->orWhere('LOWER(uk.nama_satuan) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
+            }
+
+            if(!empty($params['nama_barang'])){
+                $builder->where('uk.nama_barang', $params['nama_barang']);
             }
 
             if (!empty($order)) {
