@@ -34,6 +34,8 @@ class Production extends BaseController
     $this->mPproduksi = new ProsesProduksiModel();
     $this->mOperator = new OperatorModel();
     $this->mdelivery = new DeliveryModel();
+
+    
   }
 
   public function index()
@@ -191,6 +193,8 @@ class Production extends BaseController
       return redirect()->to('/auth/login');
     }
 
+    
+    $this->data['dnow'] = formatTanggalIndonesia(date('Y-m-d'));
     $this->data['id'] = $id;
     if ($id != "") {
       $id = decrypt($id);

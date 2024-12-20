@@ -148,8 +148,10 @@ class SalesInvoice extends BaseController
     }
 
     $stdData = new \stdClass();
+    $stdData->kode_invoice ='';
     $stdData->si_no ='';
-    $stdData->tgl_si ='';
+    $stdData->tgl_si = date('d-m-Y');
+    $stdData->tgl_transaksi  = date('d-m-Y');
     $stdData->id_konsumen ='';
     $stdData->note ='';
     $stdData->tgl_do ='';
@@ -166,7 +168,7 @@ class SalesInvoice extends BaseController
       $stdData = $this->mInvoice->getData($id);
       $status  = $stdData->status;
       
-      $this->data['row'] = $stdData;
+      
       // $this->data['detail'] = json_encode($list_detail);
 
       $status = $stdData->status;
@@ -273,7 +275,7 @@ class SalesInvoice extends BaseController
       $dt_prods = json_encode($dt_prods, true);
 
     }
-
+    $this->data['row'] = $stdData;
     if (!empty($_POST)) {
       // dd($_POST);
       if(true){

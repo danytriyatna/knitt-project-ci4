@@ -87,29 +87,30 @@
           </div>
 
           <hr>
-          <h5><b>PRODUCTION PROCESS</b></h5>
+          
           <!-- <div class="container"> -->
             <div class="row">
-              <table class="table table-striped datatable dataTable no-footer">
-                  <thead>
-                    <tr>
-                      <th>Proses</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                       <?php foreach ($proses as $r) { ?>
-                        <tr>
-                          <td>
-                            <div class="form-check form-check-inline">
-                              <input class="form-check-input" type="checkbox" name="jenis_proses" id="proses_<?= $r->id ?>" value="<?= $r->id ?>">
-                              <label class="form-check-label" for="proses_<?= $r->id ?>"><?= $r->nama ?></label>
-                            </div>
-                          </td>
-                        </tr>
-                        <?php } ?>
-                  </tbody>
-              </table>
-
+              <div class="col-sm-12">
+                <table class="table table-striped table-sm no-footer mb-0">
+                    <thead>
+                      <tr>
+                        <th>PRODUCTION PROCESS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                         <?php foreach ($proses as $r) { ?>
+                          <tr>
+                            <td>
+                              <div class="form-check-inline">
+                                <input class="form-check-input m-e-4" type="checkbox" name="jenis_proses" id="proses_<?= $r->id ?>" value="<?= $r->id ?>">
+                                <label class="form-check-label mb-0" for="proses_<?= $r->id ?>"><?= $r->nama ?></label>
+                              </div>
+                            </td>
+                          </tr>
+                          <?php } ?>
+                    </tbody>
+                </table>
+              </div>
             </div>
           <!-- </div> -->
 

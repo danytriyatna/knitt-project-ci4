@@ -139,11 +139,12 @@ class DeliveryOrder extends BaseController
     }
 
     $stdData = new \stdClass();
+    $stdData->delivery_kode = '';
     $stdData->do_no = '';
     $stdData->id_produksi = '';
     $stdData->id_walkorder = '';
     $stdData->kode_produksi = '';
-    $stdData->tgl_do = '';
+    $stdData->tgl_do = date('d-m-Y');
     $stdData->keterangan_style = '';
     $stdData->select_buyer = '';
     $stdData->alamat_buyer  = '';
@@ -165,7 +166,7 @@ class DeliveryOrder extends BaseController
       $status = $stdData->status;
       
 
-      $this->data['row']    = $stdData;
+      // $this->data['row']    = $stdData;
       // $this->data['detail'] = json_encode($list_detail);
 
       $status = $stdData->status;
@@ -237,7 +238,7 @@ class DeliveryOrder extends BaseController
       $dt_prods = json_encode($dt_prods, true);
 
     }
-
+    $this->data['row']    = $stdData;
     if (!empty($_POST)) {
       if(true){
 

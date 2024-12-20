@@ -237,7 +237,7 @@
             <div class="col-sm-12">
               <h5><b>PRODUCTION PROCESS</b></h5>
                 <div class="row">
-                  <table class="table table-striped datatable dataTable no-footer">
+                  <table class="table table-striped table-sm no-footer mb-0">
                       <thead>
                         <tr>
                           <th>Proses</th>
@@ -284,7 +284,7 @@
               <br>
 
               <div class="row">
-                <div class="col-sm-3">
+                <div class="col-sm-2">
                   <div class="form-group m-b-0 d-flex align-items-center">
                     <label class="control-label text-start text-md-end m-e-8" for="filter_status">Status</label>
                     <select id="filter_status" name="filter_status" class="form-control custom-select select2">
@@ -309,16 +309,16 @@
                   <div class="form-group row">
                     <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tgl_prod">Tanggal</label>
                     <div class="col-md-8">
-                      <input type="text" id="tgl_prod" name="tgl_prod" class="form-control datepicker" placeholder="Pilih tanggal" value="">
+                      <input type="text" id="tgl_prod" name="tgl_prod" class="form-control datepicker" placeholder="Pilih tanggal" value="<?= $dnow; ?>">
                     </div>
                   </div>
                 </div>
 
-                <div hidden class="col-sm-3">
+                <div class="col-sm-4">
                   <div class="form-group row">
-                    <label class="control-label text-start text-md-end col-md-3 col-form-label" for="name_prod">Nama</label>
+                    <label class="control-label text-start text-md-end col-md-3 col-form-label" for="nomesin">Nomor Mesin</label>
                     <div class="col-md-9">
-                      <input type="text" id="name_prod" name="name_prod" class="form-control" placeholder="Ketikkan Nama" value="<?= $row->konsumen_nama ?>">
+                      <input type="text" id="nomesin" name="nomesin" class="form-control" placeholder="Ketikkan Nomor Mesin">
                     </div>
                   </div>
                 </div>
