@@ -1,6 +1,7 @@
 let spanVendor = $('#spanVendor');
 let inpVendor = $('#namaVendor');
 let inpIdVendor = $('#idVendor');
+let inpIdHeader = $('#id_header');
 let inpPPDate = $('#pp_cr');
 let selectPaymentTipe = $('#select_payment_type');
 let btnSimpan = $('#btn-simpan');
@@ -11,6 +12,9 @@ if(inpStatus.val() == 0){
     btnSimpan.show()
 } else{
     btnSimpan.hide()
+}
+if(inpIdHeader.val().length == 0){
+    selectPaymentTipe.val("").trigger("change")
 }
 if(detailData.length > 0){
     setTimeout(() => {

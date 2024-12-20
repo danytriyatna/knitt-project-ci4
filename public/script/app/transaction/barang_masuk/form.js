@@ -1,20 +1,20 @@
-let spanPoNo = $('#spanPoNo');
-let inpPoNo = $('#poNo');
-let inpIdPo = $('#idPo');
-let inpTglShip = $('#tgl_ship');
-let inpTglReceive = $('#tgl_receive');
-let inpNamaVendor = $('#nama_vendor');
+
+let inpIdKonsumen = $('#id_buyer');
+let inpTglReceive = $('#tanggal');
+let spanKonsumen = $('#spanKonsumen');
+let divNamaKonsumen = $('#divNamaKonsumen');
+let inpKonsumen = $('#nama_konsumen');
 let inpBarang = $('#namaBarang');
+let inpKeterangan = $('#trans_desc');
 let inpIdBarang = $('#idBarang');
 let inpKodeBarang = $('#kodeBarang');
-let inpQtyPO = $('#qty_po');
 let inpQtyItem = $('#qty_item');
 let inpPrice = $('#price');
 let inpUnit = $('#unit');
 let inpEdit = $('#edit');
-let inpFormNo = $('#form_no');
 let spanBarang = $('#spanBarang');
 let selectGudang = $('#select_warehouse');
+let selectKategori = $('#select_kategori');
 let inpLotNo = $('#lot_no');
 let detailData = $("#data-details").val().replace(/&quot;/ig,'"');
 let btnAdd = $('#btn-add');
@@ -26,6 +26,15 @@ let inpStatus = $('#status');
 let inpIdHeader = $('#id_header');
 let inpIdDetail = $('#idDetail');
 
+if(inpIdHeader.val().length == 0){
+    selectGudang.val("").trigger("change")
+    selectKategori.val("").trigger("change")
+}
+
+if(selectKategori.val() == 3){
+    divNamaKonsumen.removeClass("d-none")
+}
+
 if(inpStatus.val() == 0){
     btnAdd.show()
     btnSimpan.show()
@@ -36,40 +45,41 @@ if(inpStatus.val() == 0){
     btnApprove.hide()
 }
 const regex = /^[0-9]+(\.[0-9]+)?$/; // Hanya angka dan desimal
-let dtList = new Tabulator("#dt-list", {
+
+
+let dtListKonsumen = new Tabulator("#dt-list-konsumen", {
     columns: [
         {
-            field: "id", headerSort: false,
-            width: "15%",visible:false
+            title: "Nama Konsumen", field: "nama", headerSort: false,
+            width: "25%"
         },
         {
-            title: "PO No.", field: "po_no", headerSort: false,
-            width: "30%"
+            title: "Alamat", field: "alamat", formatter: "html", headerSort: false,
+             width: "45%"
+            
         },
         {
-            title: "Ship Date", field: "date_exc", headerSort: false,
-            width: "30%"
+            title: "Email", field: "email", headerSort: false,
+            width: "15%", cssClass : 'text-center'
         },
         {
-            title: "Nama Vendor", field: "nama_vendor", headerSort: false,
-            width: "40%"
-        }
+            title: "No. HP", field: "no_hp", headerSort: false,
+            width: "15%", cssClass : 'text-center'
+        },
     ],
     locale: 'id',    
-    ajaxURL: "/purchasing/purchase-order/list",
+    ajaxURL: "/master-data/konsumen/list",
     ajaxConfig: "POST",
     sortMode: "remote",
     filterMode: "remote",
-    selectableRows: true,
     placeholder: "Tidak ada data",
     ajaxRequesting: function (url, params) {
         params.start = params.size * (params.page - 1);
         params.length = params.size;
-        params.isReceive = true;
     },
     ajaxResponse: function (url, params, response) {
-        let pageSize = dtList.getPageSize();
-        let pageNo = dtList.getPage();
+        let pageSize = dtListKonsumen.getPageSize();
+        let pageNo = dtListKonsumen.getPage();
         let startRow = (pageSize * (pageNo - 1)) + 1;
         let endRow = response.data.length + startRow - 1;
         if (response.data.length === 0) {
@@ -78,11 +88,11 @@ let dtList = new Tabulator("#dt-list", {
         let recordsFiltered = parseInt(response.recordsFiltered);
         let recordsTotal = parseInt(response.recordsTotal);
 
-        $("#table-footer .tabulator-startrow").text(startRow);
-        $("#table-footer .tabulator-endrow").text(endRow);
-        $("#table-footer .tabulator-totalrow").text(recordsFiltered);
+        $("#table-footer3 .tabulator-startrow").text(startRow);
+        $("#table-footer3 .tabulator-endrow").text(endRow);
+        $("#table-footer3 .tabulator-totalrow").text(recordsFiltered);
 
-        let elTotalFilteredRow = $("#table-footer .tabulator-totalfilteredrow");
+        let elTotalFilteredRow = $("#table-footer3 .tabulator-totalfilteredrow");
         elTotalFilteredRow.text("");
         if (recordsTotal > recordsFiltered) {
             elTotalFilteredRow.text(" (disaring dari " + recordsTotal
@@ -90,7 +100,7 @@ let dtList = new Tabulator("#dt-list", {
         }
         return response;
     },
-    footerElement: '<div id="table-footer" class="pull-left tabulator-info">'
+    footerElement: '<div id="table-footer3" class="pull-left tabulator-info">'
         + 'Menampilkan <span class="tabulator-startrow"></span> - <span class="tabulator-endrow"></span> dari '
         + '<span class="tabulator-totalrow"></span> entri<span class="tabulator-totalfilteredrow"></span></div>',
     pagination: true,
@@ -100,35 +110,32 @@ let dtList = new Tabulator("#dt-list", {
     dataSendParams: {
         sorters: "order"
     },
-    selectable: false,
+    selectableRows: false,
 });
 
 
-let searchThread = null;
-let elSearch = $("#tb-search2");
-if (elSearch != null) {
-    elSearch.on("keyup", function (e) {
+let searchThreadKonsumen = null;
+let elSearchKonsumen = $("#tb-search3");
+if (elSearchKonsumen != null) {
+    elSearchKonsumen.on("keyup", function (e) {
         if ($(this).val().length < 3 && e.keyCode > 13) {
             return;
         }
-        clearTimeout(searchThread);
-        searchThread = setTimeout(function () {
-            dtList.setFilter("", "like", elSearch.val());
+        clearTimeout(searchThreadKonsumen);
+        searchThreadKonsumen = setTimeout(function () {
+            dtListKonsumen.setFilter("", "like", elSearchKonsumen.val());
         }, 600);
     });
 }
 
-dtList.on("rowClick", function(e, row){
-    var namaVendor = row._row.data.nama_vendor.replace(/<[^>]*>/g, '');
-    var poNo = row._row.data.po_no.replace(/<[^>]*>/g, '');
-    var ShipDate = row._row.data.date_exc.replace(/<[^>]*>/g, '');
-    var idPo = row._row.data.id;
-    inpPoNo.val(poNo)
-    inpIdPo.val(idPo)
-    inpNamaVendor.val(namaVendor)
-    inpTglShip.val(formatterDate(ShipDate))
-    $("#modal-po").modal("hide");
+dtListKonsumen.on("rowClick", function(e, row){
+    var namaKonsumen = row._row.data.nama.replace(/<[^>]*>/g, '');
+    var idKonsumen = row._row.data.id;
+    inpKonsumen.val(namaKonsumen)
+    inpIdKonsumen.val(idKonsumen)
+    $("#modal-konsumen").modal("hide");
 })
+
 
 let dtListBarang = new Tabulator("#dt-list-barang", {
     columns: [
@@ -138,37 +145,23 @@ let dtListBarang = new Tabulator("#dt-list-barang", {
         },
         {
             title: "Kode Barang", field: "kode_barang", headerSort: false,
-            width: "25%"
+            width: "20%"
         },
         {
             title: "Nama Barang", field: "nama_barang", headerSort: false,
-            width: "35%"
+            width: "30%"
+        },
+        {
+            title: "Jenis Barang", field: "nama_jenis_barang", headerSort: false,
+            width: "25%"
         },
         {
             title: "Satuan", field: "nama_satuan", headerSort: false,
             width: "10%"
         },
-        {
-            title: "Qty PO", field: "qty", headerSort: false,
-            width: "15%",hozAlign:"right",
-        },
-        {
-            title: "Qty Receive", field: "qty_receive", headerSort: false,
-            width: "15%",hozAlign:"right",
-        },
-        {
-            title: "Price", field: "price", headerSort: false,
-            width: "15%",hozAlign:"right",formatter : "money",
-            formatterParams: {
-                decimal: ",",
-                thousand: ".",
-                symbol: "Rp",  // Simbol mata uang Rupiah
-                precision: 0,   // Tidak ada desimal
-            },
-        },
     ],
     locale: 'id',    
-    ajaxURL: "/purchasing/receive-item/list-barang",
+    ajaxURL: "/master-data/barang/list",
     ajaxConfig: "POST",
     sortMode: "remote",
     filterMode: "remote",
@@ -177,7 +170,6 @@ let dtListBarang = new Tabulator("#dt-list-barang", {
     ajaxRequesting: function (url, params) {
         params.start = params.size * (params.page - 1);
         params.length = params.size;
-        params.idHeader = inpIdPo.val()
     },
     ajaxResponse: function (url, params, response) {
         let pageSize = dtListBarang.getPageSize();
@@ -215,33 +207,6 @@ let dtListBarang = new Tabulator("#dt-list-barang", {
     selectable: false,
 });
 
-dtListBarang.on("rowClick", function(e, row){
-  
-    var kodeBarang = row._row.data.kode_barang.replace(/<[^>]*>/g, '');
-    var idBarang = row._row.data.id;
-    var namaBarang = row._row.data.nama_barang.replace(/<[^>]*>/g, '');
-    var namaSatuan = row._row.data.nama_satuan.replace(/<[^>]*>/g, '');
-    var qty = row._row.data.qty;
-    var price = row._row.data.price;
-    // if(dtListDetail.getData().some(x => x.id_barang == idBarang)){
-    //     return Swal.fire({
-    //         text: "Barang sudah dipilih",
-    //         icon: 'error',
-    //         showConfirmButton: false,
-    //         timer: 2000
-    //     });
-    // }
-
-    inpUnit.val(namaSatuan)
-    inpIdBarang.val(idBarang)
-    inpKodeBarang.val(kodeBarang)
-    inpBarang.val(`${namaBarang}`)
-    inpPrice.val(`${price}`)
-    inpQtyPO.val(qty)
-    inpLotNo.val("")
-    $("#modal-barang").modal("hide");
-})
-
 
 let searchThreadBarang = null;
 let elSearchBarang = $("#tb-search");
@@ -256,6 +221,38 @@ if (elSearchBarang != null) {
         }, 600);
     });
 }
+
+
+dtListBarang.on("rowClick", function(e, row){
+    if(selectKategori.val() == null){
+        return Swal.fire({
+            text: "Kategori harus dipilih",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+    
+    if(selectGudang.val() == 0){
+        return Swal.fire({
+            text: "Gudang Tujuan harus dipilih",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+
+    var kodeBarang = row._row.data.kode_barang.replace(/<[^>]*>/g, '');
+    var idBarang = row._row.data.id;
+    var namaBarang = row._row.data.nama_barang.replace(/<[^>]*>/g, '');
+    var namaSatuan = row._row.data.nama_satuan.replace(/<[^>]*>/g, '');
+    inpIdBarang.val(idBarang)
+    inpBarang.val(`${namaBarang}`)
+    inpKodeBarang.val(`${kodeBarang}`)
+    inpUnit.val(namaSatuan)
+    inpLotNo.val("")
+    $("#modal-barang").modal("hide");
+})
 
 
 let buttonRowAction = function(cell) {
@@ -314,7 +311,7 @@ let dtListDetail = new Tabulator("#dt-list-detail", {
         {title:"ITEM CODE", field:"kode_barang",hozAlign:"left", width:"15%"},
         {title:"ITEM DESCRIPTION", field:"nama_barang", hozAlign:"left",width:"25%"},
         {title:"QTY", field:"qty", hozAlign:"center",width:"10%",editor: "number"},
-        {title:"UNIT", field:"nama_unit", hozAlign:"center",width:"10%"},
+        {title:"UNIT", field:"nama_unit", hozAlign:"center",width:"15%"},
         {title:"PRICE", field:"price", formatter : "money",
             formatterParams: {
                 decimal: ",",
@@ -322,8 +319,7 @@ let dtListDetail = new Tabulator("#dt-list-detail", {
                 symbol: "Rp",  // Simbol mata uang Rupiah
                 precision: 0,   // Tidak ada desimal
         },width:"10%"},
-        {title:"WAREHOUSE", field:"nama_gudang", hozAlign:"center",width:"20%"},
-        {title:"LOT NO", width:"10%", field:"lot_no", hozAlign:"left"},
+        {title:"LOT NO", width:"15%", field:"lot_no", hozAlign:"left"},
     ],
     locale: 'id',    
     // layout: 'fitColumns',
@@ -341,6 +337,8 @@ if(detailData.length > 0){
     }, 1000);
 } 
 
+
+
 inpLotNo.keyup(function (e){
     let lotNo = inpLotNo.val()
     if(dtListDetail.getData().some(x => x.lot_no == inpLotNo.val() && inpEdit.val() != inpLotNo.val())){
@@ -354,6 +352,31 @@ inpLotNo.keyup(function (e){
     } 
 
     checkLotNo(e.target.value)
+})
+
+
+inpPrice.keyup(function (e) {
+
+    if(inpBarang.val().length === 0){
+        e.target.value = ""
+        return Swal.fire({
+            text: `Barang harus dipilih dahulu.` ,
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+
+    if(!regex.test(e.target.value)){
+        e.target.value = ""
+        return Swal.fire({
+            text: "Price harus berupa angka",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+
 })
 
 inpQtyItem.keyup(function (e) {
@@ -377,66 +400,71 @@ inpQtyItem.keyup(function (e) {
             timer: 2000
         });
     }
-
-    if(e.target.value > parseFloat(inpQtyPO.val())){
-        e.target.value = ""
-        return Swal.fire({
-                    text: `Barang hanya memiliki quantity ${inpQtyPO.val()}` ,
-                    icon: 'error',
-                    showConfirmButton: false,
-                    timer: 2000
-                });
-    }
 })
 
-spanPoNo.click(function () {
+spanKonsumen.click(function () {
     setTimeout(() => {
-        dtList.redraw(true)
+        dtListKonsumen.redraw(true)
     }, 500);
-    $("#modal-po").modal("show");
-    dtList.deselectRow();
+    $("#modal-konsumen").modal("show");
+    dtListKonsumen.deselectRow();
 });
 spanBarang.click(function () {
-    Swal.showLoading();
-    dtListBarang.replaceData() 
-    if(inpPoNo.val().length == 0){
-        return Swal.fire({
-                    text: "PO No. belum dipilih",
-                    icon: 'error',
-                    showConfirmButton: false,
-                    timer: 2000
-                });
-    }
-  
-    dtListBarang.on("dataLoaded", function(data){
-        Swal.close();
-        setTimeout(() => {
-            dtListBarang.redraw(true)
-        }, 500);
-        $("#modal-barang").modal("show")
-    });
-
+    setTimeout(() => {
+        dtListBarang.redraw(true)
+    }, 500);
+    $("#modal-barang").modal("show");
     dtListBarang.deselectRow();
 });
 
+selectKategori.on("change",function(e){
+    var nilai = e.target.value;
+    if(nilai == 3){
+        divNamaKonsumen.removeClass("d-none")
+    } else if(nilai == 9){
+        divNamaKonsumen.addClass("d-none")
+    } 
+})
+
 function submitData(status,message){
-    if(inpTglReceive.val().length == 0){
+
+    if(selectKategori.val() == null){
         return Swal.fire({
-            text: "Receive Date harus diisi",
+            text: "Tipe harus dipilih",
             icon: 'error',
             showConfirmButton: false,
             timer: 2000
         });
     }
 
-    if(inpPoNo.val().length == 0){
+    if(selectGudang.val() == null){
         return Swal.fire({
-            text: "PO No. harus dipilih",
+            text: "Warehouse harus dipilih",
             icon: 'error',
             showConfirmButton: false,
             timer: 2000
         });
     }
+    if(inpIdKonsumen.val().length == 0 && selectKategori.val() ==3){
+        return Swal.fire({
+            text: "Buyer harus dipilih",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+
+    if(inpTglReceive.val().length == 0){
+        return Swal.fire({
+            text: "Date harus diisi",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+
+
+
     
     if(dtListDetail.getData().length == 0){
         return Swal.fire({
@@ -448,7 +476,7 @@ function submitData(status,message){
     }
  
     Swal.fire({
-        title: `Apakah anda ingin ${message} data Receive Item?`,
+        title: `Apakah anda ingin ${message} data Barang Masuk?`,
         icon: 'question',
         confirmButtonText: 'Simpan',
         confirmButtonColor: '#198754',
@@ -510,7 +538,6 @@ function openModalDetail(row = null){
         inpUnit.val(data.nama_unit)
         inpQtyItem.val(data.qty)
         inpPrice.val(data.price)
-        selectGudang.val(data.id_gudang).trigger("change")
         inpLotNo.val(data.lot_no)
         inpEdit.val(data.lot_no)
     } else{
@@ -521,7 +548,6 @@ function openModalDetail(row = null){
         inpPrice.val("")
         inpLotNo.val("")
         inpEdit.val("")
-        selectGudang.val("").trigger("change")
     }
     modalDet.modal("show")
 
@@ -554,8 +580,17 @@ function openModalDetail(row = null){
                 timer: 2000
             });
         }
+
+        if(!regex.test(inpPrice.val())){
+            return Swal.fire({
+                text: "Price harus berupa angka",
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
         
-        if(selectGudang.val().length == 0){
+        if(selectGudang.val()  == null){
             return Swal.fire({
                 text: "Warehouse harus dipilih",
                 icon: 'error',
@@ -572,9 +607,6 @@ function openModalDetail(row = null){
                 id_barang                   : inpIdBarang.val(),
                 qty                         : inpQtyItem.val(),
                 price                         : inpPrice.val(),
-                id_gudang                   : selectGudang.val(),
-                qty_receive                 :inpQtyPO.val(),
-                nama_gudang                    : $('#select_warehouse option:selected').text(),
                 lot_no                   : inpLotNo.val(),
                 nama_unit                 : inpUnit.val(),
             });
@@ -585,10 +617,7 @@ function openModalDetail(row = null){
                 nama_barang                 : inpBarang.val(),
                 kode_barang                 : inpKodeBarang.val(),
                 id_barang                   : inpIdBarang.val(),
-                id_gudang                   : selectGudang.val(),
                 price                         : inpPrice.val(),
-                qty_receive:inpQtyPO.val(),
-                nama_gudang                    : $('#select_warehouse option:selected').text(),
                 qty                         : inpQtyItem.val(),
                 lot_no                   : inpLotNo.val(),
                 nama_unit                   : inpUnit.val(),
@@ -602,18 +631,18 @@ function openModalDetail(row = null){
 
 
 function simpanData(status) {
-    let totalQty = dtListDetail.getData().reduce((sum, item) => sum + parseFloat(item.qty), 0);
     $.ajax({
         type: 'POST',
-        url: '/purchasing/receive-item/save',
+        url: '/trans/incoming-goods/save',
         data: {
             id:inpIdHeader.val(),
-            id_po:inpIdPo.val(),
-            rec_date:formatLocaleDate(inpTglShip.val()),
-            qty:totalQty,
-            namaVendor:inpNamaVendor.val(),
-            form_no:inpFormNo.val(),
+            id_gudang:selectGudang.val(),
+            tanggal:formatLocaleDate(inpTglReceive.val()),
+            id_kategori:selectKategori.val(),
+            nama:inpKonsumen.val(),
+            id_buyer:inpIdKonsumen.val(),
             data:dtListDetail.getData(),
+            keterangan:inpKeterangan.val(),
             status:status
         },
         dataType: "json",
@@ -637,7 +666,7 @@ function simpanData(status) {
                     timer: 2000
                 });
                 Swal.close();
-                window.location.href = 'purchasing/receive-item'
+                window.location.href = 'trans/incoming-goods'
         
             }else{
                 Swal.fire({

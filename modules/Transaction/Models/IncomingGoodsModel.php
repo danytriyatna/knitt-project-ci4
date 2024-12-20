@@ -152,7 +152,7 @@ class IncomingGoodsModel extends \App\Models\PrModel
         $this->_data = $builder->get()->getRow();
         return $this->_data;
     }
-    function getLotNo($lotNo = null, $idBarang = null)
+    function getLotNo($lotNo = null, $idBarang = null, $idLotNo = null)
     {
         $builder = $this->db->table("trans_lots");
         $builder->select("*");
@@ -162,6 +162,9 @@ class IncomingGoodsModel extends \App\Models\PrModel
         }
         if (!empty($idBarang)) {
             $builder->where('id_barang', $idBarang);
+        }
+        if (!empty($idLotNo)) {
+            $builder->where('id', $idLotNo);
         }
         $this->_data = $builder->get()->getRow();
         return $this->_data;

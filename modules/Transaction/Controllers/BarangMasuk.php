@@ -9,12 +9,14 @@ use Modules\Referensi\Models\JenisBarangModel;
 use Modules\Referensi\Models\SatuanModel;
 use Modules\Transaction\Models\IncomingGoodsModel;
 use Modules\Transaction\Models\BarangMasukModel;
+use Modules\Transaction\Models\BarangMasukDetailModel;
 use Modules\Referensi\Models\GudangModel;
 
 class BarangMasuk extends BaseController
 {
     protected $mBarang;
     protected $mRef;
+    protected $mRefDet;
     protected $mJenisBarang;
     protected $mSatuan;
     protected $mBarangMasuk;
@@ -31,6 +33,7 @@ class BarangMasuk extends BaseController
         $this->mSatuan = new SatuanModel();
         $this->mBarangMasuk = new IncomingGoodsModel();
         $this->mRef = new BarangMasukModel();
+        $this->mRefDet = new BarangMasukDetailModel();
         $this->mGudang = new GudangModel();
         $this->files  = new FileModel();
     }
@@ -92,17 +95,17 @@ class BarangMasuk extends BaseController
             $atr_edit = null;
             $atr_del = null;
             $btnAction = null;
-            // if ($this->_edit) {
-            //     $atr_edit['title'] = 'Edit';
-            //     $atr_edit['url'] = $this->urlv . '/edit/';
-            //     $atr_edit['class'] = '';
-            // }
-            if ($this->_delete) {
-                $atr_del['title'] = 'Hapus';
-                $atr_del['url'] = $this->urlv . '/delete/';
-                $atr_del['class'] = '';
-                $atr_del['onclick'] = "return confirm('Hapus Data ?')";
+            if ($this->_edit) {
+                $atr_edit['title'] = 'Edit';
+                $atr_edit['url'] = $this->urlv . '/edit/';
+                $atr_edit['class'] = '';
             }
+            // if ($this->_delete) {
+            //     $atr_del['title'] = 'Hapus';
+            //     $atr_del['url'] = $this->urlv . '/delete/';
+            //     $atr_del['class'] = '';
+            //     $atr_del['onclick'] = "return confirm('Hapus Data ?')";
+            // }
             if ($atr_edit || $atr_del)
                 $btnAction = btn_action_group($id, $atr_edit, $atr_del);
 
@@ -110,7 +113,7 @@ class BarangMasuk extends BaseController
             //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
             $status = "";
             if ($row->status == 0) {
-                $status = "<span class='badge bg-secondary'>Draft<br>Pembayaran</span>";
+                $status = "<span class='badge bg-secondary'>Draft</span>";
             } else if ($row->status == 1) {
                 $status = "<span class='badge bg-success'>Approved</span>";
             }
@@ -120,7 +123,6 @@ class BarangMasuk extends BaseController
                     "aksi" => $btnAction ? $btnAction : '',
                     "id"   => ($id),
                     "kode_transaksi" => $row->kode_transaksi,
-                    "jumlah" => $row->jumlah,
                     "tanggal" => fdate_eng_to_ind($row->tanggal),
                     "kategori" => $row->kategori,
                     "nama_gudang" => $row->nama_gudang,
@@ -139,14 +141,28 @@ class BarangMasuk extends BaseController
         }
 
         $this->data['id'] = $id;
+
+
         if ($id != "") {
             $id = decrypt($id);
-        }
+            $resData = $this->mRef->getData($id);
+            $tanggal = date("d F Y", strtotime($resData->tanggal));
+            $resData->tanggal = $tanggal;
+            $resData->id_buyer = !empty($resData->id_buyer) ? encrypt($resData->id_buyer) : null;
+            $sort = [
+                [
+                    'field' => 'uk.id',
+                    'dir' => 'ASC'
+                ]
+            ];
 
-        if (!empty($id)) {
-            $data_detail = [];
-            $resData = $this->mBarangMasuk->getData($id);
-            $this->data['data']    = $resData;
+            $resDataDetail = $this->mRefDet->getData(null, 0, 99999, $sort, params: array("id_header" => $id, "isReceive" => false));
+            foreach ($resDataDetail as &$rowData) {
+                $rowData->id_barang = encrypt($rowData->id_barang);
+            }
+
+            $this->data['resData'] = $resData;
+            $this->data['detail'] = json_encode($resDataDetail);
         }
         $reDataKategori = $this->mBarangMasuk->getRefKategoriPersedian();
         $sortGudang = [
@@ -161,64 +177,55 @@ class BarangMasuk extends BaseController
 
         $this->data['titlehead'] = "Form Barang Masuk";
 
-        return view($this->views . '\incoming_goods_form', $this->data);
+        return view($this->views . '\barang_masuk_form', $this->data);
     }
 
     function save()
     {
 
-        $idBarang = $this->request->getPost('idBarang');
-        $idBarang = decrypt($idBarang);
-        $keterangan = $this->request->getPost('keterangan');
-        $namaKonsumen = $this->request->getPost('namaKonsumen');
-        $namaVendor = $this->request->getPost('namaVendor');
-        $jmlMasuk = $this->request->getPost('jmlMasuk');
-        $totalStok = $this->request->getPost('totalStok');
-        $tanggal = $this->request->getPost('tanggal');
-        $idGudangAsal = $this->request->getPost('idGudangAsal');
-        $idGudangTujuan = $this->request->getPost('idGudangTujuan');
-        $idKategori = $this->request->getPost('idKategori');
-
-        $msg    = "Data gagal ditambahkan !";
+        $msg    = "Data gagal disimpan !";
         $status = false;
-        $nama = "";
-        if (!empty($namaKonsumen)) {
-            $nama = $namaKonsumen;
-        } else if (!empty($namaVendor)) {
-            $nama = $namaVendor;
+        $id = $this->request->getPost('id');
+        $tanggal = $this->request->getPost('tanggal');
+        $statusData = $this->request->getPost('status');
+        $id_gudang = $this->request->getPost('id_gudang');
+        $id_buyer = $this->request->getPost('id_buyer');
+        $id_kategori = $this->request->getPost('id_kategori');
+        $nama = $this->request->getPost('nama');
+        $keterangan = $this->request->getPost('keterangan');
+        $dataDetail = $this->request->getPost('data');
+        if ($id != "") {
+            $id = decrypt($id);
         }
-
-
-        $arrData = [
-            "id_barang" => $idBarang,
-            "jenis_transaksi" => 1,
-            "jumlah" => $jmlMasuk,
+        if ($id_buyer != "") {
+            $id_buyer = decrypt($id_buyer);
+        }
+        $dataHeader = [
+            "id_buyer" => !empty($id_buyer) ? $id_buyer : null,
             "tanggal" => $tanggal,
-            "id_gudang_asal" => !empty($idGudangAsal) ? $idGudangAsal : null,
-            "id_gudang_tujuan" =>  !empty($idGudangTujuan) ? $idGudangTujuan : null,
-            "nama" => $nama,
-            "id_kategori" => $idKategori,
+            "status" => $statusData,
+            "jenis_transaksi" => 1,
+            "id_gudang" => $id_gudang,
+            "id_kategori" => $id_kategori,
             "keterangan" => $keterangan,
-            "stok" => $totalStok,
-            "active" => 1,
-            "tipe" => 1,
-            "kode_transaksi" => $this->mBarangMasuk->generateKodePersediaan(),
+            "nama" => $nama
         ];
-
-        $arrData['created_at'] = date("Y-m-d H:i:s");
-        $arrData['created_by'] = $this->get_userid();
-
-
-        $res = $this->mBarangMasuk->trxInsertUpdateRecord($arrData);
-        if ($res) {
-            $msg    = "Data berhasil ditambahkan !";
-            $status = true;
+        if ($id) {
+            $dataHeader['updated_at'] = date("Y-m-d H:i:s");
+            $dataHeader['updated_by'] = $this->get_userid();
+        } else {
+            $dataHeader['created_at'] = date("Y-m-d H:i:s");
+            $dataHeader['created_by'] = $this->get_userid();
         }
-
+        // print_r($data);exit;
+        $res = $this->mRef->trxInsertUpdateRecord($dataHeader, $id, $dataDetail);
+        if ($res) {
+            $status = true;
+            $msg = "Data berhasil disimpan!";
+        }
 
         $build_array['message'] = $msg;
         $build_array['status']  = $status;
-
         return $this->response->setJSON($build_array);
     }
 

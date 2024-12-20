@@ -6,11 +6,16 @@ class BarangMasukModel extends \App\Models\PrModel
 {
 
     protected $table = "trans_barang_header";
+    protected $tblDet = "trans_barang_detail";
     protected $kd = "1";
     protected $tblGudang = "ref_gudang";
     protected $tblBarang = "ref_barang";
+    protected $tblBuyer = "ref_konsumen";
     protected $tblKategori = "ref_kategori_persediaan";
     protected $tblSatuan = "ref_satuan";
+    protected $tblTrxBarang = "trans_barang";
+    protected $tblTrxLots = "trans_lots";
+    protected $tblTrxBalances = "trans_barang_balances";
 
     protected $_data = null;
     protected $primaryKey = 'id';
@@ -25,7 +30,8 @@ class BarangMasukModel extends \App\Models\PrModel
         $builder = $this->db->table($this->table . " uk");
         $builder->join($this->tblGudang . " abx", "uk.id_gudang = abx.id", "left");
         $builder->join($this->tblKategori . " dbx", "uk.id_kategori = dbx.id", "inner");
-        $builder->select("uk.id, uk.id_kategori, uk.keterangan, abx.nama_gudang,  uk.tanggal, uk.nama, uk.kode_transaksi, dbx.kategori");
+        $builder->join($this->tblBuyer . " ebx", "uk.id_buyer = ebx.id", "left");
+        $builder->select("uk.id, uk.id_buyer,uk.status, uk.id_kategori, uk.keterangan, abx.nama_gudang,  uk.tanggal, ebx.nama , uk.kode_transaksi, dbx.kategori");
 
         if ($id == null or $id == "") {
             $builder->where('uk.active = 1');
@@ -111,63 +117,109 @@ class BarangMasukModel extends \App\Models\PrModel
         return $kodejadi;
     }
 
-    function trxInsertUpdateRecord($data)
+    function trxInsertUpdateRecord($data, $id, $detail)
     {
         $this->db->transStart();
         try {
+            $nama = $data['nama'];
+            unset($data['nama']);
 
-
-            $this->insertRecordGetid("trans_barang", $data);
-            $arrPersediaan = [
-                "id_barang" => $data['id_barang'],
-                "id_gudang" => $data['id_gudang_tujuan'],
-                "stok" => $data['stok'],
-                "created_at" =>  $data['created_at'],
-                "created_by" =>  $data['created_by'],
-                "active" => 1,
-            ];
-            $arrParam =  [
-                "id_barang" => $data['id_barang'],
-                "id_gudang" => $data['id_gudang_tujuan'],
-            ];
-            $resData = $this->getLastStokBarang($data['id_barang'], $data['id_gudang_tujuan']);
-            if (!empty($resData)) {
-                $this->updateRecords("trans_persediaan", $arrPersediaan, $arrParam);
+            if (!empty($id)) {
+                $arrDelete =  [
+                    "id_header" => $id,
+                ];
+                $this->deleteRecordMultipleColumn($this->tblDet, $arrDelete);
+                $arrParam =  [
+                    "id" => $id,
+                ];
+                $this->updateRecords($this->table, $data, $arrParam);
             } else {
-                $this->insertRecordGetid("trans_persediaan", $arrPersediaan);
+                $data['kode_transaksi'] = $this->generateKodePersediaan();
+                $id = $this->insertRecordGetid($this->table,  $data);
             }
 
-            if ($data['id_kategori'] == 1) {
-                $data['tipe'] = 2;
-                $data['id_kategori'] = 4;
-                $data['jenis_transaksi'] = 2;
-                $this->insertRecordGetid("trans_barang", $data);
-                $resDataKeluar = $this->getLastStokBarang($data['id_barang'], $data['id_gudang_asal']);
-                $arrPersediaanKeluar = [
-                    "id_barang" => $data['id_barang'],
-                    "id_gudang" => $data['id_gudang_asal'],
-                    "stok" => $data['stok'],
-                    "created_at" =>  $data['created_at'],
-                    "created_by" =>  $data['created_by'],
-                    "active" => 1,
+            foreach ($detail as $rowData) {
+                if ($rowData['id_barang'] != "") {
+                    $idBarang = decrypt($rowData['id_barang']);
+                    // $idBarang = $rowData['id_barang'];
+                }
+
+                $dataDetail = [
+                    "id_barang" => $idBarang,
+                    "lot_no" => !empty($rowData['lot_no']) ? $rowData['lot_no'] : null,
+                    "id_header" => $id,
+                    "qty" => $rowData['qty'],
+                    "price" => !empty($rowData['price']) ? $rowData['price'] : null,
                 ];
-                $arrParamKeluar =  [
-                    "id_barang" => $data['id_barang'],
-                    "id_gudang" => $data['id_gudang_asal'],
-                ];
-                $resDataKeluar = $this->getLastStokBarang($data['id_barang'], $data['id_gudang_asal']);
-                if (!empty($resDataKeluar)) {
-                    $this->updateRecords("trans_persediaan", $arrPersediaanKeluar, $arrParamKeluar);
-                } else {
-                    $this->insertRecordGetid("trans_persediaan", $arrPersediaanKeluar);
+
+                $this->insertRecordGetid($this->tblDet, $dataDetail);
+
+                if ($data['status'] == 1) {
+
+                    $mBarangMasuk = new IncomingGoodsModel();
+                    $arrParam =  [
+                        "id_barang" => $idBarang,
+                        "id_gudang" => $data['id_gudang'],
+                    ];
+                    $resLotNo = $mBarangMasuk->getLotNo($rowData['lot_no'], $idBarang);
+                    $dataLots = [
+                        "id_barang" => $idBarang,
+                        "id_gudang" => !empty($data['id_gudang']) ? $data['id_gudang'] : null,
+                        "tanggal" => date("Y-m-d H:i:s"),
+                        "lot_no" => $rowData['lot_no'],
+                        "qty" => $rowData['qty'],
+                        "active" => 1,
+                        "created_at" =>  date("Y-m-d H:i:s"),
+                    ];
+                    if (!empty($resLotNo)) {
+                        $idLots = $resLotNo->id;
+                        $this->updateRecords($this->tblTrxLots, array("qty" => $resLotNo->qty + $rowData->qty), array("id" => $idLots));
+                    } else {
+                        $idLots = $this->insertRecordGetid($this->tblTrxLots, $dataLots);
+                    }
+
+                    $resData = $mBarangMasuk->getLastStokBarangBalances($idBarang, $data['id_gudang'], $idLots);
+
+                    // $stokAwal = !empty($resData) ? $resData->stok : 0;
+                    $dataBarang = [
+                        "id_barang" => $idBarang,
+                        "jenis_transaksi" => 1,
+                        "jumlah" =>  $rowData['qty'],
+                        "tanggal" => date("Y-m-d H:i:s"),
+                        "id_gudang_tujuan" =>  !empty($data['id_gudang']) ? $data['id_gudang'] : null,
+                        "nama" => $nama,
+                        "id_kategori" => $data['id_kategori'],
+                        "keterangan" => "Barang Masuk Dari Incoming Goods",
+                        "active" => 1,
+                        "tipe" => 1,
+                        "created_at" =>  date("Y-m-d H:i:s"),
+                        "lot_id" => $idLots,
+                        "kode_transaksi" => $this->generateKodePersediaan(),
+                    ];
+                    $this->insertRecordGetid($this->tblTrxBarang, $dataBarang);
+                    $arrStockBalances = [
+                        "id_barang" => $idBarang,
+                        "id_gudang" => !empty($data['id_gudang']) ? $data['id_gudang'] : null,
+                        "tanggal" => date("Y-m-d H:i:s"),
+                        "lot_id" => $idLots,
+                        "saldo_awal" => 0,
+                        "saldo_akhir" => $rowData['qty'],
+                        "active" => 1,
+                        "created_at" =>  date("Y-m-d H:i:s"),
+                    ];
+                    if (!empty($resData)) {
+                        $this->updateRecords($this->tblTrxBalances, array("saldo_akhir" => $resLotNo->qty + $rowData->qty), array("id" => $resData->id));
+                    } else {
+                        $this->insertRecordGetid($this->tblTrxBalances, $arrStockBalances);
+                    }
                 }
             }
-
             $this->db->transComplete();
 
             if ($this->db->transStatus() === TRUE) {
                 return true;
             } else {
+
                 throw new \Exception("Transaction failed");
             }
         } catch (\Exception $e) {

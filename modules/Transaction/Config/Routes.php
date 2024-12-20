@@ -99,14 +99,16 @@ $routes->group('trans/issue-item', ['namespace' => 'Modules\Transaction\Controll
 $routes->group('trans/incoming-goods', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'BarangMasuk::index');
   $routes->post('list', 'BarangMasuk::lists');
-  $routes->get('form', 'IncomingGoods::form');
+  $routes->get('form', 'BarangMasuk::form');
+  $routes->get('edit/(:any)', 'BarangMasuk::form/$1');
   $routes->post('last-stock', 'IncomingGoods::getLastStock');
-  $routes->post('simpan', 'IncomingGoods::save');
+  $routes->post('save', 'BarangMasuk::save');
 });
 $routes->group('trans/outgoing-goods', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'BarangKeluar::index');
   $routes->post('list', 'BarangKeluar::lists');
-  $routes->get('form', 'OutgoingGoods::form');
-  $routes->post('last-stock', 'OutgoingGoods::getLastStock');
-  $routes->post('simpan', 'OutgoingGoods::save');
+  $routes->post('list-barang', 'BarangKeluar::listsBarang');
+  $routes->get('form', 'BarangKeluar::form');
+  $routes->get('edit/(:any)', 'BarangKeluar::form/$1');
+  $routes->post('save', 'BarangKeluar::save');
 });
