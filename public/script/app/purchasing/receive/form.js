@@ -9,7 +9,9 @@ let inpIdBarang = $('#idBarang');
 let inpKodeBarang = $('#kodeBarang');
 let inpQtyPO = $('#qty_po');
 let inpQtyItem = $('#qty_item');
+let inpPrice = $('#price');
 let inpUnit = $('#unit');
+let inpEdit = $('#edit');
 let inpFormNo = $('#form_no');
 let spanBarang = $('#spanBarang');
 let selectGudang = $('#select_warehouse');
@@ -23,6 +25,7 @@ let modalDet = $('#modal-detail-item');
 let inpStatus = $('#status');
 let inpIdHeader = $('#id_header');
 let inpIdDetail = $('#idDetail');
+
 if(inpStatus.val() == 0){
     btnAdd.show()
     btnSimpan.show()
@@ -153,6 +156,16 @@ let dtListBarang = new Tabulator("#dt-list-barang", {
             title: "Qty Receive", field: "qty_receive", headerSort: false,
             width: "15%",hozAlign:"right",
         },
+        {
+            title: "Price", field: "price", headerSort: false,
+            width: "15%",hozAlign:"right",formatter : "money",
+            formatterParams: {
+                decimal: ",",
+                thousand: ".",
+                symbol: "Rp",  // Simbol mata uang Rupiah
+                precision: 0,   // Tidak ada desimal
+            },
+        },
     ],
     locale: 'id',    
     ajaxURL: "/purchasing/receive-item/list-barang",
@@ -209,21 +222,23 @@ dtListBarang.on("rowClick", function(e, row){
     var namaBarang = row._row.data.nama_barang.replace(/<[^>]*>/g, '');
     var namaSatuan = row._row.data.nama_satuan.replace(/<[^>]*>/g, '');
     var qty = row._row.data.qty;
-    
-    if(dtListDetail.getData().some(x => x.id_barang == idBarang)){
-        return Swal.fire({
-            text: "Barang sudah dipilih",
-            icon: 'error',
-            showConfirmButton: false,
-            timer: 2000
-        });
-    }
+    var price = row._row.data.price;
+    // if(dtListDetail.getData().some(x => x.id_barang == idBarang)){
+    //     return Swal.fire({
+    //         text: "Barang sudah dipilih",
+    //         icon: 'error',
+    //         showConfirmButton: false,
+    //         timer: 2000
+    //     });
+    // }
 
     inpUnit.val(namaSatuan)
     inpIdBarang.val(idBarang)
     inpKodeBarang.val(kodeBarang)
     inpBarang.val(`${namaBarang}`)
+    inpPrice.val(`${price}`)
     inpQtyPO.val(qty)
+    inpLotNo.val("")
     $("#modal-barang").modal("hide");
 })
 
@@ -262,6 +277,7 @@ let dtListDetail = new Tabulator("#dt-list-detail", {
     paginationButtonCount: 5,
     columns:[
         {field:"id", visible:false},
+        {field:"isEdit", visible:false},
         {field:"id_barang", visible:false},
         {field:"id_header", visible:false},
         {field:"qty_receive", visible:false},
@@ -299,6 +315,13 @@ let dtListDetail = new Tabulator("#dt-list-detail", {
         {title:"ITEM DESCRIPTION", field:"nama_barang", hozAlign:"left",width:"25%"},
         {title:"QTY", field:"qty", hozAlign:"center",width:"10%",editor: "number"},
         {title:"UNIT", field:"nama_unit", hozAlign:"center",width:"10%"},
+        {title:"PRICE", field:"price", formatter : "money",
+            formatterParams: {
+                decimal: ",",
+                thousand: ".",
+                symbol: "Rp",  // Simbol mata uang Rupiah
+                precision: 0,   // Tidak ada desimal
+        },width:"10%"},
         {title:"WAREHOUSE", field:"nama_gudang", hozAlign:"center",width:"20%"},
         {title:"LOT NO", width:"10%", field:"lot_no", hozAlign:"left"},
     ],
@@ -317,6 +340,21 @@ if(detailData.length > 0){
         }
     }, 1000);
 } 
+
+inpLotNo.keyup(function (e){
+    let lotNo = inpLotNo.val()
+    if(dtListDetail.getData().some(x => x.lot_no == inpLotNo.val() && inpEdit.val() != inpLotNo.val())){
+        e.target.value = ""
+        return Swal.fire({
+            text: `Lot No ${lotNo} sudah ada`,
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    } 
+
+    checkLotNo(e.target.value)
+})
 
 inpQtyItem.keyup(function (e) {
 
@@ -408,6 +446,7 @@ function submitData(status,message){
             timer: 2000
         });
     }
+ 
     Swal.fire({
         title: `Apakah anda ingin ${message} data Receive Item?`,
         icon: 'question',
@@ -439,6 +478,30 @@ btnAdd.click(function(){
     openModalDetail()
 })
 
+function checkLotNo(value){
+    $.ajax({
+        url: `/purchasing/receive-item/check-lot?id_barang=${inpIdBarang.val()}&lot_no=${value}`,
+        type: 'GET',
+        dataType: 'json', 
+        success: function(data) {
+            
+            if(data.status){
+                value = ''
+                return Swal.fire({
+                    text: data.message,
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+           
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching data:', error);
+        }
+    });
+  }
+
 function openModalDetail(row = null){
     if(row){
         let data = row.getData()
@@ -446,14 +509,18 @@ function openModalDetail(row = null){
         inpIdBarang.val(data.id_barang)
         inpUnit.val(data.nama_unit)
         inpQtyItem.val(data.qty)
+        inpPrice.val(data.price)
         selectGudang.val(data.id_gudang).trigger("change")
         inpLotNo.val(data.lot_no)
+        inpEdit.val(data.lot_no)
     } else{
         inpBarang.val("")
         inpIdBarang.val("")
         inpUnit.val("")
         inpQtyItem.val("")
+        inpPrice.val("")
         inpLotNo.val("")
+        inpEdit.val("")
         selectGudang.val("").trigger("change")
     }
     modalDet.modal("show")
@@ -504,8 +571,9 @@ function openModalDetail(row = null){
                 kode_barang                 : inpKodeBarang.val(),
                 id_barang                   : inpIdBarang.val(),
                 qty                         : inpQtyItem.val(),
+                price                         : inpPrice.val(),
                 id_gudang                   : selectGudang.val(),
-                qty_receive:inpQtyPO.val(),
+                qty_receive                 :inpQtyPO.val(),
                 nama_gudang                    : $('#select_warehouse option:selected').text(),
                 lot_no                   : inpLotNo.val(),
                 nama_unit                 : inpUnit.val(),
@@ -518,6 +586,7 @@ function openModalDetail(row = null){
                 kode_barang                 : inpKodeBarang.val(),
                 id_barang                   : inpIdBarang.val(),
                 id_gudang                   : selectGudang.val(),
+                price                         : inpPrice.val(),
                 qty_receive:inpQtyPO.val(),
                 nama_gudang                    : $('#select_warehouse option:selected').text(),
                 qty                         : inpQtyItem.val(),

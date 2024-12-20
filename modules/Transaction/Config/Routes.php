@@ -97,15 +97,15 @@ $routes->group('trans/issue-item', ['namespace' => 'Modules\Transaction\Controll
   $routes->get('form', 'IssueItem::form');
 });
 $routes->group('trans/incoming-goods', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
-  $routes->get('/', 'IncomingGoods::index');
-  $routes->post('list', 'IncomingGoods::lists');
+  $routes->get('/', 'BarangMasuk::index');
+  $routes->post('list', 'BarangMasuk::lists');
   $routes->get('form', 'IncomingGoods::form');
   $routes->post('last-stock', 'IncomingGoods::getLastStock');
   $routes->post('simpan', 'IncomingGoods::save');
 });
 $routes->group('trans/outgoing-goods', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
-  $routes->get('/', 'OutgoingGoods::index');
-  $routes->post('list', 'OutgoingGoods::lists');
+  $routes->get('/', 'BarangKeluar::index');
+  $routes->post('list', 'BarangKeluar::lists');
   $routes->get('form', 'OutgoingGoods::form');
   $routes->post('last-stock', 'OutgoingGoods::getLastStock');
   $routes->post('simpan', 'OutgoingGoods::save');

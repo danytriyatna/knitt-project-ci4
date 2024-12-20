@@ -15,6 +15,7 @@
             <div class="input-group">
               <input type="text" id="namaBarang" readonly name="namaBarang" class="form-control" placeholder="Pilih Barang" required>
               <input type="hidden" id="idDetail" name="idDetail" class="form-control" required>
+              <input type="hidden" id="edit" name="edit" class="form-control" required>
               <input type="hidden" id="idBarang" name="idBarang" class="form-control" required>
               <input type="hidden" id="kodeBarang" name="kodeBarang" class="form-control" required>
               <span id="spanBarang" class="input-group-text bg-white" id="basic-addon11"><i class="ti-search"></i></span>
@@ -37,6 +38,12 @@
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="qty_item">Qty Receive</label>
           <div class="col-md-9">
             <input type="text" id="qty_item" name="qty_item" class="form-control" placeholder="Ketikkan qty item" value="">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="price">Price</label>
+          <div class="col-md-9">
+            <input type="text" id="price" name="price" class="form-control" placeholder="Terisi otomatis oleh sistem" value="" readonly>
           </div>
         </div>
         <div class="form-group row">

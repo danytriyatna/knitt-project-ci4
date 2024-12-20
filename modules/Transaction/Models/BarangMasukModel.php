@@ -2,10 +2,10 @@
 
 namespace Modules\Transaction\Models;
 
-class IncomingGoodsModel extends \App\Models\PrModel
+class BarangMasukModel extends \App\Models\PrModel
 {
 
-    protected $table = "trans_barang";
+    protected $table = "trans_barang_header";
     protected $kd = "1";
     protected $tblGudang = "ref_gudang";
     protected $tblBarang = "ref_barang";
@@ -23,20 +23,16 @@ class IncomingGoodsModel extends \App\Models\PrModel
     function getData($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
     {
         $builder = $this->db->table($this->table . " uk");
-        $builder->join($this->tblGudang . " abx", "uk.id_gudang_tujuan = abx.id", "left");
-        $builder->join($this->tblGudang . " bbx", "uk.id_gudang_asal = bbx.id", "left");
-        $builder->join($this->tblBarang . " cbx", "uk.id_barang = cbx.id", "inner");
+        $builder->join($this->tblGudang . " abx", "uk.id_gudang = abx.id", "left");
         $builder->join($this->tblKategori . " dbx", "uk.id_kategori = dbx.id", "inner");
-        $builder->join($this->tblSatuan . " ebx", "cbx.id_satuan = ebx.id", "inner");
-        $builder->select("uk.id, uk.id_kategori, cbx.kode_barang, cbx.nama_barang,ebx.nama_satuan, uk.keterangan, bbx.nama_gudang as gudang_asal, abx.nama_gudang as gudang_tujuan, uk.jumlah, uk.tanggal, uk.nama, uk.kode_transaksi, dbx.kategori");
+        $builder->select("uk.id, uk.id_kategori, uk.keterangan, abx.nama_gudang,  uk.tanggal, uk.nama, uk.kode_transaksi, dbx.kategori");
 
         if ($id == null or $id == "") {
             $builder->where('uk.active = 1');
             $builder->where('uk.jenis_transaksi', $this->kd);
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
                 $builder->groupStart();
-                $builder->where('LOWER(cbx.nama_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(uk.kode_transaksi) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->Where('LOWER(uk.kode_transaksi) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->orWhere('LOWER(abx.nama_gudang) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->orWhere('LOWER(uk.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
@@ -66,15 +62,15 @@ class IncomingGoodsModel extends \App\Models\PrModel
     function getDataCnt($filters = null, $params = null)
     {
         $builder = $this->db->table($this->table . " uk");
-
+        $builder->join($this->tblGudang . " abx", "uk.id_gudang = abx.id", "left");
+        $builder->join($this->tblKategori . " dbx", "uk.id_kategori = dbx.id", "inner");
         $builder->select("count(1) as _cnt");
         $builder->where('uk.jenis_transaksi', $this->kd);
         $builder->where('uk.active = 1');
 
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             $builder->groupStart();
-            $builder->where('LOWER(cbx.nama_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
-            $builder->orWhere('LOWER(uk.kode_transaksi) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->Where('LOWER(uk.kode_transaksi) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->orWhere('LOWER(abx.nama_gudang) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->orWhere('LOWER(uk.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
@@ -113,58 +109,6 @@ class IncomingGoodsModel extends \App\Models\PrModel
 
         // hasilnya SOD24100001 dst.
         return $kodejadi;
-    }
-
-    function getRefKategoriPersedian()
-    {
-        $builder = $this->db->table("ref_kategori_persediaan");
-        $builder->select("*");
-        $builder->where('jenis', $this->kd);
-        $builder->where('aktif', 1);
-        $this->_data = $builder->get()->getResultArray();
-        return $this->_data;
-    }
-
-    function getLastStokBarang($idBarang, $idGudang)
-    {
-        $builder = $this->db->table("trans_persediaan");
-        $builder->select("stok");
-        $builder->where('id_barang', $idBarang);
-        $builder->where('id_gudang', $idGudang);
-        $this->_data = $builder->get()->getRow();
-        return $this->_data;
-        // if ($builder->get()) {
-        //     $this->_data = $builder->get()->getRow();
-        //     return $this->_data;
-        // } else {
-        //     return null;
-        // }
-    }
-
-    function getLastStokBarangBalances($idBarang, $idGudang, $lotId)
-    {
-        $builder = $this->db->table("trans_barang_balances");
-        $builder->select("*");
-        $builder->where('id_barang', $idBarang);
-        $builder->where('id_gudang', $idGudang);
-        $builder->where('lot_id', $lotId);
-        $builder->where('tanggal', date("Y-m-d"));
-        $this->_data = $builder->get()->getRow();
-        return $this->_data;
-    }
-    function getLotNo($lotNo = null, $idBarang = null)
-    {
-        $builder = $this->db->table("trans_lots");
-        $builder->select("*");
-        if (!empty($lotNo)) {
-
-            $builder->where('lot_no', $lotNo);
-        }
-        if (!empty($idBarang)) {
-            $builder->where('id_barang', $idBarang);
-        }
-        $this->_data = $builder->get()->getRow();
-        return $this->_data;
     }
 
     function trxInsertUpdateRecord($data)

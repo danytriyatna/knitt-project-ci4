@@ -12,6 +12,8 @@ class ReceiveItemModel extends \App\Models\PrModel
     protected $tblPoDetail = "trans_po_detail";
     protected $tblDet = "trans_receive_detail";
     protected $tblTrxBarang = "trans_barang";
+    protected $tblTrxLots = "trans_lots";
+    protected $tblTrxBalances = "trans_barang_balances";
     protected $tblTrxPersediaan = "trans_persediaan";
     protected $tblVendor = "ref_vendor";
 
@@ -191,7 +193,8 @@ class ReceiveItemModel extends \App\Models\PrModel
 
             foreach ($detail as $rowData) {
                 if ($rowData['id_barang'] != "") {
-                    $idBarang = decrypt($rowData['id_barang']);
+                    // $idBarang = decrypt($rowData['id_barang']);
+                    $idBarang = $rowData['id_barang'];
                 }
 
                 $dataDetail = [
@@ -200,7 +203,7 @@ class ReceiveItemModel extends \App\Models\PrModel
                     "lot_no" => !empty($rowData['lot_no']) ? $rowData['lot_no'] : null,
                     "id_header" => $id,
                     "qty" => $rowData['qty'],
-
+                    "price" => !empty($rowData['price']) ? $rowData['price'] : null,
                 ];
 
                 $this->insertRecordGetid($this->tblDet, $dataDetail);
@@ -219,9 +222,26 @@ class ReceiveItemModel extends \App\Models\PrModel
                         "id_barang" => $idBarang,
                         "id_gudang" => $rowData['id_gudang'],
                     ];
-                    $resData = $mBarangMasuk->getLastStokBarang($idBarang, $rowData['id_gudang']);
+                    $resLotNo = $mBarangMasuk->getLotNo($rowData['lot_no'], $idBarang);
+                    $dataLots = [
+                        "id_barang" => $idBarang,
+                        "id_gudang" => !empty($rowData['id_gudang']) ? $rowData['id_gudang'] : null,
+                        "tanggal" => date("Y-m-d H:i:s"),
+                        "lot_no" => $rowData['lot_no'],
+                        "qty" => $rowData['qty'],
+                        "active" => 1,
+                        "created_at" =>  date("Y-m-d H:i:s"),
+                    ];
+                    if (!empty($resLotNo)) {
+                        $idLots = $resLotNo->id;
+                        $this->updateRecords($this->tblTrxLots, array("qty" => $resLotNo->qty + $rowData->qty), array("id" => $idLots));
+                    } else {
+                        $idLots = $this->insertRecordGetid($this->tblTrxLots, $dataLots);
+                    }
 
-                    $stokAwal = !empty($resData) ? $resData->stok : 0;
+                    $resData = $mBarangMasuk->getLastStokBarangBalances($idBarang, $rowData['id_gudang'], $idLots);
+
+                    // $stokAwal = !empty($resData) ? $resData->stok : 0;
                     $dataBarang = [
                         "id_barang" => $idBarang,
                         "jenis_transaksi" => 1,
@@ -230,29 +250,44 @@ class ReceiveItemModel extends \App\Models\PrModel
                         "id_gudang_tujuan" =>  !empty($rowData['id_gudang']) ? $rowData['id_gudang'] : null,
                         "nama" => $namaVendor,
                         "id_kategori" => 2,
-                        "keterangan" => "Barang Masuk Dari Receive Item",
-                        "stok" => $stokAwal + $rowData['qty'],
+                        "keterangan" => "Barang Masuk Dari Receive Item Purchase Order",
                         "active" => 1,
                         "tipe" => 1,
                         "created_at" =>  date("Y-m-d H:i:s"),
-                        "lot_no" => $rowData['lot_no'],
-                        "kode_transaksi" => $mBarangMasuk->generateKodePersediaan(),
+                        "lot_id" => $idLots,
+                        "kode_transaksi" => $this->generateKode(),
                     ];
                     $this->insertRecordGetid($this->tblTrxBarang, $dataBarang);
-                    $arrPersediaan = [
+                    $arrStockBalances = [
                         "id_barang" => $idBarang,
-                        "id_gudang" => $rowData['id_gudang'],
-                        "stok" => $stokAwal + $rowData['qty'],
-                        "created_at" =>  date("Y-m-d H:i:s"),
+                        "id_gudang" => !empty($rowData['id_gudang']) ? $rowData['id_gudang'] : null,
+                        "tanggal" => date("Y-m-d H:i:s"),
+                        "lot_id" => $idLots,
+                        "saldo_awal" => 0,
+                        "saldo_akhir" => $rowData['qty'],
                         "active" => 1,
+                        "created_at" =>  date("Y-m-d H:i:s"),
                     ];
-
                     if (!empty($resData)) {
-
-                        $this->updateRecords($this->tblTrxPersediaan, $arrPersediaan, $arrParam);
+                        $this->updateRecords($this->tblTrxBalances, array("saldo_akhir" => $resLotNo->qty + $rowData->qty), array("id" => $resData->id));
                     } else {
-                        $this->insertRecordGetid($this->tblTrxPersediaan, $arrPersediaan);
+                        $this->insertRecordGetid($this->tblTrxBalances, $arrStockBalances);
                     }
+
+                    // $arrPersediaan = [
+                    //     "id_barang" => $idBarang,
+                    //     "id_gudang" => $rowData['id_gudang'],
+                    //     "stok" => $stokAwal + $rowData['qty'],
+                    //     "created_at" =>  date("Y-m-d H:i:s"),
+                    //     "active" => 1,
+                    // ];
+
+                    // if (!empty($resData)) {
+
+                    //     $this->updateRecords($this->tblTrxPersediaan, $arrPersediaan, $arrParam);
+                    // } else {
+                    //     $this->insertRecordGetid($this->tblTrxPersediaan, $arrPersediaan);
+                    // }
                 }
             }
 

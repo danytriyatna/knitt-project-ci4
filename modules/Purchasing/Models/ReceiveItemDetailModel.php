@@ -25,7 +25,7 @@ class ReceiveItemDetailModel extends \App\Models\PrModel
         $builder->join($this->tblBarang . " ebx", "uk.id_barang = ebx.id", "inner");
         $builder->join($this->tblSatuan . " fbx", "ebx.id_satuan = fbx.id", "inner");
         $builder->join($this->tblGudang . " gbx", "uk.id_gudang = gbx.id", "inner");
-        $builder->select("uk.id, uk.id_gudang, gbx.nama_gudang, uk.id_header,uk.qty,uk.lot_no, uk.id_barang,fbx.nama_satuan as nama_unit, ebx.kode_barang, ebx.nama_barang");
+        $builder->select("uk.id, uk.id_gudang, gbx.nama_gudang, uk.id_header,uk.qty,uk.lot_no, uk.id_barang,fbx.nama_satuan as nama_unit, ebx.kode_barang, ebx.nama_barang, uk.price");
 
         if (!empty($params['id_header'])) {
 

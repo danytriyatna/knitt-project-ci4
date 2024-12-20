@@ -15,6 +15,7 @@ $routes->group('purchasing/receive-item', ['namespace' => 'Modules\Purchasing\Co
   $routes->post('list-barang', 'ReceiveItem::listsBarang');
   $routes->post('save', 'ReceiveItem::save');
   $routes->get('form/(:any)', 'ReceiveItem::form/$1');
+  $routes->get('check-lot', 'ReceiveItem::checkLotsNo');
 });
 
 $routes->group('purchasing/purchase-payment', ['namespace' => 'Modules\Purchasing\Controllers'], static function ($routes) {

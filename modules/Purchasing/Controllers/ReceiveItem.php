@@ -9,6 +9,7 @@ use Modules\Purchasing\Models\ReceiveItemModel;
 use Modules\Purchasing\Models\ReceiveItemDetailModel;
 use Modules\Purchasing\Models\PurchaseDetailModel;
 use Modules\Referensi\Models\GudangModel;
+use Modules\Transaction\Models\IncomingGoodsModel;
 
 class ReceiveItem extends BaseController
 {
@@ -18,6 +19,7 @@ class ReceiveItem extends BaseController
   protected $mRefDet;
   protected $mPODetail;
   protected $mGudang;
+  protected $mBarangMasuk;
   protected $urlv  = 'purchasing/receive-item';
   function __construct()
   {
@@ -26,6 +28,7 @@ class ReceiveItem extends BaseController
     $this->mRefDet = new ReceiveItemDetailModel();
     $this->mPODetail = new PurchaseDetailModel();
     $this->mGudang = new GudangModel();
+    $this->mBarangMasuk = new IncomingGoodsModel();
   }
 
   public function index()
@@ -164,14 +167,38 @@ class ReceiveItem extends BaseController
       array_push(
         $build_array["data"],
         array(
-          "id"   => ($id),
+          // "id"   => ($id),
+          "id"   => $row->id_barang,
           "nama_barang" => $row->nama_barang,
           "kode_barang" => $row->kode_barang,
           "nama_satuan" => $row->nama_unit,
           "qty" => $row->qty - $row->qty_receive,
+          "price" => $row->price,
           "qty_receive" => $row->qty_receive,
         )
       );
+    }
+    return $this->response->setJSON($build_array);
+  }
+
+  public function checkLotsNo()
+  {
+
+    $build_array = [];
+    $build_array["code"] = 200;
+    $build_array["status"] = false;
+
+    $noLotNo = $this->request->getGet('lot_no');
+    $idBarang = $this->request->getGet('id_barang');
+
+
+    $resData = $this->mBarangMasuk->getLotNo($noLotNo, null);
+
+    if (!empty($resData)) {
+      if ($resData->id_barang != $idBarang) {
+        $build_array["message"] = "Lot No. sudah dipakai oleh barang lain";
+        $build_array["status"] = true;
+      }
     }
     return $this->response->setJSON($build_array);
   }
@@ -197,9 +224,10 @@ class ReceiveItem extends BaseController
       ];
 
       $resDataDetail = $this->mRefDet->getData(null, 0, 99999, $sort, params: array("id_header" => $id, "isReceive" => false));
-      foreach ($resDataDetail as &$rowData) {
-        $rowData->id_barang = encrypt($rowData->id_barang);
-      }
+      // foreach ($resDataDetail as &$rowData) {
+      //   $rowData->id_barang = encrypt($rowData->id_barang);
+      // }
+
       $this->data['resData'] = $resData;
       $this->data['detail'] = json_encode($resDataDetail);
     }
