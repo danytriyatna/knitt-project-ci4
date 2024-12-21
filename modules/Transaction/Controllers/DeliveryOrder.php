@@ -13,6 +13,9 @@ use Modules\Referensi\Models\ProsesProduksiModel;
 use Modules\Referensi\Models\KonsumenModel;
 use Modules\Referensi\Models\UkuranModel;
 use Modules\Referensi\Models\WarnaModel;
+use Modules\Transaction\Models\BarangKeluarModel;
+use Modules\Referensi\Models\BarangModel;
+use Modules\Transaction\Models\IncomingGoodsModel;
 
 class DeliveryOrder extends BaseController
 {
@@ -28,6 +31,8 @@ class DeliveryOrder extends BaseController
   protected $mkonsumen;
   protected $mUkuran;
   protected $mWarna;
+  protected $mBarangKeluar;
+  protected $mBarang;
 
   function __construct()
   {
@@ -41,6 +46,8 @@ class DeliveryOrder extends BaseController
     $this->mkonsumen   = new KonsumenModel();
     $this->mUkuran     = new UkuranModel();
     $this->mWarna      = new WarnaModel();
+    $this->mBarang     = new BarangModel();
+    $this->mBarangKeluar = new BarangKeluarModel();
   }
 
   public function index()
@@ -278,7 +285,7 @@ class DeliveryOrder extends BaseController
           $data['delivery_kode'] = $this->mSample->generateNo("DO", "trans_delivery", "delivery_kode");
           $data['created_at'] = date('Y-m-d H:i:s');
           $data['created_by'] = $this->get_userid();
-
+          // dd($data);
           $inUp = $this->insert($data, $dt_details, $dt_prods);
         }
 
@@ -333,6 +340,7 @@ class DeliveryOrder extends BaseController
         $this->mDelivery->insertRecordGetid($this->mDelivery->table2,$ddata);
 
         $qty = $qty + $item['qty'];
+        
       }
     }
 
@@ -408,6 +416,69 @@ class DeliveryOrder extends BaseController
         $this->mDelivery->insertRecordGetid($this->mDelivery->table2,$ddata);
 
         $qty = $qty + $item['qty'];
+
+        if($dataIn['status'] == 2){
+          // input output barang 
+
+          $dtWo = $this->mWalkorder->getData($dataIn['id_walkorder']);
+
+          $params_b['nama_barang'] = $dtWo->keterangan_style;
+          $dtBarang = $this->mBarang->getData(null, 0, 1, null, null, $params_b);
+          // dd($dtBarang);
+          $id_gudang = $dtWo->id_gudang;
+          $id_barang = $dtBarang[0]->id;
+
+          $mBarangMasuk = new IncomingGoodsModel();
+          $arrParam =  [
+              "id_barang" => $id_barang,
+              "id_gudang" => $id_gudang,
+          ];
+
+          $resLotNo = $mBarangMasuk->getLotNo(null, $id_barang, null, $id_gudang);
+
+          if (!empty($resLotNo)) {
+              $idLots = $resLotNo->id;
+              $this->mBarangKeluar->updateRecords('trans_lots', array("qty" => $resLotNo->qty - $item['qty']), array("id" => $idLots));
+          }else{
+            $idLots = 0;
+          }
+
+          $resData = $mBarangMasuk->getLastStokBarangBalances($id_barang, $id_gudang, $idLots);
+
+          // $stokAwal = !empty($resData) ? $resData->stok : 0;
+          $dataBarang = [
+              "id_barang" => $id_barang,
+              "jenis_transaksi" => 2,
+              "jumlah" =>  $item['qty'],
+              "tanggal" => date("Y-m-d H:i:s"),
+              "id_gudang_asal" =>  !empty($id_gudang) ? $id_gudang : null,
+              "nama" => 'Delivery',
+              "id_kategori" => 11,
+              "keterangan" => "Barang Keluar Produksi lewat delivery",
+              "active" => 1,
+              "tipe" => 1,
+              "created_at" =>  date("Y-m-d H:i:s"),
+              "lot_id" => $idLots,
+              "kode_transaksi" => $this->mBarangKeluar->generateKodePersediaan(),
+          ];
+          $this->mBarangKeluar->insertRecordGetid('trans_barang', $dataBarang);
+          $arrStockBalances = [
+              "id_barang" => $id_barang,
+              "id_gudang" => !empty($id_gudang) ? $id_gudang : null,
+              "tanggal" => date("Y-m-d H:i:s"),
+              "lot_id" => $idLots,
+              "saldo_awal" => 0,
+              "saldo_akhir" => $item['qty'],
+              "active" => 1,
+              "created_at" =>  date("Y-m-d H:i:s"),
+          ];
+          if (!empty($resData)) {
+              $stock = !empty($rowData['qty_exist']) ? $rowData['qty_exist'] - $rowData->qty : 0;
+              $this->mBarangKeluar->updateRecords('trans_barang_balances', array("saldo_akhir" => $stock), array("id" => $resData->id));
+          } else {
+              $this->mBarangKeluar->insertRecordGetid('trans_barang_balances', $arrStockBalances);
+          }
+        }
       }
     }
 

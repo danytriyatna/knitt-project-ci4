@@ -87,6 +87,21 @@
           </div>
 
           <hr>
+          <div class="row">
+            <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_gudang">Gudang Produksi<span class="text-danger">*</span></label>
+            <div class="col-md-5">
+              <select id="select_gudang" value="<?= ($row->id_gudang) ? $row->id_gudang : ''?>" name="select_gudang" class="form-select select2" data-placeholder="-- Pilih Gudang --" required>
+                <option value=""></option>
+                <?php foreach ($gudang as $item) : ?>
+                  <option value="<?= $item->id ?>"><?= $item->nama_gudang ?></option>
+                <?php endforeach; ?>
+              </select>
+              <div class="invalid-feedback">
+                Gudang Asal
+              </div>
+            </div>
+          </div>
+          <hr>
           
           <!-- <div class="container"> -->
             <div class="row">
@@ -113,8 +128,6 @@
               </div>
             </div>
           <!-- </div> -->
-
-          <hr>
 
           <div class="row">
             <div class="col-sm-12">

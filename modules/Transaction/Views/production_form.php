@@ -296,7 +296,7 @@
                 </div>
                 <div class="col-sm-3">
                   <div class="form-group m-b-0 d-flex align-items-center">
-                    <label class="control-label text-start text-md-end m-e-8" for="filter_operator">Operator</label>
+                    <label class="control-label text-start text-md-end m-e-8" for="filter_operator">CMT</label>
                     <select id="filter_operator" name="filter_operator" class="form-control custom-select select2">
                       <option value="">-</option>
                       <?php foreach ($operator as $rowData) : ?>

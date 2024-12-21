@@ -152,7 +152,7 @@ class IncomingGoodsModel extends \App\Models\PrModel
         $this->_data = $builder->get()->getRow();
         return $this->_data;
     }
-    function getLotNo($lotNo = null, $idBarang = null, $idLotNo = null)
+    function getLotNo($lotNo = null, $idBarang = null, $idLotNo = null, $idGudang = null)
     {
         $builder = $this->db->table("trans_lots");
         $builder->select("*");

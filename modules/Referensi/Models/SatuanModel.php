@@ -29,6 +29,10 @@ class SatuanModel extends \App\Models\PrModel
                 $builder->groupEnd();
             }
 
+            if(!empty($params['nama_satuan'])){
+                $builder->where('uk.nama_satuan', $params['nama_satuan']);
+            }
+
             if (!empty($order)) {
                 $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
             } else {
