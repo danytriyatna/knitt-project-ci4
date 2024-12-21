@@ -78,6 +78,12 @@ class LaporanStockCard extends BaseController
 
         $resData = $this->mLaporan->getLaporanStockCard($idBarang, $filter_gudang, $tahun, $bulan);
 
+        if(!empty($resData)){
+            for ($i=0; $i < count($resData); $i++) { 
+                $resData[$i]->tanggal = \fdate_eng_to_ind_3($resData[$i]->tanggal);
+            }
+        }
+
         $build_array["message"] = "Data ditemukan";
         $build_array["data"] =  !empty($resData) ? $resData : [];
         $build_array["status"] = true;
