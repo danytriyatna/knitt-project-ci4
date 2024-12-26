@@ -312,6 +312,73 @@
     </div>
   </div>
 </div>
+
+<div id="modal-print-barcode" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cetak Barcode</h5>
+        <input type="hidden" id="id_sample_qty">
+        <input type="hidden" id="id_sample_det_qty">
+        <button class="btn-close" data-bs-toggle="modal" data-bs-target="#modal-form-add-po" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <div class="row">
+          <div class="col-sm-3">
+            <img class="w-100" id="fotoText" src="http://citraknitt.com:81/uploads/sample/1734252882_9960e8d08df119d708b1.jpg" alt="Foto Sample">
+          </div>
+          <div class="col-sm-9">
+            <h6 class="f-w-700 m-b-6" id="noSampleText">SPL241200013 / HITAM</h6>
+            <p class="f-w-500 m-y-0" id="deskripsiText">ABAYA JS</p>
+            <hr class="m-y-8">
+            <p class="m-y-0" id="tglSampleText"><i class="fa fa-calendar-day f-s-11"></i>&nbsp; 01 Desember 2024</p>
+            <p class="m-y-0" id="tglDeadlineText"><i class="fa fa-calendar-week f-s-11"></i>&nbsp; <em>Deadline: 05 Desember 2024</em></p>
+            <p class="m-t-8 badge bg-secondary d-inline-block" id="buyerText"><i class="fa fa-user f-s-11"></i>&nbsp; Bu Indri</p>
+          </div>
+        </div>
+
+        <hr>
+
+        <h6 class="f-w-700">Quantity Cetak per Ukuran</h6>
+        <div class="row m-t-16">
+          <div class="col-sm-12">
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>UKURAN</th>
+                    <th>QTY</th>
+                    <th>QTY PRINT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <select class="form-select">
+                        <option value="0" disabled>-- Pilih Ukuran --</option>
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                        <option value="XL">XL</option>
+                        <option value="2XL">2XL</option>
+                        <option value="3XL">3XL</option>
+                      </select>
+                    </td>
+                    <td><input type="text" class="form-control" placeholder="Ketikkan qty" value="100"></td>
+                    <td><input type="text" class="form-control" placeholder="Ketikkan qty print" value="100"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="m-s-5 btn btn-success" data-bs-dismiss="modal"><i class="fa fa-print"></i> Cetak</button>
+      </div>
+    </div>
+  </div>
+</div>
 <?= $this->endSection('modal') ?>
 
 <?= $this->section('content'); ?>

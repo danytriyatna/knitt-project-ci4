@@ -221,6 +221,14 @@ class SampleModel extends \App\Models\PrModel
         $builder->where("abx.id_sample", $idSample);
         $builder->groupBy(array("abx.id", "w1.kode_warna", "w2.kode_warna", "w3.kode_warna", "w4.kode_warna", "w5.kode_warna", "w6.kode_warna", "w7.kode_warna", "w8.kode_warna"));
         $this->_data = $builder->get()->getResult();
+        
+        $s_data = [];
+
+        foreach ($this->_data as $td) {
+            $td->print_barcode = '<button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#modal-print-barcode"> <i class="fa fa-print"></i></button>';
+            array_push($s_data, $td);
+        }
+
         return $this->_data;
     }
 

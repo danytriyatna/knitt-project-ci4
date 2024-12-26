@@ -320,6 +320,7 @@ $(document).ready(function () {
                 paginationButtonCount: 5,
                 columns:[
                     {title:"No", field:"no",   width: "5%"},
+                    {title:"Aksi", field:"print_barcode", width:"7%", formatter:'html'},
                     {title:"Colour", field:"colordasar", width:"20%"},
                     {title:"S", field:"s", hozAlign:"center",width:"7%"},
                     {title:"M", field:"m", hozAlign:"center",width:"7%"},
