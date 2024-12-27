@@ -179,7 +179,7 @@ function checkRegex(cell) {
             });
         }  
 
-        if(row.getData().total_bayar >= row.getData.hutang){
+        if(row.getData().total_bayar >= row.getData().hutang){
             cell.restoreOldValue();
             return Swal.fire({
                 text: "Payment amount lebih besar dari yang dibayarkan",
@@ -265,9 +265,18 @@ btnSimpan.on("click",function(e){
 })
 
 function simpanData() {
-    let totalBayar = dtListPayment.getData().reduce((sum, item) => sum + parseFloat(item.total_bayar), 0);
-    let hutang = dtListPayment.getData().reduce((sum, item) => sum + parseFloat(item.hutang), 0);
-    let sisaBayar = dtListPayment.getData().reduce((sum, item) => sum + parseFloat(item.sisa_bayar), 0);
+    let totalBayar = dtListPayment.getData().reduce((sum, item) => {
+        let total = parseFloat(item.total_bayar);
+        return sum + (isNaN(total) ? 0 : total);
+    }, 0);
+    let hutang = dtListPayment.getData().reduce((sum, item) => {
+        let total = parseFloat(item.hutang);
+        return sum + (isNaN(total) ? 0 : total);
+    }, 0);
+    let sisaBayar = dtListPayment.getData().reduce((sum, item) => {
+        let total = parseFloat(item.sisa_bayar);
+        return sum + (isNaN(total) ? 0 : total);
+    }, 0);
     
     $.ajax({
         type: 'POST',

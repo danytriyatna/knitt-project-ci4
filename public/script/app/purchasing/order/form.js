@@ -614,7 +614,7 @@ let dtListDetailPO = new Tabulator("#dt-list-po", {
         },
         {title:"ITEM CODE", field:"kode_barang",hozAlign:"left", width:"15%"},
         {title:"ITEM DESCRIPTION", field:"nama_barang", hozAlign:"left",width:"20%"},
-        {title:"QTY", field:"qty", hozAlign:"center",width:"10%",editor: "number"},
+        {title:"QTY", field:"qty", hozAlign:"center",width:"10%"},
         {title:"UNIT PRICE", field:"price", hozAlign:"right",width:"15%",formatter: "money",formatterParams: {
                 decimal: ",",
                 thousand: ".",

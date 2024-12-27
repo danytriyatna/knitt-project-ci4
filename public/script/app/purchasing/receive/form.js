@@ -223,14 +223,14 @@ dtListBarang.on("rowClick", function(e, row){
     var namaSatuan = row._row.data.nama_satuan.replace(/<[^>]*>/g, '');
     var qty = row._row.data.qty;
     var price = row._row.data.price;
-    // if(dtListDetail.getData().some(x => x.id_barang == idBarang)){
-    //     return Swal.fire({
-    //         text: "Barang sudah dipilih",
-    //         icon: 'error',
-    //         showConfirmButton: false,
-    //         timer: 2000
-    //     });
-    // }
+    if(dtListDetail.getData().some(x => x.id_barang == idBarang)){
+        return Swal.fire({
+            text: `Barang ${namaBarang} sudah dipilih`,
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
 
     inpUnit.val(namaSatuan)
     inpIdBarang.val(idBarang)
@@ -313,7 +313,7 @@ let dtListDetail = new Tabulator("#dt-list-detail", {
         },
         {title:"ITEM CODE", field:"kode_barang",hozAlign:"left", width:"15%"},
         {title:"ITEM DESCRIPTION", field:"nama_barang", hozAlign:"left",width:"25%"},
-        {title:"QTY", field:"qty", hozAlign:"center",width:"10%",editor: "number"},
+        {title:"QTY", field:"qty", hozAlign:"center",width:"10%"},
         {title:"UNIT", field:"nama_unit", hozAlign:"center",width:"10%"},
         {title:"PRICE", field:"price", formatter : "money",
             formatterParams: {

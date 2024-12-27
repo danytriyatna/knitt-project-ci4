@@ -265,7 +265,14 @@ dtListBarang.on("rowClick", function(e, row){
     var namaBarang = row._row.data.nama_barang.replace(/<[^>]*>/g, '');
     var namaSatuan = row._row.data.nama_satuan.replace(/<[^>]*>/g, '');
     var lotNo = row._row.data.lot_no.replace(/<[^>]*>/g, '');
-    
+    if(dtListDetail.getData().some(x=>x.id_barang == idBarang)){
+        return Swal.fire({
+            text: `Barang ${namaBarang} telah dipilih`,
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
     if(dtListDetail.getData().some(x=>x.id_barang == idBarang && x.lot_id == idLot)){
         return Swal.fire({
             text: `Barang ${namaBarang} dengan lot ${lotNo} telah dipilih`,
@@ -341,7 +348,7 @@ let dtListDetail = new Tabulator("#dt-list-detail", {
         },
         {title:"ITEM CODE", field:"kode_barang",hozAlign:"left", width:"15%"},
         {title:"ITEM DESCRIPTION", field:"nama_barang", hozAlign:"left",width:"25%"},
-        {title:"QTY", field:"qty", hozAlign:"center",width:"10%",editor: "number"},
+        {title:"QTY", field:"qty", hozAlign:"center",width:"10%"},
         {title:"UNIT", field:"nama_unit", hozAlign:"center",width:"15%"},
         {title:"PRICE", field:"price", formatter : "money",
             formatterParams: {

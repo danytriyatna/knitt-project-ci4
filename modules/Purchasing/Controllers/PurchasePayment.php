@@ -176,7 +176,7 @@ class PurchasePayment extends BaseController
     $id_rek = $this->request->getPost('id_rek');
     $totalBayar = $this->request->getPost('totalBayar');
     $hutang = $this->request->getPost('hutang');
-    $sisaBayar = $this->request->getPost('sisaBayar');
+    // $sisaBayar = $this->request->getPost('sisaBayar');
     $dataDetail = $this->request->getPost('data');
     if ($id != "") {
       $id = decrypt($id);
@@ -184,12 +184,13 @@ class PurchasePayment extends BaseController
     if ($id_vendor != "") {
       $id_vendor = decrypt($id_vendor);
     }
+
     $dataHeader = [
       "id_vendor" => $id_vendor,
       "pay_date" => $pp_date,
       "id_rek" => $id_rek,
       "total_bayar" => $totalBayar,
-      "sisa_bayar" => $sisaBayar,
+      "sisa_bayar" => $hutang - $totalBayar,
       "hutang" => $hutang,
       "status" => 1
     ];

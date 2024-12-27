@@ -47,7 +47,7 @@ class BarangMasukModel extends \App\Models\PrModel
             if (!empty($order)) {
                 $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
             } else {
-                $builder->orderBy('id');
+                $builder->orderBy('uk.id', 'DESC');
             }
 
             if (empty($offset)) $offset = 0;

@@ -224,6 +224,7 @@ if (elSearchBarang != null) {
 
 
 dtListBarang.on("rowClick", function(e, row){
+
     if(selectKategori.val() == null){
         return Swal.fire({
             text: "Kategori harus dipilih",
@@ -236,6 +237,15 @@ dtListBarang.on("rowClick", function(e, row){
     if(selectGudang.val() == 0){
         return Swal.fire({
             text: "Gudang Tujuan harus dipilih",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+    
+    if(dtListDetail.getData().some(x=>x.id_barang == idBarang)){
+        return Swal.fire({
+            text: `Barang ${namaBarang} telah dipilih`,
             icon: 'error',
             showConfirmButton: false,
             timer: 2000
@@ -310,7 +320,7 @@ let dtListDetail = new Tabulator("#dt-list-detail", {
         },
         {title:"ITEM CODE", field:"kode_barang",hozAlign:"left", width:"15%"},
         {title:"ITEM DESCRIPTION", field:"nama_barang", hozAlign:"left",width:"25%"},
-        {title:"QTY", field:"qty", hozAlign:"center",width:"10%",editor: "number"},
+        {title:"QTY", field:"qty", hozAlign:"center",width:"10%"},
         {title:"UNIT", field:"nama_unit", hozAlign:"center",width:"15%"},
         {title:"PRICE", field:"price", formatter : "money",
             formatterParams: {
