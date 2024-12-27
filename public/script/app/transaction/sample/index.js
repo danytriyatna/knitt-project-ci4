@@ -340,7 +340,7 @@ $(document).ready(function () {
                 paginationButtonCount: 5,
                 columns:[
                     {headerSort: false,  title:"No", field:"no",   width: "5%"},
-                    {headerSort: false,  title:"Aksi", width:"7%", formatter: print_btn,
+                    {headerSort: false,  title:"QR", width:"7%", formatter: print_btn,
                         cellClick: function(e, cell) {
                             let row = cell.getRow();
                             let data_row = row.getData();
