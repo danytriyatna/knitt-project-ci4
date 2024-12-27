@@ -143,15 +143,15 @@ $(document).ready(function () {
                     } 
                 }
             },
-            {title:"Colour", field:"colour", width:"40%"},
-            {title:"S", field:"s", hozAlign:"center",width:"7%"},
-            {title:"M", field:"m", hozAlign:"center",width:"7%"},
-            {title:"L", field:"l", hozAlign:"center",width:"7%"},
-            {title:"XL", field:"xl", hozAlign:"center",width:"7%"},
-            {title:"XXL", field:"xxl", hozAlign:"center",width:"7%"},
-            {title:"3XL", field:"xxxl", hozAlign:"center",width:"7%"},
-            {title:"All", field:"all", hozAlign:"center",width:"7%"},
-            {title:"Amount", field:"harga_satuan",formatter: "money", formatterParams: {
+            {headerSort: false, title:"Colour", field:"colour", width:"40%"},
+            {headerSort: false, title:"S", field:"s", hozAlign:"center",width:"7%"},
+            {headerSort: false, title:"M", field:"m", hozAlign:"center",width:"7%"},
+            {headerSort: false, title:"L", field:"l", hozAlign:"center",width:"7%"},
+            {headerSort: false, title:"XL", field:"xl", hozAlign:"center",width:"7%"},
+            {headerSort: false, title:"XXL", field:"xxl", hozAlign:"center",width:"7%"},
+            {headerSort: false, title:"3XL", field:"xxxl", hozAlign:"center",width:"7%"},
+            {headerSort: false, title:"All", field:"all", hozAlign:"center",width:"7%"},
+            {headerSort: false, title:"Amount", field:"harga_satuan",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
@@ -178,35 +178,35 @@ $(document).ready(function () {
         paginationButtonCount: 5,
         columns:[
             {title:"ID", field:"id", visible:false},
-            {
-                headerSort: false,  
-                title: 'Aksi', 
-                formatter: buttonQRAction,
-                width: '10%', align: "center", cssClass: "text-center",
-                cellClick: function(e, cell) {
-                    let row = cell.getRow();
-                    let data_row = row.getData();
-                    if (e.target.title === 'qr code') {
-                        generateQRCode(data_row)
-                    } 
-                }
-            },
-            {title:"No",formatter: "rownum",hozAlign: "center", width:"5%"},
-            {title:"id_ukuran", field:"id_ukuran", hozAlign:"center",width:"7%",visible:false},
-            {title:"Ukuran", field:"ukuran", hozAlign:"center",width:"23%"},
-            {title:"QTY", field:"qty", hozAlign:"center",width:"22%",editor: "number",cellEdited: updateTotal},
-            {title:"Price", field:"harga_satuan",formatter: "money", formatterParams: {
+            // {
+            //     headerSort: false,  
+            //     title: 'Aksi', 
+            //     formatter: buttonQRAction,
+            //     width: '10%', align: "center", cssClass: "text-center",
+            //     cellClick: function(e, cell) {
+            //         let row = cell.getRow();
+            //         let data_row = row.getData();
+            //         if (e.target.title === 'qr code') {
+            //             generateQRCode(data_row)
+            //         } 
+            //     }
+            // },
+            {headerSort: false, title:"No",formatter: "rownum",cssClass:'text-center', hozAlign: "center", width:"8%"},
+            {headerSort: false, title:"id_ukuran", field:"id_ukuran", cssClass:'text-center', hozAlign:"center",visible:false},
+            {headerSort: false, title:"Ukuran", field:"ukuran", cssClass:'text-center', hozAlign:"center",width:"18%"},
+            {headerSort: false, title:"QTY", field:"qty", cssClass:'text-center', hozAlign:"center",width:"10%",editor: "number",cellEdited: updateTotal},
+            {headerSort: false, title:"Price", field:"harga_satuan",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
                 precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right",width:"25%",editor: "number",cellEdited: updateTotal},
-            {title:"Total", field:"harga_total",formatter: "money", formatterParams: {
+            }, hozAlign:"right",width:"32%",editor: "number",cellEdited: updateTotal},
+            {headerSort: false, title:"Total", field:"harga_total",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
                 precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right",width:"25%"},
+            }, hozAlign:"right",width:"32%"},
         ],
      
         locale: 'id',    
@@ -237,6 +237,17 @@ $(document).ready(function () {
             }, 600);
         });
     }
+
+     // declarre untuk variable print qr
+    const mdlPrint = $("#modal-print-barcode");
+    const inpp_foto = $("#fotoPrint");
+    const inpp_noSample = $("#noSamplePrint");
+    const inpp_deskripsi = $("#deskripsiPrint");
+    const inpp_tglSample = $("#tglSamplePrint");
+    const inpp_tglDeadline = $("#tglDeadlinePrint");
+    const inpp_buyer = $("#buyerPrint");    
+    const inpp_warna = $("#warnaPrint");
+    const inpp_trans = $("#warnaTrans");
 
     function cardFormatter(cell, formatterParams, onRendered){
         var data = cell.getRow().getData(); // Ambil data row
@@ -288,6 +299,14 @@ $(document).ready(function () {
                     </div>
                   </div>
                 </div>`;
+
+
+        // declarre untuk variable print qr
+        const print_btn = () => {
+            let btn = `<button type="button" class="btn btn-sm btn-info" data-bs-toggle="modalz" title="print-warna"> <i class="fa fa-print" title="print-warna"></i></button>`;
+            return btn
+        }
+
     
         onRendered(()=>{
             
@@ -312,6 +331,7 @@ $(document).ready(function () {
                     }
                 })
             });
+
             new Tabulator(`#dt-list-detail-${data.id}`, {
                 data: data.detail, 
                 layout:"fitColumns",
@@ -319,22 +339,51 @@ $(document).ready(function () {
                 paginationSize: 10,
                 paginationButtonCount: 5,
                 columns:[
-                    {title:"No", field:"no",   width: "5%"},
-                    {title:"Aksi", field:"print_barcode", width:"7%", formatter:'html'},
-                    {title:"Colour", field:"colordasar", width:"20%"},
-                    {title:"S", field:"s", hozAlign:"center",width:"7%"},
-                    {title:"M", field:"m", hozAlign:"center",width:"7%"},
-                    {title:"L", field:"l", hozAlign:"center",width:"7%"},
-                    {title:"XL", field:"xl", hozAlign:"center",width:"7%"},
-                    {title:"XXL", field:"xxl", hozAlign:"center",width:"7%"},
-                    {title:"3XL", field:"xxxl", hozAlign:"center",width:"7%"},
-                    {title:"All", field:"all", hozAlign:"center",width:"7%"},
-                    {title:"Amount", field:"harga_satuan",formatter: "money", formatterParams: {
+                    {headerSort: false,  title:"No", field:"no",   width: "5%"},
+                    {headerSort: false,  title:"Aksi", width:"7%", formatter: print_btn,
+                        cellClick: function(e, cell) {
+                            let row = cell.getRow();
+                            let data_row = row.getData();
+                            if (e.target.title === 'print-warna') {
+                                // console.log(data_row)
+
+                                const inpp_slcUkuran = $("#print_slc_ukuran");
+                                const inpp_qty       = $("#print_qty");
+                                const inpp_qtyp      = $("#print_qtyp");
+
+                                // inpp_slcUkuran
+                                inpp_qty.val(1)
+                                inpp_qtyp.val(1)
+
+                                inpp_foto.attr('src', data.file_gambar);
+                                inpp_noSample.html(data.kode_sample)
+                                inpp_deskripsi.html(data.deskripsi);
+                                inpp_warna.html(data_row.colordasar);
+                                inpp_tglSample.html(formatterDate(data.tgl_transaksi))
+                                inpp_tglDeadline.html(formatterDate(data.tgl_deadline))
+                                inpp_buyer.html(data.nama)
+
+                                setTimeout(() => {
+                                    // inpp_trans.html(data.id);
+                                    mdlPrint.modal("show");
+                                }, 500);
+                            } 
+                        }
+                    },
+                    {headerSort: false,  title:"Colour", field:"colordasar", width:"20%"},
+                    {headerSort: false,  title:"S", field:"s", cssClass: "text-center", hozAlign:"center",width:"7%"},
+                    {headerSort: false,  title:"M", field:"m", cssClass: "text-center", hozAlign:"center",width:"7%"},
+                    {headerSort: false,  title:"L", field:"l", cssClass: "text-center", hozAlign:"center",width:"7%"},
+                    {headerSort: false,  title:"XL", field:"xl", cssClass: "text-center", hozAlign:"center",width:"7%"},
+                    {headerSort: false,  title:"XXL", field:"xxl", cssClass: "text-center", hozAlign:"center",width:"7%"},
+                    {headerSort: false,  title:"3XL", field:"xxxl", cssClass: "text-center", hozAlign:"center",width:"7%"},
+                    {headerSort: false,  title:"All", field:"all", cssClass: "text-center", hozAlign:"center",width:"7%"},
+                    {headerSort: false,  title:"Amount", field:"harga_satuan",formatter: "money", formatterParams: {
                         decimal: ",",
                         thousand: ".",
                         symbol: "Rp",  // Simbol mata uang Rupiah
                         precision: 0,   // Tidak ada desimal
-                    }, hozAlign:"right"},
+                    }, hozAlign:"right", cssClass: "text-end"},
                 ],
             });
         });
@@ -587,6 +636,45 @@ $(document).ready(function () {
             },
         });
     }
+
+    $("#btn-cetak-print").on('click', function (e) {
+        e.preventDefault()
+
+        //   const inpp_slcWarna = $("#print_slc_warna");
+        const inpp_slcUkuran = $("#print_slc_ukuran");
+        const inpp_qty       = $("#print_qty");
+        const inpp_qtyp      = $("#print_qtyp");
+
+        // mdlPrint
+        const dt_noSample = inpp_noSample.html()
+        const dt_deskripsi = inpp_deskripsi.html()
+        const dt_buyer = inpp_buyer.html()
+        const dt_warna = inpp_warna.html()
+        // inpp_trans
+
+        // Query parameters
+        let params = {
+            ukuran : inpp_slcUkuran.val(),
+            qty : inpp_qty.val(),
+            qtyp : inpp_qtyp.val(),
+            noSample : dt_noSample,
+            deskripsi : '',
+            buyer : '',
+            warna : dt_warna,
+          };
+  
+          // Buat query string
+          let queryString = $.param(params); // Convert objek ke query string
+          let fullUrl = `trans/sample/generate?${queryString}`;
+  
+          // Buka link di tab baru
+          window.open(fullUrl, '_blank');
+        //   setTimeout(() => {
+        //     // inpp_trans.html(data.id);
+        //     mdlPrint.modal("hide");
+        // }, 500);
+
+    });
 
     function base64ToBlob(base64, contentType = '', sliceSize = 512) {
         const byteCharacters = atob(base64); // Hapus prefix "data:image/png;base64,"

@@ -9,6 +9,7 @@ $routes->group('trans/sample', ['namespace' => 'Modules\Transaction\Controllers'
   $routes->post('save-detail', 'Sample::saveDetail');
   $routes->get('delete/list(:any)', 'Sample::deleteList/$1');
   $routes->post('generate', 'Sample::generateQRCode');
+  $routes->get('generate', 'Sample::getQrcode');
   $routes->post('delete/detail', 'Sample::deleteDetailList');
   $routes->post('get-style-konsumen', 'Sample::getDataStyleKonsumen');
 });
