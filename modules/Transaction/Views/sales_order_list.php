@@ -344,68 +344,73 @@
 </div>
 
 
-<div id="modal-barcode-print" class="modal fade" tabindex="-1" role="dialog">
+<div id="modal-print-barcode" class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Print Barcode</h5>
-        <input type="hidden" id="id_sales_order_qty">
-        <input type="hidden" id="id_sales_order_det_qty">
-        <button class="btn-close" data-bs-toggle="modal" data-bs-target="#modal-form-add-po" aria-label="Close"></button>
+        <h5 class="modal-title text-bold">Cetak Barcode</h5>
+        <input type="hidden" id="id_sample_qty">
+        <input type="hidden" id="id_sample_det_qty">
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div class="row">
+      <div class="row">
           <div class="col-sm-3">
-            <img class="w-100" id="fotoTextPrint" src="" alt="Foto Sales Order">
+            <img class="w-100" id="fotoPrint" alt="Foto Sample">
           </div>
           <div class="col-sm-9">
-            <h6 class="f-w-700 m-b-6" id="noSalesOrderPrint"></h6>
-            <p class="f-w-500 m-y-0" id="deskripsiPrint"></p>
-            <hr class="m-y-8" />
-            <p class="m-y-0" id="tglSalesOrderPrint"></p>
-            <p class="m-y-0" id="tglDeadlinePrint"></p>
-            <p class="m-t-8 badge bg-secondary d-inline-block" id="buyerPrint"></p>
+            <h6 class="f-w-700 m-b-6" id="noSamplePrint">-</h6>
+            <p class="f-w-500 m-y-0" id="deskripsiPrint">-</p>
+            <p class="f-w-500 m-y-0" id="warnaPrint">-</p>
+            <p class="f-w-500 m-y-0 d-none" id="warnaTrans">Trans</p>
+            <hr class="m-y-8">
+            <p class="m-y-0"><i class="fa fa-calendar-day f-s-11"></i>&nbsp;<em id="tglSamplePrint">-</em> </p>
+            <p class="m-y-0"><i class="fa fa-calendar-week f-s-11"></i>&nbsp;Deadline <em id="tglDeadlinePrint">-</em></p>
+            <p class="m-t-8 badge bg-secondary d-inline-block"><i class="fa fa-user f-s-11"></i><em id="buyerPrint"></em></p>
           </div>
         </div>
 
         <hr>
 
-        <h6 class="f-w-700">Pilih Warna Style</h6>
-        <div class="row">
-          <div class="col-sm-6">
-            <!-- <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna1">Warna A</label>
-              <div class="col-md-9">
-                <select id="po_warna1" name="po_warna1" class="form-select select2" data-placeholder="-- Pilih Warna A --">
-                  <option value=""></option>
-                    
-                </select>
-              </div>
-            </div> -->
-
-          </div>
-          <div class="col-sm-6">
-            <!-- <div class="form-group row">
-              <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_warna6">Warna E</label>
-              <div class="col-md-9">
-                
-              </div>
-            </div> -->
-
-          </div>
-        </div>
-
-        <hr>
-
-        <h6 class="f-w-700">Ukuran Baju</h6>
+        <h6 class="f-w-700">Quantity Cetak per Ukuran</h6>
         <div class="row m-t-16">
           <div class="col-sm-12">
-            <div id="dt-detail-barcode" class="table-responsive table-striped"></div>
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <!-- <th>WARNA</th> -->
+                    <th>UKURAN</th>
+                    <th class="text-end">QTY</th>
+                    <th class="text-end">QTY PRINT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <!-- <td>
+                      <select id="print_slc_warna" class="form-select">
+                        <option value="" disabled>-- Pilih Warna --</option>
+                      </select>
+                    </td> -->
+                    <td>
+                      <select id="print_slc_ukuran" class="form-select">
+                        <option value="" disabled>-- Pilih Ukuran --</option>
+                        <?php foreach ($ukuran as $item) : ?>
+                          <option value="<?= $item['key_ukuran'] ?>"><?= $item['kode_ukuran'] ?></option>
+                        <?php endforeach; ?>
+                      </select>
+                    </td>
+                    <td><input id="print_qty" type="text" class="form-control text-end" placeholder="Ketikkan qty" value="1"></td>
+                    <td><input id="print_qtyp" type="text" class="form-control text-end" placeholder="Ketikkan qty print" value="1"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="m-s-5 btn btn-success" id="btn-save-detail"> <i class="fa fa-save"></i> Simpan</button>
+        <button type="button" class="m-s-5 btn btn-success" id="btn-cetak-print"><i class="fa fa-print"></i> Cetak</button>
       </div>
     </div>
   </div>
