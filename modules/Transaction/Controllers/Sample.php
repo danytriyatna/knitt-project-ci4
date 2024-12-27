@@ -51,7 +51,7 @@ class Sample extends BaseController
     $this->data['buyer'] = $this->mkonsumen->where("active", 1)->findAll();
     $this->data['ukuran'] = $this->mUkuran->where("active", 1)->findAll();
     $this->data['warna'] = $this->mWarna->where("active", 1)->findAll();
-
+    
     return view($this->views . '\sample_list', $this->data);
   }
 
@@ -394,11 +394,64 @@ class Sample extends BaseController
       $build_array['message'] = "QR Code Gagal digenerate";
       return $this->response->setJSON($build_array);
     }
+  }
 
+  function getQrcode(){
+    $ukuran = $this->request->getGet("ukuran");
+    $qty = $this->request->getGet("qty");
+    $qtyp = $this->request->getGet("qtyp");
+    $noSample = $this->request->getGet("noSample");
+    $deskripsi = $this->request->getGet("deskripsi");
+    $buyer = $this->request->getGet("buyer");
+    $warna = $this->request->getGet("warna");
 
-    // header('Content-Type: ' . $result->getMimeType());
-    // header('Content-Disposition: attachment; filename="qrcode.png"');
-    // echo $result->getString();
+    /* Data */
+    // $hex_data   = bin2hex($id);
+    // $save_name  = $hex_data. '_'. time() . '.png';
+    $save_name  = $warna . '-' . $noSample . '.png';
+
+    /* QR Code File Directory Initialize */
+    $dir = 'uploads/media/qrcode/';
+    if (! file_exists($dir)) {
+        mkdir($dir, 0775, true);
+    }
+
+    /* QR Configuration  */
+    $config['cacheable']    = true;
+    $config['imagedir']     = $dir;
+    $config['quality']      = true;
+    $config['size']         = '1024';
+    $config['black']        = [255, 255, 255];
+    $config['white']        = [255, 255, 255];
+    $this->ciqrcode->initialize($config);
+
+    $data = [
+      'ukuran' => $ukuran,
+      'qty' => $qty,
+      'qtyp' => $qtyp,
+      'noSample' => $noSample,
+      'deskripsi' => $deskripsi,
+      'buyer' => $buyer,
+      'warna' => $warna,
+    ];
+
+    /* QR Data  */
+    $params['data']     = $noSample.';'.$ukuran.';'.$warna.';'.$qty; //json_encode($data) ;//base_url() . "/produk/edit/" . encrypt($id);
+    $params['level']    = 'L';
+    $params['size']     = 10;
+    $params['savename'] = FCPATH . $config['imagedir'] . $save_name;
+
+    $oks = $this->ciqrcode->generate($params);
+
+    /* Return Data */
+    
+
+    // dd($oks);
+    $url = base_url() . "/uploads/media/qrcode/" . $save_name;
+    
+    $this->data["data"] = $data;
+    $this->data["fileName"] = $save_name;
+    return view($this->views.'\vprint_qrcode', $this->data);
   }
 
   // fungsi untuk autocomplete 

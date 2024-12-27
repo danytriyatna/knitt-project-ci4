@@ -317,23 +317,25 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Cetak Barcode</h5>
+        <h5 class="modal-title text-bold">Cetak Barcode</h5>
         <input type="hidden" id="id_sample_qty">
         <input type="hidden" id="id_sample_det_qty">
-        <button class="btn-close" data-bs-toggle="modal" data-bs-target="#modal-form-add-po" aria-label="Close"></button>
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
       <div class="row">
           <div class="col-sm-3">
-            <img class="w-100" id="fotoText" src="http://citraknitt.com:81/uploads/sample/1734252882_9960e8d08df119d708b1.jpg" alt="Foto Sample">
+            <img class="w-100" id="fotoPrint" src="http://citraknitt.com:81/uploads/sample/1734252882_9960e8d08df119d708b1.jpg" alt="Foto Sample">
           </div>
           <div class="col-sm-9">
-            <h6 class="f-w-700 m-b-6" id="noSampleText">SPL241200013 / HITAM</h6>
-            <p class="f-w-500 m-y-0" id="deskripsiText">ABAYA JS</p>
+            <h6 class="f-w-700 m-b-6" id="noSamplePrint">-</h6>
+            <p class="f-w-500 m-y-0" id="deskripsiPrint">-</p>
+            <p class="f-w-500 m-y-0" id="warnaPrint">-</p>
+            <p class="f-w-500 m-y-0 d-none" id="warnaTrans">Trans</p>
             <hr class="m-y-8">
-            <p class="m-y-0" id="tglSampleText"><i class="fa fa-calendar-day f-s-11"></i>&nbsp; 01 Desember 2024</p>
-            <p class="m-y-0" id="tglDeadlineText"><i class="fa fa-calendar-week f-s-11"></i>&nbsp; <em>Deadline: 05 Desember 2024</em></p>
-            <p class="m-t-8 badge bg-secondary d-inline-block" id="buyerText"><i class="fa fa-user f-s-11"></i>&nbsp; Bu Indri</p>
+            <p class="m-y-0"><i class="fa fa-calendar-day f-s-11"></i>&nbsp;<em id="tglSamplePrint">-</em> </p>
+            <p class="m-y-0"><i class="fa fa-calendar-week f-s-11"></i>&nbsp;Deadline <em id="tglDeadlinePrint">-</em></p>
+            <p class="m-t-8 badge bg-secondary d-inline-block"><i class="fa fa-user f-s-11"></i><em id="buyerPrint"></em></p>
           </div>
         </div>
 
@@ -346,26 +348,29 @@
               <table class="table table-striped">
                 <thead>
                   <tr>
+                    <!-- <th>WARNA</th> -->
                     <th>UKURAN</th>
-                    <th>QTY</th>
-                    <th>QTY PRINT</th>
+                    <th class="text-end">QTY</th>
+                    <th class="text-end">QTY PRINT</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
+                    <!-- <td>
+                      <select id="print_slc_warna" class="form-select">
+                        <option value="" disabled>-- Pilih Warna --</option>
+                      </select>
+                    </td> -->
                     <td>
-                      <select class="form-select">
-                        <option value="0" disabled>-- Pilih Ukuran --</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
-                        <option value="2XL">2XL</option>
-                        <option value="3XL">3XL</option>
+                      <select id="print_slc_ukuran" class="form-select">
+                        <option value="" disabled>-- Pilih Ukuran --</option>
+                        <?php foreach ($ukuran as $item) : ?>
+                          <option value="<?= $item['key_ukuran'] ?>"><?= $item['kode_ukuran'] ?></option>
+                        <?php endforeach; ?>
                       </select>
                     </td>
-                    <td><input type="text" class="form-control" placeholder="Ketikkan qty" value="100"></td>
-                    <td><input type="text" class="form-control" placeholder="Ketikkan qty print" value="100"></td>
+                    <td><input id="print_qty" type="text" class="form-control text-end" placeholder="Ketikkan qty" value="1"></td>
+                    <td><input id="print_qtyp" type="text" class="form-control text-end" placeholder="Ketikkan qty print" value="1"></td>
                   </tr>
                 </tbody>
               </table>
@@ -374,7 +379,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="m-s-5 btn btn-success" data-bs-dismiss="modal"><i class="fa fa-print"></i> Cetak</button>
+        <button type="button" class="m-s-5 btn btn-success" id="btn-cetak-print"><i class="fa fa-print"></i> Cetak</button>
       </div>
     </div>
   </div>

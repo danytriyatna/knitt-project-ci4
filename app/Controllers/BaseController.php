@@ -33,6 +33,7 @@ class BaseController extends Controller
 	protected $MOD_ALIAS = null;
 	protected $auth = null;
 	protected $menulib = null;
+	protected $ciqrcode = null;
 	protected $mauth = null;
 	protected $situs = null;
 	protected $mcommon = null;
@@ -74,6 +75,7 @@ class BaseController extends Controller
 		$this->session 		= \Config\Services::session();
 		$this->auth 		= new \App\Libraries\CIonAuth();
 		$this->menulib 		= new \App\Libraries\MenuLib();
+		$this->ciqrcode		= new \App\Libraries\CIQRCode();
 		$this->mauth 		= new \IonAuth\Models\IonAuthModel();
 		$this->mcommon 		= new \App\Models\Mcommon();
 		$this->files 		= new \App\Models\FileModel();

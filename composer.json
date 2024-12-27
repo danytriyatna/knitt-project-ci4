@@ -9,7 +9,7 @@
 		"codeigniter4/framework": "4.3.4",
 		"benedmunds/codeigniter-ion-auth": "4.x-dev",
 		"firebase/php-jwt": "dev-main",
-		"endroid/qr-code": "^6.0@dev",
+		"endroid/qr-code": "6.x-dev",
 		"khanamiryan/qrcode-detector-decoder": "dev-master"
 	},
 	"suggest": {

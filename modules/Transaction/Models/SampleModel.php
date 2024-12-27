@@ -224,10 +224,10 @@ class SampleModel extends \App\Models\PrModel
         
         $s_data = [];
 
-        foreach ($this->_data as $td) {
-            $td->print_barcode = '<button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#modal-print-barcode"> <i class="fa fa-print"></i></button>';
-            array_push($s_data, $td);
-        }
+        // foreach ($this->_data as $td) {
+        //     $td->print_barcode = '<button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#modal-print-barcode"> <i class="fa fa-print"></i></button>';
+        //     array_push($s_data, $td);
+        // }
 
         return $this->_data;
     }
