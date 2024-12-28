@@ -396,6 +396,15 @@ class WalkorderModel extends \App\Models\PrModel
             $builder->where('twp.id_ukuran', $params['id_ukuran']);
         }
 
+        if(!empty($params['key_ukuran'])){
+            $builder->where('rk.key_ukuran', $params['key_ukuran']);
+        }
+
+        if(!empty($params['kode_warna'])){
+            // $builder->where('rw.kode_warna', $params['kode_warna']);
+            $builder->where('LOWER(rw.kode_warna) LIKE', strtolower("%{$params['kode_warna']}%"));
+        }
+
         if(!empty($params['last_proses']) && !empty($params['id_walkorder'])){
             $builder->where('twp.id_proses = (select max(tx.id_proses) from trans_walkorder_proses tx where tx.id_walkorder = '.$params['id_walkorder'].')');
         }

@@ -177,14 +177,14 @@ $(document).ready(function () {
                     }
                 }
             },
-            {title:"Date", field:"date", width:"8%"},
-            {title:"Colour", field:"kode_warna", hozAlign:"left",width:"15%"},
-            {title:"Process", field:"process", hozAlign:"left",width:"10%"},
-            {title:"Operator", field:"operator", hozAlign:"left",width:"15%"},
-            {title:"Nomor Mesin", field:"nomor_mesin", hozAlign:"left",width:"15%"},
-            {title:"Size", field:"kode_ukuran", hozAlign:"left",width:"5%"},
-            {title:"QTY", field:"qty", hozAlign:"center",width:"5%", editor: "number", cellEdited: updateTotal},
-            {title:"Price", field:"harga", hozAlign:"right",width:"12%",formatter: "money", editor:"number",formatterParams: {
+            {headerSort:false, title:"Date", field:"date", width:"8%"},
+            {headerSort:false, title:"Colour", field:"kode_warna", hozAlign:"left",width:"15%"},
+            {headerSort:false, title:"Process", field:"process", hozAlign:"left",width:"10%"},
+            {headerSort:false, title:"Operator", field:"operator", hozAlign:"left",width:"15%"},
+            {headerSort:false, title:"Nomor Mesin", field:"nomor_mesin", hozAlign:"left",width:"15%"},
+            {headerSort:false, title:"Size", field:"kode_ukuran", hozAlign:"left",width:"5%"},
+            {headerSort:false, title:"QTY", field:"qty", hozAlign:"center",width:"5%", editor: "number", cellEdited: updateTotal},
+            {headerSort:false, title:"Price", field:"harga", hozAlign:"right",width:"12%",formatter: "money", editor:"number",formatterParams: {
                     decimal: ",",
                     thousand: ".",
                     symbol: "Rp",  // Simbol mata uang Rupiah
@@ -682,7 +682,7 @@ $(document).ready(function () {
         }
     });
 
-    function addItem(data){
+    function addItem(data, qty = 1){
         let dataTable = dtListDetail.getData();
         let objIndex  = dataTable.findIndex(obj => obj.colordasar == (data.kode_warna));
 
@@ -768,7 +768,7 @@ $(document).ready(function () {
                         id_warna                    : data.id_warna,
                         ref_detail_id               : data.ref_detail_id,
                         harga                       : 0,
-                        qty                         : 1,
+                        qty                         : qty,
                         harga_total                 : 0,
                         flag                        : 0,
                         id_walkorder_proses_ukuran  : data.id_walkorder_proses,
@@ -783,7 +783,7 @@ $(document).ready(function () {
     
                 dataOrder.push(isi)
             }else{
-                dataOrder[ix_order].qty = dataOrder[ix_order].qty + 1 
+                dataOrder[ix_order].qty = dataOrder[ix_order].qty + qty
             }
         }else{
             alert("Proses Belum mempunyai kuota !");
@@ -812,6 +812,37 @@ $(document).ready(function () {
 
     //     dtListDetail.replaceData(tblDetail);
     // }	
+
+
+    $( "#text_barcode" ).on("keypress", function(e){
+		let key = e.which;
+		if(key == 13){
+			$.ajax({
+				url: "trans/production/src_produk",
+				dataType: "json",
+				data: {
+				  kata_kunci   : $( "#text_barcode" ).val(),
+                  id_walkorder : $("#id_walkorder").val(),
+                  id_produksi  : $("#id_produksi").val(),
+                  proses       : statusProses.val(),
+				},
+				type : 'post',
+				success: function( es ) {
+                    // console.log(es)
+				  if(es.status){
+					// response(data.slc);
+					if(es.data.length > 0){
+						addItem(es.data[0], es.data[0].qty_prod);
+					}else{
+						alert("Produk tidak ditemukan !");
+					}
+				  }else{
+					  console.log(es.msg);
+				  }
+				}
+			  });
+		}
+	});
 
 
 });

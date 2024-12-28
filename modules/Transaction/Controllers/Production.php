@@ -423,4 +423,66 @@ class Production extends BaseController
       $build_array["slc"] = $slc;
       return $this->response->setJSON($build_array);
   }
+
+
+
+  function getCariProduk(){
+    $kata_kunci = $this->request->getPost('kata_kunci');
+
+    $id_walkorder = $this->request->getPost("id_walkorder");
+    $id_produksi  = $this->request->getPost("id_produksi");
+    $proses  = $this->request->getPost("proses");
+    
+    $status = false;
+    $msg = "Data barang tidak ditemukan !";
+    $data  = [];
+
+    try {
+      $id_produksi  = \decrypt($id_produksi);
+      $id_walkorder  = \decrypt($id_walkorder);
+
+      $kt_exp = explode(";",$kata_kunci);
+
+      $kunci_jadi = $kt_exp[1] . ' ' . $kt_exp[2]; 
+
+      $qty = $kt_exp[3]; 
+      
+      $params['id_walkorder'] = $id_walkorder;
+      // $params['kata_kunci'] = $kunci_jadi;
+      $params['id_proses'] = $proses;
+      $params['key_ukuran'] = $kt_exp[1];
+      $params['kode_warna'] = $kt_exp[2];
+      // print_r($params);exit;
+      $result = $this->mWalkorder->getListProduksiUkuran($params);
+
+      foreach ($result as $r) {
+        $isi = [];
+        $isi["id_walkorder"]  = $r->id_walkorder;
+        $isi["id_walkorder_proses"]  = $r->id;
+        $isi["ref_detail_id"] = $r->ref_detail_id;
+        $isi["id_ukuran"]     = $r->id_ukuran;
+        $isi["id_warna"]      = $r->id_warna;
+        $isi["qty"]           = $r->qty;
+        $isi["qty_prod"]      = $qty;
+        $isi["kata_kunci"]    =  "(".$r->kode_warna.") " . $r->kode_ukuran;
+        $isi["kode_warna"]    = $r->kode_warna;
+        $isi["kode_ukuran"]   = $r->kode_ukuran;
+        $isi["key_ukuran"]    = $r->key_ukuran;
+        $data[] = $isi;
+      }
+
+      $status = true;
+      $msg = "Berhasil pengambilan data !";
+
+    } catch (\Throwable $th) {
+      //throw $th;
+      // print_r($th);exit;
+    }
+
+
+    $build_array["status"] = $status;
+    $build_array["msg"] = $msg;
+    $build_array["data"] = $data;
+    return $this->response->setJSON($build_array); 
+  }
 }
