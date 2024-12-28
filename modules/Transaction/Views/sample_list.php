@@ -26,7 +26,7 @@
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="tgl_sample">Date<span class="text-danger">*</span></label>
           <div class="col-md-9">
-            <input type="text" id="tgl_sample" name="tgl_sample" class="form-control datepickerx" placeholder="Pilih tanggal sample" value="" required>
+            <input type="text" id="tgl_sample" name="tgl_sample" class="form-control datepicker" placeholder="Pilih tanggal sample" value="" required>
             <div class="invalid-feedback">
               Date tidak valid
             </div>
