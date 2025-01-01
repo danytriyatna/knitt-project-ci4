@@ -19,14 +19,14 @@
       display: grid;
       grid-template-columns: 1fr 1fr; /* Membagi menjadi dua kolom */
       grid-template-rows: auto auto; /* Membagi menjadi dua baris */
-      gap: 10mm; /* Jarak antar elemen */
+      gap: 2.5mm; /* Jarak antar elemen */
       box-sizing: border-box;
-      padding: 10mm;
+      padding: 0mm;
     }
 
     .item {
       border: 1px solid #ccc;
-      padding: 15px; /* Ruang di dalam setiap item */
+      padding: 8px; /* Ruang di dalam setiap item */
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -37,7 +37,7 @@
 
     img {
       display: block;
-      margin-bottom: 10px; /* Memberi jarak antara gambar dan teks */
+      margin-bottom: 2px; /* Memberi jarak antara gambar dan teks */
     }
 
     .details {
@@ -47,15 +47,19 @@
     }
 
     .details b {
-      font-size: 14px;
+      font-size: 16px;
       margin-bottom: 5px; /* Jarak bawah nama sample */
+    }
+
+    .details em {
+      font-size: 14px;
     }
 
     /* Print-specific styles */
     @media print {
       @page {
         size: A4 portrait; /* Mengatur mode potrait */
-        margin: 10mm; /* Margin halaman */
+        margin: 6mm; /* Margin halaman */
       }
 
       body {
@@ -75,12 +79,10 @@
     for ($i = 0; $i < $data['qtyp']; $i++) { 
     ?>
       <div class="item">
-        <img src="<?= base_url(); ?>/uploads/media/qrcode/<?= $fileName; ?>" alt="QR Code" width="100px" height="100px">
+        <img src="<?= base_url(); ?>/uploads/media/qrcode/<?= $fileName; ?>" alt="QR Code" width="192px" height="192px">
         <div class="details">
           <b><?= $data['noSample'] ?></b><br>
-          Ukuran : <em><?= strtoupper($data['ukuran']) ?: '-' ?></em><br>
-          Warna  : <em><?= $data['warna'] ?: '-' ?></em><br>
-          Jumlah : <em><?= $data['qty'] ?: '-' ?></em>
+          <em><?= strtoupper($data['ukuran']) ?: '-' ?></em> | <em><?= $data['warna'] ?: '-' ?></em> | <em><?= $data['qty'] ?: '-' ?></em>
         </div>
       </div>
     <?php 
