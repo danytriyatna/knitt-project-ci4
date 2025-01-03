@@ -58,10 +58,16 @@ $(document).ready(function () {
                         inpPosisi.val(data_row.posisi)
                         inpTglBergabung.val(data_row.tgl_bergabung)
                         inpJenisKelamin.val(data_row.jenis_kelamin).trigger('change');
-                        inpUpahHarian.val(data_row.upah_harian).trigger('change');
-                        inpUpahLembur.val(data_row.upah_lembur).trigger('change');
-                        inpUpahLemburWe.val(data_row.upah_lembur_we).trigger('change');
 
+
+
+
+                        setTimeout(() => {
+                            inpUpahHarian.val(data_row.upah_harian).trigger('change');
+                            inpUpahLembur.val(data_row.upah_lembur).trigger('change');
+                            inpUpahLemburWe.val(data_row.upah_lembur_we).trigger('change');
+
+                        }, 500);
                         isModal.modal("show");
                     }   
                 }

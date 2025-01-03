@@ -437,7 +437,7 @@ class RefKonsumen extends BaseController
             'npwp'   => $npwp
         ];
 
-        $style_data = json_decode($dataStyle, true);
+        // $style_data = json_decode($dataStyle, true);
         if(empty($id)){
             $id = $this->mkonsumen->insertRecordGetid($this->mkonsumen->table, $arr_isi);
             $msg    = "Data berhasil ditambahkan !";
