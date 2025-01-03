@@ -20,7 +20,7 @@ class LaporanPersediaanModel extends \App\Models\PrModel
         parent::__construct();
     }
 
-    function getLaporanPersediaan($idBarang = null, $idGudang = null, $year = null, $month = null)
+    function getLaporanPersediaan($idJenisBarang = null, $idGudang = null, $year = null, $month = null)
     {
         $params = [];
         $sql = "
@@ -30,15 +30,25 @@ class LaporanPersediaanModel extends \App\Models\PrModel
             abx.created_at,
             abx.kode_transaksi,
             abx.id_barang,
-            abx.lot_id,
             abx.id_gudang_asal AS id_gudang,
             'keluar' AS jenis_transaksi,
             abx.jumlah * -1 AS jumlah,
             abx.id,
-            bbx.name
+            bbx.name,
+            cbx.lot_no,
+            abx.lot_id,
+            dbx.nama_barang,
+            dbx.kode_barang,
+            ebx.nama_jenis_barang,
+            fbx.nama_satuan,
+            abx.price
         FROM
             trans_barang abx
             LEFT JOIN ref_trans bbx ON LEFT(abx.kode_transaksi, 3) = bbx.alias
+            INNER JOIN trans_lots cbx ON abx.lot_id = cbx.id
+            INNER JOIN ref_barang dbx ON abx.id_barang = dbx.id
+            INNER JOIN ref_jenis_barang ebx ON dbx.id_jenis_barang = ebx.id
+            INNER JOIN ref_satuan fbx ON dbx.id_satuan = fbx.id
         WHERE
             abx.id_gudang_asal IS NOT NULL ";
         if (!empty($month)) {
@@ -53,21 +63,35 @@ class LaporanPersediaanModel extends \App\Models\PrModel
             $sql .= " AND abx.id_gudang_asal = :id_gudang:";
             $params['id_gudang'] = $idGudang;
         }
+        if (!empty($idJenisBarang)) {
+            $sql .= " AND dbx.id_jenis_barang = :id_jenis_barang:";
+            $params['id_jenis_barang'] = $idJenisBarang;
+        }
         $sql .= " UNION ALL
         SELECT
             abx.tanggal,
             abx.created_at,
             abx.kode_transaksi,
             abx.id_barang,
-            abx.lot_id,
             abx.id_gudang_tujuan AS id_gudang,
             'masuk' AS jenis_transaksi,
             abx.jumlah AS jumlah,
             abx.id,
-            bbx.name
+            bbx.name,
+            cbx.lot_no,
+            abx.lot_id,
+            dbx.nama_barang,
+            dbx.kode_barang,
+            ebx.nama_jenis_barang,
+            fbx.nama_satuan,
+            abx.price
         FROM
             trans_barang abx 
             LEFT JOIN ref_trans bbx ON LEFT(abx.kode_transaksi, 3) = bbx.alias
+            INNER JOIN trans_lots cbx ON abx.lot_id = cbx.id
+              INNER JOIN ref_barang dbx ON abx.id_barang = dbx.id
+            INNER JOIN ref_jenis_barang ebx ON dbx.id_jenis_barang = ebx.id
+            INNER JOIN ref_satuan fbx ON dbx.id_satuan = fbx.id
         WHERE
             abx.id_gudang_tujuan IS NOT NULL ";
         if (!empty($month)) {
@@ -82,13 +106,17 @@ class LaporanPersediaanModel extends \App\Models\PrModel
             $sql .= " AND abx.id_gudang_tujuan = :id_gudang:";
             $params['id_gudang'] = $idGudang;
         }
+        if (!empty($idJenisBarang)) {
+            $sql .= " AND dbx.id_jenis_barang = :id_jenis_barang:";
+            $params['id_jenis_barang'] = $idJenisBarang;
+        }
         $sql .= " ),
     saldo_awal AS (
         SELECT
             nt.lot_id,
             nt.id_barang,
             nt.id_gudang,
-             COALESCE(SUM(nt.jumlah), 0) AS saldo_awal
+            COALESCE(SUM(nt.jumlah), 0) AS saldo_awal
         FROM
             normalized_trans nt ";
         if (!empty($idGudang)) {
@@ -110,6 +138,13 @@ class LaporanPersediaanModel extends \App\Models\PrModel
             nt.id_barang,
             nt.id_gudang,
             nt.lot_id,
+            nt.lot_no,
+            nt.nama_barang,
+            nt.kode_barang,
+            nt.nama_jenis_barang,
+            nt.nama_satuan,
+            nt.price,
+            CONCAT(nt.kode_barang,' ', nt.nama_barang) AS barang,
             CASE
                 WHEN nt.jenis_transaksi = 'masuk' THEN nt.jumlah 
                 ELSE 0 
@@ -118,7 +153,7 @@ class LaporanPersediaanModel extends \App\Models\PrModel
                 WHEN nt.jenis_transaksi = 'keluar' THEN -nt.jumlah 
                 ELSE 0 
             END AS keluar,
-            COALESCE(sa.saldo_awal, 0) + SUM(nt.jumlah) OVER (
+            SUM(nt.jumlah) OVER (
                 PARTITION BY nt.id_barang,  nt.id_gudang,  nt.lot_id
                 ORDER BY nt.id ASC, nt.kode_transaksi
             ) AS saldo_akhir
@@ -135,7 +170,8 @@ class LaporanPersediaanModel extends \App\Models\PrModel
 
 
         $sql .=  " ORDER BY
-        id_barang ASC,
+        nama_jenis_barang ASC,
+        nama_barang ASC,
         id_gudang,
         tanggal,
         kode_transaksi";

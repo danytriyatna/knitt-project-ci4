@@ -195,6 +195,7 @@ class BarangMasukModel extends \App\Models\PrModel
                         "tipe" => 1,
                         "created_at" =>  date("Y-m-d H:i:s"),
                         "lot_id" => $idLots,
+                        "price" => !empty($rowData['price']) ? $rowData['price'] : null,
                         "kode_transaksi" => $this->generateKodePersediaan(),
                     ];
                     $this->insertRecordGetid($this->tblTrxBarang, $dataBarang);

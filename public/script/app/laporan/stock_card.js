@@ -137,7 +137,7 @@ $("#filter_barang").click(function () {
 });
 
 $("#btn-tampilkan").click(function () {
-    if($("#filter_barang_id").val() == "" && $("#filter_tahun").val() == "" && $("#filter_bulan").val() == "" && $('#filter_gudang').val() == "" ){
+    if($("#filter_barang_id").val() == "" || $("#filter_tahun").val() == "" || $("#filter_bulan").val() == "" || $('#filter_gudang').val() == "" ){
       Swal.fire({
         title: 'Warning',
         text: 'Tahun,Bulan,Barang & Gudang harus dipilih',
