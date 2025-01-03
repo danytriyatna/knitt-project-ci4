@@ -34,10 +34,13 @@ class LaporanStockCardModel extends \App\Models\PrModel
             'keluar' AS jenis_transaksi,
             abx.jumlah * -1 AS jumlah,
             abx.id,
-            bbx.name
+            bbx.name,
+            cbx.lot_no,
+            abx.lot_id
         FROM
             trans_barang abx
             LEFT JOIN ref_trans bbx ON LEFT(abx.kode_transaksi, 3) = bbx.alias
+            INNER JOIN trans_lots cbx ON abx.lot_id = cbx.id
         WHERE
             abx.id_gudang_asal IS NOT NULL ";
         if (!empty($month)) {
@@ -52,6 +55,10 @@ class LaporanStockCardModel extends \App\Models\PrModel
             $sql .= " AND abx.id_gudang_asal = :id_gudang:";
             $params['id_gudang'] = $idGudang;
         }
+        if (!empty($idBarang)) {
+            $sql .= "AND abx.id_barang = :id_barang: ";
+            $params['id_barang'] = $idBarang;
+        }
         $sql .= " UNION ALL
         SELECT
             abx.tanggal,
@@ -62,10 +69,13 @@ class LaporanStockCardModel extends \App\Models\PrModel
             'masuk' AS jenis_transaksi,
             abx.jumlah AS jumlah,
             abx.id,
-            bbx.name
+            bbx.name,
+            cbx.lot_no,
+            abx.lot_id
         FROM
             trans_barang abx 
             LEFT JOIN ref_trans bbx ON LEFT(abx.kode_transaksi, 3) = bbx.alias
+            INNER JOIN trans_lots cbx ON abx.lot_id = cbx.id
         WHERE
             abx.id_gudang_tujuan IS NOT NULL ";
         if (!empty($month)) {
@@ -80,11 +90,16 @@ class LaporanStockCardModel extends \App\Models\PrModel
             $sql .= " AND abx.id_gudang_tujuan = :id_gudang:";
             $params['id_gudang'] = $idGudang;
         }
+        if (!empty($idBarang)) {
+            $sql .= "AND abx.id_barang = :id_barang: ";
+            $params['id_barang'] = $idBarang;
+        }
         $sql .= " ),
     saldo_awal AS (
         SELECT
             nt.id_barang,
             nt.id_gudang,
+            nt.lot_id,
             SUM(nt.jumlah) AS saldo_awal
         FROM
             normalized_trans nt ";
@@ -98,8 +113,10 @@ class LaporanStockCardModel extends \App\Models\PrModel
             $params['id_barang'] = $idBarang;
         }
 
+
+
         $sql .= " GROUP BY
-            nt.id_barang,nt.id_gudang
+            nt.id_barang,nt.id_gudang,nt.lot_id
     ),
     stock_card AS (
         SELECT
@@ -109,6 +126,8 @@ class LaporanStockCardModel extends \App\Models\PrModel
             nt.kode_transaksi,
             nt.id_barang,
             nt.id_gudang,
+            nt.lot_id,
+            nt.lot_no,
             CASE
                 WHEN nt.jenis_transaksi = 'masuk' THEN nt.jumlah 
                 ELSE 0 
@@ -117,8 +136,8 @@ class LaporanStockCardModel extends \App\Models\PrModel
                 WHEN nt.jenis_transaksi = 'keluar' THEN -nt.jumlah 
                 ELSE 0 
             END AS keluar,
-            COALESCE(sa.saldo_awal, 0) + SUM(nt.jumlah) OVER (
-                PARTITION BY nt.id_barang,  nt.id_gudang
+            SUM(nt.jumlah) OVER (
+                PARTITION BY nt.id_barang,  nt.id_gudang,nt.lot_id
                 ORDER BY nt.id ASC, nt.kode_transaksi
             ) AS saldo_akhir
         FROM
@@ -126,6 +145,7 @@ class LaporanStockCardModel extends \App\Models\PrModel
             LEFT JOIN saldo_awal sa 
                 ON nt.id_barang = sa.id_barang 
                 AND nt.id_gudang = sa.id_gudang
+                AND nt.lot_id = sa.lot_id
     )
     SELECT *
     FROM stock_card ";

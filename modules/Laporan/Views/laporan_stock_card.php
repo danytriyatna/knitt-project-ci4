@@ -54,7 +54,7 @@
               <div class="form-group m-b-0">
                 <label class="control-label text-left text-md-right" for="filter_fitur">Barang</label>
                 <input type="hidden" id="filter_barang_id" name="filter_barang_id">
-                <input type="text" id="filter_barang" name="filter_barang" class="form-control" placeholder="Semua Barang" readonly>
+                <input type="text" id="filter_barang" name="filter_barang" class="form-control" placeholder="-- Pilih Barang --" readonly>
               </div>
             </div>
 

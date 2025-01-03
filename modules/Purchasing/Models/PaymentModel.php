@@ -165,31 +165,33 @@ class PaymentModel extends \App\Models\PrModel
             ];
 
             foreach ($detail as $rowData) {
-                $dataDetail = [
-                    "po_no" => $rowData['po_no'],
-                    "po_date" => !empty($rowData['po_date']) ? date('Y-m-d', strtotime($rowData['po_date'])) : null,
-                    "do_date" => !empty($rowData['do_date']) ? date('Y-m-d', strtotime($rowData['do_date'])) : null,
-                    "hutang" => !empty($rowData['hutang']) ? $rowData['hutang'] : 0,
-                    "sisa_bayar" => !empty($rowData['sisa_bayar']) ? $rowData['sisa_bayar'] : 0,
-                    "total_bayar" => !empty($rowData['total_bayar']) ? $rowData['total_bayar'] : 0,
-                    "qty" => !empty($rowData['qty']) ? $rowData['qty'] : 0,
-                    "qty_receive" => !empty($rowData['qty_receive']) ? $rowData['qty_receive'] : 0,
-                    "id_po" => !empty($rowData['id_header']) ? $rowData['id_header'] : null,
-                    "id_header" => $id,
+                if (!empty($rowData['total_bayar'])) {
+                    $dataDetail = [
+                        "po_no" => $rowData['po_no'],
+                        "po_date" => !empty($rowData['po_date']) ? date('Y-m-d', strtotime($rowData['po_date'])) : null,
+                        "do_date" => !empty($rowData['do_date']) ? date('Y-m-d', strtotime($rowData['do_date'])) : null,
+                        "hutang" => !empty($rowData['hutang']) ? $rowData['hutang'] : 0,
+                        "sisa_bayar" => !empty($rowData['sisa_bayar']) ? $rowData['sisa_bayar'] : 0,
+                        "total_bayar" => !empty($rowData['total_bayar']) ? $rowData['total_bayar'] : 0,
+                        "qty" => !empty($rowData['qty']) ? $rowData['qty'] : 0,
+                        "qty_receive" => !empty($rowData['qty_receive']) ? $rowData['qty_receive'] : 0,
+                        "id_po" => !empty($rowData['id_header']) ? $rowData['id_header'] : null,
+                        "id_header" => $id,
 
-                ];
+                    ];
 
-                $this->insertRecordGetid($this->tblDet, $dataDetail);
-                $arrParam =  [
-                    "id" => $rowData['id_header'],
-                ];
-                $status = 1;
-                $totalPayment = !empty($rowData['total_bayar']) ? $rowData['total_bayar'] : 0;
-                $hutang = !empty($rowData['hutang']) ? $rowData['hutang'] : 0;
-                if ($totalPayment >= $hutang) {
-                    $status = 2;
+                    $this->insertRecordGetid($this->tblDet, $dataDetail);
+                    $arrParam =  [
+                        "id" => $rowData['id_header'],
+                    ];
+                    $status = 1;
+                    $totalPayment = !empty($rowData['total_bayar']) ? $rowData['total_bayar'] : 0;
+                    $hutang = !empty($rowData['hutang']) ? $rowData['hutang'] : 0;
+                    if ($totalPayment >= $hutang) {
+                        $status = 2;
+                    }
+                    $this->updateRecords($this->tblPoHeader, array("status" => $status, "total_payment" => !empty($rowData['total_bayar']) ? $rowData['total_bayar'] : null), $arrParam);
                 }
-                $this->updateRecords($this->tblPoHeader, array("status" => $status, "total_payment" => !empty($rowData['total_bayar']) ? $rowData['total_bayar'] : null), $arrParam);
             }
 
             $this->db->transComplete();

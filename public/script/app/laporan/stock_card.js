@@ -6,8 +6,9 @@ let dtList = new Tabulator("#dt-list", {
         {title:"Tanggal", field:"tanggal", width:"15%"},
         {title:"Transaksi", field:"transaksi", hozAlign:"left",width:"20%"},
         {title:"No. Transaksi", field:"kode_transaksi", hozAlign:"left",width:"20%"},
-        {title:"Qty Masuk", field:"masuk", hozAlign:"right",width:"15%"},
-        {title:"Qty Keluar", field:"keluar", hozAlign:"right",width:"15%"},
+        {title:"Lot", field:"lot_no", hozAlign:"left",width:"10%"},
+        {title:"Qty<br>Masuk", field:"masuk", hozAlign:"right",width:"10%"},
+        {title:"Qty<br>Keluar", field:"keluar", hozAlign:"right",width:"10%"},
         {title:"Saldo", field:"saldo_akhir", hozAlign:"right",width:"15%"},
     ],
     locale: 'id',    
@@ -136,10 +137,10 @@ $("#filter_barang").click(function () {
 });
 
 $("#btn-tampilkan").click(function () {
-    if($("#filter_tahun").val() == "" && $("#filter_bulan").val() == "" && $('#filter_gudang').val() == "" ){
+    if($("#filter_barang_id").val() == "" && $("#filter_tahun").val() == "" && $("#filter_bulan").val() == "" && $('#filter_gudang').val() == "" ){
       Swal.fire({
         title: 'Warning',
-        text: 'Tahun,Bulan & Gudang harus dipilih',
+        text: 'Tahun,Bulan,Barang & Gudang harus dipilih',
         icon: 'warning',
       })
       return false    
@@ -151,6 +152,8 @@ $("#btn-tampilkan").click(function () {
       $("#filter_barang").val("");
       $("#filter_barang_id").val("");
       $("#filter_gudang").val("").trigger("change");
+      $("#filter_tahun").val("").trigger("change");
+      $("#filter_bulan").val("").trigger("change");
   });
 
   function getDataLaporan(){
