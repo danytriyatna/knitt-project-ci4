@@ -206,7 +206,7 @@ class ItemTransferModel extends \App\Models\PrModel
                     ];
 
                     if (!empty($resData)) {
-                        $this->updateRecords($this->tblTrxBalances, array("saldo_akhir" => $resLotNo->qty + $rowData->qty), array("id" => $resData->id));
+                        $this->updateRecords($this->tblTrxBalances, array("saldo_akhir" => $resLotNo->qty + $rowData['qty']), array("id" => $resData->id));
                     } else {
                         $this->insertRecordGetid($this->tblTrxBalances, $arrStockBalances);
                     }
@@ -248,7 +248,7 @@ class ItemTransferModel extends \App\Models\PrModel
                         "created_at" =>  date("Y-m-d H:i:s"),
                     ];
                     if (!empty($resData)) {
-                        $stock = !empty($rowData['qty_exist']) ? $rowData['qty_exist'] - $rowData->qty : 0;
+                        $stock = !empty($rowData['qty_exist']) ? $rowData['qty_exist'] - $rowData['qty'] : 0;
                         $this->updateRecords($this->tblTrxBalances, array("saldo_akhir" => $stock), array("id" => $resData->id));
                     } else {
                         $this->insertRecordGetid($this->tblTrxBalances, $arrStockBalances);

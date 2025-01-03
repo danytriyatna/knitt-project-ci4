@@ -172,6 +172,7 @@ class LaporanPersediaanModel extends \App\Models\PrModel
         $sql .=  " ORDER BY
         nama_jenis_barang ASC,
         nama_barang ASC,
+        created_at ASC,
         id_gudang,
         tanggal,
         kode_transaksi";
