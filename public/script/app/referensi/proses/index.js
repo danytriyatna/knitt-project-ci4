@@ -2,8 +2,9 @@
 
 $(document).ready(function () {
     let inpData       = $('#data_id');
-    let inpKodeWarna  = $('#kode_warna');
+    let inpNama  = $('#nama');
     let inpKeterangan = $('#keterangan');
+    let inpUrutan = $('#seq');
 
     let isModal       = $("#modal-form-add-po");
 
@@ -27,29 +28,34 @@ $(document).ready(function () {
                     let data_row = row.getData();
                     if (e.target.title === 'delete') {
                         if (confirm("Anda yakin akan menghapus data?")) {
-                            window.location.replace(baseUrl + "/master-data/warna/delete/" + data_row.id);
+                            window.location.replace(baseUrl + "/master-data/proses/delete/" + data_row.id);
                         }
                     }else if(e.target.title === 'edit'){
                         inpData.val(data_row.id)
-                        inpKodeWarna.val(data_row.kode_warna)
+                        inpNama.val(data_row.nama)
                         inpKeterangan.val(data_row.keterangan)
+                        inpUrutan.val(data_row.seq)
 
                         isModal.modal("show");
                     }   
                 }
             },
             {
-                title: "Warna", field: "kode_warna", headerSort: false,
-                width: "20%", cssClass : 'text-center'
+                title: "Urutan Proses", field: "seq", headerSort: false,
+                width: "10%", cssClass : 'text-center'
             },
             {
-                title: "Kode Warna", field: "keterangan", formatter: "html", headerSort: false,
+                title: "Nama Proses", field: "nama", headerSort: false,
+                width: "10%", cssClass : 'text-start'
+            },
+            {
+                title: "Keterangan", field: "keterangan", formatter: "html", headerSort: false,
                 
             }
         ],
         locale: 'id',    
         layout: 'fitColumns',
-        ajaxURL: "/master-data/warna/list",
+        ajaxURL: "/master-data/proses/list",
         ajaxConfig: "POST",
         sortMode: "remote",
         filterMode: "remote",
@@ -111,8 +117,10 @@ $(document).ready(function () {
 
     $("#btn-add").on("click", function(){
         inpData.val("")
-        inpKodeWarna.val("")
+        inpNama.val("")
         inpKeterangan.val("")
+        inpUrutan.val(0)
+
 
         isModal.modal("show");
     });
@@ -126,16 +134,18 @@ $(document).ready(function () {
     function simpanData() {
         
         let validation = true
-        if(inpKodeWarna.val().length == 0) validation = false
+        if(inpNama.val().length == 0) validation = false
+        if(inpUrutan.val().length == 0) validation = false
     
         if(validation){
             $.ajax({
                 type: 'POST',
-                url: '/master-data/warna/simpan',
+                url: '/master-data/proses/simpan',
                 data: {
                     dataId     : inpData.val(),
-                    kodeWarna  : inpKodeWarna.val(),
+                    nama  : inpNama.val(),
                     keterangan : inpKeterangan.val(),
+                    seq : inpUrutan.val()
                 },
                 dataType: "json",
                 beforeSend: function () {
@@ -192,3 +202,4 @@ $(document).ready(function () {
     }
     
 });
+

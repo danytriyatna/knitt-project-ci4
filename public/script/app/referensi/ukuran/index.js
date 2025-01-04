@@ -4,6 +4,7 @@ $(document).ready(function () {
     let inpData       = $('#data_id');
     let inpKodeUkuran  = $('#kode_ukuran');
     let inpKeterangan = $('#keterangan');
+    let inpUrutanUkuran = $('#seq');
 
     let isModal       = $("#modal-form-add-po");
 
@@ -33,14 +34,19 @@ $(document).ready(function () {
                         inpData.val(data_row.id)
                         inpKodeUkuran.val(data_row.kode_ukuran)
                         inpKeterangan.val(data_row.keterangan)
+                        inpUrutanUkuran.val(data_row.seq)
 
                         isModal.modal("show");
                     }   
                 }
             },
             {
+                title: "Urutan Ukuran", field: "seq", headerSort: false,
+                width: "10%", cssClass : 'text-center'
+            },
+            {
                 title: "Kode Ukuran", field: "kode_ukuran", headerSort: false,
-                width: "20%", cssClass : 'text-center'
+                width: "10%", cssClass : 'text-center'
             },
             {
                 title: "Keterangan", field: "keterangan", formatter: "html", headerSort: false,
@@ -113,6 +119,8 @@ $(document).ready(function () {
         inpData.val("")
         inpKodeUkuran.val("")
         inpKeterangan.val("")
+        inpUrutanUkuran.val(0)
+
 
         isModal.modal("show");
     });
@@ -127,6 +135,7 @@ $(document).ready(function () {
         
         let validation = true
         if(inpKodeUkuran.val().length == 0) validation = false
+        if(inpUrutanUkuran.val().length == 0) validation = false
     
         if(validation){
             $.ajax({
@@ -136,6 +145,7 @@ $(document).ready(function () {
                     dataId     : inpData.val(),
                     kodeUkuran  : inpKodeUkuran.val(),
                     keterangan : inpKeterangan.val(),
+                    seq : inpUrutanUkuran.val()
                 },
                 dataType: "json",
                 beforeSend: function () {

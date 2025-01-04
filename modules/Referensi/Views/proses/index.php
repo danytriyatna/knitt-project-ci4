@@ -5,7 +5,7 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Form Master Warna</h5>
+        <h5 class="modal-title">Form Master Proses</h5>
         <input type="hidden" id="data_id">
         <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -14,16 +14,25 @@
           <i>*) Wajib diisi</i>
         </div>
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="kode_warna">Warna<span class="text-danger">*</span></label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="seq">Urutan Proses<span class="text-danger">*</span></label>
           <div class="col-md-9">
-            <input type="text" id="kode_warna" name="kode_warna" class="form-control" placeholder="Ketik Warna" required>
+            <input type="number" id="seq" name="seq" class="form-control" placeholder="Ketik Urutan Proses" required>
             <div class="invalid-feedback">
-              Warna tidak valid
+              Kode Proses tidak valid
             </div>
           </div>
         </div>
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_sales_order">Kode Warna</label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="nama">Nama Proses<span class="text-danger">*</span></label>
+          <div class="col-md-9">
+            <input type="text" id="nama" name="nama" class="form-control" placeholder="Ketik Nama Proses" required>
+            <div class="invalid-feedback">
+                Nama Proses tidak valid
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_sales_order">Keterangan</label>
           <div class="col-md-9">
             <textarea name="keterangan" id="keterangan" class="form-control" rows="5"></textarea>
           </div>
@@ -110,5 +119,5 @@
 
 <?= $this->endSection('content'); ?>
 <?= $this->section('script'); ?>
-<script src="script/app/referensi/warna/index.js"></script>
+<script src="script/app/referensi/proses/index.js"></script>
 <?= $this->endSection('script'); ?>

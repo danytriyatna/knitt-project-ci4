@@ -15,6 +15,15 @@ $routes->group("master-data/ukuran", ['namespace' => 'Modules\Referensi\Controll
     $routes->get('delete/(:any)', 'RefUkuran::deactivate/$1');
 });
 
+
+$routes->group("master-data/proses", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefProsesProduksi::index');
+
+    $routes->post('list', 'RefProsesProduksi::lists');
+    $routes->post('simpan', 'RefProsesProduksi::save');
+    $routes->get('delete/(:any)', 'RefProsesProduksi::deactivate/$1');
+});
+
 $routes->group("master-data/konsumen", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
     $routes->get('/', 'RefKonsumen::index');
 

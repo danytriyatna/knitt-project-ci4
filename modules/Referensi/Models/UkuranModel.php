@@ -18,7 +18,7 @@ class UkuranModel extends \App\Models\PrModel
     {
         $builder = $this->db->table($this->table . " uk");
 
-        $builder->select("uk.id, uk.kode_ukuran, uk.keterangan, uk.key_ukuran");
+        $builder->select("uk.id, uk.kode_ukuran, uk.keterangan, uk.key_ukuran, uk.seq");
 
         if ($id == null or $id == "") {
             $builder->where('uk.active = 1');
@@ -27,6 +27,10 @@ class UkuranModel extends \App\Models\PrModel
                 $builder->where('LOWER(uk.kode_ukuran) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->orWhere('LOWER(uk.keterangan) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
+            }
+
+            if(!empty($params['key_ukuran'])){
+                $builder->where('uk.key_ukuran', $params['key_ukuran']);
             }
 
             if (!empty($order)) {
@@ -57,6 +61,11 @@ class UkuranModel extends \App\Models\PrModel
         $builder->select("count(1) as _cnt");
 
         $builder->where('uk.active = 1');
+
+        if(!empty($params['key_ukuran'])){
+            $builder->where('uk.key_ukuran', $params['key_ukuran']);
+        }
+
 
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             $builder->groupStart();

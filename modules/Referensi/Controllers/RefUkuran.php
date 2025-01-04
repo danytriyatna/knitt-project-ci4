@@ -79,6 +79,7 @@ class RefUkuran extends BaseController
                 array(
                     "aksi" => $btnAction ? $btnAction : '',
                     "id"   => ($id),
+                    "seq" => $row->seq,
                     "kode_ukuran" => $row->kode_ukuran,
                     "keterangan" => $row->keterangan
                 )
@@ -392,21 +393,32 @@ class RefUkuran extends BaseController
         $id         = $this->request->getPost('dataId');
         $kode_ukuran = $this->request->getPost('kodeUkuran');
         $keterangan = $this->request->getPost('keterangan');
+        $urutanUkuran = $this->request->getPost('seq');
 
 
         $msg    = "Data gagal ditambahkan !";
         $status = false;
 
+        $key_ukuran = strtolower(rmvSpecialChar($kode_ukuran));
+
         $arr_isi = [
             'kode_ukuran' => $kode_ukuran, 
-            'keterangan' => $keterangan
+            'keterangan' => $keterangan,
+            'key_ukuran' => $key_ukuran,
+            'seq' => $urutanUkuran
         ];
 
         
         if(empty($id)){
-            $this->mukuran->insertRecordGetid($this->mukuran->table, $arr_isi);
-            $msg    = "Data berhasil ditambahkan !";
-            $status = true;
+            $prkode['key_ukuran'] = $key_ukuran;
+            $dtKode = $this->mukuran->getData(null, 0, 1, null, null, $prkode);
+            if(empty($dtKode)){
+                $this->mukuran->insertRecordGetid($this->mukuran->table, $arr_isi);
+                $msg    = "Data berhasil ditambahkan !";
+                $status = true;
+            }else{
+                $msg    = "Kode Ukuran sudah digunakan !";
+            }
         }else{
             $id = decrypt($id);
             $this->mukuran->updateRecord($this->mukuran->table, $arr_isi, 'id', $id);

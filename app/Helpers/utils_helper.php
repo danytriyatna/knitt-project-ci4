@@ -612,3 +612,10 @@ if (!function_exists('hitung_hari')) {
             return ($wkt / 360) . " Tahun";
     }
 }
+
+if (!function_exists('rmvSpecialChar')) {
+    function rmvSpecialChar($string) {
+        // Menghapus semua karakter spesial kecuali huruf, angka, dan spasi
+        return preg_replace('/[^a-zA-Z0-9\s]/', '', $string);
+    }
+}
