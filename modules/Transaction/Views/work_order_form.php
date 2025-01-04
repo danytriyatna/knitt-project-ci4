@@ -60,6 +60,7 @@
           <li class="breadcrumb-item active"><?= $titlehead ?></li>
           <input type="hidden" id="dataid" value="<?= $id; ?>" >
           <input type="hidden" id="data-details" value='<?= $detail; ?>' >
+          <input type="hidden" id="data-ukuran" value='<?= $dtUkuran; ?>' >
           <input type="hidden" id="data-psaved" value='<?= $proses_saved; ?>' >
         </ol>
       </div>

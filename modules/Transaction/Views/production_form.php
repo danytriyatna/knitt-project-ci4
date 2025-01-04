@@ -203,6 +203,7 @@
           <li class="breadcrumb-item">Transaksi</li>
           <li class="breadcrumb-item active"><?= $titlehead ?></li>
           <input type="hidden" id="data-details" value='<?= $detail; ?>'>
+          <input type="hidden" id="data-ukuran" value='<?= $dtUkuran; ?>' >
 
           <input type="hidden" id="ref_id" value='<?= $ref_id; ?>'>
           <input type="hidden" id="tipe_id" value='<?= $tipe_id; ?>'>

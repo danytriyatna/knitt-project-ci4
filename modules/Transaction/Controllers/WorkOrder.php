@@ -153,11 +153,20 @@ class WorkOrder extends BaseController
       
       $data_detail = [];
       if ($stdData->tipe_id == 1) {
-        $list_detail = $this->mSample->getDataDetailSample($stdData->ref_id);
+        $list_detail = $this->mSample->getDataDetailSample_crostab($stdData->ref_id);
         $stdData->file_gambar = !empty($stdData->file_name) ? base_url() . "uploads/sample/"  . $stdData->file_name : "";
+
+        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['id_sample'] = $stdData->ref_id;
+        $dtUkuran = $this->mSample->getUkuranTrans($pru);
+        
       } else {
-        $list_detail = $this->mSalesOrder->getDataDetailSalesOrder($stdData->ref_id);
+        $list_detail = $this->mSalesOrder->getDataDetailSalesOrder_crostab($stdData->ref_id);
         $stdData->file_gambar = !empty($stdData->file_name) ? base_url() . "uploads/sales_order/"  . $stdData->file_name : "";
+
+        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['id_sales_order'] = $stdData->ref_id;
+        $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
       }
 
       if (!empty($list_detail)) {
@@ -175,6 +184,7 @@ class WorkOrder extends BaseController
 
       $this->data['row']    = $stdData;
       $this->data['detail'] = json_encode($list_detail);
+      $this->data['dtUkuran'] = json_encode($dtUkuran);
 
       $status = $stdData->status;
     }

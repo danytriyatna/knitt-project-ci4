@@ -36,65 +36,54 @@ $(document).ready(function () {
         return s.join(dec);
     }
 
+    let setColumn = [
+        {
+            title: "Colour", field: "colordasar",  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
+        },
+    ]
+
+    const dt_ukuran = $("#data-ukuran").val().length > 0 ? JSON.parse($("#data-ukuran").val()) : []
+    
+    for (const el of dt_ukuran) {
+        const isKey = (el.key_ukuran == 'all') ? 'all_' : el.key_ukuran
+        setColumn.push(
+            {
+                title:el.kode_ukuran, field: isKey,  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                width:"9%", bottomCalc:"sum", 
+            }
+        )
+    }
+
+
+    // last column 
+    setColumn.push(
+        {
+            title: "QTY", field: "qty",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+            width:"10%", bottomCalc:"sum", 
+        }
+    )
+
+    setColumn.push(
+        {
+            title: "QTY<br>PRODUKSI", field: "qty_prod",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+            width:"10%", bottomCalc:"sum", visible: false
+        }
+    )
+
     // table detail 
     let dtListDetail = new Tabulator("#dt-detail", {
-        columns: [
-                {
-                    title: "Colour", field: "colordasar",  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
-                    width:"17%"
-                },
-                {
-                    title: "S", field: "s",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"9%", bottomCalc:"sum", 
-                },
-                {
-                    title: "M", field: "m",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"9%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "L", field: "l",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"9%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "XL", field: "xl",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"9%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "XXL", field: "xxl",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"9%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "3XL", field: "xxxl",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"9%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "All", field: "all",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"10%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "QTY", field: "qty",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"10%", bottomCalc:"sum", 
-                },
-                {
-                    title: "QTY<br>PRODUKSI", field: "qty_prod",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"10%", bottomCalc:"sum", visible: false
-                }
-            ],
-            locale: 'id',
-            placeholder: "Tidak ada data",
-            pagination: false,
-            paginationSize: 99,
-            paginationButtonCount: 2,
-            paginationDataSent: {
-                sorters: "order",
-            },
-            selectableRows: false
+        columns: setColumn,
+        locale: 'id',
+        placeholder: "Tidak ada data",
+        layout:"fitColumns",
+        resizableColumnFit:true,
+        pagination: false,
+        paginationSize: 99,
+        paginationButtonCount: 2,
+        paginationDataSent: {
+            sorters: "order",
+        },
+        selectableRows: false
 	});
 
     let detail_data = $("#data-details").val().replace(/&quot;/ig,'"');

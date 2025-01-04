@@ -151,7 +151,8 @@ $(document).ready(function () {
             }, hozAlign:"right", width: '12%'},
         ],
         locale: 'id',    
-        // layout: 'fitColumns',
+        layout:"fitColumns",
+        resizableColumnFit:true,
         placeholder: "Tidak ada data",
 	});
 

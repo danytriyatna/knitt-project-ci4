@@ -205,12 +205,23 @@ class Production extends BaseController
       $resData = $this->mProduksi->getData($id);
       $stdData = $this->mWalkorder->getData($resData->id_walkorder);
       if ($stdData->tipe_id == 1) {
-        $list_detail = $this->mSample->getDataDetailSample($stdData->ref_id);
+        // $list_detail = $this->mSample->getDataDetailSample($stdData->ref_id);
+        $list_detail = $this->mSample->getDataDetailSample_crostab($stdData->ref_id);
         $resData->file_gambar = !empty($resData->file_name) ? base_url() . "uploads/sample/"  . $resData->file_name : "";
+
+        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['id_sample'] = $stdData->ref_id;
+        $dtUkuran = $this->mSample->getUkuranTrans($pru);
       } else {
-        $list_detail = $this->mSalesOrder->getDataDetailSalesOrder($stdData->ref_id);
+        // $list_detail = $this->mSalesOrder->getDataDetailSalesOrder($stdData->ref_id);
+        $list_detail = $this->mSalesOrder->getDataDetailSalesOrder_crostab($stdData->ref_id);
         $resData->file_gambar = !empty($resData->file_name) ? base_url() . "uploads/sales_order/"  . $resData->file_name : "";
+
+        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['id_sales_order'] = $stdData->ref_id;
+        $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
       }
+
       if (!empty($list_detail)) {
         for ($i = 0; $i < count($list_detail); $i++) {
           $drow = $list_detail[$i];
@@ -264,6 +275,7 @@ class Production extends BaseController
       $this->data['tipe_id'] = encrypt($stdData->tipe_id);
       $this->data['ref_id'] = encrypt($stdData->ref_id);
       $this->data['detail'] = json_encode($list_detail);
+      $this->data['dtUkuran'] = json_encode($dtUkuran);
 
       $status = $stdData->status;
     }
