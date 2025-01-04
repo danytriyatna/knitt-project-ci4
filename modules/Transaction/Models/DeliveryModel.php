@@ -90,6 +90,18 @@ class DeliveryModel extends \App\Models\PrModel
         return $this->_data;
     }
 
+    function getAlldeliveryQty($params){
+        $builder = $this->db->table($this->table2 . ' td');
+
+        $builder->select("sum(td.qty) as jml");
+        $builder->where("td.ref_detail_id", $params['ref_detail_id']);
+        $builder->where("td.id_ukuran", $params['id_ukuran']);
+
+        $dt = $builder->get()->getRow();
+        $this->_data = !empty($dt) ? $dt->jml : 0;
+        return $this->_data;
+    }
+
     function getDataProduksi($params){
         $builder = $this->db->table("trans_delivery_detail tdd");
         $builder->select("tdd.id_ukuran, tdd.qty, tdd.ref_detail_id, tdd.id_delivery,

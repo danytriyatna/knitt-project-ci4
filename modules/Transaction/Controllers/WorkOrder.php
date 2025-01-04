@@ -365,7 +365,7 @@ class WorkOrder extends BaseController
     // try {
     $dataid = \decrypt($dataid);
     $data        = $this->mWalkorder->getData($dataid);
-    $data_ukuran = $this->mUkuran->getData(0, 0, 999);
+    
     $data_ukuran_input = json_decode($data_ukuran_input, true);
     $data_ukuran_warna = json_decode($data_ukuran_warna, true);
     $this->db->transBegin();
@@ -378,6 +378,17 @@ class WorkOrder extends BaseController
     $builder_proses->where("id_walkorder", $dataid);
     $builder_proses->delete();
     
+    // $data_ukuran = $this->mUkuran->getData(0, 0, 999);
+    if ($data->tipe_id == 1) {
+      $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+      $pru['id_sample'] = $data->ref_id;
+      $dtUkuran = $this->mSample->getUkuranTrans($pru);
+    }else{
+      $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+      $pru['id_sales_order'] = $data->ref_id;
+      $data_ukuran = $this->mSalesOrder->getUkuranTrans($pru);
+    }
+
     $i = 1;
     $list_proses = json_decode($list_proses, true);
     foreach ($list_proses as $item) {
@@ -436,7 +447,7 @@ class WorkOrder extends BaseController
       $update_stat['status'] = 2;
       $this->mWalkorder->updateRecord($this->mWalkorder->table, $update_stat, 'id', $dataid);
 
-      // insert to work order 
+      // insert to produksi 
       $data_wo = [
         'id_walkorder' => $dataid,
         'tipe_id' => $data->tipe_id,

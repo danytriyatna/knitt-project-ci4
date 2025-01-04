@@ -235,7 +235,9 @@
                       <?php } ?>
                     <?php } ?>
                     <input type="hidden" name="actionf" id="actionf">
+                    <input type="hidden" name="status" id="status" value="<?= !empty($status)? $status : '0' ?>">
                     <input type="hidden" name="id" id="id" value="<?= !empty($id)? $id : '' ?>">
+                    <input type="hidden" name="data-ukuran" id="data-ukuran" value='<?= !empty($dt_ukuran)? $dt_ukuran : "" ?>'>
                     <input type="hidden" name="data-details" id="data-details" value='<?= !empty($dt_details)? $dt_details : "" ?>'>
                     <input type="hidden" name="data-prods" id="data-prods" value='<?= !empty($dt_prods)? $dt_prods : "" ?>'>
                   </div>

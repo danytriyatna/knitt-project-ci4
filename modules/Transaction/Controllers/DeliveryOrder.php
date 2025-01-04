@@ -172,6 +172,18 @@ class DeliveryOrder extends BaseController
       $stdData->alamat_buyer  =  $stdData->alamat;
       $status = $stdData->status;
       
+      $dtWalkorder = $this->mWalkorder->getData($stdData->id_walkorder);
+      // / $data_ukuran = $this->mUkuran->getData(0, 0, 999);
+      if ($dtWalkorder->tipe_id == 1) {
+        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['id_sample'] = $dtWalkorder->ref_id;
+        $dtUkuran = $this->mSample->getUkuranTrans($pru);
+      }else{
+        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['id_sales_order'] = $dtWalkorder->ref_id;
+        $data_ukuran = $this->mSalesOrder->getUkuranTrans($pru);
+      }
+      $this->data['dt_ukuran'] = json_encode($data_ukuran, true);
 
       // $this->data['row']    = $stdData;
       // $this->data['detail'] = json_encode($list_detail);
@@ -599,6 +611,19 @@ class DeliveryOrder extends BaseController
       if(!empty($results)){
         $data['produksi']         = $results;
 
+        $dtWalkorder = $this->mWalkorder->getData($id_walkorder);
+        // / $data_ukuran = $this->mUkuran->getData(0, 0, 999);
+        if ($dtWalkorder->tipe_id == 1) {
+          $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+          $pru['id_sample'] = $dtWalkorder->ref_id;
+          $dtUkuran = $this->mSample->getUkuranTrans($pru);
+        }else{
+          $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+          $pru['id_sales_order'] = $dtWalkorder->ref_id;
+          $data_ukuran = $this->mSalesOrder->getUkuranTrans($pru);
+        }
+        $data['data_ukuran'] = $data_ukuran;
+
 
         $prm['id_walkorder'] = $id_walkorder;
         $rukuran = $this->mUkuran->getData(0, 0, 999);
@@ -622,6 +647,7 @@ class DeliveryOrder extends BaseController
             );
             
             $qty = 0;
+            $qty_delv = 0;
             foreach ($rukuran as $iu) {
               $keyUkuran = $iu->key_ukuran;
               $indx      = $iu->key_ukuran;
@@ -629,11 +655,19 @@ class DeliveryOrder extends BaseController
               if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
               $xharga    = $keyUkuran.'_hrg';
 
-              $isi[$indx]   = $item->$keyUkuran;
-              $isi[$xharga] = $item->$xharga;
+              $prd['id_ukuran'] = $iu->id;
+              $prd['ref_detail_id'] = $item->ref_detail_id;
+              $dt_deliv = $this->mDelivery->getAlldeliveryQty($prd);
 
-              $qty = $qty +  $item->$keyUkuran;
+              $qty_ukuran =  $item->$keyUkuran - $dt_deliv;
+              $hrg_ukuran =  $item->$xharga;
+
+              $isi[$indx]   = $qty_ukuran;
+              $isi[$xharga] = $hrg_ukuran;
+             
+              $qty = $qty +  $qty_ukuran;
             }
+            
             $isi['qty'] = $qty;
             $isi['qty_prod'] = 0;
             $isi['qty_remain'] = $qty;
