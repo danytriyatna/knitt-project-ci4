@@ -255,6 +255,7 @@ class ReceiveItemModel extends \App\Models\PrModel
                         "tipe" => 1,
                         "created_at" =>  date("Y-m-d H:i:s"),
                         "lot_id" => $idLots,
+                        "price" => !empty($rowData['price']) ? $rowData['price'] : null,
                         "kode_transaksi" => $this->generateKode(),
                     ];
                     $this->insertRecordGetid($this->tblTrxBarang, $dataBarang);
@@ -269,7 +270,7 @@ class ReceiveItemModel extends \App\Models\PrModel
                         "created_at" =>  date("Y-m-d H:i:s"),
                     ];
                     if (!empty($resData)) {
-                        $this->updateRecords($this->tblTrxBalances, array("saldo_akhir" => $resLotNo->qty + $rowData->qty), array("id" => $resData->id));
+                        $this->updateRecords($this->tblTrxBalances, array("saldo_akhir" => $resLotNo->qty + $rowData['qty']), array("id" => $resData->id));
                     } else {
                         $this->insertRecordGetid($this->tblTrxBalances, $arrStockBalances);
                     }

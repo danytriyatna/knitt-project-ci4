@@ -1,14 +1,22 @@
 let dtList = new Tabulator("#dt-list", {
     pagination: true, 
-    paginationSize: 10,
+    paginationSize: 100,
     paginationButtonCount: 5,
+    groupBy: ['nama_jenis_barang','barang'],
     columns:[
-        {title:"Tanggal", field:"tanggal", width:"15%"},
-        {title:"Transaksi", field:"transaksi", hozAlign:"left",width:"20%"},
-        {title:"No. Transaksi", field:"kode_transaksi", hozAlign:"left",width:"20%"},
-        {title:"Qty Masuk", field:"masuk", hozAlign:"right",width:"15%"},
-        {title:"Qty Keluar", field:"keluar", hozAlign:"right",width:"15%"},
-        {title:"Saldo", field:"saldo_akhir", hozAlign:"right",width:"15%"},
+        {title:"LOT", field:"lot_no", width:"15%"},
+        {title:"Size/Warna", field:"nama_satuan", hozAlign:"left",width:"15%"},
+        {title:"Qty<br>Masuk", field:"masuk", hozAlign:"right",width:"15%"},
+        {title:"Qty<br>Keluar", field:"keluar", hozAlign:"right",width:"15%"},
+        {title:"Qty<br>Akhir", field:"saldo_akhir", hozAlign:"right",width:"15%"},
+        {title:"Nilai", field:"price", hozAlign:"right",width:"15%",formatter : "money",
+            formatterParams: {
+                decimal: ",",
+                thousand: ".",
+                symbol: "Rp",  // Simbol mata uang Rupiah
+                precision: 0,   // Tidak ada desimal
+            },},
+        {title:"Tanggal", field:"tanggal", hozAlign:"right",width:"10%"},
     ],
     locale: 'id',    
     // layout: 'fitColumns',
@@ -136,7 +144,7 @@ $("#filter_barang").click(function () {
 });
 
 $("#btn-tampilkan").click(function () {
-    if($("#filter_tahun").val() == "" && $("#filter_bulan").val() == "" && $('#filter_gudang').val() == "" ){
+    if($("#filter_tahun").val() == "" || $("#filter_bulan").val() == "" || $('#filter_gudang').val() == "" ){
       Swal.fire({
         title: 'Warning',
         text: 'Tahun,Bulan & Gudang harus dipilih',
@@ -150,11 +158,13 @@ $("#btn-tampilkan").click(function () {
   $("#btn-reset").click(function () {
       $("#filter_jenis_barang").val("").trigger("change");
       $("#filter_gudang").val("").trigger("change");
+      $("#filter_tahun").val("").trigger("change");
+      $("#filter_bulan").val("").trigger("change");
   });
 
   function getDataLaporan(){
     $.ajax({
-        url: `/laporan/persediaan/list?filter_jenis_id=${$('#filter_barang_id').val()}&tahun=${$('#filter_tahun').val()}&bulan=${$('#filter_bulan').val()}&filter_gudang_id=${$('#filter_gudang').val()}`,
+        url: `/laporan/persediaan/list?filter_jenis_id=${$('#filter_jenis_barang').val()}&tahun=${$('#filter_tahun').val()}&bulan=${$('#filter_bulan').val()}&filter_gudang_id=${$('#filter_gudang').val()}`,
         type: 'GET',
         dataType: 'json', 
         success: function(data) {

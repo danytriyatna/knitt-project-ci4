@@ -36,6 +36,11 @@ class PurchaseModel extends \App\Models\PrModel
             $builder->groupEnd();
         }
 
+        if (!empty($params['isHutang']) && $params['isHutang']) {
+            $builder->whereIn("status", 1);
+        }
+
+
         if ($id == null or $id == "") {
             $builder->where('uk.active = 1');
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {

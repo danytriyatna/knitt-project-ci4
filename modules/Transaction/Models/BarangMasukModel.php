@@ -174,7 +174,7 @@ class BarangMasukModel extends \App\Models\PrModel
                     ];
                     if (!empty($resLotNo)) {
                         $idLots = $resLotNo->id;
-                        $this->updateRecords($this->tblTrxLots, array("qty" => $resLotNo->qty + $rowData->qty), array("id" => $idLots));
+                        $this->updateRecords($this->tblTrxLots, array("qty" => $resLotNo->qty + $rowData['qty']), array("id" => $idLots));
                     } else {
                         $idLots = $this->insertRecordGetid($this->tblTrxLots, $dataLots);
                     }
@@ -195,6 +195,7 @@ class BarangMasukModel extends \App\Models\PrModel
                         "tipe" => 1,
                         "created_at" =>  date("Y-m-d H:i:s"),
                         "lot_id" => $idLots,
+                        "price" => !empty($rowData['price']) ? $rowData['price'] : null,
                         "kode_transaksi" => $this->generateKodePersediaan(),
                     ];
                     $this->insertRecordGetid($this->tblTrxBarang, $dataBarang);
@@ -209,7 +210,7 @@ class BarangMasukModel extends \App\Models\PrModel
                         "created_at" =>  date("Y-m-d H:i:s"),
                     ];
                     if (!empty($resData)) {
-                        $this->updateRecords($this->tblTrxBalances, array("saldo_akhir" => $resLotNo->qty + $rowData->qty), array("id" => $resData->id));
+                        $this->updateRecords($this->tblTrxBalances, array("saldo_akhir" => $resLotNo->qty + $rowData['qty']), array("id" => $resData->id));
                     } else {
                         $this->insertRecordGetid($this->tblTrxBalances, $arrStockBalances);
                     }
