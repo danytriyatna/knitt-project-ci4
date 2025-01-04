@@ -108,47 +108,41 @@ $(document).ready(function () {
         selectableRows: false,
 	});
 
+    let defColumDet = [
+                        {
+                            headerSort: false,  
+                            title: 'Aksi', 
+                            formatter: buttonRowAction,
+                            width: 100, align: "center", cssClass: "text-center",
+                            cellClick: function(e, cell) {
+                                let row = cell.getRow();
+                                let data_row = row.getData();
+                                if (e.target.title === 'delete') {
+                                    if (confirm("Anda yakin akan menghapus data?")) {
+                                        deleteData(data_row.id)
+                                        // window.location.replace(baseUrl + "/trans/sales-order/delete/detail" + data_row.id);
+                                    }
+                                }else if(e.target.title === 'edit'){
+                                    getDetailQty(idSalesOrder,data_row.id)
+                                }   
+                            }
+                        },
+                        {headerSort: false,title:"Colour", field:"colour"},
+                        {headerSort: false,title:"Amount", field:"harga_satuan",formatter: "money", formatterParams: {
+                            decimal: ",",
+                            thousand: ".",
+                            symbol: "Rp",  // Simbol mata uang Rupiah
+                            precision: 0,   // Tidak ada desimal
+                        }, hozAlign:"right", width: '12%'},
+                    ]
     let dtListDetail = new Tabulator("#dt-detail", {
         pagination: true, 
         paginationSize: 10,
         paginationButtonCount: 5,
-        columns:[
-            {title:"ID", field:"id", visible:false},
-            {
-                headerSort: false,  
-                title: 'Aksi', 
-                formatter: buttonRowAction,
-                width: 100, align: "center", cssClass: "text-center",
-                cellClick: function(e, cell) {
-                    let row = cell.getRow();
-                    let data_row = row.getData();
-                    if (e.target.title === 'delete') {
-                        if (confirm("Anda yakin akan menghapus data?")) {
-                            deleteData(data_row.id)
-                            // window.location.replace(baseUrl + "/trans/sales-order/delete/detail" + data_row.id);
-                        }
-                    }else if(e.target.title === 'edit'){
-                        getDetailQty(idSalesOrder,data_row.id)
-                    }   
-                }
-            },
-            {headerSort: false,title:"Colour", field:"colour", width:"40%"},
-            {headerSort: false,title:"S", field:"s", hozAlign:"center",width:"7%"},
-            {headerSort: false,title:"M", field:"m", hozAlign:"center",width:"7%"},
-            {headerSort: false,title:"L", field:"l", hozAlign:"center",width:"7%"},
-            {headerSort: false,title:"XL", field:"xl", hozAlign:"center",width:"7%"},
-            {headerSort: false,title:"XXL", field:"xxl", hozAlign:"center",width:"7%"},
-            {headerSort: false,title:"3XL", field:"xxxl", hozAlign:"center",width:"7%"},
-            {headerSort: false,title:"All", field:"all", hozAlign:"center",width:"7%"},
-            {headerSort: false,title:"Amount", field:"harga_satuan",formatter: "money", formatterParams: {
-                decimal: ",",
-                thousand: ".",
-                symbol: "Rp",  // Simbol mata uang Rupiah
-                precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right"},
-        ],
+        columns: defColumDet,
         locale: 'id',    
-        // layout: 'fitColumns',
+        layout:"fitColumns",
+        resizableColumnFit:true,
         placeholder: "Tidak ada data",
 	});
 
@@ -324,59 +318,66 @@ $(document).ready(function () {
                     window.location.replace(baseUrl + "/trans/sales-order/delete/list" + data.id);
                 }
             });
-            new Tabulator(`#dt-list-detail-${data.id}`, {
-                data: data.detail, 
-                layout:"fitColumns",
-                pagination: true, 
-                paginationSize: 10,
-                paginationButtonCount: 5,
-                columns:[
-                    {headerSort: false,title:"No", field:"no",   width: "5%"},
-                    {headerSort: false,  title:"QR", width:"7%", formatter: print_btn,
-                        cellClick: function(e, cell) {
-                            let row = cell.getRow();
-                            let data_row = row.getData();
-                            if (e.target.title === 'print-warna') {
-                                // console.log(data_row)
+            
+            let isColumn = [
+                {headerSort: false,title:"No", field:"no",   width: "5%"},
+                {headerSort: false,  title:"QR", width:"7%", formatter: print_btn,
+                    cellClick: function(e, cell) {
+                        let row = cell.getRow();
+                        let data_row = row.getData();
+                        if (e.target.title === 'print-warna') {
+                            // console.log(data_row)
 
-                                const inpp_slcUkuran = $("#print_slc_ukuran");
-                                const inpp_qty       = $("#print_qty");
-                                const inpp_qtyp      = $("#print_qtyp");
+                            const inpp_slcUkuran = $("#print_slc_ukuran");
+                            const inpp_qty       = $("#print_qty");
+                            const inpp_qtyp      = $("#print_qtyp");
 
-                                // inpp_slcUkuran
-                                inpp_qty.val(1)
-                                inpp_qtyp.val(1)
+                            // inpp_slcUkuran
+                            inpp_qty.val(1)
+                            inpp_qtyp.val(1)
 
-                                inpp_foto.attr('src', data.file_gambar);
-                                inpp_noSo.html(data.kode_sales_order)
-                                inpp_deskripsi.html(data.deskripsi);
-                                inpp_warna.html(data_row.colordasar);
-                                inpp_tglSample.html(formatterDate(data.tgl_transaksi))
-                                inpp_tglDeadline.html(formatterDate(data.tgl_deadline))
-                                inpp_buyer.html(data.nama)
+                            inpp_foto.attr('src', data.file_gambar);
+                            inpp_noSo.html(data.kode_sales_order)
+                            inpp_deskripsi.html(data.deskripsi);
+                            inpp_warna.html(data_row.colordasar);
+                            inpp_tglSample.html(formatterDate(data.tgl_transaksi))
+                            inpp_tglDeadline.html(formatterDate(data.tgl_deadline))
+                            inpp_buyer.html(data.nama)
 
-                                setTimeout(() => {
-                                    // inpp_trans.html(data.id);
-                                    mdlPrint.modal("show");
-                                }, 500);
-                            } 
-                        }
-                    },
-                    {headerSort: false, cssClass: 'text-start', title:"Colour", field:"colordasar", width:"20%"},
-                    {headerSort: false, cssClass: 'text-center', title:"S", field:"s", hozAlign:"center",width:"7%"},
-                    {headerSort: false, cssClass: 'text-center', title:"M", field:"m", hozAlign:"center",width:"7%"},
-                    {headerSort: false, cssClass: 'text-center', title:"L", field:"l", hozAlign:"center",width:"7%"},
-                    {headerSort: false, cssClass: 'text-center', title:"XL", field:"xl", hozAlign:"center",width:"7%"},
-                    {headerSort: false, cssClass: 'text-center', title:"XXL", field:"xxl", hozAlign:"center",width:"7%"},
-                    {headerSort: false, cssClass: 'text-center', title:"3XL", field:"xxxl", hozAlign:"center",width:"7%"},
-                    {headerSort: false, cssClass: 'text-center', title:"All", field:"all", hozAlign:"center",width:"7%"},
-                    {headerSort: false, cssClass: 'text-center', title:"Amount", field:"harga_satuan",formatter: "money", formatterParams: {
+                            setTimeout(() => {
+                                // inpp_trans.html(data.id);
+                                mdlPrint.modal("show");
+                            }, 500);
+                        } 
+                    }
+                },
+                {headerSort: false, cssClass: 'text-start', title:"Colour", field:"colordasar"}
+            ]
+
+            for (const el of data.key_ukuran) {
+                const isKey = (el.key_ukuran == 'all') ? 'all_' : el.key_ukuran
+                isColumn.push( {headerSort: false,  title:el.kode_ukuran, field: isKey, cssClass: "text-center", hozAlign:"center", width:"7%"} )
+            }
+
+            isColumn.push(
+                {
+                    headerSort: false, cssClass: 'text-center', title:"Amount", field:"total_harga",formatter: "money", 
+                    formatterParams: {
                         decimal: ",",
                         thousand: ".",
                         symbol: "Rp",  // Simbol mata uang Rupiah
                         precision: 0,   // Tidak ada desimal
-                    }, hozAlign:"right", cssClass: 'text-end'},
-                ],
+                    },
+                    hozAlign:"right", cssClass: 'text-end', width:"15%"})
+
+            new Tabulator(`#dt-list-detail-${data.id}`, {
+                data: data.detail, 
+                layout:"fitColumns",
+                resizableColumnFit:true,
+                pagination: true, 
+                paginationSize: 10,
+                paginationButtonCount: 5,
+                columns: isColumn,
             });
         });
     
@@ -491,8 +492,8 @@ $(document).ready(function () {
                     linkFileSalesOrder.removeClass("d-none")
                     linkFileSalesOrder.attr('src', data.file_gambar)
                 }
-                dtListDetail.setData(data.detail)
-
+               
+                setColumDetailData(data)
 
                 
                 if(data.status == 'Draft'){
@@ -503,15 +504,65 @@ $(document).ready(function () {
 
                 isModal.modal("show");
 
-                setTimeout(() => {
-                    dtListDetail.redraw(true)
-                }, 500);
+                
             },
             error: function(xhr, status, error) {
                 console.error('Error fetching data:', error);
             }
         });
     }
+
+    function setColumDetailData(data){
+        let newColumn =  [
+                            {
+                                headerSort: false,  
+                                title: 'Aksi', 
+                                formatter: buttonRowAction,
+                                width: 100, align: "center", cssClass: "text-center",
+                                cellClick: function(e, cell) {
+                                    let row = cell.getRow();
+                                    let data_row = row.getData();
+                                    if (e.target.title === 'delete') {
+                                        if (confirm("Anda yakin akan menghapus data?")) {
+                                            deleteData(data_row.id)
+                                            // window.location.replace(baseUrl + "/trans/sales-order/delete/detail" + data_row.id);
+                                        }
+                                    }else if(e.target.title === 'edit'){
+                                        getDetailQty(idSalesOrder,data_row.id)
+                                    }   
+                                }
+                            },
+                            {headerSort: false,title:"Colour", field:"colour"},
+                        ]
+
+        const dataCol = data.key_ukuran
+
+        for (const el of dataCol) {
+            const isKey = (el.key_ukuran == 'all') ? 'all_' : el.key_ukuran
+            newColumn.push( {headerSort: false,  title:el.kode_ukuran, field: isKey, cssClass: "text-center", hozAlign:"center", width:"7%"} )
+        }
+
+        // last column 
+        newColumn.push(  
+                        {
+                            headerSort: false,title:"Amount", field:"total_harga",formatter: "money", 
+                            formatterParams: {
+                                decimal: ",",
+                                thousand: ".",
+                                symbol: "Rp",  // Simbol mata uang Rupiah
+                                precision: 0,   // Tidak ada desimal
+                            },
+                            hozAlign:"right", width: '15%'
+                        }
+                    )
+
+        setTimeout(() => {
+            dtListDetail.setColumns(newColumn);
+            dtListDetail.setData(data.detail)
+            dtListDetail.redraw(true)
+        }, 500);
+    }
+
     function getDetailQty(id,idDet) {
         $.ajax({
             url: `/trans/sales-order/detail-qty/${id}/${idDet}`,

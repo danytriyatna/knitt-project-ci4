@@ -108,6 +108,10 @@ class SalesOrder extends BaseController
 
       $status = $row->status == 1 ? "Draft" : "Approved";
 
+      $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+      $pru['id_sales_order'] = $row->id;
+      $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
+
       array_push(
         $build_array["data"],
         array(
@@ -121,7 +125,9 @@ class SalesOrder extends BaseController
           "uang_dp" => !empty($row->uang_dp) ? \format_angka($row->uang_dp) : 0,
           "status"  => $status,
           "file_gambar" => !empty($row->file_name) ? base_url() . "uploads/sales_order/"  . $row->file_name : "",
-          "detail" => $this->mSalesOrder->getDataDetailSalesOrder($row->id)
+          // "detail" => $this->mSalesOrder->getDataDetailSalesOrder($row->id)
+          "detail" => $this->mSalesOrder->getDataDetailSalesOrder_crostab($row->id),
+          "key_ukuran" => $dtUkuran
         )
       );
     }
@@ -133,6 +139,11 @@ class SalesOrder extends BaseController
     $id = decrypt($id);
     $results = $this->mSalesOrder->getData($id);
     $status = $results->status == 1 ? "Draft" : "Approved";
+
+    $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+    $pru['id_sales_order'] = $id;
+    $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
+
     $build_array =  array(
       "id"   => encrypt($results->id),
       "keterangan" => $results->keterangan,
@@ -146,7 +157,8 @@ class SalesOrder extends BaseController
       "id_sample" => $results->id_sample,
       "status" => $status,
       "uang_dp" =>  !empty($results->uang_dp) ? $results->uang_dp : 0,
-      "detail" => $this->mSalesOrder->getDataDetailSalesOrder($results->id)
+      "detail" => $this->mSalesOrder->getDataDetailSalesOrder_crostab($results->id),
+      "key_ukuran" => $dtUkuran
     );
     return $this->response->setJSON($build_array);
   }
@@ -257,6 +269,9 @@ class SalesOrder extends BaseController
       if(!empty($sampleId)){
         $data_detail = $this->mSample->getDataDetailSample_ori($sampleId);
         if(!empty($data_detail)){
+
+          $head_qty = 0;
+          $head_total = 0;
           foreach ($data_detail as $r) {
             $arr_isid = [
               'id_sales_order' => $hid,
@@ -283,10 +298,17 @@ class SalesOrder extends BaseController
                     'harga_satuan' => $rx->harga_satuan,
                     'harga_total' => $rx->harga_total,
                   ];
+
+                  $head_qty = $head_qty + (!empty($rx->qty)) ? (int) $rx->qty : 0;
+                  $head_total = $head_total + (!empty($rx->harga_total)) ? (float) $rx->harga_total : 0;
                    $this->mSalesOrder->insertRecordGetid('trans_sales_order_ukuran', $arr_isidx);
                 }
             }
           }
+
+          $head_up['qty'] = $head_qty;
+          $head_up['total_harga'] = $head_total;
+          $this->mSalesOrder->updateRecord($this->mSalesOrder->table, $head_up, 'id', $hid);
         }
       }
 
@@ -327,24 +349,26 @@ class SalesOrder extends BaseController
           $params_wo['tipe_id'] = 1;
           $params_wo['ref_id']  = $sampleId;
           $ref_sample_wo = $this->mworkOrder->getData(null, 0, 1, null, null, $params_wo);
-         
-          $params_wo['id_walkorder'] = $ref_sample_wo[0]->id;
-          $proces_wo = $this->mworkOrder->getData_proses(0, 0, 9999, null, null, $params_wo);
-          // print_r($proces_wo);
-          // exit;
-          if(!empty($proces_wo)){ 
-            foreach ($proces_wo as $pro) {
-              $isiProses = [
-                'id_walkorder' => $wo_id,
-                'id_proses' => $pro->id_proses,
-                'created_at' => date('Y-m-d H:i:s')
-              ];
-        
-              $proses_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table3, $isiProses);
-            }
-          }
 
           if(!empty($ref_sample_wo)){
+
+            // input proses 
+            $params_wo['id_walkorder'] = $ref_sample_wo[0]->id;
+            $proces_wo = $this->mworkOrder->getData_proses(0, 0, 9999, null, null, $params_wo);
+            // print_r($proces_wo);
+            // exit;
+            if(!empty($proces_wo)){ 
+              foreach ($proces_wo as $pro) {
+                $isiProses = [
+                  'id_walkorder' => $wo_id,
+                  'id_proses' => $pro->id_proses,
+                  'created_at' => date('Y-m-d H:i:s')
+                ];
+          
+                $proses_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table3, $isiProses);
+              }
+            }
+
             if(!empty($data_warna)){
               foreach ($data_warna as $xrow) {
                 
