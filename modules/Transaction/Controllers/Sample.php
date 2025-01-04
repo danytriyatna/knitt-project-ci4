@@ -93,11 +93,15 @@ class Sample extends BaseController
         $atr_del['class'] = '';
         $atr_del['onclick'] = "return confirm('Hapus Data ?')";
       }
-      if ($atr_edit || $atr_del)
-        $btnAction = btn_action_group($id, $atr_edit, $atr_del);
+      if ($atr_edit || $atr_del) $btnAction = btn_action_group($id, $atr_edit, $atr_del);
 
       // $aktif =  ($row->active) ? "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/deactivate/".$id."' data-confirm-message='Anda yakin ingin menonaktifkan user ini?'><i class='fa fa-check text-success'>&nbsp;</i></a>" :
       //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
+      $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+      $pru['id_sample'] = $row->id;
+      $dtUkuran = $this->mSample->getUkuranTrans($pru);
+
+      $detail = (!empty($dtUkuran)) ? $this->mSample->getDataDetailSample_crostab($row->id) : [];
 
       array_push(
         $build_array["data"],
@@ -111,7 +115,9 @@ class Sample extends BaseController
           "status" => $row->status == 0 ? "Draft" : "Approval",
           "file_gambar" => !empty($row->file_name) ? base_url() . "uploads/sample/"  . $row->file_name : "",
           "uang_dp" => !empty($row->uang_dp) ? \format_angka($row->uang_dp) : 0,
-          "detail" => $this->mSample->getDataDetailSample($row->id)
+          // "detail" => $this->mSample->getDataDetailSample($row->id)
+          "detail" => $detail,
+          "key_ukuran" => $dtUkuran
         )
       );
     }
@@ -122,6 +128,13 @@ class Sample extends BaseController
   {
     $id = decrypt($id);
     $results = $this->mSample->getData($id);
+
+    $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+    $pru['id_sample'] = $id;
+    $dtUkuran = $this->mSample->getUkuranTrans($pru);
+
+    $detail = (!empty($dtUkuran)) ? $this->mSample->getDataDetailSample_crostab($results->id) : [];
+
     $build_array =  array(
       "id"   => encrypt($results->id),
       "keterangan" => $results->keterangan,
@@ -135,7 +148,9 @@ class Sample extends BaseController
       "status" => $results->status,
       "uang_dp" =>  !empty($results->uang_dp) ? $results->uang_dp : 0,
       "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
-      "detail" => $this->mSample->getDataDetailSample($results->id)
+      // "detail" => $this->mSample->getDataDetailSample($results->id),
+      "detail" => $detail,
+      "key_ukuran" => $dtUkuran
     );
     return $this->response->setJSON($build_array);
   }

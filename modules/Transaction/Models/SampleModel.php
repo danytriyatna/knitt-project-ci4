@@ -232,6 +232,118 @@ class SampleModel extends \App\Models\PrModel
         return $this->_data;
     }
 
+    function getDataDetailSample_crostab($id){
+
+       
+        // get data ukuran 
+        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['id_sample'] = $id;
+        $dtUkuran = $this->getUkuranTrans($pru);
+
+        // looping data ukuran
+         // Dynamic Columns
+         $col11 = "";
+         $col12 = "";
+         $col21 = "";
+         $col22 = "";
+         $col3 = "";
+         
+         foreach ($dtUkuran as $item) {
+             $key = $item->key_ukuran;
+             if($key == 'all') $key = 'all_'; 
+             $hrg = $key . '_hrg';
+             $col11 .= ($col11 == "") ? "coalesce(tbl.$key,  0) as $key" : ",coalesce(tbl.$key, 0) as $key";
+            //  $col12 .= ($col12 == "") ? "coalesce(tbl.$hrg,0) as $hrg" : ",coalesce(tbl.$hrg,0) as $hrg";
+
+             $col21 .= ($col21 == "") ? "$key INT" : ",$key INT";
+
+             $col3 .= ($col3 == "") ? $key : ",".$key;
+            //  $col22 .= ($col22 == "") ? "$hrg Float" : ",$hrg Float";
+         }
+
+         // crostab query 
+         $sql = "
+                    SELECT 
+                        tbl.id,
+                        ROW_NUMBER ( ) OVER ( ORDER BY tbl.id ) AS no,
+                        COALESCE ( w1.kode_warna, '' ) as colorDasar,
+                        TRIM ( BOTH ' - ' FROM COALESCE ( w1.kode_warna, '' ) || 
+                                CASE WHEN w2.kode_warna IS NOT NULL THEN ' - ' || w2.kode_warna ELSE '' END ||
+                                CASE WHEN w3.kode_warna IS NOT NULL THEN ' - ' || w3.kode_warna ELSE '' END ||
+                                CASE WHEN w4.kode_warna IS NOT NULL THEN ' - ' || w4.kode_warna ELSE '' END ||
+                                CASE WHEN w5.kode_warna IS NOT NULL THEN ' - ' || w5.kode_warna ELSE '' END ||
+                                CASE WHEN w6.kode_warna IS NOT NULL THEN ' - ' || w6.kode_warna ELSE '' END ||
+                                CASE WHEN w7.kode_warna IS NOT NULL THEN ' - ' || w7.kode_warna ELSE '' END ||
+                                CASE WHEN w8.kode_warna IS NOT NULL THEN ' - ' || w8.kode_warna ELSE '' END 
+                        ) AS colour,
+                        {$col11},
+                        COALESCE((select sum(x.harga_total) from trans_sample_ukuran x where x.id_sample_det = tbl.id), 0) as total_harga
+                    FROM 
+                        CROSSTAB(
+                            $$ 
+                            SELECT 
+                                td.id,
+                                ru.seq,
+                                 (case when ru.key_ukuran = 'all' THEN 'all_' else ru.key_ukuran end) as key_ukuran,
+                                SUM(COALESCE(tu.qty, 0)) AS qty
+                            FROM 
+                                trans_sample_ukuran tu 
+                            INNER JOIN trans_sample_det td ON td.id = tu.id_sample_det
+                            INNER JOIN ref_ukuran ru on ru.id = tu.id_ukuran
+                            WHERE (tu.qty is not null and tu.qty > 0) AND td.id_sample = {$id}
+                            group by td.id, ru.key_ukuran, ru.seq
+                            order by td.id, ru.seq asc
+                            $$,
+                            $$ 
+                                SELECT unnest(string_to_array('{$col3}', ','))
+                            $$
+                        ) AS tbl (
+                            id INT,
+                            seq INT,
+                            {$col21}
+                        )
+                    INNER JOIN trans_sample_det td ON td.id = tbl.id
+                    INNER JOIN ref_warna w1 ON td.id_warna_1 = w1.id
+                    LEFT JOIN ref_warna w2 ON td.id_warna_2 = w2.id
+                    LEFT JOIN ref_warna w3 ON td.id_warna_3 = w3.id
+                    LEFT JOIN ref_warna w4 ON td.id_warna_4 = w4.id
+                    LEFT JOIN ref_warna w5 ON td.id_warna_5 = w5.id
+                    LEFT JOIN ref_warna w6 ON td.id_warna_6 = w6.id
+                    LEFT JOIN ref_warna w7 ON td.id_warna_7 = w7.id
+                    LEFT JOIN ref_warna w8 ON  td.id_warna_8 = w8.id;
+
+            ";
+
+        $query = $this->db->query($sql);
+        $this->_data = $query->getResult();
+
+        return $this->_data;
+    }
+
+    function getUkuranTrans($params){
+        $builder = $this->db->table('trans_sample_ukuran tu');
+        $builder->select("tu.id_ukuran, rk.key_ukuran, rk.kode_ukuran, tu.id_sample");
+
+        $builder->join('trans_sample_det td', 'td.id = tu.id_sample_det', 'inner');
+        $builder->join('ref_ukuran rk', 'tu.id_ukuran = rk.id', 'inner');
+
+        if(!empty($params['use'])){
+            $builder->where('(tu.qty is not null and tu.qty > 0)');
+        }
+        
+        if(!empty($params['id_sample'])){
+            $builder->where('tu.id_sample', $params['id_sample']);
+        }
+        
+        $builder->groupBy("tu.id_ukuran, rk.key_ukuran, rk.kode_ukuran, rk.seq, tu.id_sample");
+
+        $builder->orderBy("rk.seq");
+        
+        $this->_data = $builder->get()->getResult();
+        return $this->_data;
+    }
+
+
     function getDataDetailSample_ori($idSample, $params = null)
     {
         $builder = $this->db->table("trans_sample_det" . " abx");
@@ -330,21 +442,32 @@ class SampleModel extends \App\Models\PrModel
                 ];
                 $this->deleteRecordMultipleColumn("trans_sample_ukuran", $arrDelete);
             }
-            foreach ($dataUkuran as $rowData) {
 
+            $head_qty = 0;
+            $head_total = 0;
+            foreach ($dataUkuran as $rowData) {
+                $harga_total = (!empty($rowData['qty']) && !empty($rowData['harga_satuan'])) ? $rowData['qty'] * $rowData['harga_satuan'] : 0;
                 $arrDataUkuran = [
                     "id_sample" => $dataWarna['id_sample'],
                     "id_sample_det" => !empty($dataWarna['id']) ? $dataWarna['id'] : $idSampleDet,
                     "id_ukuran" => $rowData['id_ukuran'],
                     "qty" => $rowData['qty'],
                     "harga_satuan" => $rowData['harga_satuan'],
-                    "harga_total" => (!empty($rowData['qty']) && !empty($rowData['harga_satuan'])) ? $rowData['qty'] * $rowData['harga_satuan'] : 0, //$rowData['harga_total'],
+                    "harga_total" =>  $harga_total,//$rowData['harga_total'],
                     "active" => 1,
                     "created_at" =>  date("Y-m-d H:i:s"),
 
                 ];
+
+                $head_qty = $head_qty + (!empty($rowData['qty'])) ? (int) $rowData['qty'] : 0;
+                $head_total = $head_total + (!empty($harga_total)) ? (float) $harga_total : 0;
                 $this->insertRecordGetid("trans_sample_ukuran", $arrDataUkuran);
             }
+
+             // update data qty dan total harga 
+             $head_up['qty'] = $head_qty;
+             $head_up['total_harga'] = $head_total;
+             $this->updateRecord($this->table, $head_up, 'id', $dataWarna['id_sample']);
             $this->db->transComplete();
 
             if ($this->db->transStatus() === TRUE) {

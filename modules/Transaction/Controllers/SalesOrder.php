@@ -111,7 +111,7 @@ class SalesOrder extends BaseController
       $pru['use'] = 1;// ambil ukuran yang digunnakan order 
       $pru['id_sales_order'] = $row->id;
       $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
-
+      $detail = (!empty($dtUkuran)) ? $this->mSalesOrder->getDataDetailSalesOrder_crostab($row->id) : [];
       array_push(
         $build_array["data"],
         array(
@@ -126,7 +126,7 @@ class SalesOrder extends BaseController
           "status"  => $status,
           "file_gambar" => !empty($row->file_name) ? base_url() . "uploads/sales_order/"  . $row->file_name : "",
           // "detail" => $this->mSalesOrder->getDataDetailSalesOrder($row->id)
-          "detail" => $this->mSalesOrder->getDataDetailSalesOrder_crostab($row->id),
+          "detail" => $detail,
           "key_ukuran" => $dtUkuran
         )
       );
@@ -143,6 +143,7 @@ class SalesOrder extends BaseController
     $pru['use'] = 1;// ambil ukuran yang digunnakan order 
     $pru['id_sales_order'] = $id;
     $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
+    $detail = (!empty($dtUkuran)) ? $this->mSalesOrder->getDataDetailSalesOrder_crostab($results->id) : [];
 
     $build_array =  array(
       "id"   => encrypt($results->id),
@@ -157,7 +158,7 @@ class SalesOrder extends BaseController
       "id_sample" => $results->id_sample,
       "status" => $status,
       "uang_dp" =>  !empty($results->uang_dp) ? $results->uang_dp : 0,
-      "detail" => $this->mSalesOrder->getDataDetailSalesOrder_crostab($results->id),
+      "detail" => $detail,
       "key_ukuran" => $dtUkuran
     );
     return $this->response->setJSON($build_array);
