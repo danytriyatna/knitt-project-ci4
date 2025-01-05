@@ -174,7 +174,7 @@ class BarangMasuk extends BaseController
         $resDataGudang = $this->mGudang->getData(null, 0, 99999, $sortGudang);
         $this->data['kategori']    = $reDataKategori;
         $this->data['gudang']    = $resDataGudang;
-
+        // dd($this->data['resData']);
         $this->data['titlehead'] = "Form Barang Masuk";
 
         return view($this->views . '\barang_masuk_form', $this->data);
