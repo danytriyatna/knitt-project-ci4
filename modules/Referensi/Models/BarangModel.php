@@ -66,6 +66,8 @@ class BarangModel extends \App\Models\PrModel
         $builder = $this->db->table($this->table . " uk");
 
         $builder->select("count(1) as _cnt");
+        $builder->join($this->tblJenisBarang . " abx", "uk.id_jenis_barang = abx.id", "inner");
+        $builder->join($this->tblSatuan . " bbx", "uk.id_satuan = bbx.id", "inner");
 
         $builder->where('uk.active = 1');
 
