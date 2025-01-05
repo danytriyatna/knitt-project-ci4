@@ -31,8 +31,8 @@ class BarangModel extends \App\Models\PrModel
                 $builder->groupStart();
                 $builder->where('LOWER(uk.nama_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->orWhere('LOWER(uk.kode_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(uk.nama_jenis_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(uk.nama_satuan) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(abx.nama_jenis_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(bbx.nama_satuan) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
             }
 
@@ -73,8 +73,8 @@ class BarangModel extends \App\Models\PrModel
             $builder->groupStart();
             $builder->where('LOWER(uk.nama_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->orWhere('LOWER(uk.kode_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
-            $builder->orWhere('LOWER(uk.nama_jenis_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
-            $builder->orWhere('LOWER(uk.nama_satuan) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(abx.nama_jenis_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(bbx.nama_satuan) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
         }
 
