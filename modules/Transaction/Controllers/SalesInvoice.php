@@ -175,8 +175,10 @@ class SalesInvoice extends BaseController
 
       $dt_details = [];
       // get produksi data
-      $params['konsumen_id'] = $stdData->id_konsumen;
-      $dt = $this->mInvoice->get_walkorder_konsumen($params);
+      $params['id_invoice'] = $stdData->id;
+      $params['id_konsumen'] = $stdData->id_konsumen;
+      $dt = $this->mInvoice->get_walkorder_konsumen_ori($params);
+      // dd($dt);
       if(!empty($dt)){
         $status = true;
         $message = "Berhasil mengambil data  ";
@@ -192,25 +194,26 @@ class SalesInvoice extends BaseController
 
         foreach ($dt as $x) {
 
-          $uang_dp =  ($x->tipe_id == 1) ? $x->dp_sample : $x->dp_so;
+          $uang_dp =  ($x->tipe_id == 1) ? $x->uang_dp : $x->uang_dp;
           $uang_dp = !empty($uang_dp) ? (float) $uang_dp : 0;
 
-          $total = ($x->tipe_id == 1) ? $x->total_sample : $x->total_so;
+          $total = ($x->tipe_id == 1) ? $x->total_harga : $x->total_harga;
           $total = !empty($total) ? (float) $total : 0;
 
           $isi = [
+            'bayar'             => true,
             'id_walkorder'      => $x->id,
             'tgl_transaksi'     => fdate_ind_to_eng($x->tgl_transaksi),
             'keterangan_style'  => $x->keterangan_style,
             'konsumen_nama'     => $x->konsumen_nama,
             'tipe_id'           => $x->tipe_id,
-            'ref_id'            => ($x->tipe_id == 1) ? $x->sample_id : $x->so_id,
-            'ref_kode'          => ($x->tipe_id == 1) ? $x->kode_sample : $x->kode_sales_order,
-            'ref_qty'           => ($x->tipe_id == 1) ? $x->qty_sample : $x->qty_so,
+            'ref_id'            => ($x->tipe_id == 1) ? $x->id : $x->id,
+            'ref_kode'          => ($x->tipe_id == 1) ? $x->kode : $x->kode,
+            'ref_qty'           => ($x->tipe_id == 1) ? $x->qty : $x->qty,
             'ref_dp'            => $uang_dp,
-            // 'ref_total'         => $total,
-            // 'deliver_qty'       => $x->deliver_qty,
-            // 'totals'            => $total - $uang_dp ,
+            'ref_total'         => $total,
+            'deliver_qty'       => $x->qty_dlv,
+            'totals'            => $total - $uang_dp ,
           ];
 
           $do_harga = 0;
@@ -218,10 +221,13 @@ class SalesInvoice extends BaseController
 
           $det_list = [];
 
-          $paramx['id_konsumen']  = $stdData->id_konsumen;
-          $paramx['id_walkorder'] = $x->id;
-          $paramx['ukuran'] = $ukuran;
-          $idDetail = $this->mInvoice->getDetail_delivery($paramx);
+          $idDetail = [];
+          if(!empty($id_walkorder)){
+            $paramx['id_konsumen']  = $stdData->id_konsumen;
+            $paramx['id_walkorder'] = $x->id;
+            $paramx['ukuran'] = $ukuran;
+            $idDetail = $this->mInvoice->getDetail_delivery($paramx);
+          }
 
           $qty_do = 0;
           $total_harga = 0;
@@ -260,9 +266,9 @@ class SalesInvoice extends BaseController
 
             $det_list[] = $det_isi;
           }
-          $isi['deliver_qty'] = $qty_do;
-          $isi['ref_total'] = $total_harga;
-          $isi['totals'] = $total_harga - $uang_dp;
+          // $isi['deliver_qty'] = $qty_do;
+          // $isi['ref_total'] = $total_harga;
+          // $isi['totals'] = $total_harga - $uang_dp;
           $isi['detail_data'] = $det_list;
           $dt_details[] = $isi;
         }
@@ -471,7 +477,7 @@ class SalesInvoice extends BaseController
 
 
   // get data produksi
-  public function walkorder_user()
+  public function walkorder_user_bck()
   {
     $konsumen_id = $this->request->getPost("konsumen_id");
     $status = false;
@@ -479,7 +485,8 @@ class SalesInvoice extends BaseController
     $data = [];
 
     $params['konsumen_id'] = $konsumen_id;
-    $dt = $this->mInvoice->get_walkorder_konsumen($params);
+    // $dt = $this->mInvoice->get_walkorder_konsumen($params);
+    $dt = $this->mInvoice->get_walkorder_konsumen_ori($params);
     if(!empty($dt)){
       $status = true;
       $message = "Berhasil mengambil data  ";
@@ -567,6 +574,119 @@ class SalesInvoice extends BaseController
          $isi['deliver_qty'] = $qty_do;
          $isi['ref_total'] = $total_harga;
          $isi['totals'] = $total_harga - $uang_dp;
+         $isi['detail_data'] = $det_list;
+         $xdata[] = $isi;
+      }
+
+      $data = $xdata;
+    }
+    
+    $build_array['status']  = $status;
+    $build_array['message'] = $message;
+    $build_array['data']    = $data;
+    return $this->response->setJSON($build_array);
+  } 
+
+  public function walkorder_user()
+  {
+    $konsumen_id = $this->request->getPost("konsumen_id");
+    $status = false;
+    $message = "Konsumen belum mempunyai Order/Sample";
+    $data = [];
+
+    $params['id_konsumen'] = $konsumen_id;
+    // $dt = $this->mInvoice->get_walkorder_konsumen($params);
+    $dt = $this->mInvoice->get_walkorder_konsumen_ori($params);
+    if(!empty($dt)){
+      $status = true;
+      $message = "Berhasil mengambil data  ";
+      $xdata = [];
+
+      $rukuran = $this->mUkuran->getData(0, 0, 999);
+      $ukuran = "";
+      foreach ($rukuran as $iu) {
+        $keyUkuran = $iu->key_ukuran;
+        if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
+        $ukuran .= ($ukuran == "") ? $keyUkuran : ", ". $keyUkuran;
+      }
+
+      foreach ($dt as $x) {
+
+        $uang_dp =  ($x->tipe_id == 1) ? $x->uang_dp : $x->uang_dp;
+        $uang_dp = !empty($uang_dp) ? (float) $uang_dp : 0;
+
+        $total = ($x->tipe_id == 1) ? $x->total_harga : $x->total_harga;
+        $total = !empty($total) ? (float) $total : 0;
+
+         $isi = [
+          'id_walkorder'      => $x->id_walkorder,
+          'tgl_transaksi'     => \fdate_eng_to_ind($x->tgl_transaksi),
+          'keterangan_style'  => $x->keterangan_style,
+          'konsumen_nama'     => $x->konsumen_nama,
+          'tipe_id'           => $x->tipe_id,
+          'ref_id'            => ($x->tipe_id == 1) ? $x->id : $x->id,
+          'ref_kode'          => ($x->tipe_id == 1) ? $x->kode : $x->kode,
+          'ref_qty'           => ($x->tipe_id == 1) ? $x->qty : $x->qty,
+          'ref_dp'            => $uang_dp,
+          'ref_total'         => $total,
+          'deliver_qty'       => $x->qty_dlv,
+          'totals'            => $total - $uang_dp ,
+        ];
+
+         $do_harga = 0;
+         $do_harga = 0;
+
+         $det_list = [];
+
+         $idDetail = [];
+         if(!empty($x->id_walkorder)){
+          $paramx['id_konsumen']  = $konsumen_id;
+          $paramx['id_walkorder'] = $x->id;
+          $paramx['ukuran'] = $ukuran;
+          $paramx['get'] =  1;
+          $idDetail = $this->mInvoice->getDetail_delivery($paramx);
+         }
+
+         $qty_do = 0;
+         $total_harga = 0;
+
+         foreach ($idDetail as $d) {
+          
+          $qty = 0;
+          $ref_kode = "";
+          $ref_id = 0;
+          $ref_total = 0;
+          $ref_dp = 0;
+
+          $qty_do = $qty_do  + $d->qty_do;
+          $total_harga = $total_harga  + $d->total_harga;
+
+          $det_isi = [
+            'ref_detail_id' => $d->ref_detail_id,
+            'id_delivery' => $d->id_delivery,
+            'delivery_kode' => $d->delivery_kode,
+            'kode_warna' => $d->kode_warna,
+            'tipe_id' => $d->tipe_id,
+            'qty_do' => !empty($d->qty_do) ? $d->qty_do : 0,
+            'total_harga' => !empty($d->total_harga) ? $d->total_harga : 0,
+          ];
+
+          foreach ($rukuran as $iu) {
+            $keyUkuran = $iu->key_ukuran;
+            
+            if($iu->key_ukuran == 'all') {
+              $keyUkuran = 'all_';
+              $det_isi[$keyUkuran] = !empty($d->$keyUkuran) ? $d->$keyUkuran : 0;
+            }else{
+              $det_isi[$keyUkuran] = !empty($d->$keyUkuran) ? $d->$keyUkuran : 0;
+            }
+          }
+
+          $det_list[] = $det_isi;
+         }
+        //  $isi['deliver_qty'] = $qty_do;
+        //  $isi['ref_total'] = $total_harga;
+        //  $isi['totals'] = $total_harga - $uang_dp;
          $isi['detail_data'] = $det_list;
          $xdata[] = $isi;
       }
