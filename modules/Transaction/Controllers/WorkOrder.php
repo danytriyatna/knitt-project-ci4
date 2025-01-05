@@ -388,7 +388,7 @@ class WorkOrder extends BaseController
       $pru['id_sales_order'] = $data->ref_id;
       $data_ukuran = $this->mSalesOrder->getUkuranTrans($pru);
     }
-
+    
     $i = 1;
     $list_proses = json_decode($list_proses, true);
     foreach ($list_proses as $item) {
@@ -422,7 +422,7 @@ class WorkOrder extends BaseController
           foreach ($data_ukuran as $x) {
             $isiProses_det = [
               'id_walkorder_proses' => $proses_id,
-              'id_ukuran'           => $x->id,
+              'id_ukuran'           => $x->id_ukuran,
               'ref_detail_id'       => $xuk['id'],
               'created_at'          => date('Y-m-d H:i:s')
             ];
