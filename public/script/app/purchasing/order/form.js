@@ -280,15 +280,15 @@ if(detailData.length > 0){
 } 
 
 inpQty.keyup(function (e) {
-    if(!regex.test(e.target.value)){
-        e.target.value = ""
-        return Swal.fire({
-            text: "Quantity harus berupa angka",
-            icon: 'error',
-            showConfirmButton: false,
-            timer: 2000
-        });
-    }
+    // if(!regex.test(e.target.value)){
+    //     e.target.value = ""
+    //     return Swal.fire({
+    //         text: "Quantity harus berupa angka",
+    //         icon: 'error',
+    //         showConfirmButton: false,
+    //         timer: 2000
+    //     });
+    // }
 })
 
 function openModalDetail(row = null){
