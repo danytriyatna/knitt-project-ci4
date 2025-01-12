@@ -368,6 +368,8 @@ class WorkOrder extends BaseController
     
     $data_ukuran_input = json_decode($data_ukuran_input, true);
     $data_ukuran_warna = json_decode($data_ukuran_warna, true);
+    // print_r($data_ukuran_warna);
+    // exit;
     $this->db->transBegin();
 
     $update_stat['id_gudang'] = $id_gudang;
@@ -417,7 +419,7 @@ class WorkOrder extends BaseController
 
         //   $this->mWalkorder->insertRecordGetid($this->mWalkorder->table4, $isiProses_det);
         // }
-
+        // print_r($data_ukuran);exit;
         foreach ($data_ukuran_warna as $xuk) {
           foreach ($data_ukuran as $x) {
             $isiProses_det = [
@@ -426,11 +428,11 @@ class WorkOrder extends BaseController
               'ref_detail_id'       => $xuk['id'],
               'created_at'          => date('Y-m-d H:i:s')
             ];
-  
-            $key_ukuran = $x->key_ukuran;
+            
+            $key_ukuran = $x->key_ukuran == 'all' ? 'all_' : $x->key_ukuran;
             if ($i == 1) {
               // $isiProses_det['qty'] = !empty($data_ukuran_input['bottom'][$x->key_ukuran]) ? $data_ukuran_input['bottom'][$x->key_ukuran] : 0;
-              $isiProses_det['qty'] = !empty($xuk[$x->key_ukuran]) ? $xuk[$x->key_ukuran] : 0;
+              $isiProses_det['qty'] = !empty($xuk[$key_ukuran]) ? $xuk[$key_ukuran] : 0;
             } else {
               $isiProses_det['qty'] = 0;
             }
