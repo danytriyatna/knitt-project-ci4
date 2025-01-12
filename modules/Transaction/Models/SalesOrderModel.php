@@ -341,7 +341,7 @@ class SalesOrderModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getDataDetailSampleUkuran($idSample, $idSampleDet)
+    function getDataDetailSampleUkuran($idSalesOrder, $idSalesOrderDet)
     {
         $sql = "SELECT
                     bbx.id,
@@ -353,8 +353,9 @@ class SalesOrderModel extends \App\Models\PrModel
                 FROM
                     ref_ukuran abx
                     LEFT JOIN trans_sales_order_ukuran bbx ON bbx.id_ukuran = abx.id
-                    AND bbx.id_sales_order = $idSample
-                    AND bbx.id_sales_order_det = $idSampleDet
+                    AND bbx.id_sales_order = $idSalesOrder
+                    AND bbx.id_sales_order_det = $idSalesOrderDet
+                    WHERE abx.active = 1
                     ORDER BY abx.id";
         $result = $this->db->query($sql);
         $this->_data   = $result->getResult();

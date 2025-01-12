@@ -239,70 +239,26 @@
         <div class="row m-t-16">
           <div class="col-sm-12">
             <div id="dt-detail-qty" class="table-responsive table-striped"></div>
-            <div class="table-responsive d-none">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th>NO</th>
-                    <th>UKURAN</th>
-                    <th style="min-width: 80px; width: 80px;">QTY</th>
-                    <th style="min-width: 200px;">PRICE</th>
-                    <th>TOTAL</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>S</td>
-                    <td><input type="text" id="qty_s" name="qty_s" class="form-control" placeholder="Ketikkan qty ukuran S" value="100"></td>
-                    <td><input type="text" id="price_s" name="price_s" class="form-control form-idr" placeholder="Ketikkan harga ukuran S" value="20000"></td>
-                    <td>Rp 2.000.000</td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>M</td>
-                    <td><input type="text" id="qty_m" name="qty_m" class="form-control" placeholder="Ketikkan qty ukuran M" value="100"></td>
-                    <td><input type="text" id="price_m" name="price_m" class="form-control form-idr" placeholder="Ketikkan harga ukuran M" value="25000"></td>
-                    <td>Rp 2.500.000</td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>L</td>
-                    <td><input type="text" id="qty_l" name="qty_l" class="form-control" placeholder="Ketikkan qty ukuran L" value="100"></td>
-                    <td><input type="text" id="price_l" name="price_l" class="form-control form-idr" placeholder="Ketikkan harga ukuran L" value="30000"></td>
-                    <td>Rp 3.000.000</td>
-                  </tr>
-                  <tr>
-                    <td>4</td>
-                    <td>XL</td>
-                    <td><input type="text" id="qty_xl" name="qty_xl" class="form-control" placeholder="Ketikkan qty ukuran XL" value="100"></td>
-                    <td><input type="text" id="price_xl" name="price_xl" class="form-control form-idr" placeholder="Ketikkan harga ukuran XL" value="35000"></td>
-                    <td>Rp 3.500.000</td>
-                  </tr>
-                  <tr>
-                    <td>5</td>
-                    <td>2XL</td>
-                    <td><input type="text" id="qty_2xl" name="qty_2xl" class="form-control" placeholder="Ketikkan qty ukuran 2XL" value="100"></td>
-                    <td><input type="text" id="price_2xl" name="price_2xl" class="form-control form-idr" placeholder="Ketikkan harga ukuran 2XL" value="40000"></td>
-                    <td>Rp 4.000.000</td>
-                  </tr>
-                  <tr>
-                    <td>6</td>
-                    <td>3XL</td>
-                    <td><input type="text" id="qty_3xl" name="qty_3xl" class="form-control" placeholder="Ketikkan qty ukuran 3XL" value="100"></td>
-                    <td><input type="text" id="price_3xl" name="price_3xl" class="form-control form-idr" placeholder="Ketikkan harga ukuran 3XL" value="45000"></td>
-                    <td>Rp 4.500.000</td>
-                  </tr>
-                  <tr>
-                    <td>7</td>
-                    <td>ALL SIZE</td>
-                    <td><input type="text" id="qty_all" name="qty_all" class="form-control" placeholder="Ketikkan qty ukuran ALL SIZE" value="100"></td>
-                    <td><input type="text" id="price_all" name="price_all" class="form-control form-idr" placeholder="Ketikkan harga ukuran ALL SIZE" value="50000"></td>
-                    <td>Rp 5.000.000</td>
-                  </tr>
-                </tbody>
-              </table>
+          </div>
+        </div>
+
+        <hr>
+        <h6 class="f-w-700">Perhitungan Gramasi</h6>
+        <div class="row m-t-16">
+          <div class="row">
+            <div class="col-sm-8">
+                <button type="button" class="btn btn-sm btn-success" id="btn-refresh-gram" ><i class="fa fa-refresh"></i> Muat Ulang</button>
             </div>
+            <div class="col-sm-4">
+              <div class="form-group row">
+                <label class="control-label text-start text-md-end col-md-4 col-form-label" for="loss_perc">Loss (%)</label>
+                <div class="col-md-8">
+                  <input type="number" id="loss_perc" name="loss_perc" class="form-control" placeholder="Ketikkan nilai loss">
+                </div>
+              </div>
+            </div>
+            <br>
+            <div id="dt-detail-gram" class="table-responsive table-striped"></div>
           </div>
         </div>
       </div>

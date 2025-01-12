@@ -223,7 +223,7 @@ class WorkOrder extends BaseController
 
     $params = [];
     $params['id_walkorder'] = decrypt($wo_id);
-
+    
     $results = $this->mWalkorder->getData_detail(null, $start, $limit, $order, $filters, $params);
     $totalfiltered = $this->mWalkorder->getDataCnt_detail($filters, $params);
     $totaldata = $this->mWalkorder->getDataCnt_detail(null, $params);

@@ -51,7 +51,6 @@ class Sample extends BaseController
     $this->data['buyer'] = $this->mkonsumen->where("active", 1)->findAll();
     $this->data['ukuran'] = $this->mUkuran->where("active", 1)->findAll();
     $this->data['warna'] = $this->mWarna->where("active", 1)->findAll();
-    
     return view($this->views . '\sample_list', $this->data);
   }
 
@@ -135,6 +134,9 @@ class Sample extends BaseController
 
     $detail = (!empty($dtUkuran)) ? $this->mSample->getDataDetailSample_crostab($results->id) : [];
 
+    $prg['id_sample_det'] = $results->id;
+    $dtGram = $this->mSample->getData_gram(null, 0, 9999, null, null, $prg);
+
     $build_array =  array(
       "id"   => encrypt($results->id),
       "keterangan" => $results->keterangan,
@@ -150,16 +152,22 @@ class Sample extends BaseController
       "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
       // "detail" => $this->mSample->getDataDetailSample($results->id),
       "detail" => $detail,
-      "key_ukuran" => $dtUkuran
+      "key_ukuran" => $dtUkuran,
+      "detail_gram" => $dtGram
     );
     return $this->response->setJSON($build_array);
   }
+  
 
   function detailQtyUkuran($idSample, $idSampleDet)
   {
     $id = !empty($idSample) ? decrypt($idSample) : 0;
     $idSampleDet = !empty($idSampleDet) ? $idSampleDet : 0;
     $results = $this->mSample->getData($id);
+
+    $prg['id_sample_det'] = $idSampleDet;
+    $dtGram = $this->mSample->getData_gram(null, 0, 9999, null, null, $prg);
+    // print_r($prg);exit;
     $build_array =  array(
       "id"   => encrypt($results->id),
       "keterangan" => $results->keterangan,
@@ -170,7 +178,8 @@ class Sample extends BaseController
       "deskripsi" => $results->deskripsi,
       "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
       "detail" => $this->mSample->getDataDetailSampleWarna($id, $idSampleDet),
-      "detailUkuran" =>  $this->mSample->getDataDetailSampleUkuran($id, $idSampleDet)
+      "detailUkuran" =>  $this->mSample->getDataDetailSampleUkuran($id, $idSampleDet),
+      "detail_gram" => $dtGram
     );
     return $this->response->setJSON($build_array);
   }
@@ -300,6 +309,7 @@ class Sample extends BaseController
     $warna7 = $this->request->getPost('warna7');
     $warna8 = $this->request->getPost('warna8');
     $dataUkuran = $this->request->getPost('dataUkuran');
+    $dataGram = $this->request->getPost('dataGram');
     $dataWarna = [
       "id_warna_1" => !empty($warna1) ? $warna1 : null,
       "id_warna_2" => !empty($warna2) ? $warna2 : null,
@@ -314,7 +324,7 @@ class Sample extends BaseController
       "id" => !empty($idSampleDet) ? $idSampleDet :  null,
     ];
 
-    $res = $this->mSample->trxInsertUpdateRecord($dataWarna, $dataUkuran);
+    $res = $this->mSample->trxInsertUpdateRecord($dataWarna, $dataUkuran, $dataGram);
     if ($res) {
       $status = true;
       $msg = "Data berhasil disimpan!";

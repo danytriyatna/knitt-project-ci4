@@ -49,7 +49,6 @@ class SampleModel extends \App\Models\PrModel
             $this->_data = $builder->get()->getResult();
         } else {
             $builder->where("abx.id", $id);
-
             $this->_data = $builder->get()->getRow();
         }
 
@@ -383,7 +382,8 @@ class SampleModel extends \App\Models\PrModel
                     LEFT JOIN trans_sample_ukuran bbx ON bbx.id_ukuran = abx.id
                     AND bbx.id_sample = $idSample
                     AND bbx.id_sample_det = $idSampleDet
-                    ORDER BY abx.id";
+                WHERE abx.active = 1
+                ORDER BY abx.id";
         $result = $this->db->query($sql);
         $this->_data   = $result->getResult();
         return $this->_data;
@@ -423,13 +423,14 @@ class SampleModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function trxInsertUpdateRecord($dataWarna, $dataUkuran)
+    function trxInsertUpdateRecord($dataWarna, $dataUkuran, $dataGram)
     {
-        $this->db->transStart();
+        // $this->db->transStart();
         try {
             if (!empty($dataWarna['id'])) {
                 $dataWarna['updated_at'] = date("Y-m-d H:i:s");
                 $this->updateRecord("trans_sample_det", $dataWarna, 'id', $dataWarna['id']);
+                $idSampleDet = $dataWarna['id'];
             } else {
                 unset($dataWarna['id']);
                 $dataWarna['created_at'] = date("Y-m-d H:i:s");
@@ -441,6 +442,11 @@ class SampleModel extends \App\Models\PrModel
                     "id_sample_det" => $dataWarna['id']
                 ];
                 $this->deleteRecordMultipleColumn("trans_sample_ukuran", $arrDelete);
+
+                $arrDelete = [
+                    "id_sample_det" => $dataWarna['id']
+                ];
+                $this->deleteRecordMultipleColumn("trans_sample_gram", $arrDelete);
             }
 
             $head_qty = 0;
@@ -464,19 +470,40 @@ class SampleModel extends \App\Models\PrModel
                 $this->insertRecordGetid("trans_sample_ukuran", $arrDataUkuran);
             }
 
+            
+            foreach ($dataGram as $xrow) {
+                $arrDataGram = [
+                    "id_sample_det" => $idSampleDet,
+                    "id_warna" => $xrow['id_warna'],
+                    "qty" => $xrow['qty'],
+                    "gram" => $xrow['gram'],
+                    "gram_nd" => $xrow['gram_nd'],
+                    "kg" => $xrow['kg'],
+                    "loss" => $xrow['loss'],
+                    "kg_loss" => $xrow['kg_loss'],
+                    "total" => $xrow['total'],
+                    "active" => 1,
+                    "created_at" =>  date("Y-m-d H:i:s"),
+
+                ];
+
+                $this->insertRecordGetid("trans_sample_gram", $arrDataGram);
+            }
+
              // update data qty dan total harga 
              $head_up['qty'] = $head_qty;
              $head_up['total_harga'] = $head_total;
              $this->updateRecord($this->table, $head_up, 'id', $dataWarna['id_sample']);
             $this->db->transComplete();
 
-            if ($this->db->transStatus() === TRUE) {
-                return true;
-            } else {
-                throw new \Exception("Transaction failed");
-            }
+            // if ($this->db->transStatus() === TRUE) {
+            //     return true;
+            // } else {
+            //     throw new \Exception("Transaction failed");
+            // }
         } catch (\Exception $e) {
-            $this->db->transRollback();
+            print_r($e);exit;
+            // $this->db->transRollback();
             throw $e;
         }
     }
@@ -485,8 +512,11 @@ class SampleModel extends \App\Models\PrModel
     {
         $this->db->transStart();
         try {
-
+            // print_r($arrData);exit;
+            unset($arrData['total_harga']);
+            unset($arrData['qty']);
             $this->updateRecord("trans_sample", $arrData, 'id', $id);
+            
             if ($arrData['status'] == 1) {
                 $result = $this->getData($id);
                 $arrWorkOrder = [
@@ -496,7 +526,7 @@ class SampleModel extends \App\Models\PrModel
                     "id_konsumen" => $arrData['id_konsumen'],
                     'tgl_transaksi' => date("Y-m-d"),
                     'tgl_deadline' => $arrData['tgl_deadline'],
-                    "qty" => !empty($arrData['qty']) ? $arrData['qty'] : 0,
+                    "qty" => $result->qty,
                     "file_id" => !empty($arrData['gambar_id']) ? $arrData['gambar_id'] : null,
                     "status" => 1,
                     "tipe_id" => 1,
@@ -521,19 +551,45 @@ class SampleModel extends \App\Models\PrModel
 
                         $woIdDet = $this->insertRecordGetid("trans_walkorder_detail", $detailWorkOrder);
 
-                        for ($i = 0; $i < 8; $i++) {
-                            $field_name = 'id_warna_' . ($i + 1);
-                            if (!empty($rowData->$field_name)) {
+                        
+
+                        $prgram['id_sample_det'] = $rowData->id;
+                        $dtGram = $this->getData_gram(null, 0, 999, null,  null, $prgram);
+
+                        if(!empty($dtGram)){
+                            foreach ($dtGram as $x) {
                                 $arrWarna = [
                                     'id_walkorder_detail' => $woIdDet,
-                                    'id_warna' => $rowData->$field_name,
+                                    'id_warna' => $x->id_warna,
+                                    // 'qty' => $x->qty,
+                                    'gram' => $x->gram,
+                                    'gram_nd' => $x->gram_nd,
+                                    'kg' => $x->kg,
+                                    'loss' => $x->loss,
+                                    'kg_loss' => $x->kg_loss,
+                                    'total' => $x->total,
                                     'created_at' => date("Y-m-d H:i:s")
                                 ];
+                                // print_r($x);exit;
                                 $this->insertRecordGetid("trans_walkorder_warna", $arrWarna);
+                            }
+                        }else{
+                            for ($i = 0; $i < 8; $i++) {
+                                $field_name = 'id_warna_' . ($i + 1);
+                                if (!empty($rowData->$field_name)) {
+                                    $arrWarna = [
+                                        'id_walkorder_detail' => $woIdDet,
+                                        'id_warna' => $rowData->$field_name,
+                                        'created_at' => date("Y-m-d H:i:s")
+                                    ];
+                                    $this->insertRecordGetid("trans_walkorder_warna", $arrWarna);
+                                }
                             }
                         }
                     }
                 }
+
+                
             }
 
             $this->db->transComplete();
@@ -591,5 +647,65 @@ class SampleModel extends \App\Models\PrModel
 
         // hasilnya SOD24100001 dst.
         return $kodejadi;
+    }
+
+    function getData_gram($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
+    {
+        
+        $builder = $this->db->table("trans_sample_gram tsg");
+        $builder->select("tsg.id, tsg.id_sample_det, tsg.qty, tsg.gram,  tsg.gram_nd, tsg.kg, tsg.loss, tsg.kg_loss, tsg.total, rw.kode_warna, tsg.id_warna");
+
+        $builder->join('ref_warna rw', 'rw.id = tsg.id_warna', 'inner');
+        if ($id == null or $id == "") {
+            $builder->where('tsg.active = 1');
+            if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+                // $builder->groupStart();
+                //     $builder->where('LOWER(abx.kode_sales_order) LIKE', strtolower("%{$filters[0]['value']}%"));
+                //     $builder->orWhere('LOWER(bbx.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
+                // $builder->groupEnd();
+            }
+
+            if(!empty($params['id_sample_det'])){
+                $builder->where('tsg.id_sample_det', $params['id_sample_det']);
+            }
+
+            if (!empty($order)) {
+                $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
+            } else {
+                $builder->orderBy('tsg.id DESC');
+            }
+
+            if (empty($offset)) $offset = 0;
+            if (empty($limit)) $limit = 10;
+
+            $builder->limit($limit, $offset);
+
+            $this->_data = $builder->get()->getResult();
+        } else {
+            $builder->where("tsg.id", $id);
+
+            $this->_data = $builder->get()->getRow();
+        }
+
+        return $this->_data;
+    }
+
+    function getData_gramCnt($filters = null, $params = null)
+    {
+        $builder = $this->db->table("trans_sample_gram tsg");
+        $builder->select("count(1) as _cnt");
+        
+        if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+            // $builder->groupStart();
+            // $builder->where('LOWER(abx.kode_sales_order) LIKE', strtolower("%{$filters[0]['value']}%"));
+            // $builder->orWhere('LOWER(bbx.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
+            // $builder->groupEnd();
+        }
+
+        $builder->where('tsg.active = 1');
+
+        $this->_data = $builder->get()->getRow()->_cnt;
+
+        return $this->_data;
     }
 }

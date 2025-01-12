@@ -333,9 +333,10 @@ class ProductionModel extends \App\Models\PrModel
          $col3 = "";
          $ukuranArr = explode(",", $params['ukuran']);
          foreach ($ukuranArr as $item) {
+             $item = trim($item); 
              $hrg = $item . '_hrg';
-             $col11 .= ($col11 == "") ? "coalesce(tbl.$item,0) as $item" : ",coalesce(tbl.$item,0) as $item";
-             $col12 .= ($col12 == "") ? "coalesce(tbl.$hrg,0) as $hrg" : ",coalesce(tbl.$hrg,0) as $hrg";
+             $col11 .= ($col11 == "") ? `coalesce(tbl.$item,0) as $item` : `,coalesce(tbl.$item,0) as $item`;
+             $col12 .= ($col12 == "") ? `coalesce(tbl.$hrg,0) as $hrg` : `,coalesce(tbl.$hrg,0) as $hrg`;
 
              $col21 .= ($col21 == "") ? "$item Int" : ",$item Int";
              $col22 .= ($col22 == "") ? "$hrg Float" : ",$hrg Float";

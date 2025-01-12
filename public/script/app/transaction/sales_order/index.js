@@ -202,6 +202,7 @@ $(document).ready(function () {
         locale: 'id',    
         // layout: 'fitColumns',
         placeholder: "Tidak ada data",
+        height: '300px',
         pagination:false
 	});
 
@@ -418,7 +419,7 @@ $(document).ready(function () {
 
     $("#btn-save").on("click", function(e){
         e.preventDefault()
-        simpanData()
+        simpanData(0)
     });
 
     $("#btn-send").on("click", function(e){
