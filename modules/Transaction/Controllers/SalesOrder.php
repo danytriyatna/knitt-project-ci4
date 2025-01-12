@@ -388,13 +388,13 @@ class SalesOrder extends BaseController
                 if(!empty($xrow->id_warna_4)) $prms_sample['id_warna_4'] = $xrow->id_warna_4;
                 $data_detail = $this->mSample->getDataDetailSample_ori($sampleId, $prms_sample);
                
-                // $params_wod['ref_detail_id'] = $data_detail[0]->id;
-                // $params_wod['tipe_id'] = 1;
-                // $params_wod['id_walkorder']  = $ref_sample_wo[0]->id;
-                // $data_detail_wo = $this->mworkOrder->getData_detail(null, 0, 1, null, null, $params_wod);
+                $params_wod['ref_detail_id'] = $data_detail[0]->id;
+                $params_wod['tipe_id'] = 1;
+                $params_wod['id_walkorder']  = $ref_sample_wo[0]->id;
+                $data_detail_wo = $this->mworkOrder->getData_detail(null, 0, 1, null, null, $params_wod);
 
-                $prgram['id_sample_det'] = $data_detail[0]->id;
-                $data_detail_wo = $this->mSample->getData_gram(null, 0, 9999, null,  null, $prgram);
+                // $prgram['id_sample_det'] = $data_detail[0]->id;
+                // $dtGram = $this->mSample->getData_gram(null, 0, 9999, null,  null, $prgram);
                 
                 if(!empty($data_detail_wo)){
                     
@@ -486,6 +486,32 @@ class SalesOrder extends BaseController
                         $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
                       }
                     }
+                }else{
+                  if(!empty($data_warna)){
+                    foreach ($data_warna as $xrow) {
+                      $detail_wo = [
+                        'id_walkorder' => $wo_id,
+                        'ref_detail_id' => $xrow->id,
+                        'qty' => $this->mSalesOrder->getTotal_qty($xrow->id, 2),
+                        'tipe_id' => 2,
+                        'created_at' => date("Y-m-d H:i:s")
+                      ];
+      
+                      $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
+      
+                      for ($i=0; $i < 8 ; $i++) { 
+                        $field_name = 'id_warna_' . ($i + 1);
+                        if(!empty($xrow->$field_name)){
+                          $isi_warna = [
+                            'id_walkorder_detail' => $wo_det_id,
+                            'id_warna' => $xrow->$field_name,
+                            'created_at' => date("Y-m-d H:i:s")
+                          ];
+                          $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
+                        }
+                      }
+                    }
+                }
                 }
                
               }
