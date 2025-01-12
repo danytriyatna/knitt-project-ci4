@@ -360,7 +360,7 @@ class SalesOrder extends BaseController
           $ref_sample_wo = $this->mworkOrder->getData(null, 0, 1, null, null, $params_wo);
 
           if(!empty($ref_sample_wo)){
-
+            
             // input proses 
             $params_wo['id_walkorder'] = $ref_sample_wo[0]->id;
             $proces_wo = $this->mworkOrder->getData_proses(0, 0, 9999, null, null, $params_wo);
@@ -388,131 +388,159 @@ class SalesOrder extends BaseController
                 if(!empty($xrow->id_warna_4)) $prms_sample['id_warna_4'] = $xrow->id_warna_4;
                 $data_detail = $this->mSample->getDataDetailSample_ori($sampleId, $prms_sample);
                
-                $params_wod['ref_detail_id'] = $data_detail[0]->id;
-                $params_wod['tipe_id'] = 1;
-                $params_wod['id_walkorder']  = $ref_sample_wo[0]->id;
-                $data_detail_wo = $this->mworkOrder->getData_detail(null, 0, 1, null, null, $params_wod);
+                  if(!empty($data_detail)){
+                    $params_wod['ref_detail_id'] = $data_detail[0]->id;
+                    $params_wod['tipe_id'] = 1;
+                    $params_wod['id_walkorder']  = $ref_sample_wo[0]->id;
+                    $data_detail_wo = $this->mworkOrder->getData_detail(null, 0, 1, null, null, $params_wod);
 
-                // $prgram['id_sample_det'] = $data_detail[0]->id;
-                // $dtGram = $this->mSample->getData_gram(null, 0, 9999, null,  null, $prgram);
-                
-                if(!empty($data_detail_wo)){
-                    
-                    $qty_wodet =  $this->mSalesOrder->getTotal_qty($xrow->id, 2);
+                    // $prgram['id_sample_det'] = $data_detail[0]->id;
+                    // $dtGram = $this->mSample->getData_gram(null, 0, 9999, null,  null, $prgram);
+                  
+                    if(!empty($data_detail_wo)){
+                        
+                        $qty_wodet =  $this->mSalesOrder->getTotal_qty($xrow->id, 2);
 
-                    $gram = 0;
-                    $gram_nd = 0;
-                    $kg = 0;
-                    $loss = 0;
-                    $kg_loss = 0;
-                    $total = 0;
-                    $kuota = 0;
-                    $kuota_tambah = 0;
+                        $gram = 0;
+                        $gram_nd = 0;
+                        $kg = 0;
+                        $loss = 0;
+                        $kg_loss = 0;
+                        $total = 0;
+                        $kuota = 0;
+                        $kuota_tambah = 0;
 
-                    if(!empty($data_detail_wo[0]->gram)){
-                      $gram = $data_detail_wo[0]->gram;
-                      $gram_nd = $gram * $qty_wodet; 
-                      $kg = $gram_nd / 1000;
-                      $loss = $data_detail_wo[0]->loss;
-                      $kg_loss = ($kg * $loss) / 100; 
-                      $total = $kg +  $kg_loss;
+                        if(!empty($data_detail_wo[0]->gram)){
+                          $gram = $data_detail_wo[0]->gram;
+                          $gram_nd = $gram * $qty_wodet; 
+                          $kg = $gram_nd / 1000;
+                          $loss = $data_detail_wo[0]->loss;
+                          $kg_loss = ($kg * $loss) / 100; 
+                          $total = $kg +  $kg_loss;
 
-                      $kuota = $data_detail_wo[0]->kuota;
-                      $kuota_tambah = $kuota - $total;
-                    }
-                    
-                    $detail_wo = [
-                      'id_walkorder' => $wo_id,
-                      'ref_detail_id' => $xrow->id,
-                      'qty' => $qty_wodet,
-                      'tipe_id' => 2,
-                      'gram'         => $gram,
-                      'gram_nd'      => $gram_nd,
-                      'kg'           => $kg,
-                      'loss'         => $loss,
-                      'kg_loss'      => $kg_loss,
-                      'total'        => $total,
-                      'kuota'        => $kuota,
-                      'kuota_tambah' => $kuota_tambah,
-                      'created_at' => date("Y-m-d H:i:s")
-                    ];
-                   
-                    $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
-    
-                    for ($i=0; $i < 8 ; $i++) { 
-                      $field_name = 'id_warna_' . ($i + 1);
-                      if(!empty($xrow->$field_name)){
-
-                        $params_d['id_walkorder_detail'] = $data_detail_wo[0]->id;
-                        $params_d['id_warna'] = $xrow->$field_name;
-                        $data_detail = $this->mworkOrder->getData_warna(null, 0, 1, null, null, $params_d);
-
-                        $xgram = 0;
-                        $xgram_nd = 0;
-                        $xkg = 0;
-                        $xloss = 0;
-                        $xkg_loss = 0;
-                        $xtotal = 0;
-                        $xkuota = 0;
-                        $xkuota_tambah = 0;
-
-                        if(!empty($data_detail[0]->gram)){
-                          $xgram = $data_detail[0]->gram;
-                          $xgram_nd = $xgram * $qty_wodet; 
-                          $xkg = $xgram_nd / 1000;
-                          $xloss = $data_detail[0]->loss;
-                          $xkg_loss = ($xkg * $xloss) / 100; 
-                          $xtotal = $xkg +  $xkg_loss;
-
-                          $xkuota = $data_detail[0]->kuota;
-                          $xkuota_tambah = $xkuota - $xtotal;
+                          $kuota = $data_detail_wo[0]->kuota;
+                          $kuota_tambah = $kuota - $total;
                         }
-
-                        $isi_warna = [
-                          'id_walkorder_detail' => $wo_det_id,
-                          'id_warna' => $xrow->$field_name,
-                          'persen'       => $data_detail[0]->persen,
-                          'gram'         => $xgram,
-                          'gram_nd'      => $xgram_nd,
-                          'kg'           => $xkg,
-                          'kg_loss'      => $xkg_loss,
-                          'total'        => $xtotal,
-                          'kuota'        => $xkuota,
-                          'kuota_tambah' => $xkuota_tambah,
-                          'loss'         => $xloss,
+                        
+                        $detail_wo = [
+                          'id_walkorder' => $wo_id,
+                          'ref_detail_id' => $xrow->id,
+                          'qty' => $qty_wodet,
+                          'tipe_id' => 2,
+                          'gram'         => $gram,
+                          'gram_nd'      => $gram_nd,
+                          'kg'           => $kg,
+                          'loss'         => $loss,
+                          'kg_loss'      => $kg_loss,
+                          'total'        => $total,
+                          'kuota'        => $kuota,
+                          'kuota_tambah' => $kuota_tambah,
                           'created_at' => date("Y-m-d H:i:s")
                         ];
-                        
-                        $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
+                      
+                        $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
+        
+                        for ($i=0; $i < 8 ; $i++) { 
+                          $field_name = 'id_warna_' . ($i + 1);
+                          if(!empty($xrow->$field_name)){
+
+                            $params_d['id_walkorder_detail'] = $data_detail_wo[0]->id;
+                            $params_d['id_warna'] = $xrow->$field_name;
+                            $data_detail = $this->mworkOrder->getData_warna(null, 0, 1, null, null, $params_d);
+
+                            $xgram = 0;
+                            $xgram_nd = 0;
+                            $xkg = 0;
+                            $xloss = 0;
+                            $xkg_loss = 0;
+                            $xtotal = 0;
+                            $xkuota = 0;
+                            $xkuota_tambah = 0;
+
+                            if(!empty($data_detail[0]->gram)){
+                              $xgram = $data_detail[0]->gram;
+                              $xgram_nd = $xgram * $qty_wodet; 
+                              $xkg = $xgram_nd / 1000;
+                              $xloss = $data_detail[0]->loss;
+                              $xkg_loss = ($xkg * $xloss) / 100; 
+                              $xtotal = $xkg +  $xkg_loss;
+
+                              $xkuota = $data_detail[0]->kuota;
+                              $xkuota_tambah = $xkuota - $xtotal;
+                            }
+
+                            $isi_warna = [
+                              'id_walkorder_detail' => $wo_det_id,
+                              'id_warna' => $xrow->$field_name,
+                              'persen'       => $data_detail[0]->persen,
+                              'gram'         => $xgram,
+                              'gram_nd'      => $xgram_nd,
+                              'kg'           => $xkg,
+                              'kg_loss'      => $xkg_loss,
+                              'total'        => $xtotal,
+                              'kuota'        => $xkuota,
+                              'kuota_tambah' => $xkuota_tambah,
+                              'loss'         => $xloss,
+                              'created_at' => date("Y-m-d H:i:s")
+                            ];
+                            
+                            $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
+                          }
+                        }
+                    }else{
+                      if(!empty($data_warna)){
+                          foreach ($data_warna as $xrow) {
+                            $detail_wo = [
+                              'id_walkorder' => $wo_id,
+                              'ref_detail_id' => $xrow->id,
+                              'qty' => $this->mSalesOrder->getTotal_qty($xrow->id, 2),
+                              'tipe_id' => 2,
+                              'created_at' => date("Y-m-d H:i:s")
+                            ];
+            
+                            $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
+            
+                            for ($i=0; $i < 8 ; $i++) { 
+                              $field_name = 'id_warna_' . ($i + 1);
+                              if(!empty($xrow->$field_name)){
+                                $isi_warna = [
+                                  'id_walkorder_detail' => $wo_det_id,
+                                  'id_warna' => $xrow->$field_name,
+                                  'created_at' => date("Y-m-d H:i:s")
+                                ];
+                                $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
+                              }
+                            }
+                          }
                       }
                     }
-                }else{
-                  if(!empty($data_warna)){
-                    foreach ($data_warna as $xrow) {
-                      $detail_wo = [
-                        'id_walkorder' => $wo_id,
-                        'ref_detail_id' => $xrow->id,
-                        'qty' => $this->mSalesOrder->getTotal_qty($xrow->id, 2),
-                        'tipe_id' => 2,
-                        'created_at' => date("Y-m-d H:i:s")
-                      ];
-      
-                      $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
-      
-                      for ($i=0; $i < 8 ; $i++) { 
-                        $field_name = 'id_warna_' . ($i + 1);
-                        if(!empty($xrow->$field_name)){
-                          $isi_warna = [
-                            'id_walkorder_detail' => $wo_det_id,
-                            'id_warna' => $xrow->$field_name,
-                            'created_at' => date("Y-m-d H:i:s")
-                          ];
-                          $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
+                  }else{
+                    if(!empty($data_warna)){
+                      foreach ($data_warna as $xrow) {
+                        $detail_wo = [
+                          'id_walkorder' => $wo_id,
+                          'ref_detail_id' => $xrow->id,
+                          'qty' => $this->mSalesOrder->getTotal_qty($xrow->id, 2),
+                          'tipe_id' => 2,
+                          'created_at' => date("Y-m-d H:i:s")
+                        ];
+        
+                        $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
+        
+                        for ($i=0; $i < 8 ; $i++) { 
+                          $field_name = 'id_warna_' . ($i + 1);
+                          if(!empty($xrow->$field_name)){
+                            $isi_warna = [
+                              'id_walkorder_detail' => $wo_det_id,
+                              'id_warna' => $xrow->$field_name,
+                              'created_at' => date("Y-m-d H:i:s")
+                            ];
+                            $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
+                          }
                         }
                       }
-                    }
-                }
-                }
+                  }
+                  }
                
               }
           }
