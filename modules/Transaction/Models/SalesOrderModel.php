@@ -376,6 +376,7 @@ class SalesOrderModel extends \App\Models\PrModel
     {
         $this->db->transStart();
         try {
+            
             if (!empty($dataWarna['id'])) {
                 $dataWarna['updated_at'] = date("Y-m-d H:i:s");
                 $this->updateRecord("trans_sales_order_det", $dataWarna, 'id', $dataWarna['id']);

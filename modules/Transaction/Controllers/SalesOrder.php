@@ -251,12 +251,18 @@ class SalesOrder extends BaseController
       'deskripsi' => $deskripsi,
       'tgl_transaksi' => $tglTransaksi,
       'tgl_deadline' => $tglDeadline,
-      'id_sample' => $sampleId,
+      // 'id_sample' => $sampleId,
       // 'kode_sales_order' => $noSalesOrder,
       'active' => 1,
       // 'status' => 1,
       'gambar_id' => !empty($fileIdSalesOrder) ? $fileIdSalesOrder : null
     ];
+
+    // print_r($sampleId != 'null');exit;
+
+    if(!empty($sampleId) && $sampleId != 'null'){
+      $arr_isi['id_sample'] = $sampleId;
+    }
 
     
     $this->db->transBegin();
@@ -265,9 +271,10 @@ class SalesOrder extends BaseController
       $arr_isi['status'] = 1;
       $arr_isi['created_at'] = date("Y-m-d H:i:s");
       $arr_isi['kode_sales_order'] = $this->mSalesOrder->generete_kode();
+      // print_r($arr_isi);exit;
       $hid = $this->mSalesOrder->insertRecordGetid($this->mSalesOrder->table, $arr_isi);
 
-      if(!empty($sampleId)){
+      if(!empty($sampleId) && $sampleId != 'null'){
         $data_detail = $this->mSample->getDataDetailSample_ori($sampleId);
         if(!empty($data_detail)){
 
@@ -344,8 +351,9 @@ class SalesOrder extends BaseController
 
         // detail data 
         $data_warna = $this->mSalesOrder->getDataDetailSalesOrder_ori($id);
-
-        if(!empty($sampleId)){
+        // print_r($data_warna);
+        // exit;
+        if(!empty($sampleId) && $sampleId != 'null'){
 
           $params_wo['tipe_id'] = 1;
           $params_wo['ref_id']  = $sampleId;
@@ -356,8 +364,7 @@ class SalesOrder extends BaseController
             // input proses 
             $params_wo['id_walkorder'] = $ref_sample_wo[0]->id;
             $proces_wo = $this->mworkOrder->getData_proses(0, 0, 9999, null, null, $params_wo);
-            // print_r($proces_wo);
-            // exit;
+            
             if(!empty($proces_wo)){ 
               foreach ($proces_wo as $pro) {
                 $isiProses = [
@@ -381,10 +388,13 @@ class SalesOrder extends BaseController
                 if(!empty($xrow->id_warna_4)) $prms_sample['id_warna_4'] = $xrow->id_warna_4;
                 $data_detail = $this->mSample->getDataDetailSample_ori($sampleId, $prms_sample);
                
-                $params_wod['ref_detail_id'] = $data_detail[0]->id;
-                $params_wod['tipe_id'] = 1;
-                $params_wod['id_walkorder']  = $ref_sample_wo[0]->id;
-                $data_detail_wo = $this->mworkOrder->getData_detail(null, 0, 1, null, null, $params_wod);
+                // $params_wod['ref_detail_id'] = $data_detail[0]->id;
+                // $params_wod['tipe_id'] = 1;
+                // $params_wod['id_walkorder']  = $ref_sample_wo[0]->id;
+                // $data_detail_wo = $this->mworkOrder->getData_detail(null, 0, 1, null, null, $params_wod);
+
+                $prgram['id_sample_det'] = $data_detail[0]->id;
+                $data_detail_wo = $this->mSample->getData_gram(null, 0, 9999, null,  null, $prgram);
                 
                 if(!empty($data_detail_wo)){
                     

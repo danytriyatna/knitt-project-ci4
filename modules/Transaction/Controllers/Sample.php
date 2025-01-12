@@ -325,6 +325,7 @@ class Sample extends BaseController
     ];
 
     $res = $this->mSample->trxInsertUpdateRecord($dataWarna, $dataUkuran, $dataGram);
+    
     if ($res) {
       $status = true;
       $msg = "Data berhasil disimpan!";

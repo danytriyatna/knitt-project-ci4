@@ -425,7 +425,7 @@ class SampleModel extends \App\Models\PrModel
 
     function trxInsertUpdateRecord($dataWarna, $dataUkuran, $dataGram)
     {
-        // $this->db->transStart();
+        $this->db->transStart();
         try {
             if (!empty($dataWarna['id'])) {
                 $dataWarna['updated_at'] = date("Y-m-d H:i:s");
@@ -496,14 +496,14 @@ class SampleModel extends \App\Models\PrModel
              $this->updateRecord($this->table, $head_up, 'id', $dataWarna['id_sample']);
             $this->db->transComplete();
 
-            // if ($this->db->transStatus() === TRUE) {
-            //     return true;
-            // } else {
-            //     throw new \Exception("Transaction failed");
-            // }
+            if ($this->db->transStatus() === TRUE) {
+                return true;
+            } else {
+                throw new \Exception("Transaction failed");
+            }
         } catch (\Exception $e) {
-            print_r($e);exit;
-            // $this->db->transRollback();
+            // print_r($e);exit;
+            $this->db->transRollback();
             throw $e;
         }
     }
