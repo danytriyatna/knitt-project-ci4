@@ -14,16 +14,16 @@
           <i>*) Wajib diisi</i>
         </div>
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="kode_warna">Kode Warna<span class="text-danger">*</span></label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="kode_warna">Warna<span class="text-danger">*</span></label>
           <div class="col-md-9">
-            <input type="text" id="kode_warna" name="kode_warna" class="form-control" placeholder="Ketik Kode Warna" required>
+            <input type="text" id="kode_warna" name="kode_warna" class="form-control" placeholder="Ketik Warna" required>
             <div class="invalid-feedback">
-              Kode Warna tidak valid
+              Warna tidak valid
             </div>
           </div>
         </div>
         <div class="form-group row">
-          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_sales_order">Keterangan</label>
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="desc_sales_order">Kode Warna</label>
           <div class="col-md-9">
             <textarea name="keterangan" id="keterangan" class="form-control" rows="5"></textarea>
           </div>

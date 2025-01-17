@@ -14,6 +14,7 @@
           <div class="col-md-9">
             <div class="input-group">
               <input type="text" id="namaBarang" readonly name="namaBarang" class="form-control" placeholder="Pilih Barang" required>
+              <input type="hidden" id="idDetail" name="idDetail" class="form-control" required>
               <input type="hidden" id="idBarang" name="idBarang" class="form-control" required>
               <input type="hidden" id="kodeBarang" name="kodeBarang" class="form-control" required>
               <span id="spanBarang" class="input-group-text bg-white" id="basic-addon11"><i class="ti-search"></i></span>
@@ -144,8 +145,10 @@
                   <div class="form-group row">
                     <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_no">PO No.</label>
                     <div class="col-md-9">
-                      <input type="hidden" id="status" name="status" value="<?= $status ?>" class="form-control" required>
-                      <input type="text" id="po_no" name="po_no" class="form-control" readonly placeholder="Diisi otomatis oleh sistem">
+                      <input type="hidden" id="status" name="status" value="<?= !empty($resData->status) ? $resData->status : null ?>" class="form-control" required>
+                      <input type="hidden" id="data-details" value='<?= !empty($detail) ? $detail : null; ?>'>
+                      <input type="hidden" id="id_header" name="id_header" value="<?= !empty($id) ? $id : null ?>" class="form-control" required>
+                      <input type="text" id="po_no" name="po_no" class="form-control" value="<?= !empty($resData->po_no) ? $resData->po_no : null ?>" readonly placeholder="Diisi otomatis oleh sistem">
                     </div>
                   </div>
                 </div>
@@ -153,7 +156,7 @@
                   <div class="form-group row">
                     <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tgl_po">PO Date</label>
                     <div class="col-md-8">
-                      <input type="text" id="tgl_po" name="tgl_po" class="form-control datepicker" placeholder="Pilih tanggal PO" value="01 November 2024">
+                      <input type="text" id="tgl_po" name="tgl_po" class="form-control datepicker" placeholder="Pilih tanggal PO" value="<?= !empty($resData->po_date) ? $resData->po_date : null ?>">
                     </div>
                   </div>
                 </div>
@@ -163,7 +166,7 @@
                   <div class="form-group row">
                     <label class="control-label text-start text-md-end col-md-3 col-form-label" for="tgl_expected"><span class="text-nowrap">Expected</span><br>Date</label>
                     <div class="col-md-9">
-                      <input type="text" id="tgl_expected" name="tgl_expected" class="form-control datepicker" placeholder="Pilih expected date" value="01 November 2024">
+                      <input type="text" id="tgl_expected" name="tgl_expected" class="form-control datepicker" placeholder="Pilih expected date" value="<?= !empty($resData->date_exc) ? $resData->date_exc : null ?>">
                     </div>
                   </div>
                 </div>
@@ -173,8 +176,12 @@
                     <div class="col-md-8">
                       <select id="select_term" name="select_term" class="form-select select2" data-placeholder="-- Pilih Term --">
                         <?php foreach ($term as $row) : ?>
-                          <option value="<?= $row['id'] ?>"><?= $row['name'] ?></option>
-                        <?php endforeach ?>
+                          <?php if (!empty($data->id_term) && $data->id_term == $row['id']) { ?>
+                            <option checked value="<?= $row['id'] ?>"><?= $row['name'] ?></option>
+                          <?php } else { ?>
+                            <option value="<?= $row['id'] ?>"><?= $row['name'] ?></option>
+                        <?php }
+                        endforeach ?>
                       </select>
                     </div>
                   </div>
@@ -186,8 +193,8 @@
                 <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_vendor">Vendor</label>
                 <div class="col-md-10">
                   <div class="input-group">
-                    <input type="text" id="namaVendor" readonly name="namaVendor" class="form-control" placeholder="Pilih Vendor" required>
-                    <input type="hidden" id="idVendor" name="idVendor" class="form-control" required>
+                    <input type="text" id="namaVendor" value="<?= !empty($resData->nama_vendor) ? $resData->nama_vendor : null ?>" readonly name="namaVendor" class="form-control" placeholder="Pilih Vendor" required>
+                    <input type="hidden" id="idVendor" name="idVendor" value="<?= !empty($resData->id_vendor) ? $resData->id_vendor : null ?>" class="form-control" required>
                     <span id="spanVendor" class="input-group-text bg-white" id="basic-addon11"><i class="ti-search"></i></span>
                   </div>
                 </div>
@@ -195,7 +202,7 @@
               <div class="form-group row">
                 <label class="control-label text-start text-md-end col-md-2 col-form-label" for="ship_to">Ship To</label>
                 <div class="col-md-10">
-                  <textarea rows="3" id="ship_to" name="ship_to" class="form-control" placeholder="Ketikkan uraian pengiriman"></textarea>
+                  <textarea rows="3" id="ship_to" name="ship_to" class="form-control" placeholder="Ketikkan uraian pengiriman"><?= !empty($resData->ship_to) ? $resData->ship_to : null ?></textarea>
                 </div>
               </div>
             </div>
@@ -220,9 +227,9 @@
                   <a href="purchasing/purchase-order" class="btn btn-default m-e-5">
                     <span class="fa fa-arrow-left"></span> Kembali
                   </a>
-                  <a href="purchasing/purchase-order" class='btn btn-success'>
+                  <button class='btn btn-success' id="btn-simpan">
                     <span class="fa fa-save"></span> Simpan
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>

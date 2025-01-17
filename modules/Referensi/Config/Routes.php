@@ -15,6 +15,15 @@ $routes->group("master-data/ukuran", ['namespace' => 'Modules\Referensi\Controll
     $routes->get('delete/(:any)', 'RefUkuran::deactivate/$1');
 });
 
+
+$routes->group("master-data/proses", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefProsesProduksi::index');
+
+    $routes->post('list', 'RefProsesProduksi::lists');
+    $routes->post('simpan', 'RefProsesProduksi::save');
+    $routes->get('delete/(:any)', 'RefProsesProduksi::deactivate/$1');
+});
+
 $routes->group("master-data/konsumen", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
     $routes->get('/', 'RefKonsumen::index');
 
@@ -24,6 +33,17 @@ $routes->group("master-data/konsumen", ['namespace' => 'Modules\Referensi\Contro
 
     $routes->post('get_data_style', 'RefKonsumen::getStyle_data');
 });
+
+$routes->group("master-data/karyawan", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
+    $routes->get('/', 'RefKaryawan::index');
+
+    $routes->post('list', 'RefKaryawan::lists');
+    $routes->post('simpan', 'RefKaryawan::save');
+    $routes->get('delete/(:any)', 'RefKaryawan::deactivate/$1');
+
+    $routes->post('get_data_style', 'RefKaryawan::getStyle_data');
+});
+
 $routes->group("master-data/operator", ['namespace' => 'Modules\Referensi\Controllers'], static function ($routes) {
     $routes->get('/', 'RefOperator::index');
 

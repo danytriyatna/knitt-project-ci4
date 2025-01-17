@@ -19,7 +19,7 @@ class SalesOrderModel extends \App\Models\PrModel
         $builder = $this->db->table($this->table . " abx");
 
         $builder->select("abx.id, abx.kode_sales_order, abx.deskripsi, bbx.nama, abx.id_konsumen, abx.keterangan, abx.tgl_transaksi, abx.tgl_deadline, abx.status, 
-                          abx.gambar_id,cbx.file_name, abx.id_sample, abx.uang_dp");
+                          abx.gambar_id,cbx.file_name, abx.id_sample, abx.uang_dp, abx.style");
         $builder->join("ref_konsumen bbx", "abx.id_konsumen = bbx.id", "inner");
         $builder->join("_files cbx", "abx.gambar_id = cbx.id", "left");
         if ($id == null or $id == "") {
@@ -92,6 +92,7 @@ class SalesOrderModel extends \App\Models\PrModel
         $builder->groupBy("abx.harga_satuan");
         $builder->groupBy("xb.id_walkorder_proses");
         $builder->groupBy("abx.id");
+
         if ($id == null or $id == "") {
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
                 $builder->groupStart();
@@ -196,13 +197,14 @@ class SalesOrderModel extends \App\Models\PrModel
                         END 
                             ) AS colour,
                         COALESCE ( w1.kode_warna, '' ) as colorDasar");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'S' THEN bbx.qty ELSE 0 END ) AS S ");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'M' THEN bbx.qty ELSE 0 END ) AS M ");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'L' THEN bbx.qty ELSE 0 END ) AS L ");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'XL' THEN bbx.qty ELSE 0 END ) AS XL ");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'XXL' THEN bbx.qty ELSE 0 END ) AS XXL ");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = '3XL' THEN bbx.qty ELSE 0 END ) AS XXXL ");
-        $builder->select("MAX ( CASE WHEN cbx.kode_ukuran = 'All' THEN bbx.qty ELSE 0 END ) AS All ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'xs' THEN bbx.qty ELSE 0 END ) AS XS ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 's' THEN bbx.qty ELSE 0 END ) AS S ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'm' THEN bbx.qty ELSE 0 END ) AS M ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'l' THEN bbx.qty ELSE 0 END ) AS L ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'xl' THEN bbx.qty ELSE 0 END ) AS XL ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'xxl' THEN bbx.qty ELSE 0 END ) AS XXL ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'xxxl' THEN bbx.qty ELSE 0 END ) AS XXXL ");
+        $builder->select("MAX ( CASE WHEN cbx.key_ukuran = 'all' THEN bbx.qty ELSE 0 END ) AS All ");
         $builder->select("SUM(bbx.harga_satuan) AS harga_satuan");
         $builder->join("trans_sales_order_ukuran bbx", "abx.id = bbx.id_sales_order_det AND abx.id_sales_order = bbx.id_sales_order", "inner");
         $builder->join("ref_ukuran cbx", "bbx.id_ukuran = cbx.id", "left");
@@ -220,6 +222,117 @@ class SalesOrderModel extends \App\Models\PrModel
         return $this->_data;
     }
 
+    function getDataDetailSalesOrder_crostab($id){
+
+       
+        // get data ukuran 
+        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['id_sales_order'] = $id;
+        $dtUkuran = $this->getUkuranTrans($pru);
+
+        // looping data ukuran
+         // Dynamic Columns
+         $col11 = "";
+         $col12 = "";
+         $col21 = "";
+         $col22 = "";
+         $col3 = "";
+         
+         foreach ($dtUkuran as $item) {
+             $key = $item->key_ukuran;
+             if($key == 'all') $key = 'all_'; 
+             $hrg = $key . '_hrg';
+             $col11 .= ($col11 == "") ? "coalesce(tbl.$key,  0) as $key" : ",coalesce(tbl.$key, 0) as $key";
+            //  $col12 .= ($col12 == "") ? "coalesce(tbl.$hrg,0) as $hrg" : ",coalesce(tbl.$hrg,0) as $hrg";
+
+             $col21 .= ($col21 == "") ? "$key INT" : ",$key INT";
+
+             $col3 .= ($col3 == "") ? $key : ",".$key;
+            //  $col22 .= ($col22 == "") ? "$hrg Float" : ",$hrg Float";
+         }
+
+         // crostab query 
+         $sql = "
+                    SELECT 
+                        tbl.id,
+                        ROW_NUMBER ( ) OVER ( ORDER BY tbl.id ) AS no,
+                        COALESCE ( w1.kode_warna, '' ) as colorDasar,
+                        TRIM ( BOTH ' - ' FROM COALESCE ( w1.kode_warna, '' ) || 
+                                CASE WHEN w2.kode_warna IS NOT NULL THEN ' - ' || w2.kode_warna ELSE '' END ||
+                                CASE WHEN w3.kode_warna IS NOT NULL THEN ' - ' || w3.kode_warna ELSE '' END ||
+                                CASE WHEN w4.kode_warna IS NOT NULL THEN ' - ' || w4.kode_warna ELSE '' END ||
+                                CASE WHEN w5.kode_warna IS NOT NULL THEN ' - ' || w5.kode_warna ELSE '' END ||
+                                CASE WHEN w6.kode_warna IS NOT NULL THEN ' - ' || w6.kode_warna ELSE '' END ||
+                                CASE WHEN w7.kode_warna IS NOT NULL THEN ' - ' || w7.kode_warna ELSE '' END ||
+                                CASE WHEN w8.kode_warna IS NOT NULL THEN ' - ' || w8.kode_warna ELSE '' END 
+                        ) AS colour,
+                        {$col11},
+                        COALESCE((select sum(x.harga_total) from trans_sales_order_ukuran x where x.id_sales_order_det = tbl.id), 0) as total_harga
+                    FROM 
+                        CROSSTAB(
+                            $$ 
+                            SELECT 
+                                td.id,
+                                ru.seq,
+                                 (case when ru.key_ukuran = 'all' THEN 'all_' else ru.key_ukuran end) as key_ukuran,
+                                SUM(COALESCE(tu.qty, 0)) AS qty
+                            FROM 
+                                trans_sales_order_ukuran tu 
+                            INNER JOIN trans_sales_order_det td ON td.id = tu.id_sales_order_det
+                            INNER JOIN ref_ukuran ru on ru.id = tu.id_ukuran
+                            WHERE (tu.qty is not null and tu.qty > 0) AND td.id_sales_order = {$id}
+                            group by td.id, ru.key_ukuran, ru.seq
+                            order by td.id, ru.seq asc
+                            $$,
+                            $$ 
+                                SELECT unnest(string_to_array('{$col3}', ','))
+                            $$
+                        ) AS tbl (
+                            id INT,
+                            seq INT,
+                            {$col21}
+                        )
+                    INNER JOIN trans_sales_order_det td ON td.id = tbl.id
+                    INNER JOIN ref_warna w1 ON td.id_warna_1 = w1.id
+                    LEFT JOIN ref_warna w2 ON td.id_warna_2 = w2.id
+                    LEFT JOIN ref_warna w3 ON td.id_warna_3 = w3.id
+                    LEFT JOIN ref_warna w4 ON td.id_warna_4 = w4.id
+                    LEFT JOIN ref_warna w5 ON td.id_warna_5 = w5.id
+                    LEFT JOIN ref_warna w6 ON td.id_warna_6 = w6.id
+                    LEFT JOIN ref_warna w7 ON td.id_warna_7 = w7.id
+                    LEFT JOIN ref_warna w8 ON  td.id_warna_8 = w8.id;
+
+            ";
+
+        $query = $this->db->query($sql);
+        $this->_data = $query->getResult();
+
+        return $this->_data;
+    }
+
+    function getUkuranTrans($params){
+        $builder = $this->db->table('trans_sales_order_ukuran tu');
+        $builder->select("tu.id_ukuran, rk.key_ukuran, rk.kode_ukuran, tu.id_sales_order");
+
+        $builder->join('trans_sales_order_det td', 'td.id = tu.id_sales_order_det', 'inner');
+        $builder->join('ref_ukuran rk', 'tu.id_ukuran = rk.id', 'inner');
+
+        if(!empty($params['use'])){
+            $builder->where('(tu.qty is not null and tu.qty > 0)');
+        }
+        
+        if(!empty($params['id_sales_order'])){
+            $builder->where('tu.id_sales_order', $params['id_sales_order']);
+        }
+        
+        $builder->groupBy("tu.id_ukuran, rk.key_ukuran, rk.kode_ukuran, rk.seq, tu.id_sales_order");
+
+        $builder->orderBy("rk.seq");
+        
+        $this->_data = $builder->get()->getResult();
+        return $this->_data;
+    }
+
     function getDataDetailSalesOrder_ori($idSalesOrder)
     {
         $builder = $this->db->table("trans_sales_order_det" . " abx");
@@ -228,7 +341,7 @@ class SalesOrderModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getDataDetailSampleUkuran($idSample, $idSampleDet)
+    function getDataDetailSampleUkuran($idSalesOrder, $idSalesOrderDet)
     {
         $sql = "SELECT
                     bbx.id,
@@ -240,8 +353,9 @@ class SalesOrderModel extends \App\Models\PrModel
                 FROM
                     ref_ukuran abx
                     LEFT JOIN trans_sales_order_ukuran bbx ON bbx.id_ukuran = abx.id
-                    AND bbx.id_sales_order = $idSample
-                    AND bbx.id_sales_order_det = $idSampleDet
+                    AND bbx.id_sales_order = $idSalesOrder
+                    AND bbx.id_sales_order_det = $idSalesOrderDet
+                    WHERE abx.active = 1
                     ORDER BY abx.id";
         $result = $this->db->query($sql);
         $this->_data   = $result->getResult();
@@ -262,6 +376,7 @@ class SalesOrderModel extends \App\Models\PrModel
     {
         $this->db->transStart();
         try {
+            
             if (!empty($dataWarna['id'])) {
                 $dataWarna['updated_at'] = date("Y-m-d H:i:s");
                 $this->updateRecord("trans_sales_order_det", $dataWarna, 'id', $dataWarna['id']);
@@ -277,21 +392,33 @@ class SalesOrderModel extends \App\Models\PrModel
                 ];
                 $this->deleteRecordMultipleColumn("trans_sales_order_ukuran", $arrDelete);
             }
+
+            $head_qty = 0;
+            $head_total = 0;
             foreach ($dataUkuran as $rowData) {
 
+                $harga_total = (!empty($rowData['qty']) && !empty($rowData['harga_satuan'])) ? $rowData['qty'] * $rowData['harga_satuan'] : 0;
                 $arrDataUkuran = [
                     "id_sales_order" => $dataWarna['id_sales_order'],
                     "id_sales_order_det" => !empty($dataWarna['id']) ? $dataWarna['id'] : $idSampleDet,
                     "id_ukuran" => $rowData['id_ukuran'],
                     "qty" => $rowData['qty'],
                     "harga_satuan" => $rowData['harga_satuan'],
-                    "harga_total" => (!empty($rowData['qty']) && !empty($rowData['harga_satuan'])) ? $rowData['qty'] * $rowData['harga_satuan'] : 0, //$rowData['harga_total'],
+                    "harga_total" => $harga_total, //$rowData['harga_total'],
                     "active" => 1,
                     "created_at" =>  date("Y-m-d H:i:s"),
 
                 ];
+                $head_qty = $head_qty + (!empty($rowData['qty'])) ? (int) $rowData['qty'] : 0;
+                $head_total = $head_total + (!empty($harga_total)) ? (float) $harga_total : 0;
                 $this->insertRecordGetid("trans_sales_order_ukuran", $arrDataUkuran);
             }
+
+            // update data qty dan total harga 
+            $head_up['qty'] = $head_qty;
+            $head_up['total_harga'] = $head_total;
+            $this->updateRecord($this->table, $head_up, 'id', $dataWarna['id_sales_order']);
+
             $this->db->transComplete();
 
             if ($this->db->transStatus() === TRUE) {

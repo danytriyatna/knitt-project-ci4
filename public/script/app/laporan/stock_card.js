@@ -4,11 +4,12 @@ let dtList = new Tabulator("#dt-list", {
     paginationButtonCount: 5,
     columns:[
         {title:"Tanggal", field:"tanggal", width:"15%"},
-        {title:"Kategori", field:"kategori", hozAlign:"center",width:"20%"},
-        {title:"Nama Gudang", field:"nama_gudang", hozAlign:"center",width:"20%"},
-        {title:"Masuk", field:"masuk", hozAlign:"center",width:"15%"},
-        {title:"Keluar", field:"keluar", hozAlign:"center",width:"15%"},
-        {title:"Saldo", field:"saldo", hozAlign:"center",width:"15%"},
+        {title:"Transaksi", field:"transaksi", hozAlign:"left",width:"20%"},
+        {title:"No. Transaksi", field:"kode_transaksi", hozAlign:"left",width:"20%"},
+        {title:"Lot", field:"lot_no", hozAlign:"left",width:"10%"},
+        {title:"Qty<br>Masuk", field:"masuk", hozAlign:"right",width:"10%"},
+        {title:"Qty<br>Keluar", field:"keluar", hozAlign:"right",width:"10%"},
+        {title:"Saldo", field:"saldo_akhir", hozAlign:"right",width:"15%"},
     ],
     locale: 'id',    
     // layout: 'fitColumns',
@@ -136,10 +137,10 @@ $("#filter_barang").click(function () {
 });
 
 $("#btn-tampilkan").click(function () {
-    if($("#tgl_mulai").val() == "" && $("#tgl_akhir").val() == ""){
+    if($("#filter_barang_id").val() == "" || $("#filter_tahun").val() == "" || $("#filter_bulan").val() == "" || $('#filter_gudang').val() == "" ){
       Swal.fire({
         title: 'Warning',
-        text: 'Tanggal Mulai & Tanggal Akhir harus diisi',
+        text: 'Tahun,Bulan,Barang & Gudang harus dipilih',
         icon: 'warning',
       })
       return false    
@@ -150,11 +151,14 @@ $("#btn-tampilkan").click(function () {
   $("#btn-reset").click(function () {
       $("#filter_barang").val("");
       $("#filter_barang_id").val("");
+      $("#filter_gudang").val("").trigger("change");
+      $("#filter_tahun").val("").trigger("change");
+      $("#filter_bulan").val("").trigger("change");
   });
 
   function getDataLaporan(){
     $.ajax({
-        url: `/laporan/stock-card/list?filter_barang_id=${$('#filter_barang_id').val()}&tgl_mulai=${$('#tgl_mulai').val()}&tgl_akhir=${$('#tgl_akhir').val()}`,
+        url: `/laporan/stock-card/list?filter_barang_id=${$('#filter_barang_id').val()}&tahun=${$('#filter_tahun').val()}&bulan=${$('#filter_bulan').val()}&filter_gudang_id=${$('#filter_gudang').val()}`,
         type: 'GET',
         dataType: 'json', 
         success: function(data) {

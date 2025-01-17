@@ -50,24 +50,48 @@
         <div class="card-body">
 
           <div class="row">
-            <div class="col-sm-2">
+            <div class="col-sm-4">
               <div class="form-group m-b-0">
                 <label class="control-label text-left text-md-right" for="filter_fitur">Barang</label>
                 <input type="hidden" id="filter_barang_id" name="filter_barang_id">
-                <input type="text" id="filter_barang" name="filter_barang" class="form-control" placeholder="Semua Barang" readonly>
+                <input type="text" id="filter_barang" name="filter_barang" class="form-control" placeholder="-- Pilih Barang --" readonly>
               </div>
             </div>
 
-            <div class="col-sm-2">
+            <div class="col-sm-4">
               <div class="form-group m-b-0">
-                <label class="control-label text-left text-md-right" for="filter_penguji">Tanggal Mulai</label>
-                <input type='date' class='form-control' id='tgl_mulai' name='tgl_mulai' value="<?= date("Y-m-d") ?>">
+                <label class="control-label text-left text-md-right" for="filter_penguji">Gudang</label>
+                <select id="filter_gudang" name="filter_gudang" class="form-select select2" data-placeholder="-- Pilih Warehouse --">
+                  <option value="">Semua Gudang</option>
+                  <?php foreach ($gudang as $item) : ?>
+                    <option value="<?= $item->id ?>"><?= $item->nama_gudang ?></option>
+                  <?php endforeach; ?>
+                </select>
               </div>
             </div>
-            <div class="col-sm-2">
+
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
               <div class="form-group m-b-0">
-                <label class="control-label text-left text-md-right" for="filter_penguji">Tanggal Akhir</label>
-                <input type='date' class='form-control' id='tgl_akhir' name='tgl_akhir' value="<?= date("Y-m-d", strtotime('+7 days')) ?>">
+                <label class="control-label text-left text-md-right" for="filter_penguji">Bulan</label>
+                <select id="filter_bulan" name="filter_bulan" class="form-select select2" data-placeholder="-- Pilih Bulan --">
+                  <option value="">Semua Bulan</option>
+                  <?php foreach ($bulan as $item) : ?>
+                    <option value="<?= $item->id ?>"><?= $item->bulan ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group m-b-0">
+                <label class="control-label text-left text-md-right" for="filter_penguji">Tahun</label>
+                <select id="filter_tahun" name="filter_tahun" class="form-select select2" data-placeholder="-- Pilih Tahun --">
+                  <option value="">Semua Tahun</option>
+                  <?php foreach ($tahun as $item) : ?>
+                    <option value="<?= $item->tahun ?>"><?= $item->tahun ?></option>
+                  <?php endforeach; ?>
+                </select>
               </div>
             </div>
             <div class="col-sm-2 align-self-end">

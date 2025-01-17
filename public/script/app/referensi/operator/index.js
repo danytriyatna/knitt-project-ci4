@@ -58,7 +58,7 @@ $(document).ready(function () {
             },
             {
                 title: "Tgl Bergabung", field: "tgl_bergabung", headerSort: false,
-                width: "20%", cssClass : 'text-center'
+                width: "20%", cssClass : 'text-center', visible: false
             },
             {
                 title: "Harga", field: "harga", headerSort: false,

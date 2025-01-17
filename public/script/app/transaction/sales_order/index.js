@@ -7,6 +7,7 @@ $(document).ready(function () {
     let inpData           = $('#data_id');
     let inpNoSalesOrder   = $('#no_sales_order');
     let inpDeskripsi      = $('#desc_style');
+    let inpStyle          = $('#style');
     let inpBuyer          = $('#select_buyer');
     let inpTglTransaksi   = $('#tgl_sales_order');
     let inpTglDeadline    = $('#tgl_deadline');
@@ -107,47 +108,41 @@ $(document).ready(function () {
         selectableRows: false,
 	});
 
+    let defColumDet = [
+                        {
+                            headerSort: false,  
+                            title: 'Aksi', 
+                            formatter: buttonRowAction,
+                            width: 100, align: "center", cssClass: "text-center",
+                            cellClick: function(e, cell) {
+                                let row = cell.getRow();
+                                let data_row = row.getData();
+                                if (e.target.title === 'delete') {
+                                    if (confirm("Anda yakin akan menghapus data?")) {
+                                        deleteData(data_row.id)
+                                        // window.location.replace(baseUrl + "/trans/sales-order/delete/detail" + data_row.id);
+                                    }
+                                }else if(e.target.title === 'edit'){
+                                    getDetailQty(idSalesOrder,data_row.id)
+                                }   
+                            }
+                        },
+                        {headerSort: false,title:"Colour", field:"colour"},
+                        {headerSort: false,title:"Amount", field:"harga_satuan",formatter: "money", formatterParams: {
+                            decimal: ",",
+                            thousand: ".",
+                            symbol: "Rp",  // Simbol mata uang Rupiah
+                            precision: 0,   // Tidak ada desimal
+                        }, hozAlign:"right", width: '12%'},
+                    ]
     let dtListDetail = new Tabulator("#dt-detail", {
         pagination: true, 
         paginationSize: 10,
         paginationButtonCount: 5,
-        columns:[
-            {title:"ID", field:"id", visible:false},
-            {
-                headerSort: false,  
-                title: 'Aksi', 
-                formatter: buttonRowAction,
-                width: 100, align: "center", cssClass: "text-center",
-                cellClick: function(e, cell) {
-                    let row = cell.getRow();
-                    let data_row = row.getData();
-                    if (e.target.title === 'delete') {
-                        if (confirm("Anda yakin akan menghapus data?")) {
-                            deleteData(data_row.id)
-                            // window.location.replace(baseUrl + "/trans/sales-order/delete/detail" + data_row.id);
-                        }
-                    }else if(e.target.title === 'edit'){
-                        getDetailQty(idSalesOrder,data_row.id)
-                    }   
-                }
-            },
-            {title:"Colour", field:"colour", width:"40%"},
-            {title:"S", field:"s", hozAlign:"center",width:"7%"},
-            {title:"M", field:"m", hozAlign:"center",width:"7%"},
-            {title:"L", field:"l", hozAlign:"center",width:"7%"},
-            {title:"XL", field:"xl", hozAlign:"center",width:"7%"},
-            {title:"XXL", field:"xxl", hozAlign:"center",width:"7%"},
-            {title:"3XL", field:"xxxl", hozAlign:"center",width:"7%"},
-            {title:"All", field:"all", hozAlign:"center",width:"7%"},
-            {title:"Amount", field:"harga_satuan",formatter: "money", formatterParams: {
-                decimal: ",",
-                thousand: ".",
-                symbol: "Rp",  // Simbol mata uang Rupiah
-                precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right"},
-        ],
+        columns: defColumDet,
         locale: 'id',    
-        // layout: 'fitColumns',
+        layout:"fitColumns",
+        resizableColumnFit:true,
         placeholder: "Tidak ada data",
 	});
 
@@ -173,40 +168,41 @@ $(document).ready(function () {
         paginationButtonCount: 5,
         columns:[
             {title:"ID", field:"id", visible:false},
-            {
-                headerSort: false,  
-                title: 'Aksi', 
-                formatter: buttonQRAction,
-                width: '10%', align: "center", cssClass: "text-center",
-                cellClick: function(e, cell) {
-                    let row = cell.getRow();
-                    let data_row = row.getData();
-                    if (e.target.title === 'qr code') {
-                        generateQRCode(data_row)
-                    } 
-                }
-            },
-            {title:"No",formatter: "rownum",hozAlign: "center", width:"5%"},
-            {title:"id_ukuran", field:"id_ukuran", hozAlign:"center",width:"7%",visible:false},
-            {title:"Ukuran", field:"ukuran", hozAlign:"center",width:"23%"},
-            {title:"QTY", field:"qty", hozAlign:"center",width:"22%",editor: "number",cellEdited: updateTotal},
-            {title:"Price", field:"harga_satuan",formatter: "money", formatterParams: {
+            // {
+            //     headerSort: false,  
+            //     title: 'Aksi', 
+            //     formatter: buttonQRAction,
+            //     width: '10%', align: "center", cssClass: "text-center",
+            //     cellClick: function(e, cell) {
+            //         let row = cell.getRow();
+            //         let data_row = row.getData();
+            //         if (e.target.title === 'qr code') {
+            //             generateQRCode(data_row)
+            //         } 
+            //     }
+            // },
+            {headerSort: false,title:"No",formatter: "rownum",cssClass:'text-center', hozAlign: "center", width:"8%"},
+            {headerSort: false,title:"id_ukuran", field:"id_ukuran", cssClass:'text-center', hozAlign:"center",visible:false},
+            {headerSort: false,title:"Ukuran", field:"ukuran", cssClass:'text-center', hozAlign:"center",width:"18%"},
+            {headerSort: false,title:"QTY", field:"qty", cssClass:'text-center', hozAlign:"center",width:"10%",editor: "number",cellEdited: updateTotal},
+            {headerSort: false,title:"Price", field:"harga_satuan",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
                 precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right",width:"25%",editor: "number",cellEdited: updateTotal},
-            {title:"Total", field:"harga_total",formatter: "money", formatterParams: {
+            }, cssClass:'text-end', hozAlign:"right",width:"32%",editor: "number",cellEdited: updateTotal},
+            {headerSort: false,title:"Total", field:"harga_total",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
                 precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right",width:"25%"},
+            }, cssClass:'text-end', hozAlign:"right",width:"32%"},
         ],
      
         locale: 'id',    
         // layout: 'fitColumns',
         placeholder: "Tidak ada data",
+        height: '300px',
         pagination:false
 	});
 
@@ -232,6 +228,17 @@ $(document).ready(function () {
             }, 600);
         });
     }
+
+     // declarre untuk variable print qr
+     const mdlPrint = $("#modal-print-barcode");
+     const inpp_foto = $("#fotoPrint");
+     const inpp_noSo = $("#noSamplePrint");
+     const inpp_deskripsi = $("#deskripsiPrint");
+     const inpp_tglSample = $("#tglSamplePrint");
+     const inpp_tglDeadline = $("#tglDeadlinePrint");
+     const inpp_buyer = $("#buyerPrint");    
+     const inpp_warna = $("#warnaPrint");
+     const inpp_trans = $("#warnaTrans");
 
     function cardFormatter(cell, formatterParams, onRendered){
         let data = cell.getRow().getData(); // Ambil data row
@@ -293,6 +300,12 @@ $(document).ready(function () {
                     </div>
                   </div>
                 </div>`;
+
+        // declarre untuk variable print qr
+        const print_btn = () => {
+            let btn = `<button type="button" class="btn btn-sm btn-info" data-bs-toggle="modalz" title="print-warna"> <i class="fa fa-print" title="print-warna"></i></button>`;
+            return btn
+        }
     
         onRendered(()=>{
             
@@ -306,29 +319,66 @@ $(document).ready(function () {
                     window.location.replace(baseUrl + "/trans/sales-order/delete/list" + data.id);
                 }
             });
-            new Tabulator(`#dt-list-detail-${data.id}`, {
-                data: data.detail, 
-                layout:"fitColumns",
-                pagination: true, 
-                paginationSize: 10,
-                paginationButtonCount: 5,
-                columns:[
-                    {title:"No", field:"no",   width: "5%"},
-                    {title:"Colour", field:"colordasar", width:"20%"},
-                    {title:"S", field:"s", hozAlign:"center",width:"7%"},
-                    {title:"M", field:"m", hozAlign:"center",width:"7%"},
-                    {title:"L", field:"l", hozAlign:"center",width:"7%"},
-                    {title:"XL", field:"xl", hozAlign:"center",width:"7%"},
-                    {title:"XXL", field:"xxl", hozAlign:"center",width:"7%"},
-                    {title:"3XL", field:"xxxl", hozAlign:"center",width:"7%"},
-                    {title:"All", field:"all", hozAlign:"center",width:"7%"},
-                    {title:"Amount", field:"harga_satuan",formatter: "money", formatterParams: {
+            
+            let isColumn = [
+                {headerSort: false,title:"No", field:"no",   width: "5%"},
+                {headerSort: false,  title:"QR", width:"7%", formatter: print_btn,
+                    cellClick: function(e, cell) {
+                        let row = cell.getRow();
+                        let data_row = row.getData();
+                        if (e.target.title === 'print-warna') {
+                            // console.log(data_row)
+
+                            const inpp_slcUkuran = $("#print_slc_ukuran");
+                            const inpp_qty       = $("#print_qty");
+                            const inpp_qtyp      = $("#print_qtyp");
+
+                            // inpp_slcUkuran
+                            inpp_qty.val(1)
+                            inpp_qtyp.val(1)
+
+                            inpp_foto.attr('src', data.file_gambar);
+                            inpp_noSo.html(data.kode_sales_order)
+                            inpp_deskripsi.html(data.deskripsi);
+                            inpp_warna.html(data_row.colordasar);
+                            inpp_tglSample.html(formatterDate(data.tgl_transaksi))
+                            inpp_tglDeadline.html(formatterDate(data.tgl_deadline))
+                            inpp_buyer.html(data.nama)
+
+                            setTimeout(() => {
+                                // inpp_trans.html(data.id);
+                                mdlPrint.modal("show");
+                            }, 500);
+                        } 
+                    }
+                },
+                {headerSort: false, cssClass: 'text-start', title:"Colour", field:"colordasar"}
+            ]
+
+            for (const el of data.key_ukuran) {
+                const isKey = (el.key_ukuran == 'all') ? 'all_' : el.key_ukuran
+                isColumn.push( {headerSort: false,  title:el.kode_ukuran, field: isKey, cssClass: "text-center", hozAlign:"center", width:"7%"} )
+            }
+
+            isColumn.push(
+                {
+                    headerSort: false, cssClass: 'text-center', title:"Amount", field:"total_harga",formatter: "money", 
+                    formatterParams: {
                         decimal: ",",
                         thousand: ".",
                         symbol: "Rp",  // Simbol mata uang Rupiah
                         precision: 0,   // Tidak ada desimal
-                    }, hozAlign:"right"},
-                ],
+                    },
+                    hozAlign:"right", cssClass: 'text-end', width:"15%"})
+
+            new Tabulator(`#dt-list-detail-${data.id}`, {
+                data: data.detail, 
+                layout:"fitColumns",
+                resizableColumnFit:true,
+                pagination: true, 
+                paginationSize: 10,
+                paginationButtonCount: 5,
+                columns: isColumn,
             });
         });
     
@@ -346,6 +396,7 @@ $(document).ready(function () {
         inpTglTransaksi.val("")
         inpTglDeadline.val("")
         inpKetSalesOrder.val("")
+        inpSample.val("").trigger("change")
         inpUangDP.val("0").trigger("change");
         rowDet.hide()
         btnSend.hide()
@@ -368,7 +419,7 @@ $(document).ready(function () {
 
     $("#btn-save").on("click", function(e){
         e.preventDefault()
-        simpanData()
+        simpanData(0)
     });
 
     $("#btn-send").on("click", function(e){
@@ -430,20 +481,20 @@ $(document).ready(function () {
                 inpBuyer.val(data.id_konsumen).trigger('change')
                 
                 setTimeout(() => {
-                    inpSample.val(data.id_sample).trigger("change")
+                    inpSample.attr('value', data.id_sample)
                     setTimeout(() => {
                         inpTglDeadline.val(formatterDate(data.tgl_deadline))
                         inpTglTransaksi.val(formatterDate(data.tgl_transaksi))
                     }, 600);
-                }, 300);
+                }, 1000);
                 inpUangDP.val(data.uang_dp).trigger("change");
                 if(data.file_gambar){
                     fileSalesOrderOld.val(data.gambar_id)
                     linkFileSalesOrder.removeClass("d-none")
                     linkFileSalesOrder.attr('src', data.file_gambar)
                 }
-                dtListDetail.setData(data.detail)
-
+               
+                setColumDetailData(data)
 
                 
                 if(data.status == 'Draft'){
@@ -454,15 +505,65 @@ $(document).ready(function () {
 
                 isModal.modal("show");
 
-                setTimeout(() => {
-                    dtListDetail.redraw(true)
-                }, 500);
+                
             },
             error: function(xhr, status, error) {
                 console.error('Error fetching data:', error);
             }
         });
     }
+
+    function setColumDetailData(data){
+        let newColumn =  [
+                            {
+                                headerSort: false,  
+                                title: 'Aksi', 
+                                formatter: buttonRowAction,
+                                width: 100, align: "center", cssClass: "text-center",
+                                cellClick: function(e, cell) {
+                                    let row = cell.getRow();
+                                    let data_row = row.getData();
+                                    if (e.target.title === 'delete') {
+                                        if (confirm("Anda yakin akan menghapus data?")) {
+                                            deleteData(data_row.id)
+                                            // window.location.replace(baseUrl + "/trans/sales-order/delete/detail" + data_row.id);
+                                        }
+                                    }else if(e.target.title === 'edit'){
+                                        getDetailQty(idSalesOrder,data_row.id)
+                                    }   
+                                }
+                            },
+                            {headerSort: false,title:"Colour", field:"colour"},
+                        ]
+
+        const dataCol = data.key_ukuran
+
+        for (const el of dataCol) {
+            const isKey = (el.key_ukuran == 'all') ? 'all_' : el.key_ukuran
+            newColumn.push( {headerSort: false,  title:el.kode_ukuran, field: isKey, cssClass: "text-center", hozAlign:"center", width:"7%"} )
+        }
+
+        // last column 
+        newColumn.push(  
+                        {
+                            headerSort: false,title:"Amount", field:"total_harga",formatter: "money", 
+                            formatterParams: {
+                                decimal: ",",
+                                thousand: ".",
+                                symbol: "Rp",  // Simbol mata uang Rupiah
+                                precision: 0,   // Tidak ada desimal
+                            },
+                            hozAlign:"right", width: '15%'
+                        }
+                    )
+
+        setTimeout(() => {
+            dtListDetail.setColumns(newColumn);
+            dtListDetail.setData(data.detail)
+            dtListDetail.redraw(true)
+        }, 500);
+    }
+
     function getDetailQty(id,idDet) {
         $.ajax({
             url: `/trans/sales-order/detail-qty/${id}/${idDet}`,
@@ -578,6 +679,7 @@ $(document).ready(function () {
             formData.append("keterangan",inpKetSalesOrder.val());
             formData.append("samples", inpSample.val())
             formData.append("uang_dp", inpUangDP.val());
+            formData.append("style", inpStyle.val());
             formData.append("submit_data", send);
             
             $.ajax({
@@ -738,13 +840,12 @@ $(document).ready(function () {
                   'buyers': inpBuyer.val(),
               },
             success: function (res) {
-              
+              inpSample.empty()
               if(res.status){
                 isSampleData = res.data
-                inpSample.empty()
                 inpSample.append($("<option></option>").attr("value", 0).text("- Pilih Sample -"));
                 $.each(isSampleData, function(key,value) {
-                    inpSample.append($("<option></option>").attr("value", value.id).text(value.kode_sample + " : " + value.keterangan));
+                    inpSample.append($("<option></option>").attr("value", value.id).text(value.kode_sample + " : " + value.style));
                 });
 
                 if(inpData.val().length == 0){
@@ -753,6 +854,11 @@ $(document).ready(function () {
                     // // inpTglDeadline.val(changeTgl(isSampleData[0].tgl_deadline))
                     // inpKetSalesOrder.val(isSampleData[0].deskripsi)
                     // inpDeskripsi.val(isSampleData[0].deskripsi)
+                }else{
+                    setTimeout(() => {
+                        // console.log(inpSample.attr('value'))
+                        inpSample.attr('value') != undefined ? inpSample.val(inpSample.attr('value')).trigger('change') : ''
+                    }, 500);
                 }
                 
                 
@@ -775,17 +881,23 @@ $(document).ready(function () {
 
     inpSample.on("change", function(){
         let val = $(this).val()
+        $(this).val(val)
         let isin = isSampleData.filter((isi) => val == isi.id);
         if(isin.length > 0){
-            inpTglTransaksi.val("")
-            inpTglDeadline.val("")
             if(inpData.val().length == 0){
+                inpTglTransaksi.val("")
+                inpTglDeadline.val("")
                 let tglTr = isin[0].tgl_transaksi.split('-')
                 let tglTransaksi = tglTr['2'] + '-' + tglTr['1']+ '-' + tglTr['0']
-                inpTglTransaksi.datepicker('setDate', tglTransaksi); //.val(changeTgl(isin[0].tgl_transaksi))
+                // inpTglTransaksi.datepicker('setDate', tglTransaksi); //.val(changeTgl(isin[0].tgl_transaksi))
                 let tglD = isin[0].tgl_deadline.split('-')
                 let tglDead = tglD['2'] + '-' + tglD['1']+ '-' + tglD['0']
-                inpTglDeadline.datepicker('setDate', tglDead); //.val(changeTgl(isin[0].tgl_transaksi))
+                // inpTglDeadline.datepicker('setDate', tglDead); //.val(changeTgl(isin[0].tgl_transaksi))
+                inpStyle.val(isin[0].style)
+                setTimeout(() => {
+                    inpTglDeadline.val(formatterDate(isin[0].tgl_deadline))
+                    inpTglTransaksi.val(formatterDate(isin[0].tgl_transaksi))
+                }, 600);
                 inpKetSalesOrder.val(isin[0].deskripsi)
                 inpDeskripsi.val(isin[0].deskripsi)
             }
@@ -850,6 +962,45 @@ $(document).ready(function () {
             },
         });
     }
+
+    $("#btn-cetak-print").on('click', function (e) {
+        e.preventDefault()
+
+        //   const inpp_slcWarna = $("#print_slc_warna");
+        const inpp_slcUkuran = $("#print_slc_ukuran");
+        const inpp_qty       = $("#print_qty");
+        const inpp_qtyp      = $("#print_qtyp");
+
+        // mdlPrint
+        const dt_noSample = inpp_noSo.html()
+        const dt_deskripsi = inpp_deskripsi.html()
+        const dt_buyer = inpp_buyer.html()
+        const dt_warna = inpp_warna.html()
+        // inpp_trans
+
+        // Query parameters
+        let params = {
+            ukuran : inpp_slcUkuran.val(),
+            qty : inpp_qty.val(),
+            qtyp : inpp_qtyp.val(),
+            noSample : dt_noSample,
+            deskripsi : '',
+            buyer : '',
+            warna : dt_warna,
+          };
+  
+          // Buat query string
+          let queryString = $.param(params); // Convert objek ke query string
+          let fullUrl = `trans/sample/generate?${queryString}`;
+  
+          // Buka link di tab baru
+          window.open(fullUrl, '_blank');
+        //   setTimeout(() => {
+        //     // inpp_trans.html(data.id);
+        //     mdlPrint.modal("hide");
+        // }, 500);
+
+    });
 
     function base64ToBlob(base64, contentType = '', sliceSize = 512) {
         const byteCharacters = atob(base64); // Hapus prefix "data:image/png;base64,"

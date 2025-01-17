@@ -188,6 +188,72 @@ class InvoiceModel extends \App\Models\PrModel
         return $this->_data;
     }
 
+    function get_walkorder_konsumen_ori($params){
+
+        $whereExist = "and NOT EXISTS (
+                            SELECT 1
+                            FROM trans_invoice_detail tdx
+                            WHERE tdx.id_ref = xtb.id AND tdx.tipe_id = xtb.tipe_id
+                        )";   
+                        
+        if(!empty($params['id_invoice'])){
+            $whereExist = "and EXISTS (
+                            SELECT 1
+                            FROM trans_invoice_detail tdx
+                            WHERE tdx.id_invoice = {$params['id_invoice']} AND tdx.id_ref = xtb.id AND tdx.tipe_id = xtb.tipe_id
+                        )";
+        }
+
+        $sql = "
+            select 
+                xtb.*,
+                rk.nama as konsumen_nama
+            from (
+                SELECT
+                    2 as tipe_id,
+                    tso.id,
+                    tso.kode_sales_order as kode,
+                    tso.id_konsumen,
+                    tso.style as keterangan_style,
+                    tso.tgl_transaksi,
+                    coalesce(tso.qty, 0) as qty,
+                    coalesce(tso.total_harga, 0) as  total_harga,
+                    coalesce(tso.uang_dp, 0) as uang_dp, 
+                    coalesce((select sum(sd.qty) from trans_delivery sd inner join trans_walkorder tw on tw.id = sd.id_walkorder where tw.tipe_id = 2 and tw.ref_id = tso.id ),0) as qty_dlv,
+                    tw.id as id_walkorder
+                FROM
+                    trans_sales_order tso
+                    left join trans_walkorder tw on tw.ref_id = tso.id and tw.tipe_id = 2
+                union all 
+                select 
+                    1 as tipe_id,
+                    ts.id,
+                    ts.kode_sample as kode,
+                    ts.id_konsumen, 
+                    ts.style as keterangan_style,
+                    ts.tgl_transaksi,
+                    coalesce(ts.qty, 0) as qty,
+                    coalesce(ts.total_harga, 0) as total_harga,
+                    coalesce(ts.uang_dp, 0) as uang_dp,
+                    coalesce((select sum(sd.qty) from trans_delivery sd inner join trans_walkorder tw on tw.id = sd.id_walkorder where tw.tipe_id = 1 and tw.ref_id = ts.id ),0) as qty_dlv,
+                    tw.id as id_walkorder
+                from 
+                    trans_sample ts
+                left join trans_walkorder tw on tw.ref_id = ts.id and tw.tipe_id = 1
+            ) xtb 
+            inner join ref_konsumen rk on  xtb.id_konsumen = rk.id
+            where xtb.id_konsumen = {$params['id_konsumen']} 
+            {$whereExist}
+            order by xtb.tgl_transaksi desc
+        ";
+
+        $query = $this->db->query($sql);
+
+        $this->_data = $query->getResult();
+
+        return $this->_data;
+    }
+
     function getDetail_delivery($params){
         $id_walkorder = $params['id_walkorder'];
          // Dynamic Columns

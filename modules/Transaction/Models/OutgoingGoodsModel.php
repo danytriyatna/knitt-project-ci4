@@ -120,6 +120,7 @@ class OutgoingGoodsModel extends \App\Models\PrModel
         $builder = $this->db->table("ref_kategori_persediaan");
         $builder->select("*");
         $builder->where('jenis', $this->kd);
+        $builder->where('aktif', 1);
         $this->_data = $builder->get()->getResultArray();
         return $this->_data;
     }

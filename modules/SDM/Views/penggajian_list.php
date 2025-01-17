@@ -31,7 +31,7 @@
               <div class="form-group row mb-0">
                 <div class="col-md-12">
                   <label class="control-label text-start col-form-label" for="filter_tgl_from">Tanggal</label>
-                  <input type="text" id="filter_tgl_from" name="filter_tgl_from" class="form-control datepicker" placeholder="Pilih tanggal awal" value="">
+                  <input type="text" id="filter_tgl_from" name="filter_tgl_from" class="form-control datepickerx" placeholder="Pilih tanggal awal" value="">
                 </div>
               </div>
             </div>
@@ -39,12 +39,12 @@
               <div class="form-group row mb-0">
                 <div class="col-md-12">
                   <label class="control-label text-start col-form-label" for="filter_tgl_to">&nbsp;</label>
-                  <input type="text" id="filter_tgl_to" name="filter_tgl_to" class="form-control datepicker" placeholder="Pilih tanggal akhir" value="">
+                  <input type="text" id="filter_tgl_to" name="filter_tgl_to" class="form-control datepickerx" placeholder="Pilih tanggal akhir" value="">
                 </div>
               </div>
             </div>
             <div class="col-sm-3 align-self-end">
-              <button id="btn-generate" class="btn btn-success" type="button"><i class="fa fa-table"></i>&nbsp; Generate</button>
+              <button id="btn-generate" class="btn btn-primary" type="button"><i class="fa fa-table"></i>&nbsp; Generate</button>
             </div>
           </div>
         </div>
@@ -57,7 +57,8 @@
       <div class="card">
         <div class="card-body">
           <div class="table-responsive">
-            <table class="table table-striped datatable">
+            <div class="table-striped" id="dt-penggajian"></div>
+            <!-- <table class="table table-striped datatable">
               <thead>
                 <tr>
                   <th>NIK</th>
@@ -100,7 +101,7 @@
                 </tr>
                 <?php endfor; ?>
               </tbody>
-            </table>
+            </table> -->
           </div>
         </div>
       </div>
@@ -111,7 +112,7 @@
 <?= $this->endSection('content'); ?>
 
 <?= $this->section('script') ?>
-<script>
+<!-- <script>
   const btnGenerate = document.querySelector('#btn-generate');
   const rowData = document.querySelector('table > tbody');
 
@@ -125,5 +126,6 @@
       iLoader.stop();
     }, 1000)
   })
-</script>
+</script> -->
+<script src="script/app/sdm/penggajian/index.js"></script>
 <?= $this->endSection('script') ?>

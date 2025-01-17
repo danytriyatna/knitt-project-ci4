@@ -392,6 +392,16 @@ if(datepickerInit != null) {
   $('.datepicker').datepicker({
     format: "dd MM yyyy",
     language: "id",
+    autoclose: true,
+    clearBtn: true         // Menambahkan tombol "Clear"
+  });
+}
+
+const datepickerxInit = document.getElementsByClassName("datepickerx");
+if(datepickerxInit != null) {
+  $('.datepickerx').datepicker({
+    format: "dd-mm-yyyy",
+    language: "id",
     autoclose: true
   });
 }

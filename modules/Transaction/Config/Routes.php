@@ -9,6 +9,7 @@ $routes->group('trans/sample', ['namespace' => 'Modules\Transaction\Controllers'
   $routes->post('save-detail', 'Sample::saveDetail');
   $routes->get('delete/list(:any)', 'Sample::deleteList/$1');
   $routes->post('generate', 'Sample::generateQRCode');
+  $routes->get('generate', 'Sample::getQrcode');
   $routes->post('delete/detail', 'Sample::deleteDetailList');
   $routes->post('get-style-konsumen', 'Sample::getDataStyleKonsumen');
 });
@@ -23,6 +24,7 @@ $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Control
   $routes->get('delete/list(:any)', 'SalesOrder::deleteList/$1');
   $routes->get('delete/detail(:any)', 'SalesOrder::deleteDetailList/$1');
   $routes->post('generate', 'SalesOrder::generateQRCode');
+  $routes->get('generate', 'Sample::getQrcode');
   $routes->post('getSample', 'SalesOrder::getSampleBuyer');
 });
 
@@ -56,6 +58,8 @@ $routes->group('trans/production', ['namespace' => 'Modules\Transaction\Controll
   $routes->post('list_ukuran', 'Production::lists_ukuran');
   $routes->post('list_ukuran_prod', 'Production::getDataProduksiUkuran');
   $routes->post('list_detail', 'Production::getDataListProd');
+  $routes->post('cari_produk', 'Production::getDataProduksiItem');
+  $routes->post('src_produk', 'Production::getCariProduk');
 });
 
 $routes->group('trans/sales-invoice', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
@@ -72,12 +76,21 @@ $routes->group('trans/sales-invoice', ['namespace' => 'Modules\Transaction\Contr
 
 $routes->group('trans/customer-receipt', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'CustomerReceipt::index');
-  $routes->get('form', 'CustomerReceipt::form');
+  $routes->post('list', 'CustomerReceipt::lists');
+  $routes->get('add', 'CustomerReceipt::form');
+  $routes->post('add', 'CustomerReceipt::form');
+  $routes->get('form/(:any)', 'CustomerReceipt::form/$1');
+  $routes->post('form/(:any)', 'CustomerReceipt::form/$1');
+  $routes->post('getInvoice', 'CustomerReceipt::get_invoice');
+  $routes->get('delete/(:any)', 'CustomerReceipt::delete/$1');
 });
 
 $routes->group('trans/item-transfer', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'ItemTransfer::index');
+  $routes->post('list', 'ItemTransfer::lists');
   $routes->get('form', 'ItemTransfer::form');
+  $routes->get('edit/(:any)', 'ItemTransfer::form/$1');
+  $routes->post('save', 'ItemTransfer::save');
 });
 
 $routes->group('trans/receive-item', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
@@ -90,16 +103,18 @@ $routes->group('trans/issue-item', ['namespace' => 'Modules\Transaction\Controll
   $routes->get('form', 'IssueItem::form');
 });
 $routes->group('trans/incoming-goods', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
-  $routes->get('/', 'IncomingGoods::index');
-  $routes->post('list', 'IncomingGoods::lists');
-  $routes->get('form', 'IncomingGoods::form');
+  $routes->get('/', 'BarangMasuk::index');
+  $routes->post('list', 'BarangMasuk::lists');
+  $routes->get('form', 'BarangMasuk::form');
+  $routes->get('edit/(:any)', 'BarangMasuk::form/$1');
   $routes->post('last-stock', 'IncomingGoods::getLastStock');
-  $routes->post('simpan', 'IncomingGoods::save');
+  $routes->post('save', 'BarangMasuk::save');
 });
 $routes->group('trans/outgoing-goods', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
-  $routes->get('/', 'OutgoingGoods::index');
-  $routes->post('list', 'OutgoingGoods::lists');
-  $routes->get('form', 'OutgoingGoods::form');
-  $routes->post('last-stock', 'OutgoingGoods::getLastStock');
-  $routes->post('simpan', 'OutgoingGoods::save');
+  $routes->get('/', 'BarangKeluar::index');
+  $routes->post('list', 'BarangKeluar::lists');
+  $routes->post('list-barang', 'BarangKeluar::listsBarang');
+  $routes->get('form', 'BarangKeluar::form');
+  $routes->get('edit/(:any)', 'BarangKeluar::form/$1');
+  $routes->post('save', 'BarangKeluar::save');
 });

@@ -39,7 +39,7 @@ $(document).ready(function () {
 		let row_data = value._cell.row.data;
 		let fmBtnEdit = "<button class='btn btn-sm btn-info' type='button' title='view'><i class='fa fa-info-circle' title='view'></i></button>";
 		
-		let btnRes = fmBtnEdit;
+		let btnRes = row_data.detail_data.length > 0 ? fmBtnEdit : '';
 		return btnRes; //+ "&nbsp;" + fmBtnDelete;
 	};
 
@@ -138,6 +138,14 @@ $(document).ready(function () {
     let dtListDetail = new Tabulator("#dt-detail", {
         columns: [
                 {
+                    field: 'bayar', headerSort:false, sorter: 'string', visible : true,
+                    width: 60, align : 'center', editor:true, formatter:"tickCross", cssClass: 'text-center',
+                    cellEdited : function(cell) {
+                        let rowData = cell.getRow().getData();
+                        // isData(rowData.seq, rowData.bayar);
+                    }
+                },
+                {
                     title: "Aksi.", formatter: fmView,  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
                     width:"7%",
                     cellClick: function(e, cell) {
@@ -164,7 +172,7 @@ $(document).ready(function () {
                 },
                 {
                     title: "Ref No.", field: "ref_kode",  sorter: "string", headerSort:false, align: "center", cssClass: "text-start",
-                    width:"17%", 
+                    width:"15%", 
                 },
                 {
                     title: "Ref Tgl", field: "tgl_transaksi",  sorter: "string", headerSort:false, align: "center", cssClass: "text-start",
@@ -173,12 +181,17 @@ $(document).ready(function () {
 
                 {
                     title: "Style", field: "keterangan_style",  sorter: "string ", headerSort:false, align: "center", cssClass: "text-start",
-                    width:"13%", 
+                    width:"10%", 
                 },
 
                 {
-                    title: "Ref Qty", field: "deliver_qty",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"12%", //bottomCalc:"sum", 
+                    title: "Ref Qty", field: "ref_qty",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                    width:"6%", //bottomCalc:"sum", 
+                },
+
+                {
+                    title: "Delivery<br>Qty", field: "deliver_qty",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                    width:"6%", //bottomCalc:"sum", 
                 },
 
                 {

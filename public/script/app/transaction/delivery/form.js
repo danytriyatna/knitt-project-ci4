@@ -50,61 +50,28 @@ $(document).ready(function () {
         return s.join(dec);
     }
 
+    let setColum = [{
+                        title: "Colour", field: "colordasar",  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
+                    },
+                    {
+                        title: "Qty", field: "qty",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                        width:"9%", bottomCalc:"sum", 
+                    },
+                    {
+                        title: "DO Qty", field: "qty_prod",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                        width:"10%", bottomCalc:"sum"
+                    },
+                    {
+                        title: "Qty<br>Remain", field: "qty_remain",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                        width:"10%", bottomCalc:"sum"
+                    }];
+
     // table detail 
     let dtListDetail = new Tabulator("#dt-prod", {
-        columns: [
-                {
-                    title: "Colour", field: "colordasar",  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
-                    width:"15%"
-                },
-                {
-                    title: "S", field: "s",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"8%", bottomCalc:"sum", 
-                },
-                {
-                    title: "M", field: "m",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"8%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "L", field: "l",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"8%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "XL", field: "xl",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"8%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "XXL", field: "xxl",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"8%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "3XL", field: "xxxl",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"8%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "All", field: "all",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"8%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "Qty", field: "qty",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"9%", bottomCalc:"sum", 
-                },
-                {
-                    title: "DO Qty", field: "qty_prod",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"10%", bottomCalc:"sum"
-                },
-                {
-                    title: "Qty<br>Remain", field: "qty_remain",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"10%", bottomCalc:"sum"
-                }
-            ],
+            columns: setColum,
             locale: 'id',
+            layout:"fitColumns",
+            resizableColumnFit:true,
             placeholder: "Tidak ada data",
             pagination: false,
             paginationSize: 99,
@@ -118,6 +85,7 @@ $(document).ready(function () {
     let buttonRowAction = function(cell) {
         let fmBtnDelete = ""
         var data = cell.getRow().getData(); // Ambil data row
+        
         if (data.flag != 1){
             fmBtnDelete = `<button type="button" class="btn btn-sm btn-danger" title='delete'><i class="fa fa-trash" title='delete'></i></button>`;
         }
@@ -125,16 +93,41 @@ $(document).ready(function () {
     };
 
 
+    const inpStatus = $("#status").val()
     let dtListProduksi = new Tabulator("#dt-list-detail", {
         columns: [
             {
+                title: '', headerSort:false, formatter: buttonRowAction, sorter: 'string',
+                width: '10%', visible: !inpStatus == 2, 
+                cellClick: function(e, cell) {
+                    let row = cell.getRow();
+                    let data_row = row.getData();
+                    if (e.target.title === 'delete') {
+                        if (confirm("Anda yakin akan menghapus data?")) {
+                            let seq = cell.getRow().getData().korp_terkait_seq;
+                            cell.getRow().delete();
+
+                            // update penyebab
+                            let dataDet = dtListProduksi.getData();
+                            addkuota(cell.getRow().getData().ref_detail_id, true)
+                            //    remove rencana pengendalian
+                            dataDet = dataDet.filter(function (item) {
+                                return parseInt(item.seq) !== seq;
+                            });
+
+                            dtListProduksi.replaceData(dataDet);
+                        }
+                    }  
+                }
+            }, 
+            {
                 title: 'Colour', field: 'kode_warna', headerSort:false, formatter: "html", sorter: 'string',
-                width: '40%',
+                // width: '40%',
             }, 
     
             {
                 title: 'Size', field: 'kode_ukuran', headerSort:false, formatter: "html", sorter: 'string',
-                width: '30%', hozAlign: 'right', cssClass: 'text-end'
+                width: '20%', hozAlign: 'right', cssClass: 'text-end'
             }, 
     
             {
@@ -142,7 +135,7 @@ $(document).ready(function () {
                 width: '30%', hozAlign: 'right', cssClass: 'text-end'
             }, 
         ],
-        // layout: 'fitColumns',
+        layout: 'fitColumns',
         locale: 'id',
         placeholder: "Tidak ada data",
         pagination: false,
@@ -272,7 +265,7 @@ $(document).ready(function () {
             success: function (response) {
                 Swal.close();
                 if(response.status == true){
-                    dtListDetail.setData(response.data.detail_produksi);
+                    
                     let isProd = response.data.produksi;
 
                     inpRefNi.val(isProd.kode_prod);
@@ -280,12 +273,7 @@ $(document).ready(function () {
                     inpProduksi.val(data.id);
                     inpWo.val(data.id_walkorder);
                     
-                    setTimeout(() => {
-                        mdlProd.modal("hide");
-                        setTimeout(() => {
-                            dtListDetail.redraw(true);
-                        }, 600);
-                    }, 500);
+                    setColumn(data.detail_produksi, data.data_ukuran);
                 }else{
                     Swal.fire({
                         text: response.message,
@@ -307,10 +295,49 @@ $(document).ready(function () {
                 });
             },
         });
-
-        
-        
     });
+
+    function setColumn(data, ukuran){
+        let newColum =  [{
+                            title: "Colour", field: "colordasar",  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
+                        },];
+        const dtUkuran = ukuran;
+        for (const el of dtUkuran) {
+            const isKey = (el.key_ukuran == 'all') ? 'all_' : el.key_ukuran
+            newColum.push(
+            {
+                title:el.kode_ukuran, field: isKey,  sorter: "string", headerSort:false, align: "center", cssClass: "text-center",
+                width:"8%", bottomCalc:"sum"
+            })
+        }
+
+        newColum.push(
+        {
+            title: "Qty", field: "qty",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+            width:"9%", bottomCalc:"sum", 
+        })
+
+        newColum.push(
+        {
+            title: "DO Qty", field: "qty_prod",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+            width:"10%", bottomCalc:"sum"
+        })
+
+        newColum.push(
+        {
+            title: "Qty<br>Remain", field: "qty_remain",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+            width:"10%", bottomCalc:"sum"
+        })
+
+        setTimeout(() => {
+            dtListDetail.setColumns(newColum);
+            dtListDetail.setData(data);
+            setTimeout(() => {
+                mdlProd.modal("hide");
+                dtListDetail.redraw(true);
+            }, 600);
+        }, 500);
+    }
 
 
     function formatLocaleDate(localeDate) {
@@ -394,12 +421,13 @@ $(document).ready(function () {
 		let dataTable = dtListProduksi.getData();
 
 		let dataOrder = dtListDetail.getData();
-		let objIndex  = dataTable.findIndex(obj => obj.id_ukuran == (data.id_ukuran));
+		let objIndex  = dataTable.findIndex(obj => obj.id_ukuran == (data.id_ukuran) && obj.id_warna == (data.id_warna));
 		let ix_order  = dataOrder.findIndex(obj => obj.ref_detail_id == (data.ref_detail_id));
 
 		// let ktQty     = isQty.findIndex(obj => obj.kategori_id == (data.kategori_id));
 		// let ktQtyO    = isQtyO.findIndex(obj => parseInt(obj.sl_order_det_id) === parseInt(isSlc.val()));
 		
+
 		if(dataOrder.length > 0){
 			if(dataOrder[ix_order] == undefined){
 				alert("Warna tidak ada dalam list produksi !");
@@ -408,7 +436,6 @@ $(document).ready(function () {
 		}
 
 		data.seq = dataTable.length + 1;
-		
 		if(data.qty > dataOrder[ix_order].qty_prod){
             if(dataTable[objIndex] == undefined){
                 // console.log(ix_order);
@@ -452,8 +479,8 @@ $(document).ready(function () {
 		
 		if(objIndex >= 0){
 			if(hapus){
-				tblDetail[objIndex].qty_prod   = parseInt(tblDetail[objIndex].qty_prod) - 1;
-				tblDetail[objIndex].qty_remain = parseInt(tblDetail[objIndex].qty_remain) + 1;
+				tblDetail[objIndex].qty_remain   = parseInt(tblDetail[objIndex].qty);
+				tblDetail[objIndex].qty_prod = 0;
 			}else{
 				tblDetail[objIndex].qty_prod   = parseInt(tblDetail[objIndex].qty_prod) + 1;
                 tblDetail[objIndex].qty_remain = parseInt(tblDetail[objIndex].qty_remain) - 1;
@@ -465,14 +492,15 @@ $(document).ready(function () {
 
     
     let detail_data = $("#data-details").val().replace(/&quot;/ig,'"');
-
+    let detail_ukuran = $("#data-ukuran").val().replace(/&quot;/ig,'"');
     if(detail_data.length > 0){
         setTimeout(() => {
             try {
                 let isdata = JSON.parse(detail_data);
-                
+                let isukuran = JSON.parse(detail_ukuran);
                 // Set data ke Tabulator
-                dtListDetail.setData(isdata);
+                // dtListDetail.setData(isdata);
+                setColumn(isdata, isukuran);
             } catch (e) {
                 console.error("Error parsing JSON:", e);
             }
@@ -480,6 +508,7 @@ $(document).ready(function () {
     } 
 
     let detail_produksi = $("#data-prods").val().replace(/&quot;/ig,'"');
+    
 
     if(detail_produksi.length > 0){
         setTimeout(() => {
@@ -488,6 +517,7 @@ $(document).ready(function () {
                 
                 // Set data ke Tabulator
                 dtListProduksi.setData(isdatap);
+                
             } catch (e) {
                 console.error("Error parsing JSON:", e);
             }

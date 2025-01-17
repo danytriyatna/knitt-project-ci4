@@ -1,0 +1,182 @@
+let dtList = new Tabulator("#dt-list", {
+    pagination: true, 
+    paginationSize: 100,
+    paginationButtonCount: 5,
+    groupBy: ['nama_jenis_barang','barang'],
+    columns:[
+        {title:"LOT", field:"lot_no", width:"15%"},
+        {title:"Size/Warna", field:"nama_satuan", hozAlign:"left",width:"15%"},
+        {title:"Qty<br>Masuk", field:"masuk", hozAlign:"right",width:"15%"},
+        {title:"Qty<br>Keluar", field:"keluar", hozAlign:"right",width:"15%"},
+        {title:"Qty<br>Akhir", field:"saldo_akhir", hozAlign:"right",width:"15%"},
+        {title:"Nilai", field:"price", hozAlign:"right",width:"15%",formatter : "money",
+            formatterParams: {
+                decimal: ",",
+                thousand: ".",
+                symbol: "Rp",  // Simbol mata uang Rupiah
+                precision: 0,   // Tidak ada desimal
+            },},
+        {title:"Tanggal", field:"tanggal", hozAlign:"right",width:"10%"},
+    ],
+    locale: 'id',    
+    // layout: 'fitColumns',
+    placeholder: "Tidak ada data",
+});
+
+let dtListBarang = new Tabulator("#dt-list-barang", {
+    columns: [
+        {
+            title: "ID Barang", field: "id", headerSort: false,
+            width: "15%",visible:false
+        },
+        {
+            title: "Kode Barang", field: "kode_barang", headerSort: false,
+            width: "20%"
+        },
+        {
+            title: "Nama Barang", field: "nama_barang", headerSort: false,
+            width: "30%"
+        },
+        {
+            title: "Jenis Barang", field: "nama_jenis_barang", headerSort: false,
+            width: "25%"
+        },
+        {
+            title: "Stok Minimum", field: "stok_minimum", headerSort: false,
+            width: "15%",visible:false
+        },
+        {
+            title: "Satuan", field: "nama_satuan", headerSort: false,
+            width: "10%"
+        },
+        {
+            title: "Harga Satuan",visible:false, field: "harga_satuan", headerSort: false,
+            width: "15%",formatter: "money", formatterParams: {
+                decimal: ",",
+                thousand: ".",
+                symbol: "Rp",  // Simbol mata uang Rupiah
+                precision: 0,   // Tidak ada desimal
+            }, hozAlign:"right",
+        },
+       
+        {
+            title: "Keterangan", field: "keterangan", formatter: "html", headerSort: false,
+            width:"15%"
+        },
+    ],
+    locale: 'id',    
+    ajaxURL: "/master-data/barang/list",
+    ajaxConfig: "POST",
+    sortMode: "remote",
+    filterMode: "remote",
+    selectableRows: true,
+    placeholder: "Tidak ada data",
+    ajaxRequesting: function (url, params) {
+        params.start = params.size * (params.page - 1);
+        params.length = params.size;
+    },
+    ajaxResponse: function (url, params, response) {
+        let pageSize = dtList.getPageSize();
+        let pageNo = dtList.getPage();
+        let startRow = (pageSize * (pageNo - 1)) + 1;
+        let endRow = response.data.length + startRow - 1;
+        if (response.data.length === 0) {
+            startRow = 0; endRow = 0;
+        }
+        let recordsFiltered = parseInt(response.recordsFiltered);
+        let recordsTotal = parseInt(response.recordsTotal);
+
+        $("#table-footer .tabulator-startrow").text(startRow);
+        $("#table-footer .tabulator-endrow").text(endRow);
+        $("#table-footer .tabulator-totalrow").text(recordsFiltered);
+
+        let elTotalFilteredRow = $("#table-footer .tabulator-totalfilteredrow");
+        elTotalFilteredRow.text("");
+        if (recordsTotal > recordsFiltered) {
+            elTotalFilteredRow.text(" (disaring dari " + recordsTotal
+                + " entri keseluruhan)");
+        }
+        return response;
+    },
+    footerElement: '<div id="table-footer" class="pull-left tabulator-info">'
+        + 'Menampilkan <span class="tabulator-startrow"></span> - <span class="tabulator-endrow"></span> dari '
+        + '<span class="tabulator-totalrow"></span> entri<span class="tabulator-totalfilteredrow"></span></div>',
+    pagination: true,
+    paginationMode: "remote",
+    paginationSize: 25,
+    paginationButtonCount: 10,
+    dataSendParams: {
+        sorters: "order"
+    },
+    selectable: false,
+});
+
+
+let searchThread = null;
+let elSearch = $("#tb-search");
+if (elSearch != null) {
+    elSearch.on("keyup", function (e) {
+        if ($(this).val().length < 3 && e.keyCode > 13) {
+            return;
+        }
+        clearTimeout(searchThread);
+        searchThread = setTimeout(function () {
+            dtList.setFilter("", "like", elSearch.val());
+        }, 600);
+    });
+}
+
+dtListBarang.on("rowClick", function(e, row){
+    var kodeBarang = row._row.data.kode_barang.replace(/<[^>]*>/g, '');
+    var idBarang = row._row.data.id;
+    var namaBarang = row._row.data.nama_barang.replace(/<[^>]*>/g, '');
+    $('#filter_barang_id').val(idBarang)
+    $("#filter_barang").val(`${kodeBarang} - ${namaBarang}`);
+    $("#modal-barang").modal("hide");
+})
+
+$("#filter_barang").click(function () {
+    setTimeout(() => {
+        dtListBarang.redraw(true)
+    }, 500);
+    $("#modal-barang").modal("show");
+    dtListBarang.deselectRow();
+});
+
+$("#btn-tampilkan").click(function () {
+    if($("#filter_tahun").val() == "" || $("#filter_bulan").val() == "" || $('#filter_gudang').val() == "" ){
+      Swal.fire({
+        title: 'Warning',
+        text: 'Tahun,Bulan & Gudang harus dipilih',
+        icon: 'warning',
+      })
+      return false    
+    }
+    getDataLaporan()
+  });
+
+  $("#btn-reset").click(function () {
+      $("#filter_jenis_barang").val("").trigger("change");
+      $("#filter_gudang").val("").trigger("change");
+      $("#filter_tahun").val("").trigger("change");
+      $("#filter_bulan").val("").trigger("change");
+  });
+
+  function getDataLaporan(){
+    $.ajax({
+        url: `/laporan/persediaan/list?filter_jenis_id=${$('#filter_jenis_barang').val()}&tahun=${$('#filter_tahun').val()}&bulan=${$('#filter_bulan').val()}&filter_gudang_id=${$('#filter_gudang').val()}`,
+        type: 'GET',
+        dataType: 'json', 
+        success: function(data) {
+            
+            dtList.setData(data.data)
+    
+            setTimeout(() => {
+                dtList.redraw(true)
+            }, 500);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching data:', error);
+        }
+    });
+  }

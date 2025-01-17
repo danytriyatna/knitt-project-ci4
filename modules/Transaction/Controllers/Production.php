@@ -34,6 +34,8 @@ class Production extends BaseController
     $this->mPproduksi = new ProsesProduksiModel();
     $this->mOperator = new OperatorModel();
     $this->mdelivery = new DeliveryModel();
+
+    
   }
 
   public function index()
@@ -170,14 +172,14 @@ class Production extends BaseController
       array_push(
         $build_array["data"],
         array(
-          "id"                => ($id),
+          "id"                  => ($id),
           "kode_warna"          => ($row->kode_warna),
-          "kode_ukuran"     => $row->kode_ukuran,
-          "id_ukuran"     => $row->id_ukuran,
-          "id_walkorder_proses"     => $row->id_walkorder_proses,
-          "id_warna"     => $row->id_warna,
-          "qty"    => $row->qty,
-          "harga_satuan"               => $row->harga_satuan,
+          "kode_ukuran"         => $row->kode_ukuran,
+          "id_ukuran"           => $row->id_ukuran,
+          "id_walkorder_proses" => $row->id_walkorder_proses,
+          "id_warna"            => $row->id_warna,
+          "qty"                 => $row->qty,
+          "harga_satuan"        => $row->harga_satuan,
         )
       );
     }
@@ -191,6 +193,8 @@ class Production extends BaseController
       return redirect()->to('/auth/login');
     }
 
+    
+    $this->data['dnow'] = formatTanggalIndonesia(date('Y-m-d'));
     $this->data['id'] = $id;
     if ($id != "") {
       $id = decrypt($id);
@@ -201,12 +205,23 @@ class Production extends BaseController
       $resData = $this->mProduksi->getData($id);
       $stdData = $this->mWalkorder->getData($resData->id_walkorder);
       if ($stdData->tipe_id == 1) {
-        $list_detail = $this->mSample->getDataDetailSample($stdData->ref_id);
+        // $list_detail = $this->mSample->getDataDetailSample($stdData->ref_id);
+        $list_detail = $this->mSample->getDataDetailSample_crostab($stdData->ref_id);
         $resData->file_gambar = !empty($resData->file_name) ? base_url() . "uploads/sample/"  . $resData->file_name : "";
+
+        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['id_sample'] = $stdData->ref_id;
+        $dtUkuran = $this->mSample->getUkuranTrans($pru);
       } else {
-        $list_detail = $this->mSalesOrder->getDataDetailSalesOrder($stdData->ref_id);
+        // $list_detail = $this->mSalesOrder->getDataDetailSalesOrder($stdData->ref_id);
+        $list_detail = $this->mSalesOrder->getDataDetailSalesOrder_crostab($stdData->ref_id);
         $resData->file_gambar = !empty($resData->file_name) ? base_url() . "uploads/sales_order/"  . $resData->file_name : "";
+
+        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['id_sales_order'] = $stdData->ref_id;
+        $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
       }
+
       if (!empty($list_detail)) {
         for ($i = 0; $i < count($list_detail); $i++) {
           $drow = $list_detail[$i];
@@ -260,6 +275,7 @@ class Production extends BaseController
       $this->data['tipe_id'] = encrypt($stdData->tipe_id);
       $this->data['ref_id'] = encrypt($stdData->ref_id);
       $this->data['detail'] = json_encode($list_detail);
+      $this->data['dtUkuran'] = json_encode($dtUkuran);
 
       $status = $stdData->status;
     }
@@ -304,10 +320,15 @@ class Production extends BaseController
       $id = decrypt($id);
     }
     $tglTransaksi = $this->request->getPost('tglTransaksi');
+    
+    $tglTransaksi = !empty($tglTransaksi) ? \fdate_ind_to_eng($tglTransaksi) : '';
     $detailProd = $this->mProduksi->getDataOperatorProd($id, $tglTransaksi);
     if (!empty($detailProd)) {
       $build_array['message'] = "data ditemukan";
       $build_array['status']  = true;
+      for ($i=0; $i < count($detailProd) ; $i++) { 
+        $detailProd[$i]->date = \fdate_eng_to_ind($detailProd[$i]->date);
+      }
       $build_array['data'] = json_encode($detailProd);
     }
 
@@ -353,5 +374,127 @@ class Production extends BaseController
     $build_array['message'] = $msg;
     $build_array['status']  = $status;
     return $this->response->setJSON($build_array);
+  }
+
+
+  // fungsi untuk scan barcode atau auto complete 
+  public function getDataProduksiItem(){
+      $barcode_code = $this->request->getPost("kata_kunci");
+      $id_walkorder = $this->request->getPost("id_walkorder");
+      $id_produksi  = $this->request->getPost("id_produksi");
+      $proses  = $this->request->getPost("proses");
+
+      $id_produksi  = \decrypt($id_produksi);
+      $id_walkorder  = \decrypt($id_walkorder);
+
+
+      $status = false;
+      $msg = "Data warna ukuran tidak ditemukan !";
+      $data = [];
+      $slc  = [];
+
+      // if(!empty($barcode_code)){
+          // $params['last_proses']  = 1;
+          $params['id_walkorder'] = $id_walkorder;
+          $params['kata_kunci'] = $barcode_code;
+          $params['id_proses'] = $proses;
+          $result = $this->mWalkorder->getListProduksiUkuran($params);
+          if(!empty($result)){
+              foreach ($result as $r) {
+                  $isi = [];
+                  $isi["id_walkorder"]  = $r->id_walkorder;
+                  $isi["id_walkorder_proses"]  = $r->id;
+                  $isi["ref_detail_id"] = $r->ref_detail_id;
+                  $isi["id_ukuran"]     = $r->id_ukuran;
+                  $isi["id_warna"]      = $r->id_warna;
+                  $isi["qty"]           = $r->qty;
+                  $isi["qty_prod"]      = 0;
+                  $isi["kata_kunci"]    =  "(".$r->kode_warna.") " . $r->kode_ukuran;
+                  $isi["kode_warna"]    = $r->kode_warna;
+                  $isi["kode_ukuran"]   = $r->kode_ukuran;
+                  $isi["key_ukuran"]    = $r->key_ukuran;
+                  $data[] = $isi;
+
+                  $isi_slc = [];
+                  $isi_slc["id"]    = $r->ref_detail_id;
+                  $isi_slc["idx"]   = $r->kode_warna;
+                  $isi_slc["label"] = "(".$r->kode_warna.") " . $r->kode_ukuran . " | jumlah " . $r->qty;
+                  $isi_slc["value"] = $r->ref_detail_id;
+                  $isi_slc["data"]  = $isi;
+                  $slc[] = $isi_slc;
+              }
+              $status = true;
+              $msg = "Data produk ditemukan !";
+          }
+        
+      // }
+
+      $build_array["status"] = $status;
+      $build_array["msg"] = $msg;
+      $build_array["data"] = $data;
+      $build_array["slc"] = $slc;
+      return $this->response->setJSON($build_array);
+  }
+
+
+
+  function getCariProduk(){
+    $kata_kunci = $this->request->getPost('kata_kunci');
+
+    $id_walkorder = $this->request->getPost("id_walkorder");
+    $id_produksi  = $this->request->getPost("id_produksi");
+    $proses  = $this->request->getPost("proses");
+    
+    $status = false;
+    $msg = "Data barang tidak ditemukan !";
+    $data  = [];
+
+    try {
+      $id_produksi  = \decrypt($id_produksi);
+      $id_walkorder  = \decrypt($id_walkorder);
+
+      $kt_exp = explode(";",$kata_kunci);
+
+      $kunci_jadi = $kt_exp[1] . ' ' . $kt_exp[2]; 
+
+      $qty = $kt_exp[3]; 
+      
+      $params['id_walkorder'] = $id_walkorder;
+      // $params['kata_kunci'] = $kunci_jadi;
+      $params['id_proses'] = $proses;
+      $params['key_ukuran'] = $kt_exp[1];
+      $params['kode_warna'] = $kt_exp[2];
+      // print_r($params);exit;
+      $result = $this->mWalkorder->getListProduksiUkuran($params);
+
+      foreach ($result as $r) {
+        $isi = [];
+        $isi["id_walkorder"]  = $r->id_walkorder;
+        $isi["id_walkorder_proses"]  = $r->id;
+        $isi["ref_detail_id"] = $r->ref_detail_id;
+        $isi["id_ukuran"]     = $r->id_ukuran;
+        $isi["id_warna"]      = $r->id_warna;
+        $isi["qty"]           = $r->qty;
+        $isi["qty_prod"]      = $qty;
+        $isi["kata_kunci"]    =  "(".$r->kode_warna.") " . $r->kode_ukuran;
+        $isi["kode_warna"]    = $r->kode_warna;
+        $isi["kode_ukuran"]   = $r->kode_ukuran;
+        $isi["key_ukuran"]    = $r->key_ukuran;
+        $data[] = $isi;
+      }
+
+      $status = true;
+      $msg = "Berhasil pengambilan data !";
+
+    } catch (\Throwable $th) {
+      //throw $th;
+      // print_r($th);exit;
+    }
+
+
+    $build_array["status"] = $status;
+    $build_array["msg"] = $msg;
+    $build_array["data"] = $data;
+    return $this->response->setJSON($build_array); 
   }
 }

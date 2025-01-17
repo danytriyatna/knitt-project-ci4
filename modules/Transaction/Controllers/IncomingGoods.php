@@ -168,7 +168,7 @@ class IncomingGoods extends BaseController
         $this->data['gudang']    = $resDataGudang;
 
         $this->data['titlehead'] = "Form Barang Masuk";
-
+        
         return view($this->views . '\incoming_goods_form', $this->data);
     }
 

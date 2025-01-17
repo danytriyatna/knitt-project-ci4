@@ -66,7 +66,7 @@
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-3 col-form-label" for="do_no">DO No.</label>
                       <div class="col-md-9">
-                        <input <?=  ($view_read) ? 'disabled' : ''; ?> type="text" id="do_no" name="do_no" class="form-control" placeholder="Ketikkan nomor DO" value="<?= !empty($row) ? $row->delivery_kode: '' ; ?>">
+                        <input <?=  ($view_read) ? 'disabled' : ''; ?> type="text" id="do_no" name="do_no" class="form-control " placeholder="Ketikkan nomor DO" value="<?= !empty($row) ? $row->delivery_kode: '' ; ?>">
                         <input type="hidden" name="id_produksi" id="id_produksi" value="<?= !empty($row->id_produksi)? $row->id_produksi : ''; ?>" >
                         <input type="hidden" name="id_walkorder" id="id_walkorder" value="<?= !empty($row->id_walkorder)? $row->id_walkorder : ''; ?>" >
                       </div>
@@ -74,9 +74,9 @@
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-3 col-form-label" for="so_no">Ref No.</label>
                       <div class="col-md-8">
-                        <input type="text" <?=  ($view_read) ? 'disabled' : ''; ?> name="kode_produksi" id="kode_produksi" class="form-control" value="<?= !empty($row) ? $row->kode_produksi : '' ;?>" > 
+                        <input type="text" readonly name="kode_produksi" id="kode_produksi" class="form-control" value="<?= !empty($row) ? $row->kode_produksi : '' ;?>" > 
                       </div>
-                      <div <?=  ($view_read) ? 'hidden' : ''; ?> class="col-md-1">
+                      <div <?=  (!empty($id)) ? 'hidden' : ''; ?> class="col-md-1">
                         <button type="button" id="list_prod" class="btn btn-sm btn-primary"><i class="fa fa-search"></i></button>
                       </div>
                     </div>
@@ -85,7 +85,7 @@
                     <div class="form-group row">
                       <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tgl_do">DO Date</label>
                       <div class="col-md-8">
-                        <input <?=  ($view_read) ? 'disabled' : ''; ?> type="text" id="tgl_do" name="tgl_do" class="form-control" placeholder="Pilih tanggal DO" value="<?= !empty($row) ? $row->tgl_do : '' ;?>">
+                        <input <?=  ($view_read) ? 'disabled' : ''; ?> type="text" id="tgl_do" name="tgl_do" class="form-control datepickerx" placeholder="Pilih tanggal DO" value="<?= !empty($row) ? $row->tgl_do : '' ;?>">
                       </div>
                     </div>
                   </div>
@@ -105,7 +105,7 @@
                 <div class="form-group row">
                   <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_buyer">Buyer</label>
                   <div class="col-md-9">
-                    <select <?=  ($view_read) ? 'disabled' : ''; ?> id="select_buyer" name="select_buyer" class="form-select select2" data-placeholder="-- Pilih Buyer --" value="<?= !empty($row) ? $row->select_buyer : '' ;?>" >
+                    <select <?=  (!empty($id)) ? 'disabled' : ''; ?> id="select_buyer" name="select_buyer" class="form-select select2" data-placeholder="-- Pilih Buyer --" value="<?= !empty($row) ? $row->select_buyer : '' ;?>" >
                       <option value=""> - Pilih Buyer - </option>
                       <?php foreach ($buyer as $item) { ?>
                         <option value="<?= $item['id']; ?>"><?= $item['nama']; ?></option> 
@@ -235,7 +235,9 @@
                       <?php } ?>
                     <?php } ?>
                     <input type="hidden" name="actionf" id="actionf">
+                    <input type="hidden" name="status" id="status" value="<?= !empty($status)? $status : '0' ?>">
                     <input type="hidden" name="id" id="id" value="<?= !empty($id)? $id : '' ?>">
+                    <input type="hidden" name="data-ukuran" id="data-ukuran" value='<?= !empty($dt_ukuran)? $dt_ukuran : "" ?>'>
                     <input type="hidden" name="data-details" id="data-details" value='<?= !empty($dt_details)? $dt_details : "" ?>'>
                     <input type="hidden" name="data-prods" id="data-prods" value='<?= !empty($dt_prods)? $dt_prods : "" ?>'>
                   </div>

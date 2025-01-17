@@ -39,11 +39,11 @@ $(document).ready(function () {
                 }
             },
             {
-                title: "Kode Warna", field: "kode_warna", headerSort: false,
+                title: "Warna", field: "kode_warna", headerSort: false,
                 width: "20%", cssClass : 'text-center'
             },
             {
-                title: "Keterangan", field: "keterangan", formatter: "html", headerSort: false,
+                title: "Kode Warna", field: "keterangan", formatter: "html", headerSort: false,
                 
             }
         ],

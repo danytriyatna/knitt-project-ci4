@@ -4,7 +4,8 @@ $(document).ready(function () {
 
     // conf function 
     let cellMoney = function(cell, formatterParams){
-        let classN = "text-right tabulator-cell text-end";
+        const isEditable = cell.getElement().className.indexOf('tabulator-editable') >= 0
+        let classN = `text-right tabulator-cell text-end${isEditable ? ' tabulator-editable' : ''}`;
         cell.getElement().className = classN;
     
         let isVal = number_format(cell.getValue(), 2, ',', '.'); 
@@ -35,65 +36,54 @@ $(document).ready(function () {
         return s.join(dec);
     }
 
+    let setColumn = [
+        {
+            title: "Colour", field: "colordasar",  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
+        },
+    ]
+
+    const dt_ukuran = $("#data-ukuran").val().length > 0 ? JSON.parse($("#data-ukuran").val()) : []
+    
+    for (const el of dt_ukuran) {
+        const isKey = (el.key_ukuran == 'all') ? 'all_' : el.key_ukuran
+        setColumn.push(
+            {
+                title:el.kode_ukuran, field: isKey,  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                width:"9%", bottomCalc:"sum", 
+            }
+        )
+    }
+
+
+    // last column 
+    setColumn.push(
+        {
+            title: "QTY", field: "qty",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+            width:"10%", bottomCalc:"sum", 
+        }
+    )
+
+    setColumn.push(
+        {
+            title: "QTY<br>PRODUKSI", field: "qty_prod",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+            width:"10%", bottomCalc:"sum", visible: false
+        }
+    )
+
     // table detail 
     let dtListDetail = new Tabulator("#dt-detail", {
-        columns: [
-                {
-                    title: "Colour", field: "colordasar",  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
-                    width:"17%"
-                },
-                {
-                    title: "S", field: "s",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"9%", bottomCalc:"sum", 
-                },
-                {
-                    title: "M", field: "m",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"9%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "L", field: "l",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"9%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "XL", field: "xl",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"9%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "XXL", field: "xxl",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"9%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "3XL", field: "xxxl",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"9%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "All", field: "all",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"10%", bottomCalc:"sum", 
-                },
-
-                {
-                    title: "QTY", field: "qty",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"10%", bottomCalc:"sum", 
-                },
-                {
-                    title: "QTY<br>PRODUKSI", field: "qty_prod",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
-                    width:"10%", bottomCalc:"sum", visible: false
-                }
-            ],
-            locale: 'id',
-            placeholder: "Tidak ada data",
-            pagination: false,
-            paginationSize: 99,
-            paginationButtonCount: 2,
-            paginationDataSent: {
-                sorters: "order",
-            },
-            selectableRows: false
+        columns: setColumn,
+        locale: 'id',
+        placeholder: "Tidak ada data",
+        layout:"fitColumns",
+        resizableColumnFit:true,
+        pagination: false,
+        paginationSize: 99,
+        paginationButtonCount: 2,
+        paginationDataSent: {
+            sorters: "order",
+        },
+        selectableRows: false
 	});
 
     let detail_data = $("#data-details").val().replace(/&quot;/ig,'"');
@@ -275,7 +265,7 @@ $(document).ready(function () {
                     width:"11%"
                 },
                 {
-                    title: "GRAM", field: "gram",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                    title: "GRAM", field: "gram",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end tabulator-editable",
                     width:"11%", editor: "number", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
                     cellEdited: function (cell) {
 
@@ -537,8 +527,11 @@ $(document).ready(function () {
         let ukuran_data = dtListDetail.getData();
         let ukuran_calc = dtListDetail.getCalcResults();
 
+        let id_gudang = $("#select_gudang").val()
+
         let form_data = new FormData();
         form_data.append('dataid', dataid);
+        form_data.append('id_gudang', id_gudang);
         form_data.append('listproses', JSON.stringify(listJenis));
         form_data.append('status_data', isstataus);
         form_data.append('data_ukuran_warna', JSON.stringify(ukuran_data));
@@ -600,5 +593,7 @@ $(document).ready(function () {
             },
         });
     }
+
+    $("#select_gudang").val($("#select_gudang").attr('value')).trigger('change');
 
 });

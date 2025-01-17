@@ -3,6 +3,7 @@
 $(document).ready(function () {
     let inpData          = $('#data_id');
     let inpDeskripsi     = $('#desc_style');
+    let inpStyle         = $('#style');
     let inpBuyer         = $('#select_buyer');
     let inpTglTransaksi  = $('#tgl_sample');
     let inpTglDeadline   = $('#tgl_deadline');
@@ -34,7 +35,55 @@ $(document).ready(function () {
     var idSampleDet      = null
     var status           = null
 
+
+    // conf function 
+    let cellMoney = function(cell, formatterParams){
+        const isEditable = cell.getElement().className.indexOf('tabulator-editable') >= 0
+        let classN = `text-right tabulator-cell text-end${isEditable ? ' tabulator-editable' : ''}`;
+        cell.getElement().className = classN;
     
+        let isVal = number_format(cell.getValue(), 2, ',', '.'); 
+        return isVal; //return the contents of the cell;
+    }
+
+    function number_format (number, decimals, dec_point, thousands_sep) {
+        // Strip all characters but numerical ones.
+        number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+        var n = !isFinite(+number) ? 0 : +number,
+            prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+            sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+            dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+            s = '',
+            toFixedFix = function (n, prec) {
+                var k = Math.pow(10, prec);
+                return '' + Math.round(n * k) / k;
+            };
+        // Fix for IE parseFloat(0.55).toFixed(0) = 0;
+        s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+        if (s[0].length > 3) {
+            s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+        }
+        if ((s[1] || '').length < prec) {
+            s[1] = s[1] || '';
+            s[1] += new Array(prec - s[1].length + 1).join('0');
+        }
+        return s.join(dec);
+    }
+    
+    // Fungsi untuk mengambil nilai bottomCalc
+    function getBottomCalcValue(table, columnField) {
+        // Ambil kolom berdasarkan field
+        let column = table.getColumn(columnField);
+
+        if (!column) {
+            console.error("Kolom tidak ditemukan:", columnField);
+            return null;
+        }
+
+        // Ambil nilai hasil bottomCalc
+        var calcValue = table.getCalcResults().bottom.qty; // Hasil bottomCalc
+        return calcValue;
+    }
 
     let buttonQRAction = function(cell){
        if(cell.getData().id){
@@ -114,7 +163,6 @@ $(document).ready(function () {
         paginationSize: 10,
         paginationButtonCount: 5,
         columns:[
-            {title:"ID", field:"id", visible:false},
             {
                 headerSort: false,  
                 title: 'Aksi', 
@@ -142,23 +190,17 @@ $(document).ready(function () {
                     } 
                 }
             },
-            {title:"Colour", field:"colour", width:"40%"},
-            {title:"S", field:"s", hozAlign:"center",width:"7%"},
-            {title:"M", field:"m", hozAlign:"center",width:"7%"},
-            {title:"L", field:"l", hozAlign:"center",width:"7%"},
-            {title:"XL", field:"xl", hozAlign:"center",width:"7%"},
-            {title:"XXL", field:"xxl", hozAlign:"center",width:"7%"},
-            {title:"3XL", field:"xxxl", hozAlign:"center",width:"7%"},
-            {title:"All", field:"all", hozAlign:"center",width:"7%"},
-            {title:"Amount", field:"harga_satuan",formatter: "money", formatterParams: {
+            {headerSort: false,title:"Colour", field:"colour"},
+            {headerSort: false,title:"Amount", field:"harga_satuan",formatter: "money", formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
                 precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right"},
+            }, hozAlign:"right", width: '12%'},
         ],
         locale: 'id',    
-        // layout: 'fitColumns',
+        layout:"fitColumns",
+        resizableColumnFit:true,
         placeholder: "Tidak ada data",
 	});
 
@@ -177,39 +219,49 @@ $(document).ready(function () {
         paginationButtonCount: 5,
         columns:[
             {title:"ID", field:"id", visible:false},
+            // {
+            //     headerSort: false,  
+            //     title: 'Aksi', 
+            //     formatter: buttonQRAction,
+            //     width: '10%', align: "center", cssClass: "text-center",
+            //     cellClick: function(e, cell) {
+            //         let row = cell.getRow();
+            //         let data_row = row.getData();
+            //         if (e.target.title === 'qr code') {
+            //             generateQRCode(data_row)
+            //         } 
+            //     }
+            // },
+            {headerSort: false, title:"No",formatter: "rownum",cssClass:'text-center', hozAlign: "center", width:"8%"},
+            {headerSort: false, title:"id_ukuran", field:"id_ukuran", cssClass:'text-center', hozAlign:"center",visible:false},
+            {headerSort: false, title:"Ukuran", field:"ukuran", cssClass:'text-center', hozAlign:"center",width:"18%"},
             {
-                headerSort: false,  
-                title: 'Aksi', 
-                formatter: buttonQRAction,
-                width: '10%', align: "center", cssClass: "text-center",
-                cellClick: function(e, cell) {
-                    let row = cell.getRow();
-                    let data_row = row.getData();
-                    if (e.target.title === 'qr code') {
-                        generateQRCode(data_row)
-                    } 
-                }
+                headerSort: false, title:"QTY", field:"qty", cssClass:'text-center', hozAlign:"center",width:"10%",editor: "number",cellEdited: updateTotal,
+                bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney
             },
-            {title:"No",formatter: "rownum",hozAlign: "center", width:"5%"},
-            {title:"id_ukuran", field:"id_ukuran", hozAlign:"center",width:"7%",visible:false},
-            {title:"Ukuran", field:"ukuran", hozAlign:"center",width:"23%"},
-            {title:"QTY", field:"qty", hozAlign:"center",width:"22%",editor: "number",cellEdited: updateTotal},
-            {title:"Price", field:"harga_satuan",formatter: "money", formatterParams: {
-                decimal: ",",
-                thousand: ".",
-                symbol: "Rp",  // Simbol mata uang Rupiah
-                precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right",width:"25%",editor: "number",cellEdited: updateTotal},
-            {title:"Total", field:"harga_total",formatter: "money", formatterParams: {
-                decimal: ",",
-                thousand: ".",
-                symbol: "Rp",  // Simbol mata uang Rupiah
-                precision: 0,   // Tidak ada desimal
-            }, hozAlign:"right",width:"25%"},
+            {
+                headerSort: false, title:"Price", field:"harga_satuan",formatter: "money", formatterParams: {
+                    decimal: ",",
+                    thousand: ".",
+                    symbol: "Rp",  // Simbol mata uang Rupiah
+                    precision: 0,   // Tidak ada desimal
+                }, hozAlign:"right",width:"32%",editor: "number",cellEdited: updateTotal,
+                bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney
+            },
+            {
+                headerSort: false, title:"Total", field:"harga_total",formatter: "money", formatterParams: {
+                    decimal: ",",
+                    thousand: ".",
+                    symbol: "Rp",  // Simbol mata uang Rupiah
+                    precision: 0,   // Tidak ada desimal
+                }, hozAlign:"right",width:"32%",
+                bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney
+            },
         ],
      
         locale: 'id',    
         // layout: 'fitColumns',
+        height: '300px',
         placeholder: "Tidak ada data",
         pagination:false
 	});
@@ -236,6 +288,17 @@ $(document).ready(function () {
             }, 600);
         });
     }
+
+     // declarre untuk variable print qr
+    const mdlPrint = $("#modal-print-barcode");
+    const inpp_foto = $("#fotoPrint");
+    const inpp_noSample = $("#noSamplePrint");
+    const inpp_deskripsi = $("#deskripsiPrint");
+    const inpp_tglSample = $("#tglSamplePrint");
+    const inpp_tglDeadline = $("#tglDeadlinePrint");
+    const inpp_buyer = $("#buyerPrint");    
+    const inpp_warna = $("#warnaPrint");
+    const inpp_trans = $("#warnaTrans");
 
     function cardFormatter(cell, formatterParams, onRendered){
         var data = cell.getRow().getData(); // Ambil data row
@@ -287,6 +350,14 @@ $(document).ready(function () {
                     </div>
                   </div>
                 </div>`;
+
+
+        // declarre untuk variable print qr
+        const print_btn = () => {
+            let btn = `<button type="button" class="btn btn-sm btn-info" data-bs-toggle="modalz" title="print-warna"> <i class="fa fa-print" title="print-warna"></i></button>`;
+            return btn
+        }
+
     
         onRendered(()=>{
             
@@ -311,29 +382,66 @@ $(document).ready(function () {
                     }
                 })
             });
-            new Tabulator(`#dt-list-detail-${data.id}`, {
-                data: data.detail, 
-                layout:"fitColumns",
-                pagination: true, 
-                paginationSize: 10,
-                paginationButtonCount: 5,
-                columns:[
-                    {title:"No", field:"no",   width: "5%"},
-                    {title:"Colour", field:"colordasar", width:"20%"},
-                    {title:"S", field:"s", hozAlign:"center",width:"7%"},
-                    {title:"M", field:"m", hozAlign:"center",width:"7%"},
-                    {title:"L", field:"l", hozAlign:"center",width:"7%"},
-                    {title:"XL", field:"xl", hozAlign:"center",width:"7%"},
-                    {title:"XXL", field:"xxl", hozAlign:"center",width:"7%"},
-                    {title:"3XL", field:"xxxl", hozAlign:"center",width:"7%"},
-                    {title:"All", field:"all", hozAlign:"center",width:"7%"},
-                    {title:"Amount", field:"harga_satuan",formatter: "money", formatterParams: {
+
+            let isColumn = [
+                {headerSort: false,title:"No", field:"no",   width: "5%"},
+                {headerSort: false,  title:"QR", width:"7%", formatter: print_btn,
+                    cellClick: function(e, cell) {
+                        let row = cell.getRow();
+                        let data_row = row.getData();
+                        if (e.target.title === 'print-warna') {
+                            // console.log(data_row)
+
+                            const inpp_slcUkuran = $("#print_slc_ukuran");
+                            const inpp_qty       = $("#print_qty");
+                            const inpp_qtyp      = $("#print_qtyp");
+
+                            // inpp_slcUkuran
+                            inpp_qty.val(1)
+                            inpp_qtyp.val(1)
+
+                            inpp_foto.attr('src', data.file_gambar);
+                            inpp_noSample.html(data.kode_sample)
+                            inpp_deskripsi.html(data.deskripsi);
+                            inpp_warna.html(data_row.colordasar);
+                            inpp_tglSample.html(formatterDate(data.tgl_transaksi))
+                            inpp_tglDeadline.html(formatterDate(data.tgl_deadline))
+                            inpp_buyer.html(data.nama)
+
+                            setTimeout(() => {
+                                // inpp_trans.html(data.id);
+                                mdlPrint.modal("show");
+                            }, 500);
+                        } 
+                    }
+                },
+                {headerSort: false, cssClass: 'text-start', title:"Colour", field:"colordasar"}
+            ]
+
+            for (const el of data.key_ukuran) {
+                const isKey = (el.key_ukuran == 'all') ? 'all_' : el.key_ukuran
+                isColumn.push( {headerSort: false,  title:el.kode_ukuran, field: isKey, cssClass: "text-center", hozAlign:"center", width:"7%"} )
+            }
+
+            isColumn.push(
+                {
+                    headerSort: false, cssClass: 'text-center', title:"Amount", field:"total_harga",formatter: "money", 
+                    formatterParams: {
                         decimal: ",",
                         thousand: ".",
                         symbol: "Rp",  // Simbol mata uang Rupiah
                         precision: 0,   // Tidak ada desimal
-                    }, hozAlign:"right"},
-                ],
+                    },
+                    hozAlign:"right", cssClass: 'text-end', width:"15%"})
+
+            new Tabulator(`#dt-list-detail-${data.id}`, {
+                data: data.detail, 
+                layout:"fitColumns",
+                resizableColumnFit:true,
+                pagination: true, 
+                paginationSize: 10,
+                paginationButtonCount: 5,
+                columns: isColumn,
             });
         });
     
@@ -352,6 +460,7 @@ $(document).ready(function () {
         inpTglDeadline.val("")
         inpKetSample.val("")
         noSample.val("");
+        inpStyle.val("");
         rowDet.hide()
         $("#btn-save").hide()
         $("#btn-draft").show()
@@ -462,6 +571,7 @@ $(document).ready(function () {
                 inpKetSample.val(data.keterangan)
                 inpBuyer.val(data.id_konsumen).trigger('change')
                 noSample.val(data.kode_sample);
+                inpStyle.val(data.style);
                 inpTglDeadline.val(formatterDate(data.tgl_deadline))
                 inpTglTransaksi.val(formatterDate(data.tgl_transaksi))
                 if(data.file_gambar){
@@ -470,19 +580,70 @@ $(document).ready(function () {
                     linkFileSample.attr('src', data.file_gambar)
                 }
                 
-                dtListDetail.setData(data.detail)
+                // dtListDetail.setData(data.detail)
+                setColumDetailData(data)
                 isModal.modal("show");
-
-                setTimeout(() => {
-                    dtListDetail.redraw(true)
-                }, 500);
+                
             },
             error: function(xhr, status, error) {
                 console.error('Error fetching data:', error);
             }
         });
     }
+
+    function setColumDetailData(data){
+        let newColumn =  [
+                            {
+                                headerSort: false,  
+                                title: 'Aksi', 
+                                formatter: buttonRowAction,
+                                width: 100, align: "center", cssClass: "text-center",
+                                cellClick: function(e, cell) {
+                                    let row = cell.getRow();
+                                    let data_row = row.getData();
+                                    if (e.target.title === 'delete') {
+                                        if (confirm("Anda yakin akan menghapus data?")) {
+                                            deleteData(data_row.id)
+                                            // window.location.replace(baseUrl + "/trans/sales-order/delete/detail" + data_row.id);
+                                        }
+                                    }else if(e.target.title === 'edit'){
+                                        getDetailQty(idSample,data_row.id)
+                                    }   
+                                }
+                            },
+                            {headerSort: false,title:"Colour", field:"colour"},
+                        ]
+
+        const dataCol = data.key_ukuran
+
+        for (const el of dataCol) {
+            const isKey = (el.key_ukuran == 'all') ? 'all_' : el.key_ukuran
+            newColumn.push( {headerSort: false,  title:el.kode_ukuran, field: isKey, cssClass: "text-center", hozAlign:"center", width:"7%"} )
+        }
+
+        // last column 
+        newColumn.push(  
+                        {
+                            headerSort: false,title:"Amount", field:"total_harga",formatter: "money", 
+                            formatterParams: {
+                                decimal: ",",
+                                thousand: ".",
+                                symbol: "Rp",  // Simbol mata uang Rupiah
+                                precision: 0,   // Tidak ada desimal
+                            },
+                            hozAlign:"right", width: '15%'
+                        }
+                    )
+
+        setTimeout(() => {
+            dtListDetail.setColumns(newColumn);
+            dtListDetail.setData(data.detail)
+            dtListDetail.redraw(true)
+        }, 500);
+    }
+
     function getDetailQty(id,idDet) {
+        dtListDetailQty.setData([])
         $.ajax({
             url: `/trans/sample/detail-qty/${id}/${idDet}`,
             type: 'GET',
@@ -494,7 +655,7 @@ $(document).ready(function () {
                 } else{
                     $("#btn-save-detail").show()
                 }
-                console.log(data);
+                // console.log(data);
                 noSampleText.html(data.kode_sample)
                 deskripsiText.html(data.deskripsi)
                 tglSampleText.html(`<i class="fa fa-calendar-day f-s-11"></i>&nbsp; ${formatterDate(data.tgl_transaksi)}`)
@@ -514,9 +675,20 @@ $(document).ready(function () {
                 }
                
                 dtListDetailQty.setData(data.detailUkuran)
+
+                dtListDetailGram.setData(data.detail_gram)
                 isModalPO.modal("show");
                 setTimeout(() => {
                     dtListDetailQty.redraw(true)
+                    dtListDetailGram.redraw(true);
+
+                    let tableColumn = dtListDetailGram.getData()
+                    let total_gram = 0;
+                    if(tableColumn.length > 0){
+                        let index_total = tableColumn.length - 1;
+                        total_gram = tableColumn[index_total].value
+                    }
+                    updateRow([], total_gram)
                 }, 500);
             },
             error: function(xhr, status, error) {
@@ -583,6 +755,45 @@ $(document).ready(function () {
             },
         });
     }
+
+    $("#btn-cetak-print").on('click', function (e) {
+        e.preventDefault()
+
+        //   const inpp_slcWarna = $("#print_slc_warna");
+        const inpp_slcUkuran = $("#print_slc_ukuran");
+        const inpp_qty       = $("#print_qty");
+        const inpp_qtyp      = $("#print_qtyp");
+
+        // mdlPrint
+        const dt_noSample = inpp_noSample.html()
+        const dt_deskripsi = inpp_deskripsi.html()
+        const dt_buyer = inpp_buyer.html()
+        const dt_warna = inpp_warna.html()
+        // inpp_trans
+
+        // Query parameters
+        let params = {
+            ukuran : inpp_slcUkuran.val(),
+            qty : inpp_qty.val(),
+            qtyp : inpp_qtyp.val(),
+            noSample : dt_noSample,
+            deskripsi : '',
+            buyer : '',
+            warna : dt_warna,
+          };
+  
+          // Buat query string
+          let queryString = $.param(params); // Convert objek ke query string
+          let fullUrl = `trans/sample/generate?${queryString}`;
+  
+          // Buka link di tab baru
+          window.open(fullUrl, '_blank');
+        //   setTimeout(() => {
+        //     // inpp_trans.html(data.id);
+        //     mdlPrint.modal("hide");
+        // }, 500);
+
+    });
 
     function base64ToBlob(base64, contentType = '', sliceSize = 512) {
         const byteCharacters = atob(base64); // Hapus prefix "data:image/png;base64,"
@@ -670,6 +881,7 @@ $(document).ready(function () {
             var formData = new FormData();
             formData.append("id",inpData.val());
             formData.append("status",status);
+            formData.append("style", inpStyle.val());
             formData.append("deskripsi",inpDeskripsi.val());
             formData.append("fileSample",fileSample[0].files[0] == undefined ? null : fileSample[0].files[0] );
             formData.append("fileIdSampleOld",fileSampleOld.val());
@@ -755,6 +967,8 @@ $(document).ready(function () {
         }
 
         let dataUkuran = dtListDetailQty.getData().filter(x => x.qty && x.harga_satuan);
+        
+        let dtGram = dtListDetailGram.getData()
         if(dataUkuran.length ==0)
             {
                 return Swal.fire({
@@ -777,6 +991,7 @@ $(document).ready(function () {
                     warna6:inpPoWarna6.val(),
                     warna7:inpPoWarna7.val(),
                     warna8:inpPoWarna8.val(),
+                    dataGram: dtGram,
                     dataUkuran: dataUkuran,
                     idSample:idSample,
                     idSampleDet:idSampleDet,
@@ -829,10 +1044,10 @@ $(document).ready(function () {
         
     }
 
-    $('#desc_style').autocomplete({
+    $('#style').autocomplete({
         appendTo: '#modal-form-add-po',
 		source: function( request, response ) {
-            console.log(inpBuyer.val())
+            // console.log(inpBuyer.val())
 		  if(inpBuyer.val() != ''){
             $.ajax({
                 url: "/trans/sample/get-style-konsumen",
@@ -843,7 +1058,7 @@ $(document).ready(function () {
                 },
                 type : 'post',
                 success: function( res ) {
-                    console.log(res)
+                    // console.log(res)
                   if(res.status){
                       response(res.slc);
                   }else{
@@ -863,7 +1078,7 @@ $(document).ready(function () {
 		},
 		minLength: 0,
 		select: function( event, ui ) {
-            console.log(ui)
+            // console.log(ui)
 			// addItem(ui.item.data);
 		},
 		open: function() {
@@ -874,6 +1089,330 @@ $(document).ready(function () {
 		//   $( this ).val("");
 		}
 	});
+
+     // start table detail warna 
+     let detailQty = 0;
+     $("#btn-refresh-gram").on("click", function(e) {
+        e.preventDefault();
+        setGramasi()
+     });
+
+     let inpDetailLoss = $("#loss_perc");
+     function setGramasi(){
+        detailQty = getBottomCalcValue(dtListDetailQty, 'qty');
+        loss = inpDetailLoss.val().length > 0 ? inpDetailLoss.val() : 0
+
+        Swal.fire({
+            title: "Muat Ulang data Gramasi akan menghilangkan data sebelumnya",
+            icon: 'question',
+            confirmButtonText: 'Ya',
+            confirmButtonColor: '#dc3545',
+            showCancelButton: true,
+            cancelButtonText: 'Batal',
+            cancelButtonColor: '#6C757D'
+        }).then((result) => {
+            if (!result.isConfirmed) {
+                dtListDetailGram.setData([]);
+                return false
+            }
+        })
+
+        let gramData = [];
+        let gramIsi = {
+            'qty' : detailQty,
+            'loss' : loss,
+            'id_warna' : '',
+            'kode_warna' : '',
+            'persen' : 0,
+            'gram' : 0,
+            'gram_nd' : 0,
+            'kg' : 0,
+            'kg_loss' : 0,
+            'total' : 0,
+        }
+
+
+        let text1 = $("#po_warna1 option:selected").text();
+        if(inpPoWarna1.val().length > 0){
+            let arrW1 = gramIsi
+            arrW1.id_warna = inpPoWarna1.val()
+            arrW1.kode_warna = text1
+
+            gramData.push({
+                'id_warna' : inpPoWarna1.val(),
+                'kode_warna' : text1,
+                'qty' : detailQty,
+                'loss' : loss,
+                'persen' : 0,
+                'gram' : 0,
+                'gram_nd' : 0,
+                'kg' : 0,
+                'kg_loss' : 0,
+                'total' : 0,
+            })
+        }
+
+        let text2 = $("#po_warna2 option:selected").text();
+        if(inpPoWarna2.val().length > 0){
+            let arrW2 = gramIsi
+            arrW2.id_warna = inpPoWarna2.val()
+            arrW2.kode_warna = text2
+            gramData.push({
+                'id_warna' : inpPoWarna2.val(),
+                'kode_warna' : text2,
+                'qty' : detailQty,
+                'loss' : loss,
+                'persen' : 0,
+                'gram' : 0,
+                'gram_nd' : 0,
+                'kg' : 0,
+                'kg_loss' : 0,
+                'total' : 0,
+            })
+        }
+
+        let text3 = $("#po_warna3 option:selected").text();
+        if(inpPoWarna3.val().length > 0){
+            let arrW3 = gramIsi
+            arrW3.id_warna = inpPoWarna3.val()
+            arrW3.kode_warna = text3
+            gramData.push({
+                'id_warna' : inpPoWarna3.val(),
+                'kode_warna' : text3,
+                'qty' : detailQty,
+                'loss' : loss,
+                'persen' : 0,
+                'gram' : 0,
+                'gram_nd' : 0,
+                'kg' : 0,
+                'kg_loss' : 0,
+                'total' : 0,
+            })
+        }
+
+        let text4 = $("#po_warna4 option:selected").text();
+        if(inpPoWarna4.val().length > 0){
+            let arrW4 = gramIsi
+            arrW4.id_warna = inpPoWarna4.val()
+            arrW4.kode_warna = text4
+            gramData.push({
+                'id_warna' : inpPoWarna4.val(),
+                'kode_warna' : text4,
+                'qty' : detailQty,
+                'loss' : loss,
+                'persen' : 0,
+                'gram' : 0,
+                'gram_nd' : 0,
+                'kg' : 0,
+                'kg_loss' : 0,
+                'total' : 0,
+            })
+        }
+
+        let text5 = $("#po_warna5 option:selected").text();
+        if(inpPoWarna5.val().length > 0){
+            let arrW5 = gramIsi
+            arrW5.id_warna = inpPoWarna5.val()
+            arrW5.kode_warna = text5
+            gramData.push({
+                'id_warna' : inpPoWarna5.val(),
+                'kode_warna' : text5,
+                'qty' : detailQty,
+                'loss' : loss,
+                'persen' : 0,
+                'gram' : 0,
+                'gram_nd' : 0,
+                'kg' : 0,
+                'kg_loss' : 0,
+                'total' : 0,
+            })
+        }
+
+        let text6 = $("#po_warna6 option:selected").text();
+        if(inpPoWarna6.val().length > 0){
+            let arrW6 = gramIsi
+            arrW6.id_warna = inpPoWarna6.val()
+            arrW6.kode_warna = text6
+            gramData.push({
+                'id_warna' : inpPoWarna6.val(),
+                'kode_warna' : text6,
+                'qty' : detailQty,
+                'loss' : loss,
+                'persen' : 0,
+                'gram' : 0,
+                'gram_nd' : 0,
+                'kg' : 0,
+                'kg_loss' : 0,
+                'total' : 0,
+            })
+        }
+
+        let text7 = $("#po_warna7 option:selected").text();
+        if(inpPoWarna7.val().length > 0){
+            let arrW7 = gramIsi
+            arrW7.id_warna = inpPoWarna7.val()
+            arrW7.kode_warna = text7
+            gramData.push({
+                'id_warna' : inpPoWarna7.val(),
+                'kode_warna' : text7,
+                'qty' : detailQty,
+                'loss' : loss,
+                'persen' : 0,
+                'gram' : 0,
+                'gram_nd' : 0,
+                'kg' : 0,
+                'kg_loss' : 0,
+                'total' : 0,
+            })
+        }
+
+        let text8 = $("#po_warna8 option:selected").text();
+        if(inpPoWarna8.val().length > 0){
+            let arrW8 = gramIsi
+            arrW8.id_warna = inpPoWarna8.val()
+            arrW8.kode_warna = text8
+            gramData.push({
+                'id_warna' : inpPoWarna8.val(),
+                'kode_warna' : text8,
+                'qty' : detailQty,
+                'loss' : loss,
+                'persen' : 0,
+                'gram' : 0,
+                'gram_nd' : 0,
+                'kg' : 0,
+                'kg_loss' : 0,
+                'total' : 0,
+            })
+        }
+        // console.log(gramData);
+        setTimeout(() => {
+            dtListDetailGram.setData(gramData);
+        }, 500);
+     }
+
+     
+     let dtListDetailGram = new Tabulator("#dt-detail-gram", {
+         columns: [
+                 {
+                     title: "Colour", field: "kode_warna",  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
+                     width:"16%"
+                 },
+                 {
+                     title: "%", field: "persen",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                     width:"14%"
+                 },
+                 {
+                     title: "GRAM", field: "gram",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end tabulator-editable",
+                     width:"14%", editor: "number", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                     cellEdited: function (cell) {
+ 
+                         let qty = parseInt(detailQty)
+                        //  console.log(qty)
+                         // Dapatkan baris data yang telah diedit
+                         let rowData = cell.getRow().getData();
+                         let tableColumn = cell._cell.column.cells;
+                         let total_gram = 0;
+                         if(tableColumn.length > 0){
+                             let index_total = tableColumn.length - 1;
+                             total_gram = tableColumn[index_total].value
+                         }
+                         updateRow(rowData, total_gram)
+                         let val_gram = rowData.gram ? rowData.gram : 0;
+                         // let val_persen = total_gram > 0 ? (rowData.gram/total_gram) * 100 : 0;
+                         //     val_persen = val_persen > 0 ? val_persen.toFixed(2) : 0;
+                         let val_gram_nd = val_gram * qty;
+                         let val_kg = val_gram_nd / 1000;
+                             // val_kg = val_kg > 0 ? val_kg.toFixed(2) : 0;
+                         let val_kg_loss = inpDetailLoss.val().length > 0 ? (val_kg * inpDetailLoss.val())/ 100 : 0
+                             // val_kg_loss = val_kg_loss > 0 ? val_kg_loss.toFixed(2) : 0;
+ 
+                         let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
+                             // val_total = val_total > 0 ? val_total.toFixed(2) : 0
+                         let val_kuota = 0;
+                             // val_kuota    = val_kuota    > 0 ? val_kuota   .toFixed(2) : 0
+                         let val_kuota_tambah =  val_kuota - val_total
+             
+                         // Set nilai total di baris yang sama
+                         cell.getRow().update({ 
+                             // persen: val_persen,
+                             gram_nd: val_gram_nd,
+                             kg: val_kg,
+                             kg_loss: val_kg_loss,
+                             total: val_total,
+                             kuota: val_kuota,
+                             kuota_tambah: val_kuota_tambah,
+                          });
+                     },
+                 },
+                 {
+                     title: "NEEDS<br>(GRAM)", field: "gram_nd",  sorter: "string", headerSort:false,  align: "center", cssClass: "text-end",
+                     width:"14%", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                 },
+ 
+                 {
+                     title: "IN KG", field: "kg",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                     width:"14%", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                 },
+ 
+                 {
+                     title: "LOSS<br>(KG)", field: "kg_loss",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                     width:"14%", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                 },
+ 
+                 {
+                     title: "NFP (KG)", field: "total",  sorter: "string", headerSort:false, align: "center", cssClass: "text-end",
+                     width:"14%", bottomCalc:"sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                 }
+             ],
+             locale: 'id',
+            //  layout: 'fitColumns',
+             height: '300px',
+             placeholder: "Tidak ada data",
+             pagination: false,
+             paginationSize: 99,
+             paginationButtonCount: 2,
+             paginationDataSent: {
+                 sorters: "order",
+             },
+             selectableRows: false
+     });
+
+     inpDetailLoss.on("change", function(){
+        let val = $(this).val()
+        let rows = dtListDetailGram.getRows();
+        rows.forEach(row => {
+            let rowData = row.getData();
+            let val_kg = rowData.kg;
+
+            let val_kg_loss = val.length > 0 ? (val_kg * val) / 100 : 0
+                val_kg_loss = val_kg_loss > 0 ? val_kg_loss.toFixed(2) : 0;
+
+            let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
+                val_total = val_total > 0 ? val_total.toFixed(2) : 0
+
+            let val_kuota = 0;//parseFloat(val_kg) - parseFloat(val_kg_loss);
+                val_kuota    = val_kuota    > 0 ? val_kuota   .toFixed(2) : 0
+
+            let val_kuota_tambah = val_kuota - val_total;
+
+            row.update({
+                kg_loss: val_kg_loss,
+                total: val_total,
+                kuota: val_kuota,
+                kuota_tambah: val_kuota_tambah,
+            });
+        });
+    });
+
+     function updateRow(data, total){
+        let rows = dtListDetailGram.getRows();
+        rows.forEach(row => {
+            let rowData = row.getData();
+            let val_persen = total > 0 ? (rowData.gram/total) * 100 : 0;
+                             val_persen = val_persen > 0 ? val_persen.toFixed(2) : 0;
+            row.update({ persen: val_persen });
+        });
+    }   
     
 });
 

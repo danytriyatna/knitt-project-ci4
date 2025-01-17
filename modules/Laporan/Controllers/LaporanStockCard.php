@@ -43,7 +43,19 @@ class LaporanStockCard extends BaseController
         }
 
         $this->data['titlehead'] = "Laporan Stock Card ";
+        $sortGudang = [
+            [
+                'field' => 'nama_gudang',
+                'dir' => 'ASC'
+            ]
+        ];
+        $resDataGudang = $this->mGudang->getData(null, 0, 99999, $sortGudang);
+        $resTahun = $this->mLaporan->getTahun();
+        $resBulan = $this->mLaporan->getBulan();
 
+        $this->data['gudang']    = $resDataGudang;
+        $this->data['tahun']    = $resTahun;
+        $this->data['bulan']    = $resBulan;
         return view($this->views . '\laporan_stock_card', $this->data);
     }
 
@@ -56,11 +68,21 @@ class LaporanStockCard extends BaseController
         $build_array["status"] = false;
 
         $idBarang = $this->request->getGet('filter_barang_id');
-        $idBarang = decrypt($idBarang);
-        $tgl_mulai = $this->request->getGet('tgl_mulai');
-        $tgl_akhir = $this->request->getGet('tgl_akhir');
+        if ($idBarang != null) {
+            $idBarang = decrypt($idBarang);
+        }
+        $filter_gudang = $this->request->getGet('filter_gudang_id');
 
-        $resData = $this->mLaporan->getLaporanStockCard($idBarang, $tgl_mulai, $tgl_akhir);
+        $tahun = $this->request->getGet('tahun');
+        $bulan = $this->request->getGet('bulan');
+
+        $resData = $this->mLaporan->getLaporanStockCard($idBarang, $filter_gudang, $tahun, $bulan);
+
+        // if(!empty($resData)){
+        //     for ($i=0; $i < count($resData); $i++) { 
+        //         $resData[$i]->tanggal = \fdate_eng_to_ind_3($resData[$i]->tanggal);
+        //     }
+        // }
 
         $build_array["message"] = "Data ditemukan";
         $build_array["data"] =  !empty($resData) ? $resData : [];

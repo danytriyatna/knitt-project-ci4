@@ -12,6 +12,7 @@ use Modules\Referensi\Models\WarnaModel;
 use Modules\Transaction\Models\SalesOrderModel;
 use Modules\Transaction\Models\SampleModel;
 use Modules\Transaction\Models\ProductionModel;
+use Modules\Referensi\Models\GudangModel;
 
 use App\Models\FileModel;
 
@@ -26,6 +27,7 @@ class WorkOrder extends BaseController
   protected $mSalesOrder;
   protected $mPproduksi;
   protected $mProduksi;
+  protected $mGudang;
 
   protected $views = '\Modules\Transaction\Views';
   protected $urlv  = 'trans/work-order';
@@ -43,6 +45,7 @@ class WorkOrder extends BaseController
     $this->mSalesOrder = new SalesOrderModel();
     $this->mPproduksi = new ProsesProduksiModel();
     $this->mProduksi = new ProductionModel();
+    $this->mGudang = new GudangModel();
   }
 
 
@@ -147,14 +150,23 @@ class WorkOrder extends BaseController
     $status = 1;
     if (!empty($id)) {
       $stdData = $this->mWalkorder->getData($id);
-
+      
       $data_detail = [];
       if ($stdData->tipe_id == 1) {
-        $list_detail = $this->mSample->getDataDetailSample($stdData->ref_id);
+        $list_detail = $this->mSample->getDataDetailSample_crostab($stdData->ref_id);
         $stdData->file_gambar = !empty($stdData->file_name) ? base_url() . "uploads/sample/"  . $stdData->file_name : "";
+
+        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['id_sample'] = $stdData->ref_id;
+        $dtUkuran = $this->mSample->getUkuranTrans($pru);
+        
       } else {
-        $list_detail = $this->mSalesOrder->getDataDetailSalesOrder($stdData->ref_id);
+        $list_detail = $this->mSalesOrder->getDataDetailSalesOrder_crostab($stdData->ref_id);
         $stdData->file_gambar = !empty($stdData->file_name) ? base_url() . "uploads/sales_order/"  . $stdData->file_name : "";
+
+        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['id_sales_order'] = $stdData->ref_id;
+        $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
       }
 
       if (!empty($list_detail)) {
@@ -172,6 +184,7 @@ class WorkOrder extends BaseController
 
       $this->data['row']    = $stdData;
       $this->data['detail'] = json_encode($list_detail);
+      $this->data['dtUkuran'] = json_encode($dtUkuran);
 
       $status = $stdData->status;
     }
@@ -182,6 +195,15 @@ class WorkOrder extends BaseController
     $proces_data = $this->mPproduksi->getData(null, 0, 999);
     $params_wo['id_walkorder'] = $id;
     $proces_saved = $this->mWalkorder->getData_proses(0, 0, 9999, null, null, $params_wo);
+
+    $sortGudang = [
+        [
+            'field' => 'nama_gudang',
+            'dir' => 'ASC'
+        ]
+    ];
+    $resDataGudang = $this->mGudang->getData(null, 0, 99999, $sortGudang);
+    $this->data['gudang']    = $resDataGudang;
 
     $this->data['proses'] = $proces_data;
     $this->data['proses_saved'] = json_encode($proces_saved);
@@ -201,7 +223,7 @@ class WorkOrder extends BaseController
 
     $params = [];
     $params['id_walkorder'] = decrypt($wo_id);
-
+    
     $results = $this->mWalkorder->getData_detail(null, $start, $limit, $order, $filters, $params);
     $totalfiltered = $this->mWalkorder->getDataCnt_detail($filters, $params);
     $totaldata = $this->mWalkorder->getDataCnt_detail(null, $params);
@@ -332,6 +354,7 @@ class WorkOrder extends BaseController
     $dataid      = $this->request->getPost('dataid');
     $list_proses = $this->request->getPost('listproses');
     $status_data = $this->request->getPost('status_data');
+    $id_gudang = $this->request->getPost('id_gudang');
 
     $data_ukuran_input = $this->request->getPost('data_ukuran');
     $data_ukuran_warna = $this->request->getPost('data_ukuran_warna');
@@ -342,15 +365,31 @@ class WorkOrder extends BaseController
     // try {
     $dataid = \decrypt($dataid);
     $data        = $this->mWalkorder->getData($dataid);
-    $data_ukuran = $this->mUkuran->getData(0, 0, 999);
+    
     $data_ukuran_input = json_decode($data_ukuran_input, true);
     $data_ukuran_warna = json_decode($data_ukuran_warna, true);
+    // print_r($data_ukuran_warna);
+    // exit;
     $this->db->transBegin();
+
+    $update_stat['id_gudang'] = $id_gudang;
+    $this->mWalkorder->updateRecord($this->mWalkorder->table, $update_stat, 'id', $dataid);
 
 
     $builder_proses = $this->db->table($this->mWalkorder->table3);
     $builder_proses->where("id_walkorder", $dataid);
     $builder_proses->delete();
+    
+    // $data_ukuran = $this->mUkuran->getData(0, 0, 999);
+    if ($data->tipe_id == 1) {
+      $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+      $pru['id_sample'] = $data->ref_id;
+      $dtUkuran = $this->mSample->getUkuranTrans($pru);
+    }else{
+      $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+      $pru['id_sales_order'] = $data->ref_id;
+      $data_ukuran = $this->mSalesOrder->getUkuranTrans($pru);
+    }
     
     $i = 1;
     $list_proses = json_decode($list_proses, true);
@@ -380,20 +419,20 @@ class WorkOrder extends BaseController
 
         //   $this->mWalkorder->insertRecordGetid($this->mWalkorder->table4, $isiProses_det);
         // }
-
+        // print_r($data_ukuran);exit;
         foreach ($data_ukuran_warna as $xuk) {
           foreach ($data_ukuran as $x) {
             $isiProses_det = [
               'id_walkorder_proses' => $proses_id,
-              'id_ukuran'           => $x->id,
+              'id_ukuran'           => $x->id_ukuran,
               'ref_detail_id'       => $xuk['id'],
               'created_at'          => date('Y-m-d H:i:s')
             ];
-  
-            $key_ukuran = $x->key_ukuran;
+            
+            $key_ukuran = $x->key_ukuran == 'all' ? 'all_' : $x->key_ukuran;
             if ($i == 1) {
               // $isiProses_det['qty'] = !empty($data_ukuran_input['bottom'][$x->key_ukuran]) ? $data_ukuran_input['bottom'][$x->key_ukuran] : 0;
-              $isiProses_det['qty'] = !empty($xuk[$x->key_ukuran]) ? $xuk[$x->key_ukuran] : 0;
+              $isiProses_det['qty'] = !empty($xuk[$key_ukuran]) ? $xuk[$key_ukuran] : 0;
             } else {
               $isiProses_det['qty'] = 0;
             }
@@ -410,7 +449,7 @@ class WorkOrder extends BaseController
       $update_stat['status'] = 2;
       $this->mWalkorder->updateRecord($this->mWalkorder->table, $update_stat, 'id', $dataid);
 
-      // insert to work order 
+      // insert to produksi 
       $data_wo = [
         'id_walkorder' => $dataid,
         'tipe_id' => $data->tipe_id,

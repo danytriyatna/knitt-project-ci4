@@ -27,47 +27,46 @@
     <div class="col-lg-12">
       <div class="card">
         <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped datatable">
-              <thead>
-                <tr>
-                  <th style="min-width: 105px; width: 105px;">
-                    <a href="trans/item-transfer/form" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Tambah</a>
-                  </th>
-                  <th>TRANSFER NO.</th>
-                  <th>DATE</th>
-                  <th>TRANSFER FROM</th>
-                  <th>TRANSFER TO</th>
-                  <th>TRANSFER STATUS</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php for($i = 0; $i < 3; $i++) : ?>
-                <tr>
-                  <td>
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-default btn-sm dropdown-toggle"
-                        data-bs-toggle="dropdown">
-                        <i class="fas fa-cog"></i> Aksi <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu dropdown-menu-act" role="menu">
-                        <li><a href="trans/item-transfer/form" title="Edit"><i class="fa fa-fw fa-edit"></i> Edit</a></li>
-                        <li><a href="javascript:void(0)" title="Hapus"><i class="fa fa-fw fa-trash"></i> Hapus</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                  <td>TRF24100001</td>
-                  <td>01-11-2024</td>
-                  <td>GUDANG UTAMA</td>
-                  <td>GUDANG PRODUKSI</td>
-                  <td>
-                    <span class="badge bg-secondary">DRAFT</span>
-                  </td>
-                </tr>
-                <?php endfor; ?>
-              </tbody>
-            </table>
+          <div class="row">
+            <div class="col-md-12 mb-3">
+              <?php if (isset($_SESSION['message'])) { ?>
+                <script type="text/javascript">
+                  window.setTimeout(function() {
+                    $(".alert").alert('close');
+                  }, 3000);
+                </script>
+                <div class="alert alert-success">
+                  <?php echo $_SESSION['message']; ?>
+                </div>
+              <?php } ?>
+              <?php if (isset($_SESSION['err'])) { ?>
+                <script type="text/javascript">
+                  window.setTimeout(function() {
+                    $(".alert").alert('close');
+                  }, 5000);
+                </script>
+                <div class="alert alert-error">
+                  <strong>Warning! </strong><?php echo $_SESSION['err']; ?>
+                </div>
+              <?php } ?>
+            </div>
+            <div class="col-sm-3">
+              <a href="trans/item-transfer/form" type="button" class="btn btn-sm btn-success" id="btn-add"> <i class="fa fa-plus"></i> Tambah</a>
+            </div>
+            <div class="col-sm-4 offset-md-5">
+              <div class="form-group">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-white" id="basic-addon11" style="border-right-width: 0px;"><i class="ti-search"></i></span>
+                  <input type="text" id="tb-search" class="form-control p-s-0" placeholder="Pencarian" aria-label="Username" aria-describedby="basic-addon11" style="border-left-width: 0px;">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-12">
+              <div id="dt-list" class="table-responsive table-striped"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -76,3 +75,6 @@
 </div>
 
 <?= $this->endSection('content'); ?>
+<?= $this->section('script'); ?>
+<script src="script/app/transaction/transfer/index.js"></script>
+<?= $this->endSection('script'); ?>

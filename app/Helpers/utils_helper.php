@@ -242,6 +242,22 @@ if (!function_exists('fdate_eng_to_ind_3')) {
     }
 }
 
+if(!function_exists('formatTanggalIndonesia')){
+    function formatTanggalIndonesia($tanggal) {
+       // Pisahkan tanggal, bulan, dan tahun
+        $tanggalArray = explode('-', $tanggal);  // format input: Y-m-d
+        $tahun = $tanggalArray[0];
+        $bulanAngka = $tanggalArray[1];
+        $hari = $tanggalArray[2];
+
+        // Dapatkan nama bulan dalam bahasa Indonesia
+        $bulanNama = bulan((int)$bulanAngka);
+
+        // Gabungkan hasilnya dalam format 'd F Y'
+        return $hari . ' ' . $bulanNama . ' ' . $tahun;
+    }
+}
+
 /**
  * Konversi tanggal yyyy-mm-dd H:i:s -> dd-mm-yyyy H:i:s
  *
@@ -594,5 +610,12 @@ if (!function_exists('hitung_hari')) {
             return ($wkt / 30) . " Bulan";
         elseif ($wkt >= 360)
             return ($wkt / 360) . " Tahun";
+    }
+}
+
+if (!function_exists('rmvSpecialChar')) {
+    function rmvSpecialChar($string) {
+        // Menghapus semua karakter spesial kecuali huruf, angka, dan spasi
+        return preg_replace('/[^a-zA-Z0-9\s]/', '', $string);
     }
 }

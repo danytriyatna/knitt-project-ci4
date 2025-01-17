@@ -5,7 +5,7 @@ namespace Modules\Transaction\Models;
 class WalkorderModel extends \App\Models\PrModel
 {
 
-    protected $table = "trans_walkorder";
+    protected $table  = "trans_walkorder";
     protected $table2 = "trans_walkorder_detail";
     protected $table3 = "trans_walkorder_proses";
     protected $table4 = "trans_walkorder_proses_ukuran";
@@ -26,7 +26,7 @@ class WalkorderModel extends \App\Models\PrModel
 
         $builder->select("abx.id, abx.ref_id, abx.ref_kode, abx.kode_walkorder, abx.id_konsumen, abx.id_style, abx.qty, abx.file_id,
                           abx.ref_kode, abx.status, bbx.nama as konsumen_nama, abx.tgl_deadline, abx.tgl_transaksi, abx.keterangan_style,
-                          abx.tipe_id, cbx.file_name
+                          abx.tipe_id, cbx.file_name, abx.id_gudang
                         ");
 
         $builder->join("ref_konsumen bbx", "abx.id_konsumen = bbx.id", "inner");
@@ -49,6 +49,14 @@ class WalkorderModel extends \App\Models\PrModel
 
             if (!empty($params['ref_kode'])) {
                 $builder->where('abx.ref_kode', $params['ref_kode']);
+            }
+
+            if (!empty($params['ref_id'])) {
+                $builder->where('abx.ref_id', $params['ref_id']);
+            }
+
+            if (!empty($params['tipe_id'])) {
+                $builder->where('abx.tipe_id', $params['tipe_id']);
             }
 
             if (!empty($order)) {
@@ -154,6 +162,10 @@ class WalkorderModel extends \App\Models\PrModel
 
             if (!empty($params['id_walkorder'])) {
                 $builder->where('abx.id_walkorder', $params['id_walkorder']);
+            }
+
+            if (!empty($params['ref_detail_id'])) {
+                $builder->where('abx.ref_detail_id', $params['ref_detail_id']);
             }
 
             if (!empty($order)) {
@@ -291,8 +303,8 @@ class WalkorderModel extends \App\Models\PrModel
                 $builder->groupEnd();
             }
 
-            if (!empty($params['id_walkorder'])) {
-                $builder->where('abx.id_walkorder', $params['id_walkorder']);
+            if (!empty($params['id_walkorder_proses'])) {
+                $builder->where('abx.id_walkorder_proses', $params['id_walkorder_proses']);
             }
 
             if (!empty($order)) {
@@ -384,6 +396,15 @@ class WalkorderModel extends \App\Models\PrModel
             $builder->where('twp.id_ukuran', $params['id_ukuran']);
         }
 
+        if(!empty($params['key_ukuran'])){
+            $builder->where('rk.key_ukuran', $params['key_ukuran']);
+        }
+
+        if(!empty($params['kode_warna'])){
+            // $builder->where('rw.kode_warna', $params['kode_warna']);
+            $builder->where('LOWER(rw.kode_warna) LIKE', strtolower("%{$params['kode_warna']}%"));
+        }
+
         if(!empty($params['last_proses']) && !empty($params['id_walkorder'])){
             $builder->where('twp.id_proses = (select max(tx.id_proses) from trans_walkorder_proses tx where tx.id_walkorder = '.$params['id_walkorder'].')');
         }
@@ -433,6 +454,10 @@ class WalkorderModel extends \App\Models\PrModel
 
             if (!empty($params['id_walkorder_detail'])) {
                 $builder->where('abx.id_walkorder_detail', $params['id_walkorder_detail']);
+            }
+
+            if (!empty($params['id_warna'])) {
+                $builder->where('abx.id_warna', $params['id_warna']);
             }
 
             if (!empty($order)) {

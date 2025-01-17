@@ -4,6 +4,11 @@ let inpIdVendor = $('#idVendor');
 let inpBarang = $('#namaBarang');
 let inpIdBarang = $('#idBarang');
 let inpKodeBarang = $('#kodeBarang');
+let inpTglExpec = $('#tgl_expected');
+let inpTglPO = $('#tgl_po');
+let inpShipTo = $('#ship_to');
+let inpIdHeader = $('#id_header');
+let inpIdDetail = $('#idDetail');
 let inpQty = $('#qty_item');
 let inpDisc = $('#disc_item');
 let inpCheckTax = $('#check_tax');
@@ -14,9 +19,20 @@ let inpUnit = $('#unit');
 let inpStatus = $('#status');
 let inpTax = $('#tax');
 let btnAdd = $('#btn-add');
+let btnSimpan = $('#btn-simpan');
+let btnApprove = $('#btn-approve');
 let btnSimpanDetail = $('#btn-simpan-det');
 let modalDet = $('#modal-detail-item');
-
+let detailData = $("#data-details").val().replace(/&quot;/ig,'"');
+const regex = /^[0-9]+(\.[0-9]+)?$/; // Hanya angka dan desimal
+   
+if(inpStatus.val() == 0){
+    btnAdd.show()
+    btnSimpan.show()
+} else{
+    btnAdd.hide()
+    btnSimpan.hide()
+}
 
 let dtList = new Tabulator("#dt-list", {
     columns: [
@@ -209,6 +225,14 @@ dtList.on("rowClick", function(e, row){
     var idBarang = row._row.data.id;
     var namaBarang = row._row.data.nama_barang.replace(/<[^>]*>/g, '');
     var namaSatuan = row._row.data.nama_satuan.replace(/<[^>]*>/g, '');
+    if(dtListDetailPO.getData().some(x => x.id_barang == idBarang)){
+        return Swal.fire({
+            text: "Barang sudah dipilih",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
 
     inpUnit.val(namaSatuan)
     inpIdBarang.val(idBarang)
@@ -244,7 +268,28 @@ btnAdd.click(function(){
     openModalDetail()
 })
 
+if(detailData.length > 0){
+    setTimeout(() => {
+        try {
+            let isdata = JSON.parse(detailData);
+            dtListDetailPO.setData(isdata);
+        } catch (e) {
+            console.error("Error parsing JSON:", e);
+        }
+    }, 1000);
+} 
 
+inpQty.keyup(function (e) {
+    // if(!regex.test(e.target.value)){
+    //     e.target.value = ""
+    //     return Swal.fire({
+    //         text: "Quantity harus berupa angka",
+    //         icon: 'error',
+    //         showConfirmButton: false,
+    //         timer: 2000
+    //     });
+    // }
+})
 
 function openModalDetail(row = null){
     if(row){
@@ -278,8 +323,10 @@ function openModalDetail(row = null){
         let priceAfterDisc = 0;
         let tax = "";
         let disc = "";
-        const regex = /^[0-9]+(\.[0-9]+)?$/; // Hanya angka dan desimal
+        
     
+     
+
         if(inpBarang.val().length == 0){
             return Swal.fire({
                 text: "Barang harus dipilih",
@@ -362,6 +409,7 @@ function openModalDetail(row = null){
     
         if(row){
             row.update({
+                id:inpIdDetail.val(),
                 nama_barang                 : inpBarang.val(),
                 kode_barang                 : inpKodeBarang.val(),
                 id_barang                   : inpIdBarang.val(),
@@ -374,28 +422,140 @@ function openModalDetail(row = null){
                 tax                 : tax,
                 nama_unit                 : inpUnit.val(),
             });
-            // modalDet.modal("hide")
         } else{
 
             dtListDetailPO.addRow({
-                
+                id:null,
                 nama_barang                 : inpBarang.val(),
                 kode_barang                 : inpKodeBarang.val(),
                 id_barang                   : inpIdBarang.val(),
                 qty                         : inpQty.val(),
                 price                       : inpUnitPrice.val(),
                 grand_price                 : grandPrice,
-                disc_price:discPrice,
-                tax_price:taxAfterPrice,
-                disc                 : disc,
-                tax                 : tax,
-                nama_unit                 : inpUnit.val(),
+                disc_price                  : discPrice,
+                tax_price                   : taxAfterPrice,
+                disc                        : disc,
+                tax                         : tax,
+                nama_unit                   : inpUnit.val(),
             });
-            // modalDet.modal("hide")
         }
         modalDet.modal("hide")
         
     })
+
+}
+
+btnSimpan.on("click",function(e){
+    e.preventDefault()
+    if(inpTglPO.val().length == 0){
+        return Swal.fire({
+            text: "PO Date harus diisi",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+    if(inpTglExpec.val().length == 0){
+        return Swal.fire({
+            text: "Expected Date harus diisi",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+    if(inpVendor.val().length == 0){
+        return Swal.fire({
+            text: "Vendor harus dipilih",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+    if(dtListDetailPO.getData().length == 0){
+        return Swal.fire({
+            text: "Data detail tidak boleh kosong",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+    Swal.fire({
+        title: "Apakah anda ingin mensubmit data Purchase Order?",
+        icon: 'question',
+        confirmButtonText: 'Simpan',
+        confirmButtonColor: '#198754',
+        showCancelButton: true,
+        cancelButtonText: 'Batal',
+        cancelButtonColor: '#6C757D'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            simpanData()
+        }
+    })
+  
+})
+
+function simpanData() {
+    let totalQty = dtListDetailPO.getData().reduce((sum, item) => sum + parseFloat(item.qty), 0);
+    let totalGrandPrice = dtListDetailPO.getData().reduce((sum, item) => sum + parseFloat(item.grand_price), 0);
+    $.ajax({
+        type: 'POST',
+        url: '/purchasing/purchase-order/save',
+        data: {
+            id:inpIdHeader.val(),
+            id_vendor:inpIdVendor.val(),
+            po_date:formatLocaleDate(inpTglPO.val()),
+            date_exc:formatLocaleDate(inpTglExpec.val()),
+            id_term:selectTerm.val(),
+            ship_to:inpShipTo.val(),
+            qty:totalQty,
+            total:totalGrandPrice,
+            data:dtListDetailPO.getData(),
+        },
+        dataType: "json",
+        beforeSend: function () {
+            Swal.fire({
+                title: 'Loading...',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                onBeforeOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        },
+        success: function (response) {
+
+            if(response.status == true){
+                Swal.fire({
+                    text: response.message,
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                Swal.close();
+                window.location.href = 'purchasing/purchase-order'
+              
+            }else{
+                Swal.fire({
+                    text: response.message,
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        },
+        error: function (e) {
+            let msg = e.responseJSON.message;
+            Swal.close();
+
+            Swal.fire({
+                text: msg,
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        },
+    });
 
 }
 
@@ -454,7 +614,7 @@ let dtListDetailPO = new Tabulator("#dt-list-po", {
         },
         {title:"ITEM CODE", field:"kode_barang",hozAlign:"left", width:"15%"},
         {title:"ITEM DESCRIPTION", field:"nama_barang", hozAlign:"left",width:"20%"},
-        {title:"QTY", field:"qty", hozAlign:"center",width:"10%",editor: "number"},
+        {title:"QTY", field:"qty", hozAlign:"center",width:"10%"},
         {title:"UNIT PRICE", field:"price", hozAlign:"right",width:"15%",formatter: "money",formatterParams: {
                 decimal: ",",
                 thousand: ".",
@@ -475,3 +635,4 @@ let dtListDetailPO = new Tabulator("#dt-list-po", {
     // layout: 'fitColumns',
     placeholder: "Tidak ada data",
 });
+

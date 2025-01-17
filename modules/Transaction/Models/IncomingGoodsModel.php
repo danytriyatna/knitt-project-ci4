@@ -120,6 +120,7 @@ class IncomingGoodsModel extends \App\Models\PrModel
         $builder = $this->db->table("ref_kategori_persediaan");
         $builder->select("*");
         $builder->where('jenis', $this->kd);
+        $builder->where('aktif', 1);
         $this->_data = $builder->get()->getResultArray();
         return $this->_data;
     }
@@ -130,6 +131,41 @@ class IncomingGoodsModel extends \App\Models\PrModel
         $builder->select("stok");
         $builder->where('id_barang', $idBarang);
         $builder->where('id_gudang', $idGudang);
+        $this->_data = $builder->get()->getRow();
+        return $this->_data;
+        // if ($builder->get()) {
+        //     $this->_data = $builder->get()->getRow();
+        //     return $this->_data;
+        // } else {
+        //     return null;
+        // }
+    }
+
+    function getLastStokBarangBalances($idBarang, $idGudang, $lotId)
+    {
+        $builder = $this->db->table("trans_barang_balances");
+        $builder->select("*");
+        $builder->where('id_barang', $idBarang);
+        $builder->where('id_gudang', $idGudang);
+        $builder->where('lot_id', $lotId);
+        $builder->where('tanggal', date("Y-m-d"));
+        $this->_data = $builder->get()->getRow();
+        return $this->_data;
+    }
+    function getLotNo($lotNo = null, $idBarang = null, $idLotNo = null, $idGudang = null)
+    {
+        $builder = $this->db->table("trans_lots");
+        $builder->select("*");
+        if (!empty($lotNo)) {
+
+            $builder->where('lot_no', $lotNo);
+        }
+        if (!empty($idBarang)) {
+            $builder->where('id_barang', $idBarang);
+        }
+        if (!empty($idLotNo)) {
+            $builder->where('id', $idLotNo);
+        }
         $this->_data = $builder->get()->getRow();
         return $this->_data;
     }

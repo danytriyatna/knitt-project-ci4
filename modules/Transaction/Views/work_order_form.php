@@ -60,6 +60,7 @@
           <li class="breadcrumb-item active"><?= $titlehead ?></li>
           <input type="hidden" id="dataid" value="<?= $id; ?>" >
           <input type="hidden" id="data-details" value='<?= $detail; ?>' >
+          <input type="hidden" id="data-ukuran" value='<?= $dtUkuran; ?>' >
           <input type="hidden" id="data-psaved" value='<?= $proses_saved; ?>' >
         </ol>
       </div>
@@ -87,27 +88,47 @@
           </div>
 
           <hr>
-          <h5><b>PRODUCTION PROCESS</b></h5>
-          <div class="container">
-            <div class="row">
-
-              <?php foreach ($proses as $r) { ?>
-                <div class="col">
-                  <div class="card">
-                    <div class="card-body" style="min-height: 80px;">
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="jenis_proses" id="proses_<?= $r->id ?>" value="<?= $r->id ?>">
-                        <label class="form-check-label" for="proses_<?= $r->id ?>"><?= $r->nama ?></label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              <?php } ?>
-
+          <div class="row">
+            <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_gudang">Gudang Produksi<span class="text-danger">*</span></label>
+            <div class="col-md-5">
+              <select id="select_gudang" value="<?= ($row->id_gudang) ? $row->id_gudang : ''?>" name="select_gudang" class="form-select select2" data-placeholder="-- Pilih Gudang --" required>
+                <option value=""></option>
+                <?php foreach ($gudang as $item) : ?>
+                  <option value="<?= $item->id ?>"><?= $item->nama_gudang ?></option>
+                <?php endforeach; ?>
+              </select>
+              <div class="invalid-feedback">
+                Gudang Asal
+              </div>
             </div>
           </div>
-
           <hr>
+          
+          <!-- <div class="container"> -->
+            <div class="row">
+              <div class="col-sm-12">
+                <table class="table table-striped table-sm no-footer mb-0">
+                    <thead>
+                      <tr>
+                        <th>PRODUCTION PROCESS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                         <?php foreach ($proses as $r) { ?>
+                          <tr>
+                            <td>
+                              <div class="form-check-inline">
+                                <input class="form-check-input m-e-4" type="checkbox" name="jenis_proses" id="proses_<?= $r->id ?>" value="<?= $r->id ?>">
+                                <label class="form-check-label mb-0" for="proses_<?= $r->id ?>"><?= $r->nama ?></label>
+                              </div>
+                            </td>
+                          </tr>
+                          <?php } ?>
+                    </tbody>
+                </table>
+              </div>
+            </div>
+          <!-- </div> -->
 
           <div class="row">
             <div class="col-sm-12">

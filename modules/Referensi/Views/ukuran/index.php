@@ -14,6 +14,15 @@
           <i>*) Wajib diisi</i>
         </div>
         <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="seq">Urutan Ukuran<span class="text-danger">*</span></label>
+          <div class="col-md-9">
+            <input type="number" id="seq" name="seq" class="form-control" placeholder="Ketik Urutan Ukuran" required>
+            <div class="invalid-feedback">
+              Kode Ukuran tidak valid
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="kode_ukuran">Kode Ukuran<span class="text-danger">*</span></label>
           <div class="col-md-9">
             <input type="text" id="kode_ukuran" name="kode_ukuran" class="form-control" placeholder="Ketik Kode Ukuran" required>

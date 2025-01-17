@@ -101,7 +101,7 @@ class RefKonsumen extends BaseController
             $style_data = $this->mkonsumen->getDataStyle(null, 0, 999, null, null, $params);
             if(!empty($style_data)){
                 $data   = $style_data;
-                $status = false;
+                $status = true;
                 $msg    = "Berhasil mengambil data Styke Konsumen !";
             }
         } catch (\Throwable $th) {
@@ -437,7 +437,7 @@ class RefKonsumen extends BaseController
             'npwp'   => $npwp
         ];
 
-        $style_data = json_decode($dataStyle, true);
+        // $style_data = json_decode($dataStyle, true);
         if(empty($id)){
             $id = $this->mkonsumen->insertRecordGetid($this->mkonsumen->table, $arr_isi);
             $msg    = "Data berhasil ditambahkan !";

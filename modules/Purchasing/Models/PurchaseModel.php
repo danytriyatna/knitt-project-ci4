@@ -6,9 +6,12 @@ class PurchaseModel extends \App\Models\PrModel
 {
 
     protected $table = "trans_po_header";
+    protected $tblDet = "trans_po_detail";
     protected $tblTerm = "ref_term";
     protected $tblVendor = "ref_vendor";
     protected $tblTax = "ref_tax";
+    protected $tblBarang = "ref_barang";
+    protected $tblSatuan = "ref_satuan";
 
 
     protected $_data = null;
@@ -24,7 +27,19 @@ class PurchaseModel extends \App\Models\PrModel
         $builder = $this->db->table($this->table . " uk");
         $builder->join($this->tblVendor . " dbx", "uk.id_vendor = dbx.id", "inner");
         $builder->join($this->tblTerm . " ebx", "uk.id_term = ebx.id", "inner");
-        $builder->select("uk.id, uk.id_vendor, uk.id_term, uk.po_no,dbx.nama as nama_vendor, ebx.name as term, uk.po_date, uk.date_exc, uk.ship_to, uk.qty, uk.qty_payment, uk.total, uk.total_payment");
+        $builder->select("uk.id, uk.status, uk.id_vendor, uk.id_term, uk.po_no,dbx.nama as nama_vendor, ebx.name as term, uk.po_date, uk.date_exc, uk.ship_to, uk.qty, uk.qty_payment, uk.total, uk.total_payment");
+
+        if (!empty($params['isReceive']) && $params['isReceive']) {
+            $builder->groupStart();
+            $builder->where("qty_payment < qty");
+            $builder->orWhere("qty_payment IS NULL");
+            $builder->groupEnd();
+        }
+
+        if (!empty($params['isHutang']) && $params['isHutang']) {
+            $builder->whereIn("status", 1);
+        }
+
 
         if ($id == null or $id == "") {
             $builder->where('uk.active = 1');
@@ -38,7 +53,7 @@ class PurchaseModel extends \App\Models\PrModel
             if (!empty($order)) {
                 $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
             } else {
-                $builder->orderBy('id');
+                $builder->orderBy('uk.id', 'DESC');
             }
 
             if (empty($offset)) $offset = 0;
@@ -60,6 +75,7 @@ class PurchaseModel extends \App\Models\PrModel
     {
         $builder = $this->db->table($this->table . " uk");
         $builder->select("count(1) as _cnt");
+        $builder->join($this->tblVendor . " dbx", "uk.id_vendor = dbx.id", "inner");
         $builder->where('uk.active = 1');
 
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
@@ -78,7 +94,7 @@ class PurchaseModel extends \App\Models\PrModel
     {
         $kd = "POD";
         $builder = $this->db->table($this->table . ' a');
-        $builder->select("LEFT(kode_transaksi, 7) AS tgl, RIGHT( kode_transaksi, 4 ) AS kode ");
+        $builder->select("LEFT(po_no, 7) AS tgl, RIGHT( po_no, 4 ) AS kode ");
 
         $builder->orderBy('a.id', "DESC");
         $builder->limit(1);
@@ -119,6 +135,14 @@ class PurchaseModel extends \App\Models\PrModel
         $this->_data = $builder->get()->getRow();
         return $this->_data;
     }
+    function getDataDetail($idHeader = null)
+    {
+        $builder = $this->db->table($this->tblDet . " uk");
+        $builder->select("uk.id");
+        $builder->where("id_header", $idHeader);
+        $this->_data = $builder->get()->getResult();
+        return $this->_data;
+    }
 
     function getLastStokBarang($idBarang, $idGudang)
     {
@@ -130,56 +154,47 @@ class PurchaseModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function trxInsertUpdateRecord($data)
+    function trxInsertUpdateRecord($data, $id, $detail)
     {
         $this->db->transStart();
         try {
-
-
-            $this->insertRecordGetid("trans_barang", $data);
-            $arrPersediaan = [
-                "id_barang" => $data['id_barang'],
-                "id_gudang" => $data['id_gudang_tujuan'],
-                "stok" => $data['stok'],
-                "created_at" =>  $data['created_at'],
-                "created_by" =>  $data['created_by'],
-                "active" => 1,
-            ];
-            $arrParam =  [
-                "id_barang" => $data['id_barang'],
-                "id_gudang" => $data['id_gudang_tujuan'],
-            ];
-            $resData = $this->getLastStokBarang($data['id_barang'], $data['id_gudang_tujuan']);
-            if (!empty($resData)) {
-                $this->updateRecords("trans_persediaan", $arrPersediaan, $arrParam);
+            if (!empty($id)) {
+                $arrDelete =  [
+                    "id_header" => $id,
+                ];
+                $this->deleteRecordMultipleColumn($this->tblDet, $arrDelete);
+                $arrParam =  [
+                    "id" => $id,
+                ];
+                $this->updateRecords($this->table, $data, $arrParam);
             } else {
-                $this->insertRecordGetid("trans_persediaan", $arrPersediaan);
+                $data['po_no'] = $this->generateKodePO();
+                $id = $this->insertRecordGetid($this->table,  $data);
             }
+            $arrDelete =  [
+                "id_header" => $id,
+            ];
 
-            if ($data['id_kategori'] == 1) {
-                $data['tipe'] = 2;
-                $data['id_kategori'] = 4;
-                $data['jenis_transaksi'] = 2;
-                $this->insertRecordGetid("trans_barang", $data);
-                $resDataKeluar = $this->getLastStokBarang($data['id_barang'], $data['id_gudang_asal']);
-                $arrPersediaanKeluar = [
-                    "id_barang" => $data['id_barang'],
-                    "id_gudang" => $data['id_gudang_asal'],
-                    "stok" => $data['stok'],
-                    "created_at" =>  $data['created_at'],
-                    "created_by" =>  $data['created_by'],
-                    "active" => 1,
-                ];
-                $arrParamKeluar =  [
-                    "id_barang" => $data['id_barang'],
-                    "id_gudang" => $data['id_gudang_asal'],
-                ];
-                $resDataKeluar = $this->getLastStokBarang($data['id_barang'], $data['id_gudang_asal']);
-                if (!empty($resDataKeluar)) {
-                    $this->updateRecords("trans_persediaan", $arrPersediaanKeluar, $arrParamKeluar);
-                } else {
-                    $this->insertRecordGetid("trans_persediaan", $arrPersediaanKeluar);
+            foreach ($detail as $rowData) {
+                if ($rowData['id_barang'] != "") {
+                    $idBarang = decrypt($rowData['id_barang']);
                 }
+
+                $dataDetail = [
+                    "id_barang" => $idBarang,
+                    "disc" => !empty($rowData['disc']) ? $rowData['disc'] : null,
+                    "tax" => !empty($rowData['tax']) ? $rowData['tax'] : null,
+                    "price" => !empty($rowData['price']) ? $rowData['price'] : null,
+                    "grand_price" => !empty($rowData['grand_price']) ? $rowData['grand_price'] : null,
+                    "disc_price" => !empty($rowData['disc_price']) ? $rowData['disc_price'] : null,
+                    "tax_price" => !empty($rowData['tax_price']) ? $rowData['tax_price'] : null,
+                    "id_header" => $id,
+                    "qty_receive" => 0,
+                    "qty" => $rowData['qty'],
+
+                ];
+
+                $this->insertRecordGetid($this->tblDet, $dataDetail);
             }
 
             $this->db->transComplete();

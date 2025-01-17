@@ -51,7 +51,6 @@ class Sample extends BaseController
     $this->data['buyer'] = $this->mkonsumen->where("active", 1)->findAll();
     $this->data['ukuran'] = $this->mUkuran->where("active", 1)->findAll();
     $this->data['warna'] = $this->mWarna->where("active", 1)->findAll();
-
     return view($this->views . '\sample_list', $this->data);
   }
 
@@ -93,11 +92,15 @@ class Sample extends BaseController
         $atr_del['class'] = '';
         $atr_del['onclick'] = "return confirm('Hapus Data ?')";
       }
-      if ($atr_edit || $atr_del)
-        $btnAction = btn_action_group($id, $atr_edit, $atr_del);
+      if ($atr_edit || $atr_del) $btnAction = btn_action_group($id, $atr_edit, $atr_del);
 
       // $aktif =  ($row->active) ? "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/deactivate/".$id."' data-confirm-message='Anda yakin ingin menonaktifkan user ini?'><i class='fa fa-check text-success'>&nbsp;</i></a>" :
       //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
+      $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+      $pru['id_sample'] = $row->id;
+      $dtUkuran = $this->mSample->getUkuranTrans($pru);
+
+      $detail = (!empty($dtUkuran)) ? $this->mSample->getDataDetailSample_crostab($row->id) : [];
 
       array_push(
         $build_array["data"],
@@ -111,7 +114,9 @@ class Sample extends BaseController
           "status" => $row->status == 0 ? "Draft" : "Approval",
           "file_gambar" => !empty($row->file_name) ? base_url() . "uploads/sample/"  . $row->file_name : "",
           "uang_dp" => !empty($row->uang_dp) ? \format_angka($row->uang_dp) : 0,
-          "detail" => $this->mSample->getDataDetailSample($row->id)
+          // "detail" => $this->mSample->getDataDetailSample($row->id)
+          "detail" => $detail,
+          "key_ukuran" => $dtUkuran
         )
       );
     }
@@ -122,6 +127,16 @@ class Sample extends BaseController
   {
     $id = decrypt($id);
     $results = $this->mSample->getData($id);
+
+    $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+    $pru['id_sample'] = $id;
+    $dtUkuran = $this->mSample->getUkuranTrans($pru);
+
+    $detail = (!empty($dtUkuran)) ? $this->mSample->getDataDetailSample_crostab($results->id) : [];
+
+    $prg['id_sample_det'] = $results->id;
+    $dtGram = $this->mSample->getData_gram(null, 0, 9999, null, null, $prg);
+
     $build_array =  array(
       "id"   => encrypt($results->id),
       "keterangan" => $results->keterangan,
@@ -131,19 +146,28 @@ class Sample extends BaseController
       "tgl_deadline" => $results->tgl_deadline,
       "deskripsi" => $results->deskripsi,
       "gambar_id" => $results->gambar_id,
+      "style" => $results->style,
       "status" => $results->status,
       "uang_dp" =>  !empty($results->uang_dp) ? $results->uang_dp : 0,
       "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
-      "detail" => $this->mSample->getDataDetailSample($results->id)
+      // "detail" => $this->mSample->getDataDetailSample($results->id),
+      "detail" => $detail,
+      "key_ukuran" => $dtUkuran,
+      "detail_gram" => $dtGram
     );
     return $this->response->setJSON($build_array);
   }
+  
 
   function detailQtyUkuran($idSample, $idSampleDet)
   {
     $id = !empty($idSample) ? decrypt($idSample) : 0;
     $idSampleDet = !empty($idSampleDet) ? $idSampleDet : 0;
     $results = $this->mSample->getData($id);
+
+    $prg['id_sample_det'] = $idSampleDet;
+    $dtGram = $this->mSample->getData_gram(null, 0, 9999, null, null, $prg);
+    // print_r($prg);exit;
     $build_array =  array(
       "id"   => encrypt($results->id),
       "keterangan" => $results->keterangan,
@@ -154,7 +178,8 @@ class Sample extends BaseController
       "deskripsi" => $results->deskripsi,
       "file_gambar" => !empty($results->file_name) ? base_url() . "uploads/sample/" . $results->file_name : "",
       "detail" => $this->mSample->getDataDetailSampleWarna($id, $idSampleDet),
-      "detailUkuran" =>  $this->mSample->getDataDetailSampleUkuran($id, $idSampleDet)
+      "detailUkuran" =>  $this->mSample->getDataDetailSampleUkuran($id, $idSampleDet),
+      "detail_gram" => $dtGram
     );
     return $this->response->setJSON($build_array);
   }
@@ -172,6 +197,7 @@ class Sample extends BaseController
     $qty = $this->request->getPost('qty');
     $hargaTotal = $this->request->getPost('hargaTotal');
     $stat = $this->request->getPost('status');
+    $style = $this->request->getPost('style');
 
 
     $this->validation->setRules([
@@ -226,6 +252,7 @@ class Sample extends BaseController
       'tgl_transaksi' => $tglTransaksi,
       'tgl_deadline' => $tglDeadline,
       'total_harga' => $hargaTotal,
+      'style' => $style,
       'qty' => $qty,
       'active' => 1,
       'status' => $stat,
@@ -237,12 +264,12 @@ class Sample extends BaseController
 
       // menyimpan style 
       $prm_syle['id_konsumen'] = $idKonsumen;
-      $prm_syle['kode_style'] = $deskripsi;
+      $prm_syle['kode_style'] = $style;
       $cek_style = $this->mkonsumen->getDataStyle(0, 0, 1, null, null, $prm_syle);
       if(empty($cek_style)){
         $in_style['id_konsumen'] = $idKonsumen;
-        $in_style['kode_style'] = $deskripsi;
-        $in_style['keterangan_style'] = $deskripsi;
+        $in_style['kode_style'] = $style;
+        $in_style['keterangan_style'] = $style;
         $this->mSample->insertRecordGetid('ref_konsumen_style', $in_style);
       }
 
@@ -282,6 +309,7 @@ class Sample extends BaseController
     $warna7 = $this->request->getPost('warna7');
     $warna8 = $this->request->getPost('warna8');
     $dataUkuran = $this->request->getPost('dataUkuran');
+    $dataGram = $this->request->getPost('dataGram');
     $dataWarna = [
       "id_warna_1" => !empty($warna1) ? $warna1 : null,
       "id_warna_2" => !empty($warna2) ? $warna2 : null,
@@ -296,7 +324,8 @@ class Sample extends BaseController
       "id" => !empty($idSampleDet) ? $idSampleDet :  null,
     ];
 
-    $res = $this->mSample->trxInsertUpdateRecord($dataWarna, $dataUkuran);
+    $res = $this->mSample->trxInsertUpdateRecord($dataWarna, $dataUkuran, $dataGram);
+    
     if ($res) {
       $status = true;
       $msg = "Data berhasil disimpan!";
@@ -391,11 +420,64 @@ class Sample extends BaseController
       $build_array['message'] = "QR Code Gagal digenerate";
       return $this->response->setJSON($build_array);
     }
+  }
 
+  function getQrcode(){
+    $ukuran = $this->request->getGet("ukuran");
+    $qty = $this->request->getGet("qty");
+    $qtyp = $this->request->getGet("qtyp");
+    $noSample = $this->request->getGet("noSample");
+    $deskripsi = $this->request->getGet("deskripsi");
+    $buyer = $this->request->getGet("buyer");
+    $warna = $this->request->getGet("warna");
 
-    // header('Content-Type: ' . $result->getMimeType());
-    // header('Content-Disposition: attachment; filename="qrcode.png"');
-    // echo $result->getString();
+    /* Data */
+    // $hex_data   = bin2hex($id);
+    // $save_name  = $hex_data. '_'. time() . '.png';
+    $save_name  = $warna . '-' . $noSample . '.png';
+
+    /* QR Code File Directory Initialize */
+    $dir = 'uploads/media/qrcode/';
+    if (! file_exists($dir)) {
+        mkdir($dir, 0775, true);
+    }
+
+    /* QR Configuration  */
+    $config['cacheable']    = true;
+    $config['imagedir']     = $dir;
+    $config['quality']      = true;
+    $config['size']         = '1024';
+    $config['black']        = [255, 255, 255];
+    $config['white']        = [255, 255, 255];
+    $this->ciqrcode->initialize($config);
+
+    $data = [
+      'ukuran' => $ukuran,
+      'qty' => $qty,
+      'qtyp' => $qtyp,
+      'noSample' => $noSample,
+      'deskripsi' => $deskripsi,
+      'buyer' => $buyer,
+      'warna' => $warna,
+    ];
+
+    /* QR Data  */
+    $params['data']     = $noSample.';'.$ukuran.';'.$warna.';'.$qty; //json_encode($data) ;//base_url() . "/produk/edit/" . encrypt($id);
+    $params['level']    = 'L';
+    $params['size']     = 10;
+    $params['savename'] = FCPATH . $config['imagedir'] . $save_name;
+
+    $oks = $this->ciqrcode->generate($params);
+
+    /* Return Data */
+    
+
+    // dd($oks);
+    $url = base_url() . "/uploads/media/qrcode/" . $save_name;
+    
+    $this->data["data"] = $data;
+    $this->data["fileName"] = $save_name;
+    return view($this->views.'\vprint_qrcode', $this->data);
   }
 
   // fungsi untuk autocomplete 
