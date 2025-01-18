@@ -322,4 +322,82 @@ $(document).ready(function () {
         // return `${year}-${month}-${day}`;
         return localeDate;//`${day}-${month}-${year}`;
     }
+
+    $("#btn-import").on("click", function(){
+        import_data();
+    });
+
+    function import_data(){
+        const inpFile = $("#nmExcel");
+
+        if (inpFile.val().length > 0) {
+
+            Swal.fire({
+                title: "Apakah anda yakin untuk import Absensi ?",
+                icon: 'question',
+                confirmButtonText: 'Ya',
+                confirmButtonColor: '#dc3545',
+                showCancelButton: true,
+                cancelButtonText: 'Batal',
+                cancelButtonColor: '#6C757D'
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    inpFile.val('');
+                    return false
+                }else{
+                    const tglInput = inpTgl.val()
+                    
+                    let xform = new FormData();
+                    
+                    xform.append("tglAbsen", tglInput);
+                    xform.append("fileImport",inpFile[0].files[0] == undefined ? null : inpFile[0].files[0] );
+
+                    $.ajax({
+                        type: 'POST',
+                        url: 'sdm/absensi/importData', // point to server-side controller method
+                        data: xform,
+                        type: 'post',
+                        processData: false,  // Jangan ubah data menjadi string
+                        contentType: false,  // Agar jQuery tidak mengatur tipe konten
+                        beforeSend: function () {
+                            Swal.fire({
+                                title: 'Loading...',
+                                allowOutsideClick: false,
+                                showConfirmButton: false,
+                                onBeforeOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+                        },
+                        success: function (res) {
+                            Swal.close();
+                           if(res.status){
+                               dtList.setData();
+                           }else{
+                            Swal.fire({
+                                text: res,
+                                icon: 'warning',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                           }
+                        },
+                        error: function (res) {
+                            Swal.close();
+                            console.log(res);
+                        }
+                    });
+                }
+            })
+
+            
+        }else{
+            Swal.fire({
+                text: "File yang akan diimport harus diisi !",
+                icon: 'warning',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+    }
 });

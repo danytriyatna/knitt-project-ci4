@@ -901,7 +901,7 @@ $(document).ready(function () {
                 url: '/trans/sample/save',
                 data: formData,
                 processData: false,  // Jangan ubah data menjadi string
-            contentType: false,  // Agar jQuery tidak mengatur tipe konten
+                contentType: false,  // Agar jQuery tidak mengatur tipe konten
                 beforeSend: function () {
                     Swal.fire({
                         title: 'Loading...',

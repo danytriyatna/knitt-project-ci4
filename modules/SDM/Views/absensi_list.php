@@ -35,10 +35,21 @@
                 </div>
               </div>
             </div>
-            <div class="col-sm-10 align-self-end">
+            <div class="col-sm-5 align-self-end">
               <button id="btn-filter" class="btn btn-secondary" type="button"><i class="fa fa-filter"></i>&nbsp; Filter</button>
               <button id="btn-generate" class="btn btn-primary" type="button"><i class="fa fa-table"></i>&nbsp; Generate</button>
               <button id="btn-save" class="btn btn-success" type="button"><i class="fa fa-save"></i>&nbsp; Simpan</button>
+            </div>
+            <div class="col-sm-2">
+              <div class="form-group row mb-0">
+                <div class="col-md-12">
+                  <label for="">Import Excel</label>
+                  <input type="file" name="nmExcel" id="nmExcel" class="form-control">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3 align-self-end">
+              <button id="btn-import" class="btn btn-success" type="button">&nbsp;<i class="fa fa-file-excel"></i> Import</button>
             </div>
           </div>
         </div>

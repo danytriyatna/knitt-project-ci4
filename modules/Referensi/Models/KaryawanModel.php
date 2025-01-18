@@ -32,6 +32,14 @@ class KaryawanModel extends \App\Models\PrModel
                 $builder->groupEnd();
             }
 
+            if(!empty($params['nip'])){
+                $builder->where('ky.nip', $params['nip']);
+            }
+
+            if(!empty($params['not_nip'])){
+                $builder->whereNotIn('ky.nip', $params['not_nip']);
+            }
+
             if (!empty($order)) {
                 $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
             } else {
@@ -68,6 +76,14 @@ class KaryawanModel extends \App\Models\PrModel
             $builder->orWhere('LOWER(ky.posisi) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->orWhere('LOWER(ky.alamat) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
+        }
+
+        if(!empty($params['nip'])){
+            $builder->where('ky.nip', $params['nip']);
+        }
+
+        if(!empty($params['not_nip'])){
+            $builder->whereNotIn('ky.nip', $params['not_nip']);
         }
 
         $this->_data = $builder->get()->getRow()->_cnt;
