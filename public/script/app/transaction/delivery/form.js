@@ -267,12 +267,13 @@ $(document).ready(function () {
                 if(response.status == true){
                     
                     let isProd = response.data.produksi;
+                    let data = response.data;
 
                     inpRefNi.val(isProd.kode_prod);
                     inpStyle.val(isProd.keterangan_style);
                     inpProduksi.val(data.id);
                     inpWo.val(data.id_walkorder);
-                    
+                    // console.log(data);
                     setColumn(data.detail_produksi, data.data_ukuran);
                 }else{
                     Swal.fire({
@@ -301,8 +302,10 @@ $(document).ready(function () {
         let newColum =  [{
                             title: "Colour", field: "colordasar",  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
                         },];
-        const dtUkuran = ukuran;
-        for (const el of dtUkuran) {
+        const dt_Ukuran = ukuran;
+        console.log(dt_Ukuran)
+        console.log(data)
+        for (const el of dt_Ukuran) {
             const isKey = (el.key_ukuran == 'all') ? 'all_' : el.key_ukuran
             newColum.push(
             {

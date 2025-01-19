@@ -331,17 +331,24 @@ class ProductionModel extends \App\Models\PrModel
          $col21 = "";
          $col22 = "";
          $col3 = "";
+
+         $ord = "";
+         $ordx = "";
          $ukuranArr = explode(",", $params['ukuran']);
          foreach ($ukuranArr as $item) {
              $item = trim($item); 
              $hrg = $item . '_hrg';
-             $col11 .= ($col11 == "") ? `coalesce(tbl.$item,0) as $item` : `,coalesce(tbl.$item,0) as $item`;
-             $col12 .= ($col12 == "") ? `coalesce(tbl.$hrg,0) as $hrg` : `,coalesce(tbl.$hrg,0) as $hrg`;
+             $col11 .= ($col11 == "") ? "coalesce(tbl.$item,0) as $item" : ",coalesce(tbl.$item,0) as $item";
+             $col12 .= ($col12 == "") ? "coalesce(tbl.$hrg,0) as $hrg" : ",coalesce(tbl.$hrg,0) as $hrg";
 
              $col21 .= ($col21 == "") ? "$item Int" : ",$item Int";
              $col22 .= ($col22 == "") ? "$hrg Float" : ",$hrg Float";
-         }
 
+             $ord  .= $ord == "" ? $item  : "," . $item ;
+             $ordx .= $ordx == "" ? $hrg : "," . $hrg;
+         }
+         $all_order = $ord . ',' . $ordx;
+        //  print_r($all_order);exit;
         // $sql = "
         //     select 
         //         tbl.ref_detail_id__,
@@ -445,13 +452,7 @@ class ProductionModel extends \App\Models\PrModel
                         ORDER BY twpu.ref_detail_id, twp.id_proses, column_name
                         $$,
                         $$ 
-                        SELECT key_ukuran 
-                        FROM (
-                            SELECT key_ukuran, 1 as tseq, seq  FROM ref_ukuran WHERE active = 1
-                            UNION ALL
-                            SELECT CONCAT(key_ukuran, '_hrg'), 2 as tseq, seq  FROM ref_ukuran WHERE active = 1
-                        ) AS subquery
-                        ORDER BY tseq, seq
+                            SELECT unnest(string_to_array('$all_order', ',')) AS param_id
                         $$
                     ) AS tbl (
                         ref_detail_id INT,
@@ -470,6 +471,15 @@ class ProductionModel extends \App\Models\PrModel
                 END;
 
         ";
+
+
+        // SELECT key_ukuran 
+        //                 FROM (
+        //                     SELECT key_ukuran, 1 as tseq, seq  FROM ref_ukuran WHERE active = 1
+        //                     UNION ALL
+        //                     SELECT CONCAT(key_ukuran, '_hrg'), 2 as tseq, seq  FROM ref_ukuran WHERE active = 1
+        //                 ) AS subquery
+        //                 ORDER BY tseq, seq
 
         // -- s INT, m INT, l INT, xl INT, xxl INT, all_ INT, xxxl INT, xs INT,
         //                 == s_hrg FLOAT, m_hrg FLOAT, l_hrg FLOAT, xl_hrg FLOAT, xxl_hrg FLOAT, all_hrg FLOAT, xxxl_hrg FLOAT, xs_hrg FLOAT
