@@ -271,9 +271,9 @@ $(document).ready(function () {
 
                     inpRefNi.val(isProd.kode_prod);
                     inpStyle.val(isProd.keterangan_style);
-                    inpProduksi.val(data.id);
-                    inpWo.val(data.id_walkorder);
-                    // console.log(data);
+                    inpProduksi.val(isProd.id).trigger("change");
+                    inpWo.val(isProd.id_walkorder).trigger("change");
+                    
                     setColumn(data.detail_produksi, data.data_ukuran);
                 }else{
                     Swal.fire({
@@ -426,7 +426,8 @@ $(document).ready(function () {
 		let dataOrder = dtListDetail.getData();
 		let objIndex  = dataTable.findIndex(obj => obj.id_ukuran == (data.id_ukuran) && obj.id_warna == (data.id_warna));
 		let ix_order  = dataOrder.findIndex(obj => obj.ref_detail_id == (data.ref_detail_id));
-
+        console.log(dataOrder);
+        console.log(data);
 		// let ktQty     = isQty.findIndex(obj => obj.kategori_id == (data.kategori_id));
 		// let ktQtyO    = isQtyO.findIndex(obj => parseInt(obj.sl_order_det_id) === parseInt(isSlc.val()));
 		

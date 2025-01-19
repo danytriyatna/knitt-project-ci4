@@ -401,7 +401,7 @@ class ProductionModel extends \App\Models\PrModel
                             twpu.ref_detail_id,
                             twp.id_walkorder,
                             twp.id_proses,
-                            rk.key_ukuran || CASE 
+                            rk.key_ukuran || case when rk.key_ukuran = 'all' then '_' else '' end || CASE 
                                 WHEN subquery.is_qty THEN ''
                                 ELSE '_hrg'
                             END AS column_name,
