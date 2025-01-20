@@ -1,210 +1,84 @@
 $(document).ready(function () {
-
-    //Create Date Editor
-    var dateEditor = function(cell, onRendered, success, cancel){
-        //cell - the cell component for the editable cell
-        //onRendered - function to call when the editor has been rendered
-        //success - function to call to pass thesuccessfully updated value to Tabulator
-        //cancel - function to call to abort the edit and return to a normal cell
-
-        //create and style input
-        var cellValue = luxon.DateTime.fromFormat(cell.getValue(), "dd/MM/yyyy").toFormat("yyyy-MM-dd"),
-        input = document.createElement("input");
-
-        input.setAttribute("type", "date");
-
-        input.style.padding = "4px";
-        input.style.width = "100%";
-        input.style.boxSizing = "border-box";
-
-        input.value = cellValue;
-
-        onRendered(function(){
-            input.focus();
-            input.style.height = "100%";
-        });
-
-        function onChange(){
-            if(input.value != cellValue){
-                success(luxon.DateTime.fromFormat(input.value, "yyyy-MM-dd").toFormat("dd/MM/yyyy"));
-            }else{
-                cancel();
-            }
-        }
-
-        //submit new value on blur or change
-        input.addEventListener("blur", onChange);
-
-        //submit new value on enter
-        input.addEventListener("keydown", function(e){
-            if(e.keyCode == 13){
-                onChange();
-            }
-
-            if(e.keyCode == 27){
-                cancel();
-            }
-        });
-
-        return input;
-    };
-
-    //Create Time Editor
-    var timeEditor = function(cell, onRendered, success, cancel){
-        //cell - the cell component for the editable cell
-        //onRendered - function to call when the editor has been rendered
-        //success - function to call to pass the successfully updated value to Tabulator
-        //cancel - function to call to abort the edit and return to a normal cell
-
-        //create and style input
-        var cellValue = cell.getValue(); // assumes cellValue is in "HH:mm" format
-        var input = document.createElement("input");
-
-        input.setAttribute("type", "time");
-
-        input.style.padding = "4px";
-        input.style.width = "100%";
-        input.style.boxSizing = "border-box";
-
-        // Set the initial value of the input to the cell's value
-        input.value = cellValue;
-
-        onRendered(function(){
-            input.focus();
-            input.style.height = "100%";
-        });
-
-        function onChange(){
-            if(input.value != cellValue){
-                // Pass the updated value back in "HH:mm" format
-                success(input.value);
-            }else{
-                cancel();
-            }
-        }
-
-        //submit new value on blur or change
-        input.addEventListener("blur", onChange);
-
-        //submit new value on enter
-        input.addEventListener("keydown", function(e){
-            if(e.keyCode == 13){ // Enter key
-                onChange();
-            }
-
-            if(e.keyCode == 27){ // Escape key
-                cancel();
-            }
-        });
-
-        return input;
-    };
-
-    let inpTglA = $("#filter_tgl_from");
-    let inpTglS = $("#filter_tgl_to");
-    let dtList = new Tabulator("#dt-penggajian", {
+    let dtList = new Tabulator("#dt-list", {
         columns: [
+            {
+                title: " ", field: "aksi", headerSort: false, formatter: "html",
+                width: 100
+            },
             
 			{
-				title: 'NIK', field: 'nip', headerSort:false, sorter: 'string',
-				width: 160
+				title: 'Kode', field: 'kode_gaji', headerSort:false, sorter: 'string',
+				width: 160, formatter : "html"
 			}, 
 				
 			{
-				title: 'Nama', field: 'full_name', headerSort:false, sorter: 'string',
-				width: 240
+				title: 'Periode Awal', field: 'periode_awal', headerSort:false, sorter: 'string',
+				width: 140
 			}, 
 
             {
-				title: 'Posisi', field: 'posisi', headerSort:false, sorter: 'string',
-				formatter : "html", width: 150,
+				title: 'Periode Akhir', field: 'periode_akhir', headerSort:false, sorter: 'string',
+				width: 140
+			}, 
+
+            {
+				title: 'Keterangan', field: 'keterangan', headerSort:false, sorter: 'string',
+				formatter : "html"
 			},
 
             {
-				title: 'Hadir', field: 'hadir', headerSort:false, sorter: 'string',
-				width: 100, cssClass:'text-center',
+				title: 'Status', field: 'status', headerSort:false, sorter: 'string',
+				width: 80, align:'center',
 			},
-
-            {
-				title: 'Izin', field: 'izin', headerSort:false, sorter: 'string',
-				width: 100, cssClass:'text-center',
-			},
-
-            {
-				title: 'Sakit', field: 'sakit', headerSort:false, sorter: 'string',
-				width: 100, cssClass:'text-center',
-			},
-
-            {
-				title: 'Tanpa<br>Keterangan', field: 'alpha', headerSort:false, sorter: 'string',
-				width: 120, cssClass:'text-center',
-			},
-
-            {
-				title: 'Gaji/Upah', field: 'gaji_harian', headerSort:false, sorter: 'string', align: "center",
-                width: 220, formatter:"money", cssClass:"text-end"
-			} ,
-
-            {
-				title: 'Lembur HK', field: 'lembur', headerSort:false, sorter: 'string',
-				width: 100, cssClass:'text-center',
-			},
-
-            {
-				title: 'Lembur HL', field: 'lembur_we', headerSort:false, sorter: 'string',
-				width: 100, cssClass:'text-center',
-			},
-
-            {
-				title: 'Lembur', field: 'uang_lembur', headerSort:false, sorter: 'string', align: "center",
-                width: 220, formatter:"money", cssClass:"text-end"
-			} ,
-
-            {
-				title: 'Gaji/Upah', field: 'total', headerSort:false, sorter: 'string', align: "center",
-                width: 220, formatter:"money", cssClass:"text-end"
-			} ,
 				
         ],
         layout: 'fitColumns',
-		locale: 'id',
-		placeholder: "Tidak ada data",
-		selectable: false
-    });
-
-    $("#btn-generate").on("click", function(){
-        // dtList.setData();
-        const tglA = inpTglA.val();
-        const tglZ = inpTglS.val();
-        $.ajax({
-            url: 'sdm/penggajian/get_laporan', // point to server-side controller method
-            dataType: 'json', // what to expect back from the server
-            data: {tgl_mulai : tglA, tgl_akhir : tglZ},
-            type : 'post',
-            beforeSend: function () {
-                Swal.fire({
-                    title: 'Loading...',
-                    allowOutsideClick: false,
-                    showConfirmButton: false,
-                    onBeforeOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            },
-            success: function (res) {
-                Swal.close();
-               if(res.status){
-				//    console.log(res.msg);
-				   dtList.setData(res.data);
-			   }else{
-				   alert(res.msg)
-			   }
-            },
-            error: function (res) {
-                Swal.close();
-                // console.log(res);
+        ajaxURL: "/sdm/penggajian/list",
+        placeholder: "Tidak ada data",
+        ajaxConfig: "POST",
+        ajaxSorting: true,
+        ajaxFiltering: false,
+        sortMode: "remote",
+        filterMode: "remote",
+        minHeight: 300,
+        ajaxRequesting: function (url, params) {
+            params.start = params.size * (params.page - 1);
+            params.length = params.size;
+        },
+        ajaxResponse: function (url, params, response) {
+            let pageSize = dtList.getPageSize();
+            let pageNo = dtList.getPage();
+            let startRow = (pageSize * (pageNo - 1)) + 1;
+            let endRow = response.data.length + startRow - 1;
+            if (response.data.length === 0) {
+                startRow = 0; endRow = 0;
             }
-        });
+            let recordsFiltered = parseInt(response.recordsFiltered);
+            let recordsTotal = parseInt(response.recordsTotal);
+
+            $("#table-footer .tabulator-startrow").text(startRow);
+            $("#table-footer .tabulator-endrow").text(endRow);
+            $("#table-footer .tabulator-totalrow").text(recordsFiltered);
+
+            let elTotalFilteredRow = $("#table-footer .tabulator-totalfilteredrow");
+            elTotalFilteredRow.text("");
+            if (recordsTotal > recordsFiltered) {
+                elTotalFilteredRow.text(" (disaring dari " + recordsTotal
+                    + " entri keseluruhan)");
+            }
+            return response;
+        },
+        footerElement: '<div id="table-footer" class="pull-left tabulator-info">'
+            + 'Menampilkan <span class="tabulator-startrow"></span> - <span class="tabulator-endrow"></span> dari '
+            + '<span class="tabulator-totalrow"></span> entri<span class="tabulator-totalfilteredrow"></span></div>',
+        pagination: true,
+        paginationMode: "remote",
+        paginationSize: 25,
+        paginationButtonCount: 10,
+        dataSendParams: {
+            sorters: "order"
+        },
+        selectableRows: false,
     });
 
     let searchThread = null;
@@ -219,31 +93,5 @@ $(document).ready(function () {
                 dtList.setFilter("", "like", elSearch.val());
             }, 600);
         });
-    }
-
-    function formatLocaleDate(localeDate) {
-    
-        // var months = {
-        //     "Januari": "01",
-        //     "Februari": "02",
-        //     "Maret": "03",
-        //     "April": "04",
-        //     "Mei": "05",
-        //     "Juni": "06",
-        //     "Juli": "07",
-        //     "Agustus": "08",
-        //     "September": "09",
-        //     "Oktober": "10",
-        //     "November": "11",
-        //     "Desember": "12"
-        // };
-
-        // var parts = localeDate.split(" ");
-        // var day = parts[0].padStart(2, '0'); 
-        // var month = months[parts[1]]; 
-        // var year = parts[2];
-
-        // return `${year}-${month}-${day}`;
-        return localeDate;//`${day}-${month}-${year}`;
     }
 });

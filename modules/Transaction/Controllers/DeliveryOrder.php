@@ -601,13 +601,13 @@ class DeliveryOrder extends BaseController
   function getDataProduksi(){
       $id_walkorder = $this->request->getPost("id_walkorder");
       $id_produksi  = $this->request->getPost("produkds");
-
+      
       $status = false;
       $msg    = "Gagal mengambil data produksi !";
       $data   = [];
 
       $results = $this->mProduksi->getData($id_produksi);
-
+      // print_r($results);exit;
       if(!empty($results)){
         $data['produksi']         = $results;
 
@@ -616,7 +616,7 @@ class DeliveryOrder extends BaseController
         if ($dtWalkorder->tipe_id == 1) {
           $pru['use'] = 1;// ambil ukuran yang digunnakan order 
           $pru['id_sample'] = $dtWalkorder->ref_id;
-          $dtUkuran = $this->mSample->getUkuranTrans($pru);
+          $data_ukuran = $this->mSample->getUkuranTrans($pru);
         }else{
           $pru['use'] = 1;// ambil ukuran yang digunnakan order 
           $pru['id_sales_order'] = $dtWalkorder->ref_id;
@@ -628,13 +628,13 @@ class DeliveryOrder extends BaseController
         $prm['id_walkorder'] = $id_walkorder;
         $rukuran = $this->mUkuran->getData(0, 0, 999);
         $ukuran = "";
-        foreach ($rukuran as $iu) {
+        foreach ($data_ukuran as $iu) {
           $keyUkuran = $iu->key_ukuran;
           if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
           $ukuran .= ($ukuran == "") ? $keyUkuran : ", ". $keyUkuran;
         }
         $prm['ukuran'] = $ukuran;
-
+        // print_r($prm);exit;
         $dataProd = [];
         $rsProd = $this->mProduksi->getProduksilast($prm); 
         
@@ -648,14 +648,14 @@ class DeliveryOrder extends BaseController
             
             $qty = 0;
             $qty_delv = 0;
-            foreach ($rukuran as $iu) {
+            foreach ($data_ukuran as $iu) {
               $keyUkuran = $iu->key_ukuran;
-              $indx      = $iu->key_ukuran;
-              
+
               if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
+              $indx      = $keyUkuran;
               $xharga    = $keyUkuran.'_hrg';
 
-              $prd['id_ukuran'] = $iu->id;
+              $prd['id_ukuran'] = $iu->id_ukuran;
               $prd['ref_detail_id'] = $item->ref_detail_id;
               $dt_deliv = $this->mDelivery->getAlldeliveryQty($prd);
 

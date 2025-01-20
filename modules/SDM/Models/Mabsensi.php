@@ -38,10 +38,14 @@ class Mabsensi extends \App\Models\PrModel
                 $builder->where('sdm.tgl_absen', $params['tgl_absen']);
             }
 
+            if(!empty($params['nip'])){
+                $builder->where('rk.nip', $params['nip']);
+            }
+
             if (!empty($order)) {
                 $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
             } else {
-                $builder->orderBy('id');
+                $builder->orderBy("(rk.nip = '-'), rk.nip");
             }
 
             if (empty($offset)) $offset = 0;
@@ -75,6 +79,14 @@ class Mabsensi extends \App\Models\PrModel
             $builder->orWhere('LOWER(rk.nip) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->orWhere('LOWER(rk.posisi) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
+        }
+
+        if(!empty($params['tgl_absen'])){
+            $builder->where('sdm.tgl_absen', $params['tgl_absen']);
+        }
+
+        if(!empty($params['nip'])){
+            $builder->where('rk.nip', $params['nip']);
         }
 
         $this->_data = $builder->get()->getRow()->_cnt;

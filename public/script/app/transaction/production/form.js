@@ -772,7 +772,7 @@ $(document).ready(function () {
     
                 dataOrder.push(isi)
             }else{
-                dataOrder[ix_order].qty = dataOrder[ix_order].qty + qty
+                dataOrder[ix_order].qty = parseInt(dataOrder[ix_order].qty) + parseInt(qty)
             }
         }else{
             alert("Proses Belum mempunyai kuota !");
