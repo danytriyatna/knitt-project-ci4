@@ -337,11 +337,11 @@ class Production extends BaseController
 
   function getDataProduksiUkuran(){
     $id_walkorder = $this->request->getPost('walkorders');
-    $id_proses = $this->request->getPost('proses');
+    // $id_proses = $this->request->getPost('proses');
 
     $id_walkorder = \decrypt($id_walkorder);
     $params['id_walkorder'] = $id_walkorder;
-    $params['id_proses'] = $id_proses;
+    // $params['id_proses'] = $id_proses;
     $result = $this->mWalkorder->getListProduksiUkuran($params);
 
     $data    = [];

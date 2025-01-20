@@ -11,6 +11,15 @@ use Modules\Referensi\Models\SatuanModel;
 use Modules\Referensi\Models\KaryawanModel;
 use Modules\SDM\Models\Mabsensi;
 
+// user library spreadsheet for excel
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
+use PhpOffice\PhpSpreadsheet\NamedRange;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 class Absensi extends BaseController
 {
   protected $views = '\Modules\SDM\Views';
@@ -224,5 +233,125 @@ class Absensi extends BaseController
     $build_array["msg"] = $msg;
     $build_array["data"] = $data;
     return $this->response->setJSON($build_array);
+  }
+
+  // import langsung tanpa validasi
+  function import_excel() 
+  {
+      $file_excel   = $this->request->getFile('fileImport');
+      $tgl_absen    = $this->request->getPost('tglAbsen');
+
+      
+      $ext = $file_excel->getClientExtension();
+      
+      if($ext == 'xls') {
+          $render = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
+      } else {
+          $render = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+      }
+      // $inputFileType = IOFactory::identify($file_excel);
+      // print_r($inputFileType);exit;
+      $status = false;
+      $msg = "Simpan data gagal!";
+
+      $spreadsheet = $render->load($file_excel);
+
+      $data = $spreadsheet->getActiveSheet()->toArray();
+      // print_r(count($data));exit;
+      $i = 1;
+      $build_array = [];
+
+      $this->db->transBegin();
+      $ckds = "";
+
+      $tgl_absen = fdate_ind_to_eng($tgl_absen);
+      $this->mabsen->deleteRecord($this->mabsen->table, 'tgl_absen', ($tgl_absen));
+      $inNip = [];
+      foreach ($data as $xr) {
+        
+          if($i >= 3){
+            
+              $nip = $xr[3];
+              $jamInJd = $xr[8];
+              $jamIn = $xr[9];
+
+              $terlambat = $xr[11];
+
+              $jamInOutJd = $xr[13];
+              $jamOut = $xr[14];
+
+              $lemburA = !empty($xr[15]) ? $xr[15] / 60 : 0;
+              $lemburD = $xr[16];
+              $lemburAk = $xr[17];
+
+              // lakukan penginputan atau save data sesuai dengan nik
+              if(!empty($nip)){
+                $pr_kr['nip'] = $nip;
+                $get_karyawan = $this->mkaryawan->getData(null, 0, 1, null, null, $pr_kr);
+
+                if(!empty($get_karyawan)){
+                  $inNip[] = $nip;
+                  $dt = $get_karyawan[0];
+                  
+                  $isi = [];
+                  $isi['id_karyawan'] = $dt->id;
+                  $isi['posisi'] = $dt->posisi;
+                  $isi['tgl_absen'] = ($tgl_absen);
+
+                  $status_kehadiran = null;
+
+                  if(!empty($jamIn)){
+                    $status_kehadiran = 1;
+                  } else {
+                    $status_kehadiran = 0;
+                  }
+
+                  $status_lembur = 0;
+                  
+                  $isi['jam_masuk'] = $tgl_absen . ' ' . $jamIn;
+                  $isi['jam_keluar'] = $tgl_absen . ' ' . $jamOut;
+                  $isi['status_kehadiran'] = $status_kehadiran;
+                  $isi['hari_hadir'] = 1;
+                  $isi['keterangan_kehadiran'] = '-';
+                  $isi['status_lembur'] = $status_lembur;
+                  $isi['jml_lembur'] = $lemburD;
+                  $isi['keterangan_lembur'] = '-';
+
+                  $this->mabsen->insertRecordGetid($this->mabsen->table, $isi);
+                }
+              }
+
+          }
+
+          $i++;
+      }
+      
+      // generaate all karyawan
+      $param_all['not_nip'] = $inNip;
+      $data_karyawan = $this->mkaryawan->getData(null, 0, 9999, null, null, $param_all);
+      // $params['tgl_absen'] = \fdate_ind_to_eng($tgl_absen);
+    // $dt_absen = $this->mabsen->getData(null, 0, 9999, null, null, $params);
+        foreach ($data_karyawan  as $dt) {
+          $isi = [];
+          $isi['id_karyawan'] = $dt->id;
+          $isi['posisi'] = $dt->posisi;
+          $isi['tgl_absen'] = fdate_ind_to_eng($tgl_absen);
+          $this->mabsen->insertRecordGetid($this->mabsen->table, $isi);
+        }
+
+      if ($this->db->transStatus() === FALSE) {
+          $this->db->transRollback();
+      } else {
+          $this->db->transCommit();
+          $status = true;
+          $msg = "Simpan data berhasil";
+      }
+
+
+      $build_array['status'] = $status;
+      $build_array['message'] = $msg;
+
+      return $this->response->setJSON($build_array);
+
   }
 }

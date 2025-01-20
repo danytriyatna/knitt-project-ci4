@@ -267,11 +267,12 @@ $(document).ready(function () {
                 if(response.status == true){
                     
                     let isProd = response.data.produksi;
+                    let data = response.data;
 
                     inpRefNi.val(isProd.kode_prod);
                     inpStyle.val(isProd.keterangan_style);
-                    inpProduksi.val(data.id);
-                    inpWo.val(data.id_walkorder);
+                    inpProduksi.val(isProd.id).trigger("change");
+                    inpWo.val(isProd.id_walkorder).trigger("change");
                     
                     setColumn(data.detail_produksi, data.data_ukuran);
                 }else{
@@ -301,8 +302,10 @@ $(document).ready(function () {
         let newColum =  [{
                             title: "Colour", field: "colordasar",  sorter: "string", headerSort:false, align: "center", cssClass: "text-left",
                         },];
-        const dtUkuran = ukuran;
-        for (const el of dtUkuran) {
+        const dt_Ukuran = ukuran;
+        console.log(dt_Ukuran)
+        console.log(data)
+        for (const el of dt_Ukuran) {
             const isKey = (el.key_ukuran == 'all') ? 'all_' : el.key_ukuran
             newColum.push(
             {
@@ -423,7 +426,8 @@ $(document).ready(function () {
 		let dataOrder = dtListDetail.getData();
 		let objIndex  = dataTable.findIndex(obj => obj.id_ukuran == (data.id_ukuran) && obj.id_warna == (data.id_warna));
 		let ix_order  = dataOrder.findIndex(obj => obj.ref_detail_id == (data.ref_detail_id));
-
+        console.log(dataOrder);
+        console.log(data);
 		// let ktQty     = isQty.findIndex(obj => obj.kategori_id == (data.kategori_id));
 		// let ktQtyO    = isQtyO.findIndex(obj => parseInt(obj.sl_order_det_id) === parseInt(isSlc.val()));
 		
