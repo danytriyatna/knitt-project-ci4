@@ -141,7 +141,7 @@ class ProductionModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getDataOperatorProd($id, $tgl_transaksi = null)
+    function getDataOperatorProd($id, $tgl_transaksi = null, $id_proses = null)
     {
         $builder = $this->db->table("trans_produksi_operator abx");
         $builder->select("abx.flag, abx.id_proses as id_walkorder_proses_ukuran, abx.qty, ebx.nama_operator as operator, dbx.kode_warna, 
@@ -155,6 +155,10 @@ class ProductionModel extends \App\Models\PrModel
         $builder->where('abx.id_produksi', $id);
         if (!empty($tgl_transaksi)) {
             $builder->where('abx.tgl_transaksi', $tgl_transaksi);
+        }
+
+        if (!empty($id_proses)) {
+            $builder->where('abx.id_proses', $id_proses);
         }
         
         $builder->orderBy("abx.id", "ASC");

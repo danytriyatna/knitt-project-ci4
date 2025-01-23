@@ -316,13 +316,16 @@ class Production extends BaseController
     $build_array['message'] = "data tidak ditemukan";
     $build_array['status']  = false;
     $id = $this->request->getPost('id');
+
+    $id_proses = $this->request->getPost('proses');
+
     if ($id != "") {
       $id = decrypt($id);
     }
     $tglTransaksi = $this->request->getPost('tglTransaksi');
     
     $tglTransaksi = !empty($tglTransaksi) ? \fdate_ind_to_eng($tglTransaksi) : '';
-    $detailProd = $this->mProduksi->getDataOperatorProd($id, $tglTransaksi);
+    $detailProd = $this->mProduksi->getDataOperatorProd($id, $tglTransaksi, $id_proses);
     if (!empty($detailProd)) {
       $build_array['message'] = "data ditemukan";
       $build_array['status']  = true;
@@ -337,11 +340,11 @@ class Production extends BaseController
 
   function getDataProduksiUkuran(){
     $id_walkorder = $this->request->getPost('walkorders');
-    // $id_proses = $this->request->getPost('proses');
+    $id_proses = $this->request->getPost('proses');
 
     $id_walkorder = \decrypt($id_walkorder);
     $params['id_walkorder'] = $id_walkorder;
-    // $params['id_proses'] = $id_proses;
+    $params['id_proses'] = $id_proses;
     $result = $this->mWalkorder->getListProduksiUkuran($params);
 
     $data    = [];
