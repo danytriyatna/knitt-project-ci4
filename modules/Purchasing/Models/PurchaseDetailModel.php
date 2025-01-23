@@ -39,8 +39,8 @@ class PurchaseDetailModel extends \App\Models\PrModel
             $builder->where('uk.active = 1');
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
                 $builder->groupStart();
-                $builder->where('LOWER(dbx.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->orWhere('LOWER(uk.po_no) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->where('LOWER(ebx.nama_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(ebx.kode_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
             }
 
@@ -69,12 +69,14 @@ class PurchaseDetailModel extends \App\Models\PrModel
     {
         $builder = $this->db->table($this->table . " uk");
         $builder->select("count(1) as _cnt");
+        $builder->join($this->tblBarang . " ebx", "uk.id_barang = ebx.id", "inner");
+        $builder->join($this->tblSatuan . " fbx", "ebx.id_satuan = fbx.id", "inner");
         $builder->where('uk.active = 1');
 
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             $builder->groupStart();
-            $builder->where('LOWER(dbx.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
-            $builder->orWhere('LOWER(uk.po_no) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->where('LOWER(ebx.nama_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->orWhere('LOWER(ebx.kode_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
         }
 

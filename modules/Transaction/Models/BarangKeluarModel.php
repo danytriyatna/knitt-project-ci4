@@ -102,7 +102,7 @@ class BarangKeluarModel extends \App\Models\PrModel
             $builder->where('uk.active = 1');
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
                 $builder->groupStart();
-                $builder->Where('LOWER(uk.kode_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->Where('LOWER(abx.kode_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->orWhere('LOWER(abx.nama_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->orWhere('LOWER(uk.lot_no) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
@@ -141,7 +141,7 @@ class BarangKeluarModel extends \App\Models\PrModel
         }
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             $builder->groupStart();
-            $builder->Where('LOWER(uk.kode_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->Where('LOWER(abx.kode_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->orWhere('LOWER(abx.nama_barang) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->orWhere('LOWER(uk.lot_no) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
