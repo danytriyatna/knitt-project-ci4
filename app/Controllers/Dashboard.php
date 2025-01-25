@@ -28,7 +28,7 @@ class Dashboard extends BaseController
   {
       $start   = $this->request->getPost('start');
       $limit   = $this->request->getPost('length');
-      $filters = $this->request->getPost('filters');
+      $filters = $this->request->getPost('filter');
       $order   = $this->request->getPost('order');
       // $tahun   = $this->request->getPost('tahun');
 
@@ -46,46 +46,69 @@ class Dashboard extends BaseController
       );
 
       foreach ($results as $row) {
-          $id = encrypt($row->id);
+          $id = encrypt($row->trans_id);
 
-          $link_order = "";
-          $link_prod = "";
-          $link_dev = "";
+          $btnOrder = "";
+          $btnProd = "";
+          $btnDev = "";
+
+          $tipe = "-";
           
           if($row->tipe == 1){
             $link_order = base_url() . "/trans/sample";
+            $btnOrder = "<a class='btn btn-sm btn-primary' target='_blank' href=".$link_order." > ".$row->trans_kode." </a>";
+
+            $tipe = "Sample";
           }else{
             $link_order = base_url() . "/trans/sales-order";
-          }
+            $btnOrder = "<a class='btn btn-sm btn-primary' target='_blank' href=".$link_order." > ".$row->trans_kode." </a>";
 
+            $tipe = "Sales Order";
+          }
+          
           if(!empty($row->id_prod)){
             $prod_id = encrypt($row->id_prod);
             $link_prod = base_url() . "/trans/production/form/" . $prod_id;
+
+            $btnProd = "<a class='btn btn-sm btn-primary' target='_blank' href=".$link_prod." > ".$row->kode_prod." </a>";
           }
 
           if(!empty($row->id_dev)){
             $dev_id = encrypt($row->id_dev);
             $link_dev = base_url() . "/trans/delivery-order/form/" . $dev_id;
-          }
 
-        //   tbl.trans_id, tbl.trans_kode, tbl.id_konsumen, tbl.nama, tbl.keterangan, tbl.tgl_deadline, tbl.qty, 
-        //   tbl.kode_prod, tbl.id_prod, tbl.qty_prod, 
-        //   tbl.kode_dev, tbl.id_dev, tbl.qty_kirim
+            $btnDev = "<a class='btn btn-sm btn-primary' target='_blank' href=".$link_dev." > ".$row->kode_dev." </a>";
+          }
           
           $tgl_deadline = "";
           if(!empty($row->tgl_deadline)){
               $tgl_deadline = fdate_eng_to_ind($row->tgl_deadline);
           }
+
+          $tgl_transaksi = "";
+          if(!empty($row->tgl_transaksi)){
+              $tgl_transaksi = fdate_eng_to_ind($row->tgl_transaksi);
+          }
+
+          $qty_sisa = (int) $row->qty - (int) $row->qty_prod;
+          $qty_sisa_kirim = (int) $row->qty_prod - (int) $row->qty_kirim;
+
           
-          $status = '-';
-          // $total_pay = $this->mtrans_pay_det->get_total_bayar($row->sl_customer_receipt_id);
+          
           array_push($build_array['data'], array(
-              'aksi' => $btnAction,
-              'kode_gaji' => $row->kode_gaji,
-              'periode_awal' => $periode_awal,
-              'periode_akhir' => $periode_akhir,
+              'btnOrder' => $btnOrder,
+              'btnProd' => $btnProd,
+              'btnDev' => $btnDev,
+              'tipe' => $tipe,
+              'nama' => $row->nama,
               'keterangan' => $row->keterangan,
-              'status' => $status,
+              'tgl_transaksi' => $tgl_transaksi,
+              'tgl_deadline' => $tgl_deadline,
+              'qty' => $row->qty,
+              'qty_prod' => $row->qty_prod,
+              'qty_kirim' => $row->qty_kirim,
+              'qty_sisa' => $qty_sisa,
+              'qty_sisa_kirim' => $qty_sisa_kirim,
           ));
 
       }

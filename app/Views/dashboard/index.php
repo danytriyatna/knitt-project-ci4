@@ -79,41 +79,18 @@
             <h6 class="mb-0 f-w-600">TRACKING PRODUKSI</h6>
           </div>
           <div class="card-body">
+            <div class="row">
+              <div class="col-sm-4 offset-md-8">
+                <div class="form-group">
+                  <div class="input-group mb-3">
+                    <span class="input-group-text bg-white" id="basic-addon11" style="border-right-width: 0px;"><i class="ti-search"></i></span>
+                    <input type="text"id="inp-tracking" class="form-control p-s-0" placeholder="Pencarian" aria-label="Username" aria-describedby="basic-addon11" style="border-left-width: 0px;">
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="table-responsive">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th>NO. ORDER</th>
-                    <th>TGL ORDER</th>
-                    <th>BUYER</th>
-                    <th>STYLE</th>
-                    <th>DEADLINE</th>
-                    <th>QTY ORDER</th>
-                    <th>NO. PRODUKSI</th>
-                    <th>QTY PRODUKSI</th>
-                    <th>QTY SELESAI</th>
-                    <th>NO. PENGIRIMAN</th>
-                    <th>QTY KIRIM</th>
-                    <th>SISA</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="javascript:void(0)" class="text-primary f-w-400">S0241200001</a></td>
-                    <td>12/01/2024</td>
-                    <td>HASAN</td>
-                    <td>HS-001</td>
-                    <td>15/12/2024</td>
-                    <td>110</td>
-                    <td><a href="javascript:void(0)" class="text-primary f-w-400">PRD241200001</a></td>
-                    <td>50</td>
-                    <td>50</td>
-                    <td><a href="javascript:void(0)" class="text-primary f-w-400">DOD241200001</a></td>
-                    <td>50</td>
-                    <td>60</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-striped"  id="tbl-tracking"></div>
             </div>
           </div>
         </div>
@@ -356,3 +333,7 @@
     </div>
   </div>
 <?= $this->endSection('content'); ?>
+
+<?= $this->section('script') ?>
+<script src="script/app/dashboard/index.js"></script>
+<?= $this->endSection('script') ?>
