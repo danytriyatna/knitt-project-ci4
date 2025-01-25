@@ -88,6 +88,7 @@ $routes->group('trans/customer-receipt', ['namespace' => 'Modules\Transaction\Co
 $routes->group('trans/item-transfer', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'ItemTransfer::index');
   $routes->post('list', 'ItemTransfer::lists');
+  $routes->get('print/(:any)', 'ItemTransfer::print/$1');
   $routes->get('form', 'ItemTransfer::form');
   $routes->get('edit/(:any)', 'ItemTransfer::form/$1');
   $routes->post('save', 'ItemTransfer::save');
@@ -109,6 +110,7 @@ $routes->group('trans/incoming-goods', ['namespace' => 'Modules\Transaction\Cont
   $routes->get('edit/(:any)', 'BarangMasuk::form/$1');
   $routes->post('last-stock', 'IncomingGoods::getLastStock');
   $routes->post('save', 'BarangMasuk::save');
+  $routes->get('print/(:any)', 'BarangMasuk::print/$1');
 });
 $routes->group('trans/outgoing-goods', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
   $routes->get('/', 'BarangKeluar::index');
@@ -117,4 +119,5 @@ $routes->group('trans/outgoing-goods', ['namespace' => 'Modules\Transaction\Cont
   $routes->get('form', 'BarangKeluar::form');
   $routes->get('edit/(:any)', 'BarangKeluar::form/$1');
   $routes->post('save', 'BarangKeluar::save');
+  $routes->get('print/(:any)', 'BarangKeluar::print/$1');
 });
