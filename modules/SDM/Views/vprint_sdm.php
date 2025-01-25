@@ -76,14 +76,42 @@
 <body>
   <div class="sheet">
     <?php 
-    for ($i = 0; $i < $data['qtyp']; $i++) { 
+      foreach ($detail as $r) { 
     ?>
       <div class="item">
-        <img src="<?= base_url(); ?>/uploads/media/qrcode/<?= $fileName; ?>" alt="QR Code" width="192px" height="192px">
-        <div class="details">
-          <b><?= $data['noSample'] ?></b><br>
-          <em><?= $data['deskripsi'] ?: '-' ?></em> | <em><?= strtoupper($data['ukuran']) ?: '-' ?></em> | <em><?= $data['warna'] ?: '-' ?></em> | <em><?= $data['qty'] ?: '-' ?></em>
-        </div>
+        <h4>SLIP GAJI PERIODE</h4>
+        <?= $row->periode_awal ?> S/D <?= $row->periode_akhir ?>
+        <hr>
+        <table>
+          <tr>
+            <th>Nama</th>
+            <th>:</th>
+            <td style="text-align:left;"><?= $r->full_name ?></td>
+          </tr>
+          <tr>
+            <th>Posisi</th>
+            <th>:</th>
+            <td style="text-align:left;"><?= $r->posisi ?></td>
+          </tr>
+        </table>
+        <hr>
+        <table>
+          <tr>
+            <th>Gaji/Upah</th>
+            <th>:</th>
+            <td style="text-align:left;"><?= ($r->gaji_harian) ? format_angka($r->gaji_harian) : 0 ?></td>
+          </tr>
+          <tr>
+            <th>Lembur</th>
+            <th>:</th>
+            <td style="text-align:left;"><?= ($r->uang_lembur) ? format_angka($r->uang_lembur) : 0 ?></td>
+          </tr>
+          <tr>
+            <th>Total</th>
+            <th>:</th>
+            <td style="text-align:left;"><?= ($r->gaji) ? format_angka($r->gaji) : 0 ?></td>
+          </tr>
+        </table>
       </div>
     <?php 
     }

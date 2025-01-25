@@ -101,6 +101,7 @@ class Mabsensi extends \App\Models\PrModel
         $builder->select("rk.nip,
                           rk.full_name,
                           rk.posisi,
+                          rk.id as id_karyawan,
                           COUNT(1) FILTER (WHERE sdm.status_kehadiran = 1) AS hadir,
                           COUNT(1) FILTER (WHERE sdm.status_kehadiran = 2) AS izin,
                           COUNT(1) FILTER (WHERE sdm.status_kehadiran = 3) AS sakit,
@@ -123,7 +124,7 @@ class Mabsensi extends \App\Models\PrModel
             $builder->where("sdm.tgl_absen <=", $params['tgl_akhir']);
         }
     
-        $builder->groupBy("rk.nip, rk.full_name, rk.posisi, rk.upah_harian, rk.upah_lembur, rk.upah_lembur_we");
+        $builder->groupBy("rk.nip, rk.full_name, rk.posisi, rk.upah_harian, rk.upah_lembur, rk.upah_lembur_we, rk.id");
         $builder->orderBy("rk.nip ASC");
     
         $this->_data = $builder->get()->getResult();

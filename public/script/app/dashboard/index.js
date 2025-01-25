@@ -21,19 +21,18 @@ $(document).ready(function () {
 				
 			{
 				title: 'BUYER', field: 'nama', headerSort:false, sorter: 'string',
-				width: 250
+				width: 180
 			}, 
 
             {
 				title: 'STYLE', field: 'keterangan', headerSort:false, sorter: 'string',
-				formatter : "html"
+				formatter : "html", width: 180
 			},
 
             {
 				title: 'TGL DEADLINE', field: 'tgl_deadline', headerSort:false, sorter: 'string',
 				width: 120, formatter : "html", hozAlign: 'center', cssClass: 'text-center'
 			}, 
-				
 
             {
 				title: 'QTY', field: 'qty', headerSort:false, sorter: 'string',

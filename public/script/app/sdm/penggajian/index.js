@@ -28,7 +28,7 @@ $(document).ready(function () {
 
             {
 				title: 'Status', field: 'status', headerSort:false, sorter: 'string',
-				width: 80, align:'center',
+				width: 120, align:'center',
 			},
 				
         ],
