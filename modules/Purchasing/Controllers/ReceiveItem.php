@@ -4,6 +4,7 @@ namespace Modules\Purchasing\Controllers;
 
 use CodeIgniter\Controller;
 use App\Controllers\BaseController;
+use App\Libraries\DompdfGenerator;
 use DateTime;
 use Modules\Purchasing\Models\ReceiveItemModel;
 use Modules\Purchasing\Models\ReceiveItemDetailModel;
@@ -68,6 +69,7 @@ class ReceiveItem extends BaseController
 
 
       $atr_edit = null;
+      $atr_other = null;
       $atr_del = null;
       $btnAction = null;
       // if ($this->_edit) {
@@ -81,8 +83,15 @@ class ReceiveItem extends BaseController
       //   $atr_del['class'] = '';
       //   $atr_del['onclick'] = "return confirm('Hapus Data ?')";
       // }
-      if ($atr_edit || $atr_del)
-        $btnAction = btn_action_group($id, $atr_edit, $atr_del);
+      if ($row->status != 0) {
+        $atr_other['title'] = 'Print';
+        $atr_other['target'] = "blank";
+        $atr_other['url'] = $this->urlv . '/print/';
+        $atr_other['class'] = '';
+        $atr_other['icon_class'] = 'fa-print';
+      }
+      if ($atr_edit || $atr_other)
+        $btnAction = btn_action_group($id, $atr_edit, $atr_del, $atr_other);
 
       // $aktif =  ($row->active) ? "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/deactivate/".$id."' data-confirm-message='Anda yakin ingin menonaktifkan user ini?'><i class='fa fa-check text-success'>&nbsp;</i></a>" :
       //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
@@ -287,5 +296,35 @@ class ReceiveItem extends BaseController
     $build_array['status']  = $status;
 
     return $this->response->setJSON($build_array);
+  }
+
+  public function print($id = null)
+  {
+    if (!$this->auth->loggedIn()) {
+      return redirect()->to('/auth/login');
+    }
+    $dompdf = new DompdfGenerator();
+
+    $this->data['data'] = [];
+    if ($id != "") {
+      $id = decrypt($id);
+      // dd($id);
+      // die;
+      $resData = $this->mRef->getData($id);
+
+      $sort = [
+        [
+          'field' => 'uk.id',
+          'dir' => 'ASC'
+        ]
+      ];
+
+      $resDataDetail = $this->mRefDet->getData(null, 0, 99999, $sort, params: array("id_header" => $id, "isReceive" => false));
+      $this->data['data'] = !empty($resData) ? $resData : [];
+      $this->data['detail'] = !empty($resDataDetail) ? $resDataDetail : [];
+    }
+    $html = view($this->views . '\receive_item_print', $this->data);
+
+    $dompdf->generate($html, 'rec_item.pdf', true);
   }
 }

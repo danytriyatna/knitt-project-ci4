@@ -4,6 +4,7 @@ namespace Modules\Purchasing\Controllers;
 
 use CodeIgniter\Controller;
 use App\Controllers\BaseController;
+use App\Libraries\DompdfGenerator;
 use CodeIgniter\Pager\PagerRenderer;
 use Modules\Purchasing\Models\PaymentModel;
 use Modules\Purchasing\Models\PaymentDetailModel;
@@ -64,11 +65,19 @@ class PurchasePayment extends BaseController
 
       $atr_edit = null;
       $atr_del = null;
+      $atr_other = null;
       $btnAction = null;
       // if ($this->_edit) {
       $atr_edit['title'] = 'Edit';
       $atr_edit['url'] = $this->urlv . '/form/';
       $atr_edit['class'] = '';
+      if ($row->status == 1) {
+        $atr_other['title'] = 'Print';
+        $atr_other['target'] = "blank";
+        $atr_other['url'] = $this->urlv . '/print/';
+        $atr_other['class'] = '';
+        $atr_other['icon_class'] = 'fa-print';
+      }
       // }
       // if ($this->_delete) {
       //   $atr_del['title'] = 'Hapus';
@@ -76,8 +85,8 @@ class PurchasePayment extends BaseController
       //   $atr_del['class'] = '';
       //   $atr_del['onclick'] = "return confirm('Hapus Data ?')";
       // }
-      if ($atr_edit || $atr_del)
-        $btnAction = btn_action_group($id, $atr_edit, $atr_del);
+      if ($atr_edit || $atr_other)
+        $btnAction = btn_action_group($id, $atr_edit, $atr_del, $atr_other);
 
 
 
@@ -212,5 +221,28 @@ class PurchasePayment extends BaseController
     $build_array['status']  = $status;
 
     return $this->response->setJSON($build_array);
+  }
+  public function print($id = null)
+  {
+    if (!$this->auth->loggedIn()) {
+      return redirect()->to('/auth/login');
+    }
+    $dompdf = new DompdfGenerator();
+
+    $this->data['data'] = [];
+    if ($id != "") {
+      $id = decrypt($id);
+      // dd($id);
+      // die;
+      $resData = $this->mRef->getData($id);
+
+      $resDataDetail = $this->mRefDet->getDataDetail($id);
+      $this->data['data'] = !empty($resData) ? $resData : [];
+      $this->data['detail'] = !empty($resDataDetail) ? $resDataDetail : [];
+    }
+    $html = view($this->views . '\purchase_payment_print', $this->data);
+
+
+    $dompdf->generate($html, 'paymeny.pdf', true);
   }
 }

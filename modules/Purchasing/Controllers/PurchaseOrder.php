@@ -7,7 +7,7 @@ use App\Controllers\BaseController;
 use DateTime;
 use Modules\Purchasing\Models\PurchaseModel;
 use Modules\Purchasing\Models\PurchaseDetailModel;
-
+use App\Libraries\DompdfGenerator;
 
 class PurchaseOrder extends BaseController
 {
@@ -15,6 +15,7 @@ class PurchaseOrder extends BaseController
   protected $mPO;
   protected $mPODetail;
   protected $urlv  = 'purchasing/purchase-order';
+
   function __construct()
   {
     $this->MOD_ALIAS = "MOD_PURCHASE_ORDER";
@@ -62,20 +63,25 @@ class PurchaseOrder extends BaseController
 
       $atr_edit = null;
       $atr_del = null;
+      $atr_other = null;
       $btnAction = null;
       // if ($this->_edit) {
       $atr_edit['title'] = 'Edit';
       $atr_edit['url'] = $this->urlv . '/form/';
       $atr_edit['class'] = '';
       // }
-      // if ($this->_delete) {
-      //   $atr_del['title'] = 'Hapus';
-      //   $atr_del['url'] = $this->urlv . '/delete/';
-      //   $atr_del['class'] = '';
-      //   $atr_del['onclick'] = "return confirm('Hapus Data ?')";
-      // }
-      if ($atr_edit || $atr_del)
-        $btnAction = btn_action_group($id, $atr_edit, $atr_del);
+      if ($row->status != 0) {
+        $atr_other['title'] = 'Print';
+        $atr_other['target'] = "blank";
+        $atr_other['url'] = $this->urlv . '/print/';
+        $atr_other['class'] = '';
+        $atr_other['icon_class'] = 'fa-print';
+      }
+
+      // $atr_del['onclick'] = "return confirm('Hapus Data ?')";
+
+      if ($atr_edit || $atr_other)
+        $btnAction = btn_action_group($id, $atr_edit, $atr_del, $atr_other);
 
 
 
@@ -201,5 +207,34 @@ class PurchaseOrder extends BaseController
     $build_array['status']  = $status;
 
     return $this->response->setJSON($build_array);
+  }
+
+  public function print($id = null)
+  {
+    if (!$this->auth->loggedIn()) {
+      return redirect()->to('/auth/login');
+    }
+    $dompdf = new DompdfGenerator();
+
+    $this->data['data'] = [];
+    if ($id != "") {
+      $id = decrypt($id);
+      // dd($id);
+      // die;
+      $resData = $this->mPO->getData($id);
+      $sort = [
+        [
+          'field' => 'uk.id',
+          'dir' => 'ASC'
+        ]
+      ];
+      $resDataDetail = $this->mPODetail->getData(null, 0, 99999, $sort, params: array("id_header" => $id));
+      $this->data['data'] = !empty($resData) ? $resData : [];
+      $this->data['detail'] = !empty($resDataDetail) ? $resDataDetail : [];
+    }
+    $html = view($this->views . '\purchase_order_print', $this->data);
+
+
+    $dompdf->generate($html, 'po.pdf', true);
   }
 }
