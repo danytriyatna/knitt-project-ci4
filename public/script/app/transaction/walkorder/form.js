@@ -397,61 +397,72 @@ $(document).ready(function () {
         form_data.append('detail', inDetailID);
         form_data.append('warna_data', inData);
         
-        $.ajax({
-            url: "/trans/work-order/save-warna", // point to server-side controller method
-            dataType: "json", // what to expect back from the server
-            data: form_data,
-            type: "post",
-            cache: false,
-            contentType: false,
-            processData: false,
-            beforeSend: function () {
-                Swal.fire({
-                    title: 'Loading...',
-                    allowOutsideClick: false,
-                    showConfirmButton: false,
-                    onBeforeOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            },
-            success: function (res) {
-                Swal.close();
-
-                if(res.status){
+        if(inLoss.length > 0){
+            $.ajax({
+                url: "/trans/work-order/save-warna", // point to server-side controller method
+                dataType: "json", // what to expect back from the server
+                data: form_data,
+                type: "post",
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
                     Swal.fire({
-                        text: res.message,
-                        icon: 'success',
+                        title: 'Loading...',
+                        allowOutsideClick: false,
                         showConfirmButton: false,
-                        timer: 2500
-                    }).then((result) => {
-                        dtList_detail1.setData();
-                        mdDetail.modal("hide");
+                        onBeforeOpen: () => {
+                            Swal.showLoading();
+                        }
                     });
-                }else{
+                },
+                success: function (res) {
+                    Swal.close();
+    
+                    if(res.status){
+                        Swal.fire({
+                            text: res.message,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 2500
+                        }).then((result) => {
+                            dtList_detail1.setData();
+                            mdDetail.modal("hide");
+                        });
+                    }else{
+                        Swal.fire({
+                            text: res.message,
+                            icon: 'error',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+    
+                    }
+                    
+                },
+                error: function (res) {
+                    Swal.close();
                     Swal.fire({
-                        text: res.message,
+                        text: "Gagal simpan data",
                         icon: 'error',
                         showConfirmButton: false,
                         timer: 2000
+                    }).then((result) => {
+                        
                     });
-
-                }
-                
-            },
-            error: function (res) {
-                Swal.close();
-                Swal.fire({
-                    text: "Gagal simpan data",
-                    icon: 'error',
-                    showConfirmButton: false,
-                    timer: 2000
-                }).then((result) => {
                     
-                });
+                },
+            });
+        }else{
+            Swal.fire({
+                text: "Lengkapi pengisian data ! loss telah diisi",
+                icon: 'warning',
+                showConfirmButton: false,
+                timer: 2000
+            }).then((result) => {
                 
-            },
-        });
+            });
+        }
     }
 
     $("#btn-save-warna").on("click", function(e) {
@@ -529,69 +540,80 @@ $(document).ready(function () {
 
         let id_gudang = $("#select_gudang").val()
 
-        let form_data = new FormData();
-        form_data.append('dataid', dataid);
-        form_data.append('id_gudang', id_gudang);
-        form_data.append('listproses', JSON.stringify(listJenis));
-        form_data.append('status_data', isstataus);
-        form_data.append('data_ukuran_warna', JSON.stringify(ukuran_data));
-        form_data.append('data_ukuran', JSON.stringify(ukuran_calc));
-        
-        $.ajax({
-            url: "/trans/work-order/save-data", // point to server-side controller method
-            dataType: "json", // what to expect back from the server
-            data: form_data,
-            type: "post",
-            cache: false,
-            contentType: false,
-            processData: false,
-            beforeSend: function () {
-                Swal.fire({
-                    title: 'Loading...',
-                    allowOutsideClick: false,
-                    showConfirmButton: false,
-                    onBeforeOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            },
-            success: function (res) {
-                Swal.close();
-
-                if(res.status){
+        if(id_gudang.length > 0){
+            let form_data = new FormData();
+            form_data.append('dataid', dataid);
+            form_data.append('id_gudang', id_gudang);
+            form_data.append('listproses', JSON.stringify(listJenis));
+            form_data.append('status_data', isstataus);
+            form_data.append('data_ukuran_warna', JSON.stringify(ukuran_data));
+            form_data.append('data_ukuran', JSON.stringify(ukuran_calc));
+            
+            $.ajax({
+                url: "/trans/work-order/save-data", // point to server-side controller method
+                dataType: "json", // what to expect back from the server
+                data: form_data,
+                type: "post",
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
                     Swal.fire({
-                        text: res.message,
-                        icon: 'success',
+                        title: 'Loading...',
+                        allowOutsideClick: false,
                         showConfirmButton: false,
-                        timer: 2500
-                    }).then((result) => {
-                        // similar behavior as clicking on a link
-                        window.location.href = "/trans/work-order";
+                        onBeforeOpen: () => {
+                            Swal.showLoading();
+                        }
                     });
-                }else{
+                },
+                success: function (res) {
+                    Swal.close();
+
+                    if(res.status){
+                        Swal.fire({
+                            text: res.message,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 2500
+                        }).then((result) => {
+                            // similar behavior as clicking on a link
+                            window.location.href = "/trans/work-order";
+                        });
+                    }else{
+                        Swal.fire({
+                            text: res.message,
+                            icon: 'error',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+
+                    }
+                    
+                },
+                error: function (res) {
+                    Swal.close();
                     Swal.fire({
-                        text: res.message,
+                        text: "Gagal simpan data",
                         icon: 'error',
                         showConfirmButton: false,
                         timer: 2000
+                    }).then((result) => {
+                        
                     });
-
-                }
-                
-            },
-            error: function (res) {
-                Swal.close();
-                Swal.fire({
-                    text: "Gagal simpan data",
-                    icon: 'error',
-                    showConfirmButton: false,
-                    timer: 2000
-                }).then((result) => {
                     
-                });
+                },
+            });
+        }else{
+            Swal.fire({
+                text: "Lengkapi pengisian data ! pastikan gudang telah dipilih",
+                icon: 'warning',
+                showConfirmButton: false,
+                timer: 2000
+            }).then((result) => {
                 
-            },
-        });
+            });
+        }
     }
 
     $("#select_gudang").val($("#select_gudang").attr('value')).trigger('change');

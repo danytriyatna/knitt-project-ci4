@@ -362,7 +362,7 @@ class WorkOrder extends BaseController
     $msg    = "Data gagal disimpan !";
     $status = false;
 
-    // try {
+    try {
     $dataid = \decrypt($dataid);
     $data        = $this->mWalkorder->getData($dataid);
     
@@ -474,11 +474,11 @@ class WorkOrder extends BaseController
       $msg    = "Data berhasil disimpan !";
       $status = true;
     }
-    // } catch (\Throwable $th) {
-    //   //throw $th;
-    //   $this->db->transRollback();
-    //   print_r($th);exit;
-    // }
+    } catch (\Throwable $th) {
+      //throw $th;
+      $this->db->transRollback();
+      // print_r($th);exit;
+    }
 
     $build_array['message'] = $msg;
     $build_array['status']  = $status;

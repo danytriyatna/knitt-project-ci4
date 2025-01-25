@@ -107,7 +107,7 @@ class Production extends BaseController
           "id"                => ($id),
           "ref_kode"          => ($row->kode_walkorder),
           "konsumen_nama"     => $row->konsumen_nama,
-          "kode_prod"    => $row->kode_prod,
+          "kode_prod"         => $row->kode_prod,
           "qty"               => $row->qty,
           "tipe"              => $tipe,
           "qty_prod"          => $qty_prod,

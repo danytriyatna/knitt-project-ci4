@@ -351,7 +351,8 @@ class WalkorderModel extends \App\Models\PrModel
 
     function getCnt_produksi($id){
         $builder = $this->db->table($this->table4 . " abx");
-        $builder->select("sum(abx.qty_prod) as _cnt");
+        $builder->select("(SUM(abx.qty_prod)) as _cnt");
+        $builder->where("ab.id_proses = 1");
         $builder->join($this->table3 . " ab", "ab.id = abx.id_walkorder_proses");
         $builder->where('ab.id_walkorder', $id);
         $this->_data = $builder->get()->getRow()->_cnt;

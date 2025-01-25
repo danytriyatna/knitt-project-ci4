@@ -73,4 +73,7 @@ class Mcommon extends Model
         $this->db->transComplete();
     }
 
+    
+
+
 }
