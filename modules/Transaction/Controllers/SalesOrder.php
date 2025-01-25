@@ -708,7 +708,7 @@ class SalesOrder extends BaseController
     }
     $data = json_decode((string)$data);
     $resData = $this->mSalesOrder->getDataDetailSalesOrderUkuranById($data->id);
-
+    
     try {
 
       $writer = new PngWriter();

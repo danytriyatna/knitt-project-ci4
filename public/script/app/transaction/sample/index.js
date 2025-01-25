@@ -777,7 +777,7 @@ $(document).ready(function () {
             qty : inpp_qty.val(),
             qtyp : inpp_qtyp.val(),
             noSample : dt_noSample,
-            deskripsi : '',
+            deskripsi : dt_deskripsi,
             buyer : '',
             warna : dt_warna,
           };
