@@ -83,6 +83,7 @@ $routes->group('trans/customer-receipt', ['namespace' => 'Modules\Transaction\Co
   $routes->post('form/(:any)', 'CustomerReceipt::form/$1');
   $routes->post('getInvoice', 'CustomerReceipt::get_invoice');
   $routes->get('delete/(:any)', 'CustomerReceipt::delete/$1');
+  $routes->get('print/(:any)', 'CustomerReceipt::print/$1');
 });
 
 $routes->group('trans/item-transfer', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
