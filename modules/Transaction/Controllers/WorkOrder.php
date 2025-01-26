@@ -384,7 +384,7 @@ class WorkOrder extends BaseController
     if ($data->tipe_id == 1) {
       $pru['use'] = 1;// ambil ukuran yang digunnakan order 
       $pru['id_sample'] = $data->ref_id;
-      $dtUkuran = $this->mSample->getUkuranTrans($pru);
+      $data_ukuran = $this->mSample->getUkuranTrans($pru);
     }else{
       $pru['use'] = 1;// ambil ukuran yang digunnakan order 
       $pru['id_sales_order'] = $data->ref_id;
@@ -477,7 +477,7 @@ class WorkOrder extends BaseController
     } catch (\Throwable $th) {
       //throw $th;
       $this->db->transRollback();
-      // print_r($th);exit;
+      print_r($th);exit;
     }
 
     $build_array['message'] = $msg;
