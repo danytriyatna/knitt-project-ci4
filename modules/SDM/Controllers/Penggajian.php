@@ -126,8 +126,8 @@ class Penggajian extends BaseController
 
       $stdData = new \stdClass();
       $stdData->kode_gaji = '';
-      $stdData->periode_awal = $this->dnow;
-      $stdData->periode_akhir = $this->dnow;
+      $stdData->periode_awal = date('d-m-Y');
+      $stdData->periode_akhir = date('d-m-Y');
       $stdData->keterangan = '';
       $stdData->status = 1;
 
@@ -175,6 +175,8 @@ class Penggajian extends BaseController
         // end auditor
 
     }
+
+    $this->data['row'] = $stdData;
 
     if($_POST)
 		{ 
