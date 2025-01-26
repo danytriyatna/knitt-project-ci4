@@ -39,6 +39,8 @@ $routes->get('/register', 'Auth::register');
 $routes->post('/register', 'Auth::proses_register');
 $routes->get('/forgot_password', 'Auth::forgot_password');
 
+$routes->post('/dashboard/list_order', 'Dashboard::lists',  ['filter' => 'otorisasi:MOD_HOME']);
+
 $routes->post('api/login', 'API\Auth::login');
 
 $routes->group('api/v1', ['filter' => 'JWTAuth', 'namespace' => 'App\Controllers\API'], function($routes)

@@ -27,81 +27,46 @@
       <div class="card">
         <div class="card-body">
           <div class="row">
-            <div class="col-sm-2">
-              <div class="form-group row mb-0">
-                <div class="col-md-12">
-                  <label class="control-label text-start col-form-label" for="filter_tgl_from">Tanggal</label>
-                  <input type="text" id="filter_tgl_from" name="filter_tgl_from" class="form-control datepickerx" placeholder="Pilih tanggal awal" value="">
+            <div class="col-md-12 mb-3">
+              <?php if (isset($_SESSION['message'])) { ?>
+                <script type="text/javascript">
+                  window.setTimeout(function() {
+                    $(".alert").alert('close');
+                  }, 3000);
+                </script>
+                <div class="alert alert-success">
+                  <?php echo $_SESSION['message']; ?>
+                </div>
+              <?php } ?>
+              <?php if (isset($_SESSION['err'])) { ?>
+                <script type="text/javascript">
+                  window.setTimeout(function() {
+                    $(".alert").alert('close');
+                  }, 5000);
+                </script>
+                <div class="alert alert-error">
+                  <strong>Warning! </strong><?php echo $_SESSION['err']; ?>
+                </div>
+              <?php } ?>
+            </div>
+            <div class="col-sm-3">
+              <!-- <button type="button" class="btn btn-sm btn-success" id="btn-add"> <i class="fa fa-plus"></i> Tambah</button> -->
+               <a href="/sdm/penggajian/add" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> Tambah</a>
+            </div>
+            <div class="col-sm-4 offset-md-5">
+              <div class="form-group">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-white" id="basic-addon11" style="border-right-width: 0px;"><i class="ti-search"></i></span>
+                  <input type="text" class="form-control p-s-0" placeholder="Pencarian" aria-label="Username" aria-describedby="basic-addon11" style="border-left-width: 0px;">
                 </div>
               </div>
-            </div>
-            <div class="col-sm-2">
-              <div class="form-group row mb-0">
-                <div class="col-md-12">
-                  <label class="control-label text-start col-form-label" for="filter_tgl_to">&nbsp;</label>
-                  <input type="text" id="filter_tgl_to" name="filter_tgl_to" class="form-control datepickerx" placeholder="Pilih tanggal akhir" value="">
-                </div>
-              </div>
-            </div>
-            <div class="col-sm-3 align-self-end">
-              <button id="btn-generate" class="btn btn-primary" type="button"><i class="fa fa-table"></i>&nbsp; Generate</button>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="row">
-    <div class="col-lg-12">
-      <div class="card">
-        <div class="card-body">
-          <div class="table-responsive">
-            <div class="table-striped" id="dt-penggajian"></div>
-            <!-- <table class="table table-striped datatable">
-              <thead>
-                <tr>
-                  <th>NIK</th>
-                  <th>NAMA</th>
-                  <th>JABATAN</th>
-                  <th>HADIR</th>
-                  <th>IZIN</th>
-                  <th>SAKIT</th>
-                  <th>TANPA KETERANGAN</th>
-                  <th>GAJI/UPAH</th>
-                  <th>JAM LEMBUR HK</th>
-                  <th>JAM LEMBUR HL</th>
-                  <th>LEMBUR</th>
-                  <th>POTONGAN</th>
-                  <th>KETERANGAN POTONGAN</th>
-                  <th>JML GAJI/UPAH</th>
-                </tr>
-              </thead>
-              <tbody class="d-none">
-                <?php for($i = 0; $i < 3; $i++) : ?>
-                <tr>
-                  <td>24120<?= $i ?></td>
-                  <td><?= ['Ayi', 'Rosa', 'Tono'][$i] ?></td>
-                  <td>Karyawan/Staff</td>
-                  <td>7</td>
-                  <td>1</td>
-                  <td>0</td>
-                  <td>0</td>
-                  <td class="text-nowrap">450.000,00</td>
-                  <td>3</td>
-                  <td>0</td>
-                  <td class="text-nowrap">225.000,00</td>
-                  <td style="min-width: 130px;">
-                    <input id="input_potongan_<?= $i ?>" name="input_potongan_<?= $i ?>" type="text" class="form-control form-idr" value="50000">
-                  </td>
-                  <td>
-                    <textarea id="ket_potongan_<?= $i ?>" name="ket_potongan_<?= $i ?>" class="form-control" rows="2"></textarea>
-                  </td>
-                  <td class="text-nowrap">625.000,00</td>
-                </tr>
-                <?php endfor; ?>
-              </tbody>
-            </table> -->
+          <div class="row">
+            <div class="col-sm-12">
+              <div id="dt-list" class="table-responsive table-striped"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -112,20 +77,5 @@
 <?= $this->endSection('content'); ?>
 
 <?= $this->section('script') ?>
-<!-- <script>
-  const btnGenerate = document.querySelector('#btn-generate');
-  const rowData = document.querySelector('table > tbody');
-
-  if (rowData)
-
-  btnGenerate.addEventListener('click', () => {
-    iLoader.start()
-
-    setTimeout(() => {
-      rowData.classList.remove('d-none');
-      iLoader.stop();
-    }, 1000)
-  })
-</script> -->
 <script src="script/app/sdm/penggajian/index.js"></script>
 <?= $this->endSection('script') ?>

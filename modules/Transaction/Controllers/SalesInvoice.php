@@ -298,7 +298,7 @@ class SalesInvoice extends BaseController
         $dt_details = json_decode($dt_details, true);
 
 
-        $data['tgl_transaksi'] = $stdData->tgl_si;
+        $data['tgl_transaksi'] = \fdate_ind_to_eng($stdData->tgl_si);
         $data['keterangan'] = $stdData->note;
         $data['id_konsumen'] = $stdData->id_konsumen;
 

@@ -480,16 +480,23 @@ $(document).ready(function () {
         // get_detailData(e.target.value)
         get_detailData()
     })
+
+    statusProses.on("change", function(){
+        get_detailData();
+    });
+
     get_detailData();
     function get_detailData(tgl){
         let date = tglTransaksi != undefined ? formatLocaleDate(tglTransaksi.val()) : ''
         let idProduksi =  $("#id_produksi").val()
+        let proses = statusProses.val();
         $.ajax({
             type: 'POST',
             url: '/trans/production/list_detail',
             data: {
                 id:idProduksi,
                 tglTransaksi:date,
+                proses:proses
             },
             dataType: "json",
             beforeSend: function () {

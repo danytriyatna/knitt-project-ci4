@@ -11,4 +11,11 @@ $routes->group('sdm/absensi', ['namespace' => 'Modules\SDM\Controllers'], static
 $routes->group('sdm/penggajian', ['namespace' => 'Modules\SDM\Controllers'], static function ($routes) {
 	$routes->get('/', 'Penggajian::index');
 	$routes->post('get_laporan', 'Penggajian::getDataPenggajian');
+	$routes->post('list', 'Penggajian::lists');
+	$routes->get('add', 'Penggajian::form');
+	$routes->post('add', 'Penggajian::form');
+	$routes->get('form/(:any)', 'Penggajian::form/$1');
+	$routes->post('form/(:any)', 'Penggajian::form/$1');
+	$routes->get('delete/(:any)', 'Penggajian::delete/$1');
+	$routes->get('generate', 'Penggajian::printSlip_gaji');
 });

@@ -362,7 +362,7 @@ class WorkOrder extends BaseController
     $msg    = "Data gagal disimpan !";
     $status = false;
 
-    // try {
+    try {
     $dataid = \decrypt($dataid);
     $data        = $this->mWalkorder->getData($dataid);
     
@@ -384,7 +384,7 @@ class WorkOrder extends BaseController
     if ($data->tipe_id == 1) {
       $pru['use'] = 1;// ambil ukuran yang digunnakan order 
       $pru['id_sample'] = $data->ref_id;
-      $dtUkuran = $this->mSample->getUkuranTrans($pru);
+      $data_ukuran = $this->mSample->getUkuranTrans($pru);
     }else{
       $pru['use'] = 1;// ambil ukuran yang digunnakan order 
       $pru['id_sales_order'] = $data->ref_id;
@@ -474,11 +474,11 @@ class WorkOrder extends BaseController
       $msg    = "Data berhasil disimpan !";
       $status = true;
     }
-    // } catch (\Throwable $th) {
-    //   //throw $th;
-    //   $this->db->transRollback();
-    //   print_r($th);exit;
-    // }
+    } catch (\Throwable $th) {
+      //throw $th;
+      $this->db->transRollback();
+      print_r($th);exit;
+    }
 
     $build_array['message'] = $msg;
     $build_array['status']  = $status;

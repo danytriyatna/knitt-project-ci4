@@ -232,9 +232,9 @@ class DeliveryOrder extends BaseController
           $qty = 0;
           foreach ($rukuran as $iu) {
             $keyUkuran = $iu->key_ukuran;
-            $indx      = $iu->key_ukuran;
-         
+
             if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
+            $indx      = $keyUkuran;
             $xharga    = $keyUkuran.'_hrg';
 
             $isi[$indx] = $item->$keyUkuran;
@@ -331,10 +331,23 @@ class DeliveryOrder extends BaseController
   function insert($dataIn, $detail, $produksi){
     $tgl = date('Y-m-d H:i:s');
     $userId = $this->get_userid();
-    
+    // dd($dataIn);
     $this->db->transBegin();
 
     $id = $this->mDelivery->insertRecordGetid($this->mDelivery->table,$dataIn);
+
+    $id_walkorder = $dataIn['id_walkorder']; 
+    $dtWalkorder = $this->mWalkorder->getData($id_walkorder);
+    // / $data_ukuran = $this->mUkuran->getData(0, 0, 999);
+    if ($dtWalkorder->tipe_id == 1) {
+      $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+      $pru['id_sample'] = $dtWalkorder->ref_id;
+      $data_ukuran = $this->mSample->getUkuranTrans($pru);
+    }else{
+      $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+      $pru['id_sales_order'] = $dtWalkorder->ref_id;
+      $data_ukuran = $this->mSalesOrder->getUkuranTrans($pru);
+    }
 
     $qty = 0;
     if(!empty($detail)){
@@ -361,7 +374,7 @@ class DeliveryOrder extends BaseController
     
     if(!empty($produksi)){
 
-      $rukuran = $this->mUkuran->getData(0, 0, 999);
+      // $rukuran = $this->mUkuran->getData(0, 0, 999);
       foreach ($produksi as $itemx) {
         // dd($itemx);
         $xdata = [];
@@ -370,16 +383,15 @@ class DeliveryOrder extends BaseController
        
         $xdata['created_at']    = $tgl;
         $xdata['created_by']    = $userId;
-        foreach ($rukuran as $iu) {
+        foreach ($data_ukuran as $iu) {
           $keyUkuran = $iu->key_ukuran;
           $indx      = $iu->key_ukuran;
 
-
-          $xdata['qty']          = $itemx[$keyUkuran];
           if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
+          $xdata['qty'] = $itemx[$keyUkuran];
           $xharga    = $keyUkuran.'_hrg';
 
-          $xdata['id_ukuran']    = $iu->id;
+          $xdata['id_ukuran']    = $iu->id_ukuran;
           $xdata['harga_satuan'] = $itemx[$xharga];
          
           $this->mDelivery->insertRecordGetid($this->mDelivery->table3,$xdata);
@@ -411,6 +423,19 @@ class DeliveryOrder extends BaseController
     $this->mDelivery->updateRecord($this->mDelivery->table, $dataIn, 'id', $id);
 
     $qty = 0;
+
+    $id_walkorder = $dataIn['id_walkorder']; 
+    $dtWalkorder = $this->mWalkorder->getData($id_walkorder);
+    // / $data_ukuran = $this->mUkuran->getData(0, 0, 999);
+    if ($dtWalkorder->tipe_id == 1) {
+      $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+      $pru['id_sample'] = $dtWalkorder->ref_id;
+      $data_ukuran = $this->mSample->getUkuranTrans($pru);
+    }else{
+      $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+      $pru['id_sales_order'] = $dtWalkorder->ref_id;
+      $data_ukuran = $this->mSalesOrder->getUkuranTrans($pru);
+    }
     
     if(!empty($detail)){
       $builderx = $this->db->table($this->mDelivery->table2);
@@ -498,7 +523,7 @@ class DeliveryOrder extends BaseController
     $this->mDelivery->updateRecord($this->mDelivery->table, $dataIn, 'id', $id);
     if(!empty($produksi)){
 
-      $rukuran = $this->mUkuran->getData(0, 0, 999);
+      // $rukuran = $this->mUkuran->getData(0, 0, 999);
 
       $builderv = $this->mDelivery->table($this->mDelivery->table3);
       $builderv->where("id_delivery", $id);
@@ -511,16 +536,15 @@ class DeliveryOrder extends BaseController
        
         $xdata['created_at']    = $tgl;
         $xdata['created_by']    = $userId;
-        foreach ($rukuran as $iu) {
+        foreach ($data_ukuran as $iu) {
           $keyUkuran = $iu->key_ukuran;
           $indx      = $iu->key_ukuran;
 
-
-          $xdata['qty']          = $itemx[$keyUkuran];
           if($iu->key_ukuran == 'all') $keyUkuran = 'all_';
+          $xdata['qty']          = $itemx[$keyUkuran];
           $xharga    = $keyUkuran.'_hrg';
 
-          $xdata['id_ukuran']    = $iu->id;
+          $xdata['id_ukuran']    = $iu->id_ukuran;
           $xdata['harga_satuan'] = $itemx[$xharga];
          
           $this->mDelivery->insertRecordGetid($this->mDelivery->table3,$xdata);

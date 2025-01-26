@@ -31,7 +31,7 @@ class PaymentModel extends \App\Models\PrModel
             $builder->where('uk.active = 1');
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
                 $builder->groupStart();
-                $builder->where('LOWER(dbx.nama_vendor) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->where('LOWER(dbx.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->orWhere('LOWER(ebx.rekening_no) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->orWhere('LOWER(ebx.rekening_bank) LIKE', strtolower("%{$filters[0]['value']}%"));
                 $builder->groupEnd();
@@ -68,7 +68,7 @@ class PaymentModel extends \App\Models\PrModel
 
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             $builder->groupStart();
-            $builder->where('LOWER(dbx.nama_vendor) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->where('LOWER(dbx.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->orWhere('LOWER(ebx.rekening_no) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->orWhere('LOWER(ebx.rekening_bank) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
