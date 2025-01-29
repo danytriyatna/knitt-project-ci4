@@ -203,7 +203,7 @@ class Absensi extends BaseController
           $status_kehadiran = 4;
         }
 
-        $status_lembur = "";
+        $status_lembur = 0;
         if($x['status_lembur'] == "-"){
           $status_lembur = 0;
         } else if($x['status_lembur'] == "Lembur Weekday"){
@@ -212,11 +212,16 @@ class Absensi extends BaseController
           $status_lembur = 2;
         }
 
+        $hari_hadir = 0;
+        if(!empty($x['hari_hadir'])){
+          $hari_hadir = (int) $x['hari_hadir'];
+        }
+
         $isi = [];
         $isi['jam_masuk'] = $tgl_absen . ' ' . $x['jam_masuk'];
         $isi['jam_keluar'] = $tgl_absen . ' ' . $x['jam_keluar'];
         $isi['status_kehadiran'] = $status_kehadiran;
-        $isi['hari_hadir'] = $x['hari_hadir'];
+        $isi['hari_hadir'] = $hari_hadir;
         $isi['keterangan_kehadiran'] = $x['keterangan_kehadiran'];
         $isi['status_lembur'] = $status_lembur;
         $isi['jml_lembur'] = $x['jml_lembur'];
