@@ -177,7 +177,7 @@ class DeliveryOrder extends BaseController
       if ($dtWalkorder->tipe_id == 1) {
         $pru['use'] = 1;// ambil ukuran yang digunnakan order 
         $pru['id_sample'] = $dtWalkorder->ref_id;
-        $dtUkuran = $this->mSample->getUkuranTrans($pru);
+        $data_ukuran = $this->mSample->getUkuranTrans($pru);
       }else{
         $pru['use'] = 1;// ambil ukuran yang digunnakan order 
         $pru['id_sales_order'] = $dtWalkorder->ref_id;
