@@ -11,8 +11,12 @@ if (!function_exists('sess_prefix')) {
 if (!function_exists('format_angka')) {
     function format_angka($angka, $dec = 0)
     {
-        $hasil = number_format($angka, $dec, ".", ",");
-        return $hasil;
+       if(!empty($angka)){
+            $hasil = number_format($angka, $dec, ".", ",");
+            return $hasil;
+       }else{
+        return 0;
+       }
     }
 }
 
