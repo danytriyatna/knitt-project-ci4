@@ -66,7 +66,7 @@ class Rpt_laba_rugi extends BaseController
         $this->data['tahun'] = $tahun;
         $this->data['bulan'] = $bulan;
         // dd($this->data['oke']);
-        $this->data['list_coa'] = $this->mcoa->getData(null, 0, 9999);
+        $this->data['list_coa'] = $this->mcoa->getData(null, 0, 9999, null, null, null, null, '');
         $this->data['mlaba'] = $this->mlaba;
 		$this->data['titlehead'] = "Laporan Laba Rugi";
 		return view($this->url_v.'\vakun_rep_laba', $this->data);
@@ -102,7 +102,7 @@ class Rpt_laba_rugi extends BaseController
                 $coa_nama = "<b>". $row->kode ." - " .$row->nama. "</b>";
             }
             array_push($build_array['data'], array(
-               'coa_kode' => $row->coa_kode,
+               'coa_kode' => $row->kode,
                'id' => $row->id,
                'parent_id' => $row->parent_id,
                'coa_nama' => $coa_nama,
@@ -133,7 +133,7 @@ class Rpt_laba_rugi extends BaseController
         $fileName = "laporan-laba-periode-{$bulan}-{$tahun}.xlsx";
 
         $results = $this->mcoa->getData(null, 0, 9999);
-
+        // dd($results);
     
         //start phpspreadsheet
         $sheets    = new Spreadsheet;
@@ -269,12 +269,12 @@ class Rpt_laba_rugi extends BaseController
         $p_id = null; 
 
         $pdpt_sw = $this->mlaba->getDataPendapatan(1, $tahun, $bulan);
-        $pdpt_ju = $this->mlaba->getDataPendapatan(2, $tahun, $bulan);
+        $pdpt_ju = 0;//$this->mlaba->getDataPendapatan(2, $tahun, $bulan);
         $pdpt_ttl = $pdpt_sw + $pdpt_ju;
 
         $pngl_sw = $this->mlaba->getDataPengeluaran(1, 2, $tahun, $bulan);
-        $pngl_ju = $this->mlaba->getDataPengeluaran(1, 1, $tahun, $bulan);
-        $pngl_spt = $this->mlaba->getDataPengeluaran(2, 2, $tahun, $bulan);
+        $pngl_ju = 0;//$this->mlaba->getDataPengeluaran(1, 1, $tahun, $bulan);
+        $pngl_spt = 0;//$this->mlaba->getDataPengeluaran(2, 2, $tahun, $bulan);
 
         $spas = "    ";
         $sheets->setActiveSheetIndex(0)
@@ -283,17 +283,17 @@ class Rpt_laba_rugi extends BaseController
         $ix = $ix + 1;
         $sheets->setActiveSheetIndex(0)
                ->setCellValue('A'.$ix, $spas . " 4001 - Pendapatan")
-               ->setCellValue('B'.$ix, "");
-        $ix = $ix + 1;
-        $sheets->setActiveSheetIndex(0)
-               ->setCellValue('A'.$ix, $spas ."    4011 - Sewa")
                ->setCellValue('B'.$ix, ($pdpt_sw));
         $ix = $ix + 1;
-        $sheets->setActiveSheetIndex(0)
-               ->setCellValue('A'.$ix, $spas ."    4012 - Penjualan")
-               ->setCellValue('B'.$ix, ($pdpt_ju));
+        // $sheets->setActiveSheetIndex(0)
+        //        ->setCellValue('A'.$ix, $spas ."    4011 - Sewa")
+        //        ->setCellValue('B'.$ix, ($pdpt_sw));
+        // $ix = $ix + 1;
+        // $sheets->setActiveSheetIndex(0)
+        //        ->setCellValue('A'.$ix, $spas ."    4012 - Penjualan")
+        //        ->setCellValue('B'.$ix, ($pdpt_ju));
 
-        $ix = $ix + 1;
+        // $ix = $ix + 1;
         $sheets->setActiveSheetIndex(0)
                 ->setCellValue('A'.$ix, $spas ."Total Pendapatan")
                 ->setCellValue('C'.$ix, $pdpt_ttl);
@@ -301,22 +301,22 @@ class Rpt_laba_rugi extends BaseController
         $ix = $ix + 1;
         $sheets->setActiveSheetIndex(0)
                 ->setCellValue('A'.$ix, $spas . " 4002 - Pengeluaran")
-                ->setCellValue('B'.$ix, "");
+                ->setCellValue('B'.$ix,  $pngl_sw);
         $ix = $ix + 1;
-        $sheets->setActiveSheetIndex(0)
-                ->setCellValue('A'.$ix, $spas ."    4021 - Sewa")
-                ->setCellValue('B'.$ix, $pngl_sw);
-        $ix = $ix + 1;
-        $sheets->setActiveSheetIndex(0)
-                ->setCellValue('A'.$ix, $spas ."    4022 - Pembelian")
-                ->setCellValue('B'.$ix,  $pngl_ju);
+        // // $sheets->setActiveSheetIndex(0)
+        // //         ->setCellValue('A'.$ix, $spas ."    4021 - Sewa")
+        // //         ->setCellValue('B'.$ix, $pngl_sw);
+        // // $ix = $ix + 1;
+        // // $sheets->setActiveSheetIndex(0)
+        // //         ->setCellValue('A'.$ix, $spas ."    4022 - Pembelian")
+        // //         ->setCellValue('B'.$ix,  $pngl_ju);
 
-        $ix = $ix + 1;
-        $sheets->setActiveSheetIndex(0)
-                ->setCellValue('A'.$ix, $spas ."    4023 - Pembelian Sparepart")
-                ->setCellValue('B'.$ix, $pngl_spt);
+        // // $ix = $ix + 1;
+        // $sheets->setActiveSheetIndex(0)
+        //         ->setCellValue('A'.$ix, $spas ."    4023 - Pembelian Sparepart")
+        //         ->setCellValue('B'.$ix, $pngl_spt);
         
-                $ix = $ix + 1;
+        //         $ix = $ix + 1;
         $pngl_ttl = $pngl_sw + $pngl_ju + $pngl_spt;
 
 
@@ -350,6 +350,7 @@ class Rpt_laba_rugi extends BaseController
                ->setCellValue('A'.$ix, "5000 - Fix Cost")
                ->setCellValue('B'.$ix, "");
        
+            //    dd(count($results) );
         for ($xx = 0; $xx < count($results) ; $xx++) { 
             $r = $results[$xx];
 
@@ -364,7 +365,7 @@ class Rpt_laba_rugi extends BaseController
             if($coa_ttl > 0){
                 $pngl_ttl +=  $coa_ttl;
                 $sheets->setActiveSheetIndex(0)
-                        ->setCellValue('A'.$ix,  $spasi.$r->coa_kode." - ".$r->coa_nama)
+                        ->setCellValue('A'.$ix,  $spasi.$r->kode." - ".$r->nama)
                         ->setCellValue('B'.$ix,  $coa_ttl);
                         // ->setCellValue('O'.$ix, !empty($row->bln1) ? $row->bln1 : 0);
 

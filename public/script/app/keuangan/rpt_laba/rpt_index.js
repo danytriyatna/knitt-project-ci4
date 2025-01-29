@@ -5,12 +5,15 @@ $(document).ready(function () {
 
 
 
-    $("#btn_cari").on("click", function(){
-        location.href = "/keuangan/laporan_laba?tahun=" + slTahun.val() + "&bulan=" + slBulan.val();
-    });
-
     let btnExcel = $("#btn_excel");
     setTimeout(() => {
+
+      
+      $("#btn_cari").on("click", function(){
+          location.href = "/keuangan/laporan_laba?tahun=" + slTahun.val() + "&bulan=" + slBulan.val();
+      });
+
+
       $("#btn_excel").on("click", function () {
         let s_tahun = slTahun.val();
         let s_bulan = slBulan.val();
@@ -35,5 +38,5 @@ $(document).ready(function () {
           window.open(url, "_blank");
   
       });
-    }, 500);
+    }, 1000);
  });

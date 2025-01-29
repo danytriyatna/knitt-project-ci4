@@ -91,7 +91,7 @@ class Mlaba_rugi extends PrModel
         if(!empty($parent)){
             $builder->where("au.parent_id", $parent);
         }else{
-            $builder->where("ai.id", $coa_id);
+            $builder->where("au.id", $coa_id);
         }
         $builder->where("EXTRACT ( YEAR FROM ay.trans_akun_date )", $tahun);
         $builder->where("EXTRACT ( MONTH FROM ay.trans_akun_date )", $bulan);

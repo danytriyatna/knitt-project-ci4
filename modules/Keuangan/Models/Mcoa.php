@@ -15,7 +15,7 @@ class Mcoa extends PrModel
 
 	public $_data = '';
 
-    function getData($id = null, $offset = null, $limit = null, $order = null, $filters = null, $slc = null, $child = null)
+    function getData($id = null, $offset = null, $limit = null, $order = null, $filters = null, $slc = null, $child = null, $parent = null)
     {
         $builder = $this->db->table($this->table.' a');
         $builder->select("a.id as coa_id, a.kode, a.parent_id, a.level, a.nama,
@@ -36,6 +36,10 @@ class Mcoa extends PrModel
                         $builder->orLike('upper(b.nama)', strtoupper($filters[0]['value']));
                     $builder->groupEnd();
                 }
+            }
+
+            if(!empty($parent)){
+                $builder->where('b.kode', $parent);
             }
 
             if(!empty($slc)){

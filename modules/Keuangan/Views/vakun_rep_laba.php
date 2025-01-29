@@ -61,8 +61,8 @@
                   <div class="col-sm-2">
                     <button id="btn_cari" class="btn btn-primary open_form" type="button"><i class="fa fa-search"></i>
                       Cari</button>
-                      <!-- <button id="btn_excel" class="btn btn-success open_form" type="button"><i class="fa fa-file-excel"></i>
-                      Print</button> -->
+                      <button id="btn_excel" class="btn btn-success open_form" type="button"><i class="fa fa-file-excel"></i>
+                      Print</button>
                   </div>
                   <div hidden class="col-sm-3 offset-sm-6">
                     <div class="input-group">
@@ -79,11 +79,11 @@
                     $total_pengeluaran = 0;
                     $total_pengeluaran_beban = 0;
                     $total_pendapatan += $mlaba->getDataPendapatan(1, $tahun, $bulan);
-                    $total_pendapatan += $mlaba->getDataPendapatan(2, $tahun, $bulan);
+                    $total_pendapatan += 0;//$mlaba->getDataPendapatan(2, $tahun, $bulan);
 
                     $total_pengeluaran += $mlaba->getDataPengeluaran(1, 2, $tahun, $bulan);
-                    $total_pengeluaran += $mlaba->getDataPengeluaran(1, 1, $tahun, $bulan);
-                    $total_pengeluaran += $mlaba->getDataPengeluaran(2, 2, $tahun, $bulan);
+                    $total_pengeluaran += 0;//$mlaba->getDataPengeluaran(1, 1, $tahun, $bulan);
+                    $total_pengeluaran += 0;//$mlaba->getDataPengeluaran(2, 2, $tahun, $bulan);
                     $spasi = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
                   ?>
                   <table style="width:100%;" id="dt-list" class="table table-striped">
@@ -181,5 +181,5 @@
 
 <?= $this->endSection('content'); ?>
 <?= $this->section('script'); ?>
-<script src="<?php echo base_url() ?>/script/modules/keuangan/rpt_laba/rpt_index.js"></script>
+<script src="/script/app/keuangan/rpt_laba/rpt_index.js"></script>
 <?= $this->endSection('script'); ?>
