@@ -86,6 +86,31 @@
     </div>
   </div>
 </div>
+<div id="modal-so" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">List Data Sales Order / Sample</h5>
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12 mb-3">
+            <div class="col-md-4" style="float: right; position: relative; right: 15px;">
+              <div class="homeSearch w-100" style="width: 100%; margin-left: 5%; margin-top: 0;">
+                <input type="text" id="tb-search-so" class="form-control" placeholder="Pencarian . . .">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div id="dt-list-sample" class="table-responsive table-striped"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
 <?= $this->endSection('modal') ?>
 
 <?= $this->section('content'); ?>
@@ -168,6 +193,28 @@
                       </select>
                     </div>
                   </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group row">
+                    <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tipe">Tipe</label>
+                    <div class="col-md-8">
+                      <select id="tipe" name="tipe" class="form-select select2" data-placeholder="-- Pilih Tipe --">
+                        <?php if (!empty($resData->tipe) && $resData->tipe == 2) { ?>
+                          <option value="1">NON CMT</option>
+                          <option selected value="2">CMT</option>
+                        <?php } else { ?>
+                          <option selected value="1">NON CMT</option>
+                          <option value="2">CMT</option>
+                        <?php } ?>
+                      </select>
+                    </div>
+
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <button type="button" class="btn btn-sm btn-info d-none" id="btn-view"> <i class="fa fa-eye"></i></button>
                 </div>
               </div>
             </div>

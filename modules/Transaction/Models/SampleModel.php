@@ -220,7 +220,7 @@ class SampleModel extends \App\Models\PrModel
         $builder->where("abx.id_sample", $idSample);
         $builder->groupBy(array("abx.id", "w1.kode_warna", "w2.kode_warna", "w3.kode_warna", "w4.kode_warna", "w5.kode_warna", "w6.kode_warna", "w7.kode_warna", "w8.kode_warna"));
         $this->_data = $builder->get()->getResult();
-        
+
         $s_data = [];
 
         // foreach ($this->_data as $td) {
@@ -231,37 +231,38 @@ class SampleModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getDataDetailSample_crostab($id){
+    function getDataDetailSample_crostab($id)
+    {
 
-       
+
         // get data ukuran 
-        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['use'] = 1; // ambil ukuran yang digunnakan order 
         $pru['id_sample'] = $id;
         $dtUkuran = $this->getUkuranTrans($pru);
 
         // looping data ukuran
-         // Dynamic Columns
-         $col11 = "";
-         $col12 = "";
-         $col21 = "";
-         $col22 = "";
-         $col3 = "";
-         
-         foreach ($dtUkuran as $item) {
-             $key = $item->key_ukuran;
-             if($key == 'all') $key = 'all_'; 
-             $hrg = $key . '_hrg';
-             $col11 .= ($col11 == "") ? "coalesce(tbl.$key,  0) as $key" : ",coalesce(tbl.$key, 0) as $key";
+        // Dynamic Columns
+        $col11 = "";
+        $col12 = "";
+        $col21 = "";
+        $col22 = "";
+        $col3 = "";
+
+        foreach ($dtUkuran as $item) {
+            $key = $item->key_ukuran;
+            if ($key == 'all') $key = 'all_';
+            $hrg = $key . '_hrg';
+            $col11 .= ($col11 == "") ? "coalesce(tbl.$key,  0) as $key" : ",coalesce(tbl.$key, 0) as $key";
             //  $col12 .= ($col12 == "") ? "coalesce(tbl.$hrg,0) as $hrg" : ",coalesce(tbl.$hrg,0) as $hrg";
 
-             $col21 .= ($col21 == "") ? "$key INT" : ",$key INT";
+            $col21 .= ($col21 == "") ? "$key INT" : ",$key INT";
 
-             $col3 .= ($col3 == "") ? $key : ",".$key;
+            $col3 .= ($col3 == "") ? $key : "," . $key;
             //  $col22 .= ($col22 == "") ? "$hrg Float" : ",$hrg Float";
-         }
+        }
 
-         // crostab query 
-         $sql = "
+        // crostab query 
+        $sql = "
                     SELECT 
                         tbl.id,
                         ROW_NUMBER ( ) OVER ( ORDER BY tbl.id ) AS no,
@@ -319,25 +320,36 @@ class SampleModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getUkuranTrans($params){
+    function getDataSample($kodeSample)
+    {
+        $builder = $this->db->table($this->table);
+        $builder->select("id");
+        $builder->where("kode_sample", $kodeSample);
+
+        $this->_data = $builder->get()->getRow();
+        return $this->_data;
+    }
+
+    function getUkuranTrans($params)
+    {
         $builder = $this->db->table('trans_sample_ukuran tu');
         $builder->select("tu.id_ukuran, rk.key_ukuran, rk.kode_ukuran, tu.id_sample");
 
         $builder->join('trans_sample_det td', 'td.id = tu.id_sample_det', 'inner');
         $builder->join('ref_ukuran rk', 'tu.id_ukuran = rk.id', 'inner');
 
-        if(!empty($params['use'])){
+        if (!empty($params['use'])) {
             $builder->where('(tu.qty is not null and tu.qty > 0)');
         }
-        
-        if(!empty($params['id_sample'])){
+
+        if (!empty($params['id_sample'])) {
             $builder->where('tu.id_sample', $params['id_sample']);
         }
-        
+
         $builder->groupBy("tu.id_ukuran, rk.key_ukuran, rk.kode_ukuran, rk.seq, tu.id_sample");
 
         $builder->orderBy("rk.seq");
-        
+
         $this->_data = $builder->get()->getResult();
         return $this->_data;
     }
@@ -347,20 +359,20 @@ class SampleModel extends \App\Models\PrModel
     {
         $builder = $this->db->table("trans_sample_det" . " abx");
         $builder->where("abx.id_sample", $idSample);
-        
-        if(!empty($params['id_warna_1'])){
+
+        if (!empty($params['id_warna_1'])) {
             $builder->where('id_warna_1', $params['id_warna_1']);
         }
 
-        if(!empty($params['id_warna_2'])){
+        if (!empty($params['id_warna_2'])) {
             $builder->where('id_warna_2', $params['id_warna_2']);
         }
 
-        if(!empty($params['id_warna_3'])){
+        if (!empty($params['id_warna_3'])) {
             $builder->where('id_warna_3', $params['id_warna_3']);
         }
 
-        if(!empty($params['id_warna_4'])){
+        if (!empty($params['id_warna_4'])) {
             $builder->where('id_warna_4', $params['id_warna_4']);
         }
 
@@ -459,7 +471,7 @@ class SampleModel extends \App\Models\PrModel
                     "id_ukuran" => $rowData['id_ukuran'],
                     "qty" => $rowData['qty'],
                     "harga_satuan" => $rowData['harga_satuan'],
-                    "harga_total" =>  $harga_total,//$rowData['harga_total'],
+                    "harga_total" =>  $harga_total, //$rowData['harga_total'],
                     "active" => 1,
                     "created_at" =>  date("Y-m-d H:i:s"),
 
@@ -470,7 +482,7 @@ class SampleModel extends \App\Models\PrModel
                 $this->insertRecordGetid("trans_sample_ukuran", $arrDataUkuran);
             }
 
-            
+
             foreach ($dataGram as $xrow) {
                 $arrDataGram = [
                     "id_sample_det" => $idSampleDet,
@@ -490,10 +502,10 @@ class SampleModel extends \App\Models\PrModel
                 $this->insertRecordGetid("trans_sample_gram", $arrDataGram);
             }
 
-             // update data qty dan total harga 
-             $head_up['qty'] = $head_qty;
-             $head_up['total_harga'] = $head_total;
-             $this->updateRecord($this->table, $head_up, 'id', $dataWarna['id_sample']);
+            // update data qty dan total harga 
+            $head_up['qty'] = $head_qty;
+            $head_up['total_harga'] = $head_total;
+            $this->updateRecord($this->table, $head_up, 'id', $dataWarna['id_sample']);
             $this->db->transComplete();
 
             if ($this->db->transStatus() === TRUE) {
@@ -516,7 +528,7 @@ class SampleModel extends \App\Models\PrModel
             unset($arrData['total_harga']);
             unset($arrData['qty']);
             $this->updateRecord("trans_sample", $arrData, 'id', $id);
-            
+
             if ($arrData['status'] == 1) {
                 $result = $this->getData($id);
                 $arrWorkOrder = [
@@ -551,12 +563,12 @@ class SampleModel extends \App\Models\PrModel
 
                         $woIdDet = $this->insertRecordGetid("trans_walkorder_detail", $detailWorkOrder);
 
-                        
+
 
                         $prgram['id_sample_det'] = $rowData->id;
                         $dtGram = $this->getData_gram(null, 0, 999, null,  null, $prgram);
 
-                        if(!empty($dtGram)){
+                        if (!empty($dtGram)) {
                             foreach ($dtGram as $x) {
                                 $arrWarna = [
                                     'id_walkorder_detail' => $woIdDet,
@@ -573,7 +585,7 @@ class SampleModel extends \App\Models\PrModel
                                 // print_r($x);exit;
                                 $this->insertRecordGetid("trans_walkorder_warna", $arrWarna);
                             }
-                        }else{
+                        } else {
                             for ($i = 0; $i < 8; $i++) {
                                 $field_name = 'id_warna_' . ($i + 1);
                                 if (!empty($rowData->$field_name)) {
@@ -588,8 +600,6 @@ class SampleModel extends \App\Models\PrModel
                         }
                     }
                 }
-
-                
             }
 
             $this->db->transComplete();
@@ -651,7 +661,7 @@ class SampleModel extends \App\Models\PrModel
 
     function getData_gram($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
     {
-        
+
         $builder = $this->db->table("trans_sample_gram tsg");
         $builder->select("tsg.id, tsg.id_sample_det, tsg.qty, tsg.gram,  tsg.gram_nd, tsg.kg, tsg.loss, tsg.kg_loss, tsg.total, rw.kode_warna, tsg.id_warna");
 
@@ -665,7 +675,7 @@ class SampleModel extends \App\Models\PrModel
                 // $builder->groupEnd();
             }
 
-            if(!empty($params['id_sample_det'])){
+            if (!empty($params['id_sample_det'])) {
                 $builder->where('tsg.id_sample_det', $params['id_sample_det']);
             }
 
@@ -694,7 +704,7 @@ class SampleModel extends \App\Models\PrModel
     {
         $builder = $this->db->table("trans_sample_gram tsg");
         $builder->select("count(1) as _cnt");
-        
+
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             // $builder->groupStart();
             // $builder->where('LOWER(abx.kode_sales_order) LIKE', strtolower("%{$filters[0]['value']}%"));

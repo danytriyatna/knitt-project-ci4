@@ -222,37 +222,38 @@ class SalesOrderModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getDataDetailSalesOrder_crostab($id){
+    function getDataDetailSalesOrder_crostab($id)
+    {
 
-       
+
         // get data ukuran 
-        $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+        $pru['use'] = 1; // ambil ukuran yang digunnakan order 
         $pru['id_sales_order'] = $id;
         $dtUkuran = $this->getUkuranTrans($pru);
 
         // looping data ukuran
-         // Dynamic Columns
-         $col11 = "";
-         $col12 = "";
-         $col21 = "";
-         $col22 = "";
-         $col3 = "";
-         
-         foreach ($dtUkuran as $item) {
-             $key = $item->key_ukuran;
-             if($key == 'all') $key = 'all_'; 
-             $hrg = $key . '_hrg';
-             $col11 .= ($col11 == "") ? "coalesce(tbl.$key,  0) as $key" : ",coalesce(tbl.$key, 0) as $key";
+        // Dynamic Columns
+        $col11 = "";
+        $col12 = "";
+        $col21 = "";
+        $col22 = "";
+        $col3 = "";
+
+        foreach ($dtUkuran as $item) {
+            $key = $item->key_ukuran;
+            if ($key == 'all') $key = 'all_';
+            $hrg = $key . '_hrg';
+            $col11 .= ($col11 == "") ? "coalesce(tbl.$key,  0) as $key" : ",coalesce(tbl.$key, 0) as $key";
             //  $col12 .= ($col12 == "") ? "coalesce(tbl.$hrg,0) as $hrg" : ",coalesce(tbl.$hrg,0) as $hrg";
 
-             $col21 .= ($col21 == "") ? "$key INT" : ",$key INT";
+            $col21 .= ($col21 == "") ? "$key INT" : ",$key INT";
 
-             $col3 .= ($col3 == "") ? $key : ",".$key;
+            $col3 .= ($col3 == "") ? $key : "," . $key;
             //  $col22 .= ($col22 == "") ? "$hrg Float" : ",$hrg Float";
-         }
+        }
 
-         // crostab query 
-         $sql = "
+        // crostab query 
+        $sql = "
                     SELECT 
                         tbl.id,
                         ROW_NUMBER ( ) OVER ( ORDER BY tbl.id ) AS no,
@@ -310,25 +311,26 @@ class SalesOrderModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getUkuranTrans($params){
+    function getUkuranTrans($params)
+    {
         $builder = $this->db->table('trans_sales_order_ukuran tu');
         $builder->select("tu.id_ukuran, rk.key_ukuran, rk.kode_ukuran, tu.id_sales_order");
 
         $builder->join('trans_sales_order_det td', 'td.id = tu.id_sales_order_det', 'inner');
         $builder->join('ref_ukuran rk', 'tu.id_ukuran = rk.id', 'inner');
 
-        if(!empty($params['use'])){
+        if (!empty($params['use'])) {
             $builder->where('(tu.qty is not null and tu.qty > 0)');
         }
-        
-        if(!empty($params['id_sales_order'])){
+
+        if (!empty($params['id_sales_order'])) {
             $builder->where('tu.id_sales_order', $params['id_sales_order']);
         }
-        
+
         $builder->groupBy("tu.id_ukuran, rk.key_ukuran, rk.kode_ukuran, rk.seq, tu.id_sales_order");
 
         $builder->orderBy("rk.seq");
-        
+
         $this->_data = $builder->get()->getResult();
         return $this->_data;
     }
@@ -376,7 +378,7 @@ class SalesOrderModel extends \App\Models\PrModel
     {
         $this->db->transStart();
         try {
-            
+
             if (!empty($dataWarna['id'])) {
                 $dataWarna['updated_at'] = date("Y-m-d H:i:s");
                 $this->updateRecord("trans_sales_order_det", $dataWarna, 'id', $dataWarna['id']);
@@ -446,6 +448,16 @@ class SalesOrderModel extends \App\Models\PrModel
         return $this->_data->cnt;
     }
 
+    function getDataSO($kodeSalesOrder)
+    {
+        $builder = $this->db->table($this->table);
+        $builder->select("id");
+        $builder->where("kode_sales_order", $kodeSalesOrder);
+
+        $this->_data = $builder->get()->getRow();
+        return $this->_data;
+    }
+
 
     function generete_kode()
     {
@@ -497,5 +509,4 @@ class SalesOrderModel extends \App\Models\PrModel
         $this->_data = $builder->get()->getRow();
         return $this->_data;
     }
-
 }

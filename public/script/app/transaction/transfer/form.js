@@ -13,11 +13,13 @@ let inpEdit = $('#edit');
 let spanBarang = $('#spanBarang');
 let selectGudangAsal = $('#gudang_asal');
 let selectGudangTujuan = $('#gudang_tujuan');
+let selectTipe = $('#tipe');
 let inpLotNo = $('#lot_no');
 let inpIdLot = $('#id_lot');
 let detailData = $("#data-details").val().replace(/&quot;/ig,'"');
 let btnAdd = $('#btn-add');
 let btnSimpan = $('#btn-simpan');
+let btnView = $('#btn-view');
 let btnApprove = $('#btn-approve');
 let btnSimpanDetail = $('#btn-simpan-det');
 let modalDet = $('#modal-detail-item');
@@ -29,8 +31,14 @@ let inpIdGudangAsal = $('#id_gudang_asal');
 if(inpIdHeader.val().length == 0){
     selectGudangAsal.val("").trigger("change")
     selectGudangTujuan.val("").trigger("change")
+  
 }
 
+    if(selectTipe.val() == 1){
+        btnView.addClass("d-none")
+    } else{
+        btnView.removeClass("d-none")
+    } 
 
 if(inpStatus.val() == 0){
     btnAdd.show()
@@ -140,6 +148,16 @@ if (elSearchBarang != null) {
         }, 600);
     });
 }
+
+let elSearchSO = $("#tb-search-so");
+    if (elSearchSO != null) {
+        elSearchSO.on("keyup", function (e) {
+            if ($(this).val().length < 3 && e.keyCode > 13) {
+                return;
+            }
+            getDetail(elSearchSO.val())
+        });
+    }
 
 
 dtListBarang.on("rowClick", function(e, row){
@@ -297,6 +315,17 @@ inpPrice.keyup(function (e) {
 
 })
 
+
+selectTipe.on("change",function(e){
+    var nilai = e.target.value;
+    if(nilai == 1){
+        btnView.addClass("d-none")
+    } else{
+        btnView.removeClass("d-none")
+    } 
+    
+})
+
 inpQtyItem.keyup(function (e) {
 
     if(inpBarang.val().length === 0){
@@ -432,6 +461,10 @@ btnApprove.on("click",function(e){
 
 btnAdd.click(function(){
     openModalDetail()
+})
+
+btnView.click(function(){
+    $("#modal-so").modal("show")
 })
 
 function checkLotNo(value){
@@ -573,6 +606,57 @@ function openModalDetail(row = null){
  
 }
 
+function getDetail(kodeOrder) {
+    $.ajax({
+        url: `/trans/sales-order/view`,
+        type: 'GET',
+        data:{kodeOrder:kodeOrder},
+        dataType: 'json', 
+        success: function(data) {
+            drawTableRefSO(data.ukuran,data.data)
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching data:', error);
+        }
+    });
+}
+
+function drawTableRefSO(ukuran,detail){
+    let isColumn = [
+        {headerSort: false,title:"No", field:"no",   width: "5%"},
+        {headerSort: false, cssClass: 'text-start', title:"Colour", field:"colordasar"}
+    ]
+
+    for (const el of ukuran) {
+        const isKey = (el.key_ukuran == 'all') ? 'all_' : el.key_ukuran
+        isColumn.push( {headerSort: false,  title:el.kode_ukuran, field: isKey, cssClass: "text-center", hozAlign:"center", width:"7%"} )
+    }
+
+    isColumn.push(
+        {
+            headerSort: false, cssClass: 'text-center', title:"Amount", field:"total_harga",formatter: "money", 
+            formatterParams: {
+                decimal: ",",
+                thousand: ".",
+                symbol: "Rp",  // Simbol mata uang Rupiah
+                precision: 0,   // Tidak ada desimal
+            },
+            hozAlign:"right", cssClass: 'text-end', width:"15%"})
+
+    new Tabulator(`#dt-list-sample`, {
+        data: detail, 
+        layout:"fitColumns",
+        resizableColumnFit:true,
+        pagination: true, 
+        paginationSize: 10,
+        paginationButtonCount: 5,
+        columns: isColumn,
+    });
+
+
+}
+
+
 
 function simpanData(status) {
     $.ajax({
@@ -582,6 +666,7 @@ function simpanData(status) {
             id:inpIdHeader.val(),
             id_gudang_asal:selectGudangAsal.val(),
             id_gudang_tujuan:selectGudangTujuan.val(),
+            tipe:selectTipe.val(),
             tanggal:formatLocaleDate(inpTglReceive.val()),
             data:dtListDetail.getData(),
             keterangan:inpKeterangan.val(),

@@ -136,6 +136,35 @@ class SalesOrder extends BaseController
     return $this->response->setJSON($build_array);
   }
 
+  function view()
+  {
+    $detail = [];
+    $dtUkuran = [];
+    $kodeOrder = $this->request->getGet('kodeOrder');
+
+    $data = $this->mSalesOrder->getDataSO($kodeOrder);
+
+    if (!empty($data)) {
+      $id = !empty($data) ? $data->id : null;
+      $pru['use'] = 1; // ambil ukuran yang digunnakan order 
+      $pru['id_sales_order'] = $id;
+      $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
+      $detail = (!empty($dtUkuran)) ? $this->mSalesOrder->getDataDetailSalesOrder_crostab($id) : [];
+    } else {
+      $data = $this->mSample->getDataSample($kodeOrder);
+      if (!empty($data)) {
+        $id = !empty($data) ? $data->id : null;
+        $pru['use'] = 1; // ambil ukuran yang digunnakan order 
+        $pru['id_sample'] = $id;
+        $dtUkuran = $this->mSample->getUkuranTrans($pru);
+
+        $detail = (!empty($dtUkuran)) ? $this->mSample->getDataDetailSample_crostab($id) : [];
+      }
+    }
+
+    return $this->response->setJSON(array("data" => $detail, "ukuran" => $dtUkuran));
+  }
+
   function detail($id)
   {
     $id = decrypt($id);

@@ -150,6 +150,7 @@ class ItemTransfer extends BaseController
       //     $rowData->id_barang = encrypt($rowData->id_barang);
       // }
 
+
       $this->data['resData'] = $resData;
       $this->data['detail'] = json_encode($resDataDetail);
     }
@@ -176,6 +177,7 @@ class ItemTransfer extends BaseController
     $id_gudang_asal = $this->request->getPost('id_gudang_asal');
     $id_gudang_tujuan = $this->request->getPost('id_gudang_tujuan');
     $keterangan = $this->request->getPost('keterangan');
+    $tipe = $this->request->getPost('tipe');
     $dataDetail = $this->request->getPost('data');
     if ($id != "") {
       $id = decrypt($id);
@@ -187,6 +189,7 @@ class ItemTransfer extends BaseController
       "tanggal" => $tanggal,
       "status" => $statusData,
       "keterangan" => $keterangan,
+      "tipe" => $tipe,
     ];
     if ($id) {
       $dataHeader['updated_at'] = date("Y-m-d H:i:s");

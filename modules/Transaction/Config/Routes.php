@@ -28,6 +28,7 @@ $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Control
   $routes->get('generate', 'Sample::getQrcode');
   $routes->post('getSample', 'SalesOrder::getSampleBuyer');
   $routes->get('print/(:any)', 'SalesOrder::print/$1');
+  $routes->get('view', 'SalesOrder::view');
 });
 
 $routes->group('trans/delivery-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
