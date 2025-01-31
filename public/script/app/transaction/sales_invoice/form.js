@@ -142,6 +142,7 @@ $(document).ready(function () {
                     width: 60, align : 'center', editor:true, formatter:"tickCross", cssClass: 'text-center',
                     cellEdited : function(cell) {
                         let rowData = cell.getRow().getData();
+                        setFooterHarga();
                         // isData(rowData.seq, rowData.bayar);
                     }
                 },
@@ -157,7 +158,7 @@ $(document).ready(function () {
                             detRefKonsumen.val(rowData.konsumen_nama);
                             detStyle.val(rowData.keterangan_style);
                             detAlamat.val("");
-
+                            
                             dtList_detail1.setData(rowData.detail_data);
                             setTimeout(() => {
                                 dtList_detail1.redraw(true)
@@ -257,6 +258,7 @@ $(document).ready(function () {
             // contentType: false,
             // processData: false,
             beforeSend: function () {
+                dtListDetail.setData([]);
                 Swal.fire({
                     title: 'Loading...',
                     allowOutsideClick: false,
@@ -332,7 +334,9 @@ $(document).ready(function () {
         let harga      = 0;
 
         for (const inv of detailList) {
-            harga = harga + inv.totals;
+            if(inv.bayar != undefined){
+                harga = harga + inv.totals;
+            }
         }
 
         let pajak = (harga * ppn) / 100;

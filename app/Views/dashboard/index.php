@@ -23,8 +23,19 @@
             <h6 class="mb-0 f-w-600">PIUTANG PENJUALAN</h6>
           </div>
           <div class="card-body">
+            <div class="row">
+              <div class="col-sm-4 offset-md-8">
+                <div class="form-group">
+                  <div class="input-group mb-3">
+                    <span class="input-group-text bg-white" id="basic-addon11" style="border-right-width: 0px;"><i class="ti-search"></i></span>
+                    <input type="text"id="inp-invoice" class="form-control p-s-0" placeholder="Pencarian" aria-label="Username" aria-describedby="basic-addon11" style="border-left-width: 0px;">
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="table-responsive">
-              <table class="table table-striped">
+              <div class="table-striped"  id="tbl-invoice"></div>
+              <!-- <table class="table table-striped">
                 <thead>
                   <tr>
                     <th>NO. INVOICE</th>
@@ -38,7 +49,7 @@
                 </thead>
                 <tbody>
                 </tbody>
-              </table>
+              </table> -->
             </div>
           </div>
         </div>
@@ -50,8 +61,19 @@
             <h6 class="mb-0 f-w-600">HUTANG PEMBELIAN</h6>
           </div>
           <div class="card-body">
+            <div class="row">
+              <div class="col-sm-4 offset-md-8">
+                <div class="form-group">
+                  <div class="input-group mb-3">
+                    <span class="input-group-text bg-white" id="basic-addon11" style="border-right-width: 0px;"><i class="ti-search"></i></span>
+                    <input type="text"id="inp-po" class="form-control p-s-0" placeholder="Pencarian" aria-label="Username" aria-describedby="basic-addon11" style="border-left-width: 0px;">
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="table-responsive">
-              <table class="table table-striped">
+            <div class="table-striped"  id="tbl-po"></div>
+              <!-- <table class="table table-striped">
                 <thead>
                   <tr>
                     <th>NO. PO</th>
@@ -65,7 +87,7 @@
                 </thead>
                 <tbody>
                 </tbody>
-              </table>
+              </table> -->
             </div>
           </div>
         </div>

@@ -167,20 +167,22 @@
                     </div>
                   </div>
                   <div class="col-sm-6">
-                    <!-- <div class="form-group row">
-                      <label class="control-label text-start text-md-end col-md-4 col-form-label" for="due_date">Due Date</label>
+                    <div class="form-group row">
+                      <label class="control-label text-start text-md-end col-md-4 col-form-label" for="tgl_jatuh_tempo">Tgl Jatuh Tempo</label>
                       <div class="col-md-8">
-                        <input type="text" id="due_date" name="due_date" class="form-control datepicker" placeholder="Pilih due date" value="03 November 2024">
+                        <input <?= ($view_read) ? 'disabled' : '' ?> type="text" id="tgl_jatuh_tempo" name="tgl_jatuh_tempo" class="form-control datepickerx" placeholder="Pilih due date" value="<?= $row->tgl_jatuh_tempo; ?>">
                       </div>
-                    </div> -->
+                    </div>
                   </div>
                 </div>
               </div>
               <div class="col-sm-6">
                 <div class="form-group row">
-                  <label class="control-label text-start text-md-end col-md-2 col-form-label" for="notes_si">Notes</label>
+                  <label class="control-label text-start text-md-end col-md-2 col-form-label" for="keterangan">Notes</label>
                   <div class="col-md-9">
-                    <textarea <?= ($view_read) ? 'disabled' : '' ?> rows="3" id="notes_si" name="notes_si" class="form-control" placeholder="Ketikkan notes">-</textarea>
+                    <textarea <?= ($view_read) ? 'disabled' : '' ?> rows="3" id="keterangan" name="keterangan" class="form-control" placeholder="Ketikkan notes">
+                      <?= !empty($row) ? $row->keterangan : "-"; ?>
+                    </textarea>
                   </div>
                 </div>
               </div>

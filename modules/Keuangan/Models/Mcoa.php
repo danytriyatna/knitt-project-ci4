@@ -7,7 +7,7 @@ use \App\Models\PrModel;
 class Mcoa extends PrModel
 {
 	protected $table                = 'm_coa';
-	protected $primaryKey           = 'coa_id';
+	protected $primaryKey           = 'id';
 	protected $useAutoIncrement     = true;
 	protected $protectFields        = false;
 
