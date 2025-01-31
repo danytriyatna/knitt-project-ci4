@@ -135,4 +135,213 @@ $(document).ready(function () {
     }
 
     // end table tracking order 
+
+
+    // table invoice
+    let dtListInvoice = new Tabulator("#tbl-invoice", {
+        columns: [
+            {
+                title: "NO. INVOICE", field: "btnInv", headerSort: false, formatter: "html",
+                width: 110, hozAlign: 'center', cssClass: 'text-center'
+            }, 
+
+			{
+				title: 'TGL<br>INVOICE', field: 'tgl_invoice', headerSort:false, sorter: 'string',
+				width: 100, formatter : "html", hozAlign: 'center', cssClass: 'text-center'
+			}, 
+				
+			{
+				title: 'BUYER', field: 'nama', headerSort:false, sorter: 'string',
+				width: 120
+			}, 
+
+            {
+				title: 'TGL<br>JATUH<br>TEMPO', field: 'tgl_jatuh_tempo', headerSort:false, sorter: 'string',
+				width: 100, formatter : "html", hozAlign: 'center', cssClass: 'text-center'
+			}, 
+
+            {
+				title: 'NILAI<br>INVOICE', field: 'total_invoice', headerSort:false, sorter: 'string',
+				width: 100, formatter : "money", hozAlign: 'right', cssClass: 'text-end'
+			}, 
+
+            {
+				title: 'PEMBAYARAN', field: 'pembayaran', headerSort:false, sorter: 'string',
+				width: 100, formatter : "money", hozAlign: 'right', cssClass: 'text-end'
+			}, 
+
+            {
+				title: 'SISA', field: 'sisa_bayar', headerSort:false, sorter: 'string',
+				width: 100, formatter : "money", hozAlign: 'right', cssClass: 'text-end'
+			}, 
+
+            
+        ],
+        layout: 'fitColumns',
+        ajaxURL: "/dashboard/list_invoice",
+        placeholder: "Tidak ada data",
+        ajaxConfig: "POST",
+        ajaxSorting: true,
+        ajaxFiltering: false,
+        sortMode: "remote",
+        filterMode: "remote",
+        minHeight: 300,
+        ajaxRequesting: function (url, params) {
+            params.start = params.size * (params.page - 1);
+            params.length = params.size;
+        },
+        ajaxResponse: function (url, params, response) {
+            let pageSize = dtListInvoice.getPageSize();
+            let pageNo = dtListInvoice.getPage();
+            let startRow = (pageSize * (pageNo - 1)) + 1;
+            let endRow = response.data.length + startRow - 1;
+            if (response.data.length === 0) {
+                startRow = 0; endRow = 0;
+            }
+            let recordsFiltered = parseInt(response.recordsFiltered);
+            let recordsTotal = parseInt(response.recordsTotal);
+
+            $("#table-footer-inv .tabulator-startrow").text(startRow);
+            $("#table-footer-inv .tabulator-endrow").text(endRow);
+            $("#table-footer-inv .tabulator-totalrow").text(recordsFiltered);
+
+            let elTotalFilteredRow = $("#table-footer-inv .tabulator-totalfilteredrow");
+            elTotalFilteredRow.text("");
+            if (recordsTotal > recordsFiltered) {
+                elTotalFilteredRow.text(" (disaring dari " + recordsTotal
+                    + " entri keseluruhan)");
+            }
+            return response;
+        },
+        footerElement: '<div id="table-footer-inv" class="pull-left tabulator-info">'
+            + 'Menampilkan <span class="tabulator-startrow"></span> - <span class="tabulator-endrow"></span> dari '
+            + '<span class="tabulator-totalrow"></span> entri<span class="tabulator-totalfilteredrow"></span></div>',
+        pagination: true,
+        paginationMode: "remote",
+        paginationSize: 25,
+        paginationButtonCount: 10,
+        dataSendParams: {
+            sorters: "order"
+        },
+        selectableRows: false,
+    });
+
+    let searchThreadInv = null;
+    let elSearchInv = $("#inp-invoice");
+    if (elSearchInv != null) {
+        elSearchInv.keyup(function (e) {
+            if ($(this).val().length < 3 && e.keyCode > 13) {
+                return;
+            }
+            clearTimeout(searchThreadInv);
+            searchThreadInv = setTimeout(function () {
+                dtListInvoice.setFilter("", "like", elSearchInv.val());
+            }, 600);
+        });
+    }
+    // end table invoice
+
+    // table PO
+    let dtListPo = new Tabulator("#tbl-po", {
+        columns: [
+            {
+                title: "NO. PO", field: "btnPo", headerSort: false, formatter: "html",
+                width: 110, hozAlign: 'center', cssClass: 'text-center'
+            }, 
+
+			{
+				title: 'TGL<br>PO', field: 'po_date', headerSort:false, sorter: 'string',
+				width: 100, formatter : "html", hozAlign: 'center', cssClass: 'text-center'
+			}, 
+				
+			{
+				title: 'BUYER', field: 'nama', headerSort:false, sorter: 'string',
+				width: 120
+			}, 
+
+            {
+				title: 'TGL<br>JATUH<br>TEMPO', field: 'date_exc', headerSort:false, sorter: 'string',
+				width: 100, formatter : "html", hozAlign: 'center', cssClass: 'text-center'
+			}, 
+
+            {
+				title: 'NILAI<br>PO', field: 'total_bayar', headerSort:false, sorter: 'string',
+				width: 100, formatter : "money", hozAlign: 'right', cssClass: 'text-end'
+			}, 
+
+            {
+				title: 'PEMBAYARAN', field: 'dibayar', headerSort:false, sorter: 'string',
+				width: 100, formatter : "money", hozAlign: 'right', cssClass: 'text-end'
+			}, 
+
+            {
+				title: 'SISA', field: 'sisa_bayar', headerSort:false, sorter: 'string',
+				width: 100, formatter : "money", hozAlign: 'right', cssClass: 'text-end'
+			}, 
+
+            
+        ],
+        layout: 'fitColumns',
+        ajaxURL: "/dashboard/list_po",
+        placeholder: "Tidak ada data",
+        ajaxConfig: "POST",
+        ajaxSorting: true,
+        ajaxFiltering: false,
+        sortMode: "remote",
+        filterMode: "remote",
+        minHeight: 300,
+        ajaxRequesting: function (url, params) {
+            params.start = params.size * (params.page - 1);
+            params.length = params.size;
+        },
+        ajaxResponse: function (url, params, response) {
+            let pageSize = dtListPo.getPageSize();
+            let pageNo = dtListPo.getPage();
+            let startRow = (pageSize * (pageNo - 1)) + 1;
+            let endRow = response.data.length + startRow - 1;
+            if (response.data.length === 0) {
+                startRow = 0; endRow = 0;
+            }
+            let recordsFiltered = parseInt(response.recordsFiltered);
+            let recordsTotal = parseInt(response.recordsTotal);
+
+            $("#table-footer-po .tabulator-startrow").text(startRow);
+            $("#table-footer-po .tabulator-endrow").text(endRow);
+            $("#table-footer-po .tabulator-totalrow").text(recordsFiltered);
+
+            let elTotalFilteredRow = $("#table-footer-po .tabulator-totalfilteredrow");
+            elTotalFilteredRow.text("");
+            if (recordsTotal > recordsFiltered) {
+                elTotalFilteredRow.text(" (disaring dari " + recordsTotal
+                    + " entri keseluruhan)");
+            }
+            return response;
+        },
+        footerElement: '<div id="table-footer-po" class="pull-left tabulator-info">'
+            + 'Menampilkan <span class="tabulator-startrow"></span> - <span class="tabulator-endrow"></span> dari '
+            + '<span class="tabulator-totalrow"></span> entri<span class="tabulator-totalfilteredrow"></span></div>',
+        pagination: true,
+        paginationMode: "remote",
+        paginationSize: 25,
+        paginationButtonCount: 10,
+        dataSendParams: {
+            sorters: "order"
+        },
+        selectableRows: false,
+    });
+
+    let searchThreadPo = null;
+    let elSearchPo = $("#inp-po");
+    if (elSearchPo != null) {
+        elSearchPo.keyup(function (e) {
+            if ($(this).val().length < 3 && e.keyCode > 13) {
+                return;
+            }
+            clearTimeout(searchThreadPo);
+            searchThreadPo = setTimeout(function () {
+                dtListPo.setFilter("", "like", elSearchPo.val());
+            }, 600);
+        });
+    }
+    // end table PO
 });

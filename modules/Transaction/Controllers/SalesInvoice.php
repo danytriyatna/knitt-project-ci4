@@ -153,11 +153,14 @@ class SalesInvoice extends BaseController
     $stdData->tgl_si = date('d-m-Y');
     $stdData->tgl_transaksi  = date('d-m-Y');
     $stdData->id_konsumen ='';
-    $stdData->note ='';
+    $stdData->keterangan ='';
     $stdData->tgl_do ='';
     $stdData->ttl_inp ='';
     $stdData->pajak_inp ='';
     $stdData->ttl_harga_inp ='';
+    $stdData->status = 1;
+    $stdData->tgl_jatuh_tempo = date('d-m-Y');
+    $stdData->rentang_waktu = 0;
 
     // variable detail data
     $dt_details = [];
@@ -289,18 +292,23 @@ class SalesInvoice extends BaseController
         $stdData->si_no = trim($this->request->getPost('si_no'));
         $stdData->tgl_si = trim($this->request->getPost('tgl_si'));
         $stdData->id_konsumen = trim($this->request->getPost('select_buyer'));
-        $stdData->note = trim($this->request->getPost('notes_si'));
         $stdData->ttl_inp = trim($this->request->getPost('ttl_inp'));
         $stdData->pajak_inp = trim($this->request->getPost('pajak_inp'));
         $stdData->ttl_harga_inp  = trim($this->request->getPost('ttl_harga_inp'));
+        $stdData->keterangan  = trim($this->request->getPost('keterangan'));
+        $stdData->tgl_jatuh_tempo  = trim($this->request->getPost('tgl_jatuh_tempo'));
+        // $stdData->rentang_waktu  = trim($this->request->getPost('rentang_waktu'));
+
         $dt_details = trim($this->request->getPost('dt_details'));
 
         $dt_details = json_decode($dt_details, true);
 
 
         $data['tgl_transaksi'] = \fdate_ind_to_eng($stdData->tgl_si);
-        $data['keterangan'] = $stdData->note;
+        $data['keterangan'] = $stdData->keterangan;
         $data['id_konsumen'] = $stdData->id_konsumen;
+        $data['tgl_jatuh_tempo'] = \fdate_ind_to_eng($stdData->tgl_jatuh_tempo);
+        $data['rentang_waktu'] = $stdData->rentang_waktu;
 
         $data['total'] = $stdData->ttl_inp;
         $data['pph'] = 11;
@@ -357,7 +365,7 @@ class SalesInvoice extends BaseController
   }
 
   function insert($dataIn, $detail){
-    // dd($detail);
+    
     $tgl = date('Y-m-d H:i:s');
     $userId = $this->get_userid();
 
@@ -367,34 +375,37 @@ class SalesInvoice extends BaseController
 
     $qty = 0;
     if(!empty($detail)){
+      
       $builderx = $this->mInvoice->table($this->mInvoice->table2);
       $builderx->where("id_invoice", $id);
       $builderx->delete();
       foreach ($detail as $item) {
-        $ddata = [];
-        $ddata['id_invoice'] = $id;
-        $ddata['id_ref'] = $item['ref_id'];
-        $ddata['kode_ref'] = $item['ref_kode'];
-        $ddata['tipe_id'] = $item['tipe_id'];
-        // $ddata['qty'] = $item['tipe_id'];
-        $ddata['qty_do'] = $item['deliver_qty'];
-        $ddata['down_payment'] = $item['ref_dp'];
+        if(!empty($item['bayar'])){
+          $ddata = [];
+          $ddata['id_invoice'] = $id;
+          $ddata['id_ref'] = $item['ref_id'];
+          $ddata['kode_ref'] = $item['ref_kode'];
+          $ddata['tipe_id'] = $item['tipe_id'];
+          // $ddata['qty'] = $item['tipe_id'];
+          $ddata['qty_do'] = $item['deliver_qty'];
+          $ddata['down_payment'] = $item['ref_dp'];
 
-        $ddata['total'] = $item['totals'];
-        $ddata['grand_total'] = $item['totals'];
+          $ddata['total'] = $item['totals'];
+          $ddata['grand_total'] = $item['totals'];
 
-        $ddata['created_at'] = $tgl;
-        $ddata['created_by'] = $userId;
-        $id_detail = $this->mInvoice->insertRecordGetid($this->mInvoice->table2,$ddata);
+          $ddata['created_at'] = $tgl;
+          $ddata['created_by'] = $userId;
+          $id_detail = $this->mInvoice->insertRecordGetid($this->mInvoice->table2,$ddata);
 
-        foreach ($item['detail_data'] as $xdetail) {
-          $dddata = [];
-          $dddata['id_invoice'] = $id;
-          $dddata['id_invoice_detail'] = $id_detail;
-          $dddata['id_delivery'] = $xdetail['id_delivery'];
-          $dddata['qty'] = $xdetail['qty_do'];
-          $dddata['total'] = $xdetail['total_harga'];
-          $this->mInvoice->insertRecordGetid($this->mInvoice->table3,$dddata);
+          foreach ($item['detail_data'] as $xdetail) {
+            $dddata = [];
+            $dddata['id_invoice'] = $id;
+            $dddata['id_invoice_detail'] = $id_detail;
+            $dddata['id_delivery'] = $xdetail['id_delivery'];
+            $dddata['qty'] = $xdetail['qty_do'];
+            $dddata['total'] = $xdetail['total_harga'];
+            $this->mInvoice->insertRecordGetid($this->mInvoice->table3,$dddata);
+          }
         }
       }
     }
