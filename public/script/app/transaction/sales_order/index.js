@@ -249,14 +249,16 @@ $(document).ready(function () {
                     <span class="f-w-700 text-muted">`+data.status+`</span>`
 
          aksi = `<button type="button" class="btn btn-sm btn-warning text-dark edit" data-id="${data.id}"> <i class="fa fa-edit"></i> Edit</button>
-                 <button type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>`;
+                 <button type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>
+                 <button type="button" hidden  class="btn btn-sm btn-info print" data-id="${data.id}"> <i class="fa fa-print"></i> Cetak</button>`;
         }else{
          status = ` <i class="fa fa-check-circle text-success m-e-6"></i>
                     <span class="f-w-700 text-success">`+data.status+`</span>`
 
 
         aksi = `<button type="button" class="btn btn-sm btn-warning text-dark edit" data-id="${data.id}"> <i class="fa fa-edit"></i> Edit</button>
-                <button hidden type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>`;
+                <button hidden type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>
+                <button type="button"   class="btn btn-sm btn-info print" data-id="${data.id}"> <i class="fa fa-print"></i> Cetak</button>`;
         }
         
         // HTML Card Layout
@@ -313,6 +315,9 @@ $(document).ready(function () {
                 fileSalesOrder.val('')
                 linkFileSalesOrder.attr('src', "")
                 getDetail(data.id)
+            });
+            document.querySelector(`.print[data-id='${data.id}']`).addEventListener('click', ()=>{
+                window.open(`${baseUrl}/trans/sales-order/print/${data.id}`, "_blank");
             });
             document.querySelector(`.delete[data-id='${data.id}']`).addEventListener('click', ()=>{
                 if (confirm("Anda yakin akan menghapus data?")) {

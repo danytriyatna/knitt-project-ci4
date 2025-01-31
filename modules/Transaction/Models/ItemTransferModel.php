@@ -30,7 +30,7 @@ class ItemTransferModel extends \App\Models\PrModel
         $builder = $this->db->table($this->table . " uk");
         $builder->join($this->tblGudang . " abx", "uk.id_gudang_asal = abx.id", "left");
         $builder->join($this->tblGudang . " bbx", "uk.id_gudang_tujuan = bbx.id", "left");
-        $builder->select("uk.id,uk.tanggal, abx.nama_gudang as gudang_asal, bbx.nama_gudang as gudang_tujuan, uk.id_gudang_tujuan, uk.id_gudang_asal, uk.kode_transaksi, uk.status, uk.tanggal, uk.keterangan");
+        $builder->select("uk.id,uk.tanggal,uk.tipe, abx.nama_gudang as gudang_asal, bbx.nama_gudang as gudang_tujuan, uk.id_gudang_tujuan, uk.id_gudang_asal, uk.kode_transaksi, uk.status, uk.tanggal, uk.keterangan");
 
         if ($id == null or $id == "") {
             $builder->where('uk.active = 1');

@@ -303,12 +303,16 @@ $(document).ready(function () {
     function cardFormatter(cell, formatterParams, onRendered){
         var data = cell.getRow().getData(); // Ambil data row
         let btnAksi = `<button type="button" class="btn btn-sm btn-warning text-dark edit" data-id="${data.id}"> <i class="fa fa-edit"></i> Edit</button>
-                        <button type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>`
+                        <button type="button" class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>
+                         <button type="button" hidden  class="btn btn-sm btn-info print" data-id="${data.id}"> <i class="fa fa-print"></i> Cetak</button>`
         let status = ` <i class="fa fa-dot-circle text-muted m-e-6"></i>
                     <span class="f-w-700 text-muted">`+data.status+`</span>`
-        if(data.status === 'Submit'){
+                    console.log(data.status)
+        if(data.status === 'Submit' || data.status === 'Approval'){
             btnAksi = `<button type="button" class="btn btn-sm btn-warning text-dark edit" data-id="${data.id}"> <i class="fa fa-edit"></i> Edit</button>
-            <button type="button" hidden class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>`
+            <button type="button" hidden class="btn btn-sm btn-danger delete" data-id="${data.id}"> <i class="fa fa-trash"></i> Hapus</button>
+            <button type="button"  class="btn btn-sm btn-info print" data-id="${data.id}"> <i class="fa fa-print"></i> Cetak</button>
+            `
              status = ` <i class="fa fa-check-circle text-success m-e-6"></i>
                     <span class="f-w-700 text-success">`+data.status+`</span>`
         }
@@ -366,6 +370,10 @@ $(document).ready(function () {
                 linkFileSample.attr('src', "")
                 linkFileSample.addClass("d-none")
                 getDetail(data.id)
+            });
+            
+            document.querySelector(`.print[data-id='${data.id}']`).addEventListener('click', ()=>{
+                window.open(`${baseUrl}/trans/sample/print/${data.id}`, "_blank");
             });
             document.querySelector(`.delete[data-id='${data.id}']`).addEventListener('click', ()=>{
                 Swal.fire({

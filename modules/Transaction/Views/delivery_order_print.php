@@ -139,7 +139,7 @@
                             <tbody>
                                 <tr>
                                     <th style="width: 50px;"><small>TGL</small></th>
-                                    <td><?= formatTanggalIndonesia($data->rec_date) ?></td>
+                                    <td><?= formatTanggalIndonesia($data->tgl_transaksi) ?></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -149,7 +149,7 @@
                                     <th><small>KEPADA YTH</small></th>
                                 </tr>
                                 <tr>
-                                    <td><?= $data->nama_vendor ?></td>
+                                    <td><?= $data->konsumen_nama ?></td>
                                 </tr>
                                 <tr>
                                     <td>&nbsp;</td>
@@ -168,19 +168,17 @@
         </table>
     </div>
 
-    <h1 class="uppercase text-lg mb-6 mt-0">RECEIVE ITEM</h1>
-    <p class="uppercase text-md my-0"><span class="d-inline-block" style="width: 152px;">No. Receive</span> : <?= $data->po_no ?></p>
-    <p class="uppercase text-md my-0"><span class="d-inline-block" style="width: 152px;">No. PO</span> : <?= $data->rec_no ?></p>
+    <h1 class="uppercase text-lg mb-6 mt-0">DELIVERY ORDER</h1>
+    <p class="uppercase text-md my-0"><span class="d-inline-block" style="width: 152px;">No. DO</span> : <?= $data->delivery_kode ?></p>
     <br>
 
     <table class="table-bordered w-100">
         <thead>
             <tr>
-                <th class="text-center" style="width: 40px;">No.</th>
-                <th class="text-center" style="width: 45%;">NAMA BARANG</th>
-                <th class="text-center" style="width: 20%;">BANYAKNYA</th>
-                <th class="text-center" style="width: 20%;">HARGA SATUAN</th>
-                <th class="text-center" style="width: 30%;">GUDANG</th>
+                <th class="text-center" style="width: 10px;">No.</th>
+                <th class="text-center" style="width: 40%;">COLOUR</th>
+                <th class="text-center" style="width: 30%;">SIZE</th>
+                <th class="text-center" style="width: 20%;">QTY</th>
             </tr>
         </thead>
         <tbody>
@@ -188,11 +186,10 @@
             foreach ($detail as $row) : ?>
                 <tr>
                     <td><?= $i++ ?></td>
-                    <td><?= $row->nama_barang ?></td>
-                    <td class="text-right"><?= $row->qty ?></td>
-                    <td class="text-right"><?= !empty($row->price) ? "Rp." . number_format(round($row->price)) : "" ?></td>
-                    <td><?= $row->nama_gudang ?></td>
+                    <td><?= $row['kode_warna'] ?></td>
+                    <td><?= $row['kode_ukuran'] ?></td>
 
+                    <td class="text-right"><?= $row['qty'] ?></td>
 
 
                 </tr>

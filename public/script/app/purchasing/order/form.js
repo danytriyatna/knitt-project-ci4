@@ -11,6 +11,7 @@ let inpIdHeader = $('#id_header');
 let inpIdDetail = $('#idDetail');
 let inpQty = $('#qty_item');
 let inpDisc = $('#disc_item');
+let inpKode = $('#kode');
 let inpCheckTax = $('#check_tax');
 let inpUnitPrice = $('#unit_price');
 let spanBarang = $('#spanBarang');
@@ -298,6 +299,7 @@ function openModalDetail(row = null){
         inpIdBarang.val(data.id_barang)
         inpUnit.val(data.nama_unit)
         inpQty.val(data.qty)
+        inpKode.val(data.kode)
         if(data.tax){
             $('input[type=checkbox]').prop('checked',true);
         } else{
@@ -420,6 +422,7 @@ function openModalDetail(row = null){
                 tax_price:taxAfterPrice,
                 disc                 : disc,
                 tax                 : tax,
+                kode                        : inpKode.val(),
                 nama_unit                 : inpUnit.val(),
             });
         } else{
@@ -436,6 +439,7 @@ function openModalDetail(row = null){
                 tax_price                   : taxAfterPrice,
                 disc                        : disc,
                 tax                         : tax,
+                kode                        : inpKode.val(),
                 nama_unit                   : inpUnit.val(),
             });
         }
@@ -614,6 +618,7 @@ let dtListDetailPO = new Tabulator("#dt-list-po", {
         },
         {title:"ITEM CODE", field:"kode_barang",hozAlign:"left", width:"15%"},
         {title:"ITEM DESCRIPTION", field:"nama_barang", hozAlign:"left",width:"20%"},
+        {title:"KODE", field:"kode", hozAlign:"left",width:"20%"},
         {title:"QTY", field:"qty", hozAlign:"center",width:"10%"},
         {title:"UNIT PRICE", field:"price", hozAlign:"right",width:"15%",formatter: "money",formatterParams: {
                 decimal: ",",

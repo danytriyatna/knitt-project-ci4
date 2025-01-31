@@ -33,6 +33,7 @@
             <input type="text" id="qty_item" name="qty_item" class="form-control" placeholder="Ketikkan qty item">
           </div>
         </div>
+
         <div class="form-group row">
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="unit_price">Unit Price</label>
           <div class="col-md-9">
@@ -53,6 +54,12 @@
                 Tax
               </label>
             </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="control-label text-start text-md-end col-md-2 col-form-label" for="kode">Kode</label>
+          <div class="col-md-9">
+            <input type="text" id="kode" name="kode" class="form-control" placeholder="Ketikkan kode">
           </div>
         </div>
       </div>

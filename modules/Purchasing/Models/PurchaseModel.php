@@ -188,6 +188,7 @@ class PurchaseModel extends \App\Models\PrModel
                     "grand_price" => !empty($rowData['grand_price']) ? $rowData['grand_price'] : null,
                     "disc_price" => !empty($rowData['disc_price']) ? $rowData['disc_price'] : null,
                     "tax_price" => !empty($rowData['tax_price']) ? $rowData['tax_price'] : null,
+                    "kode" => !empty($rowData['kode']) ? $rowData['kode'] : null,
                     "id_header" => $id,
                     "qty_receive" => 0,
                     "qty" => $rowData['qty'],

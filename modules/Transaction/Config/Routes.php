@@ -12,6 +12,7 @@ $routes->group('trans/sample', ['namespace' => 'Modules\Transaction\Controllers'
   $routes->get('generate', 'Sample::getQrcode');
   $routes->post('delete/detail', 'Sample::deleteDetailList');
   $routes->post('get-style-konsumen', 'Sample::getDataStyleKonsumen');
+  $routes->get('print/(:any)', 'Sample::print/$1');
 });
 
 $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
@@ -26,6 +27,8 @@ $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Control
   $routes->post('generate', 'SalesOrder::generateQRCode');
   $routes->get('generate', 'Sample::getQrcode');
   $routes->post('getSample', 'SalesOrder::getSampleBuyer');
+  $routes->get('print/(:any)', 'SalesOrder::print/$1');
+  $routes->get('view', 'SalesOrder::view');
 });
 
 $routes->group('trans/delivery-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
@@ -38,6 +41,7 @@ $routes->group('trans/delivery-order', ['namespace' => 'Modules\Transaction\Cont
   $routes->post('form/(:any)', 'DeliveryOrder::form/$1');
   $routes->post('det_produksi', 'DeliveryOrder::getDataProduksi');
   $routes->post('cari_produk', 'DeliveryOrder::getDataProduksiItem');
+  $routes->get('print/(:any)', 'DeliveryOrder::print/$1');
 });
 
 $routes->group('trans/work-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
@@ -72,6 +76,7 @@ $routes->group('trans/sales-invoice', ['namespace' => 'Modules\Transaction\Contr
   $routes->post('form/(:any)', 'SalesInvoice::form/$1');
   $routes->post('get_order', 'SalesInvoice::walkorder_user');
   $routes->post('cari_produk', 'SalesInvoice::getDataProduksiItem');
+  $routes->get('print/(:any)', 'SalesInvoice::print/$1');
 });
 
 $routes->group('trans/customer-receipt', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
