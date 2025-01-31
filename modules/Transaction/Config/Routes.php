@@ -12,6 +12,7 @@ $routes->group('trans/sample', ['namespace' => 'Modules\Transaction\Controllers'
   $routes->get('generate', 'Sample::getQrcode');
   $routes->post('delete/detail', 'Sample::deleteDetailList');
   $routes->post('get-style-konsumen', 'Sample::getDataStyleKonsumen');
+  $routes->get('print/(:any)', 'Sample::print/$1');
 });
 
 $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {
@@ -26,6 +27,7 @@ $routes->group('trans/sales-order', ['namespace' => 'Modules\Transaction\Control
   $routes->post('generate', 'SalesOrder::generateQRCode');
   $routes->get('generate', 'Sample::getQrcode');
   $routes->post('getSample', 'SalesOrder::getSampleBuyer');
+  $routes->get('print/(:any)', 'SalesOrder::print/$1');
 });
 
 $routes->group('trans/delivery-order', ['namespace' => 'Modules\Transaction\Controllers'], static function ($routes) {

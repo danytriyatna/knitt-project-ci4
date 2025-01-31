@@ -3,6 +3,7 @@
 namespace Modules\Transaction\Controllers;
 
 use CodeIgniter\Controller;
+use App\Libraries\DompdfGenerator;
 use App\Controllers\BaseController;
 use Modules\Transaction\Models\SampleModel;
 use Modules\Referensi\Models\KonsumenModel;
@@ -96,7 +97,7 @@ class Sample extends BaseController
 
       // $aktif =  ($row->active) ? "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/deactivate/".$id."' data-confirm-message='Anda yakin ingin menonaktifkan user ini?'><i class='fa fa-check text-success'>&nbsp;</i></a>" :
       //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
-      $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+      $pru['use'] = 1; // ambil ukuran yang digunnakan order 
       $pru['id_sample'] = $row->id;
       $dtUkuran = $this->mSample->getUkuranTrans($pru);
 
@@ -128,7 +129,7 @@ class Sample extends BaseController
     $id = decrypt($id);
     $results = $this->mSample->getData($id);
 
-    $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+    $pru['use'] = 1; // ambil ukuran yang digunnakan order 
     $pru['id_sample'] = $id;
     $dtUkuran = $this->mSample->getUkuranTrans($pru);
 
@@ -157,7 +158,7 @@ class Sample extends BaseController
     );
     return $this->response->setJSON($build_array);
   }
-  
+
 
   function detailQtyUkuran($idSample, $idSampleDet)
   {
@@ -266,7 +267,7 @@ class Sample extends BaseController
       $prm_syle['id_konsumen'] = $idKonsumen;
       $prm_syle['kode_style'] = $style;
       $cek_style = $this->mkonsumen->getDataStyle(0, 0, 1, null, null, $prm_syle);
-      if(empty($cek_style)){
+      if (empty($cek_style)) {
         $in_style['id_konsumen'] = $idKonsumen;
         $in_style['kode_style'] = $style;
         $in_style['keterangan_style'] = $style;
@@ -325,7 +326,7 @@ class Sample extends BaseController
     ];
 
     $res = $this->mSample->trxInsertUpdateRecord($dataWarna, $dataUkuran, $dataGram);
-    
+
     if ($res) {
       $status = true;
       $msg = "Data berhasil disimpan!";
@@ -422,7 +423,8 @@ class Sample extends BaseController
     }
   }
 
-  function getQrcode(){
+  function getQrcode()
+  {
     $ukuran = $this->request->getGet("ukuran");
     $qty = $this->request->getGet("qty");
     $qtyp = $this->request->getGet("qtyp");
@@ -438,8 +440,8 @@ class Sample extends BaseController
 
     /* QR Code File Directory Initialize */
     $dir = 'uploads/media/qrcode/';
-    if (! file_exists($dir)) {
-        mkdir($dir, 0775, true);
+    if (!file_exists($dir)) {
+      mkdir($dir, 0775, true);
     }
 
     /* QR Configuration  */
@@ -462,7 +464,7 @@ class Sample extends BaseController
     ];
 
     /* QR Data  */
-    $params['data']     = $noSample.';'.$ukuran.';'.$warna.';'.$qty; //json_encode($data) ;//base_url() . "/produk/edit/" . encrypt($id);
+    $params['data']     = $noSample . ';' . $ukuran . ';' . $warna . ';' . $qty; //json_encode($data) ;//base_url() . "/produk/edit/" . encrypt($id);
     $params['level']    = 'L';
     $params['size']     = 10;
     $params['savename'] = FCPATH . $config['imagedir'] . $save_name;
@@ -470,18 +472,19 @@ class Sample extends BaseController
     $oks = $this->ciqrcode->generate($params);
 
     /* Return Data */
-    
+
 
     // dd($oks);
     $url = base_url() . "/uploads/media/qrcode/" . $save_name;
-    
+
     $this->data["data"] = $data;
     $this->data["fileName"] = $save_name;
-    return view($this->views.'\vprint_qrcode', $this->data);
+    return view($this->views . '\vprint_qrcode', $this->data);
   }
 
   // fungsi untuk autocomplete 
-  public function getDataStyleKonsumen(){
+  public function getDataStyleKonsumen()
+  {
     $kata_kunci  = $this->request->getPost("kata_kunci");
     $id_konsumen = $this->request->getPost("id_konsumen");
 
@@ -493,18 +496,18 @@ class Sample extends BaseController
       $params['id_konsumen'] = $id_konsumen;
       $params['kata_kunci']  = $kata_kunci;
       $result = $this->mkonsumen->getDataStyle(null, 0, 9999, null, null, $params);
-      if(!empty($result)){
-          foreach ($result as $r) {
-              $isi_slc = [];
-              $isi_slc["id"]    = 0;
-              $isi_slc["idx"]   = 0;
-              $isi_slc["value"] = $r->kode_style;
-              $isi_slc["label"] = $r->keterangan_style;
-              $isi_slc["data"]  = [];
-              $slc[] = $isi_slc;
-          }
-          $status = true;
-          $msg = "Data style ditemukan !";
+      if (!empty($result)) {
+        foreach ($result as $r) {
+          $isi_slc = [];
+          $isi_slc["id"]    = 0;
+          $isi_slc["idx"]   = 0;
+          $isi_slc["value"] = $r->kode_style;
+          $isi_slc["label"] = $r->keterangan_style;
+          $isi_slc["data"]  = [];
+          $slc[] = $isi_slc;
+        }
+        $status = true;
+        $msg = "Data style ditemukan !";
       }
     } catch (\Throwable $th) {
       //throw $th;
@@ -516,5 +519,39 @@ class Sample extends BaseController
     $build_array["data"] = [];
     $build_array["slc"] = $slc;
     return $this->response->setJSON($build_array);
-}
+  }
+
+  public function print($id = null)
+  {
+    if (!$this->auth->loggedIn()) {
+      return redirect()->to('/auth/login');
+    }
+    $dompdf = new DompdfGenerator();
+
+    $this->data['data'] = [];
+    if ($id != "") {
+      $id = decrypt($id);
+      // dd($id);
+      // die;
+      $resData = $this->mSample->getData($id);
+      $pru['use'] = 1; // ambil ukuran yang digunnakan order 
+      $pru['id_sample'] = $id;
+      $dtUkuran = $this->mSample->getUkuranTrans($pru);
+
+      $resDataDetail = (!empty($dtUkuran)) ? $this->mSample->getDataDetailSample_crostab($id) : [];
+      $keysUkuran = !empty($resDataDetail) ? array_keys(get_object_vars($resDataDetail[0])) : [];
+
+      // Tentukan key mana yang merupakan ukuran (filter selain `id`, `no`, `colordasar`, `colour`, dan `total_harga`)
+      $excludeKeys = ["id", "no", "colordasar", "colour", "total_harga"];
+      $ukuranKeysInc = array_values(array_diff($keysUkuran, $excludeKeys));
+
+      $this->data['data'] = !empty($resData) ? $resData : [];
+      $this->data['ukuran'] = !empty($ukuranKeysInc) ? $ukuranKeysInc : [];
+      $this->data['detail'] = !empty($resDataDetail) ? $resDataDetail : [];
+    }
+    $html = view($this->views . '\sample_print', $this->data);
+
+
+    $dompdf->generate($html, 'sample.pdf', true);
+  }
 }

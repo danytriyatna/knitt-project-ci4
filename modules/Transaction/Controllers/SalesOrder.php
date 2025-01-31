@@ -3,6 +3,8 @@
 namespace Modules\Transaction\Controllers;
 
 use CodeIgniter\Controller;
+
+use App\Libraries\DompdfGenerator;
 use App\Controllers\BaseController;
 use Modules\Transaction\Models\SalesOrderModel;
 use Modules\Referensi\Models\KonsumenModel;
@@ -108,7 +110,7 @@ class SalesOrder extends BaseController
 
       $status = $row->status == 1 ? "Draft" : "Approved";
 
-      $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+      $pru['use'] = 1; // ambil ukuran yang digunnakan order 
       $pru['id_sales_order'] = $row->id;
       $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
       $detail = (!empty($dtUkuran)) ? $this->mSalesOrder->getDataDetailSalesOrder_crostab($row->id) : [];
@@ -140,7 +142,7 @@ class SalesOrder extends BaseController
     $results = $this->mSalesOrder->getData($id);
     $status = $results->status == 1 ? "Draft" : "Approved";
 
-    $pru['use'] = 1;// ambil ukuran yang digunnakan order 
+    $pru['use'] = 1; // ambil ukuran yang digunnakan order 
     $pru['id_sales_order'] = $id;
     $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
     $detail = (!empty($dtUkuran)) ? $this->mSalesOrder->getDataDetailSalesOrder_crostab($results->id) : [];
@@ -238,7 +240,7 @@ class SalesOrder extends BaseController
 
         // $this->files->delete(['id' => $fileIdSalesOrderOld]);
       }
-    }else{
+    } else {
       $fileIdSalesOrder = $fileIdSalesOrderOld;
     }
 
@@ -260,23 +262,23 @@ class SalesOrder extends BaseController
 
     // print_r($sampleId != 'null');exit;
 
-    if(!empty($sampleId) && $sampleId != 'null'){
+    if (!empty($sampleId) && $sampleId != 'null') {
       $arr_isi['id_sample'] = $sampleId;
     }
 
-    
+
     $this->db->transBegin();
 
-    if (empty($id)) {  
+    if (empty($id)) {
       $arr_isi['status'] = 1;
       $arr_isi['created_at'] = date("Y-m-d H:i:s");
       $arr_isi['kode_sales_order'] = $this->mSalesOrder->generete_kode();
       // print_r($arr_isi);exit;
       $hid = $this->mSalesOrder->insertRecordGetid($this->mSalesOrder->table, $arr_isi);
 
-      if(!empty($sampleId) && $sampleId != 'null'){
+      if (!empty($sampleId) && $sampleId != 'null') {
         $data_detail = $this->mSample->getDataDetailSample_ori($sampleId);
-        if(!empty($data_detail)){
+        if (!empty($data_detail)) {
 
           $head_qty = 0;
           $head_total = 0;
@@ -296,21 +298,21 @@ class SalesOrder extends BaseController
             ];
             $hidd = $this->mSalesOrder->insertRecordGetid('trans_sales_order_det', $arr_isid);
             $data_details = $this->mSample->getDataDetailSampleUkuran($sampleId, $r->id);
-            if(!empty($data_details)){
-                foreach ($data_details as $rx) {
-                  $arr_isidx = [
-                    'id_sales_order' => $hid,
-                    'id_sales_order_det' => $hidd,
-                    'id_ukuran' => $rx->id_ukuran,
-                    'qty' => $rx->qty,
-                    'harga_satuan' => $rx->harga_satuan,
-                    'harga_total' => $rx->harga_total,
-                  ];
+            if (!empty($data_details)) {
+              foreach ($data_details as $rx) {
+                $arr_isidx = [
+                  'id_sales_order' => $hid,
+                  'id_sales_order_det' => $hidd,
+                  'id_ukuran' => $rx->id_ukuran,
+                  'qty' => $rx->qty,
+                  'harga_satuan' => $rx->harga_satuan,
+                  'harga_total' => $rx->harga_total,
+                ];
 
-                  $head_qty = $head_qty + (!empty($rx->qty)) ? (int) $rx->qty : 0;
-                  $head_total = $head_total + (!empty($rx->harga_total)) ? (float) $rx->harga_total : 0;
-                   $this->mSalesOrder->insertRecordGetid('trans_sales_order_ukuran', $arr_isidx);
-                }
+                $head_qty = $head_qty + (!empty($rx->qty)) ? (int) $rx->qty : 0;
+                $head_total = $head_total + (!empty($rx->harga_total)) ? (float) $rx->harga_total : 0;
+                $this->mSalesOrder->insertRecordGetid('trans_sales_order_ukuran', $arr_isidx);
+              }
             }
           }
 
@@ -319,17 +321,15 @@ class SalesOrder extends BaseController
           $this->mSalesOrder->updateRecord($this->mSalesOrder->table, $head_up, 'id', $hid);
         }
       }
-
-     
     } else {
       $arr_isi['updated_at'] = date("Y-m-d H:i:s");
       $id = decrypt($id);
-      if(!empty($submit_data)){
+      if (!empty($submit_data)) {
         $arr_isi['status'] = 2;
       }
       $this->mSalesOrder->updateRecord($this->mSalesOrder->table, $arr_isi, 'id', $id);
 
-      if(!empty($submit_data)){
+      if (!empty($submit_data)) {
         $allQty = $this->mSalesOrder->getTotal_qty($id, 1);
         $wo_data = [
           'kode_walkorder' => $this->mworkOrder->generete_kode(),
@@ -353,164 +353,141 @@ class SalesOrder extends BaseController
         $data_warna = $this->mSalesOrder->getDataDetailSalesOrder_ori($id);
         // print_r($data_warna);
         // exit;
-        if(!empty($sampleId) && $sampleId != 'null'){
+        if (!empty($sampleId) && $sampleId != 'null') {
 
           $params_wo['tipe_id'] = 1;
           $params_wo['ref_id']  = $sampleId;
           $ref_sample_wo = $this->mworkOrder->getData(null, 0, 1, null, null, $params_wo);
 
-          if(!empty($ref_sample_wo)){
-            
+          if (!empty($ref_sample_wo)) {
+
             // input proses 
             $params_wo['id_walkorder'] = $ref_sample_wo[0]->id;
             $proces_wo = $this->mworkOrder->getData_proses(0, 0, 9999, null, null, $params_wo);
-            
-            if(!empty($proces_wo)){ 
+
+            if (!empty($proces_wo)) {
               foreach ($proces_wo as $pro) {
                 $isiProses = [
                   'id_walkorder' => $wo_id,
                   'id_proses' => $pro->id_proses,
                   'created_at' => date('Y-m-d H:i:s')
                 ];
-          
+
                 $proses_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table3, $isiProses);
               }
             }
 
-            if(!empty($data_warna)){
+            if (!empty($data_warna)) {
               foreach ($data_warna as $xrow) {
-                
+
                 // get detail wo 
                 $prms_sample['id_warna_1'] = $xrow->id_warna_1;
                 // $prms_sample['id_warna_2'] = $xrow->id_warna_2;
-                if(!empty($xrow->id_warna_2)) $prms_sample['id_warna_2'] = $xrow->id_warna_2;
-                if(!empty($xrow->id_warna_3)) $prms_sample['id_warna_3'] = $xrow->id_warna_3;
-                if(!empty($xrow->id_warna_4)) $prms_sample['id_warna_4'] = $xrow->id_warna_4;
+                if (!empty($xrow->id_warna_2)) $prms_sample['id_warna_2'] = $xrow->id_warna_2;
+                if (!empty($xrow->id_warna_3)) $prms_sample['id_warna_3'] = $xrow->id_warna_3;
+                if (!empty($xrow->id_warna_4)) $prms_sample['id_warna_4'] = $xrow->id_warna_4;
                 $data_detail = $this->mSample->getDataDetailSample_ori($sampleId, $prms_sample);
-               
-                  if(!empty($data_detail)){
-                    $params_wod['ref_detail_id'] = $data_detail[0]->id;
-                    $params_wod['tipe_id'] = 1;
-                    $params_wod['id_walkorder']  = $ref_sample_wo[0]->id;
-                    $data_detail_wo = $this->mworkOrder->getData_detail(null, 0, 1, null, null, $params_wod);
 
-                    // $prgram['id_sample_det'] = $data_detail[0]->id;
-                    // $dtGram = $this->mSample->getData_gram(null, 0, 9999, null,  null, $prgram);
-                  
-                    if(!empty($data_detail_wo)){
-                        
-                        $qty_wodet =  $this->mSalesOrder->getTotal_qty($xrow->id, 2);
+                if (!empty($data_detail)) {
+                  $params_wod['ref_detail_id'] = $data_detail[0]->id;
+                  $params_wod['tipe_id'] = 1;
+                  $params_wod['id_walkorder']  = $ref_sample_wo[0]->id;
+                  $data_detail_wo = $this->mworkOrder->getData_detail(null, 0, 1, null, null, $params_wod);
 
-                        $gram = 0;
-                        $gram_nd = 0;
-                        $kg = 0;
-                        $loss = 0;
-                        $kg_loss = 0;
-                        $total = 0;
-                        $kuota = 0;
-                        $kuota_tambah = 0;
+                  // $prgram['id_sample_det'] = $data_detail[0]->id;
+                  // $dtGram = $this->mSample->getData_gram(null, 0, 9999, null,  null, $prgram);
 
-                        if(!empty($data_detail_wo[0]->gram)){
-                          $gram = $data_detail_wo[0]->gram;
-                          $gram_nd = $gram * $qty_wodet; 
-                          $kg = $gram_nd / 1000;
-                          $loss = $data_detail_wo[0]->loss;
-                          $kg_loss = ($kg * $loss) / 100; 
-                          $total = $kg +  $kg_loss;
+                  if (!empty($data_detail_wo)) {
 
-                          $kuota = $data_detail_wo[0]->kuota;
-                          $kuota_tambah = $kuota - $total;
+                    $qty_wodet =  $this->mSalesOrder->getTotal_qty($xrow->id, 2);
+
+                    $gram = 0;
+                    $gram_nd = 0;
+                    $kg = 0;
+                    $loss = 0;
+                    $kg_loss = 0;
+                    $total = 0;
+                    $kuota = 0;
+                    $kuota_tambah = 0;
+
+                    if (!empty($data_detail_wo[0]->gram)) {
+                      $gram = $data_detail_wo[0]->gram;
+                      $gram_nd = $gram * $qty_wodet;
+                      $kg = $gram_nd / 1000;
+                      $loss = $data_detail_wo[0]->loss;
+                      $kg_loss = ($kg * $loss) / 100;
+                      $total = $kg +  $kg_loss;
+
+                      $kuota = $data_detail_wo[0]->kuota;
+                      $kuota_tambah = $kuota - $total;
+                    }
+
+                    $detail_wo = [
+                      'id_walkorder' => $wo_id,
+                      'ref_detail_id' => $xrow->id,
+                      'qty' => $qty_wodet,
+                      'tipe_id' => 2,
+                      'gram'         => $gram,
+                      'gram_nd'      => $gram_nd,
+                      'kg'           => $kg,
+                      'loss'         => $loss,
+                      'kg_loss'      => $kg_loss,
+                      'total'        => $total,
+                      'kuota'        => $kuota,
+                      'kuota_tambah' => $kuota_tambah,
+                      'created_at' => date("Y-m-d H:i:s")
+                    ];
+
+                    $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
+
+                    for ($i = 0; $i < 8; $i++) {
+                      $field_name = 'id_warna_' . ($i + 1);
+                      if (!empty($xrow->$field_name)) {
+
+                        $params_d['id_walkorder_detail'] = $data_detail_wo[0]->id;
+                        $params_d['id_warna'] = $xrow->$field_name;
+                        $data_detail = $this->mworkOrder->getData_warna(null, 0, 1, null, null, $params_d);
+
+                        $xgram = 0;
+                        $xgram_nd = 0;
+                        $xkg = 0;
+                        $xloss = 0;
+                        $xkg_loss = 0;
+                        $xtotal = 0;
+                        $xkuota = 0;
+                        $xkuota_tambah = 0;
+
+                        if (!empty($data_detail[0]->gram)) {
+                          $xgram = $data_detail[0]->gram;
+                          $xgram_nd = $xgram * $qty_wodet;
+                          $xkg = $xgram_nd / 1000;
+                          $xloss = $data_detail[0]->loss;
+                          $xkg_loss = ($xkg * $xloss) / 100;
+                          $xtotal = $xkg +  $xkg_loss;
+
+                          $xkuota = $data_detail[0]->kuota;
+                          $xkuota_tambah = $xkuota - $xtotal;
                         }
-                        
-                        $detail_wo = [
-                          'id_walkorder' => $wo_id,
-                          'ref_detail_id' => $xrow->id,
-                          'qty' => $qty_wodet,
-                          'tipe_id' => 2,
-                          'gram'         => $gram,
-                          'gram_nd'      => $gram_nd,
-                          'kg'           => $kg,
-                          'loss'         => $loss,
-                          'kg_loss'      => $kg_loss,
-                          'total'        => $total,
-                          'kuota'        => $kuota,
-                          'kuota_tambah' => $kuota_tambah,
+
+                        $isi_warna = [
+                          'id_walkorder_detail' => $wo_det_id,
+                          'id_warna' => $xrow->$field_name,
+                          'persen'       => $data_detail[0]->persen,
+                          'gram'         => $xgram,
+                          'gram_nd'      => $xgram_nd,
+                          'kg'           => $xkg,
+                          'kg_loss'      => $xkg_loss,
+                          'total'        => $xtotal,
+                          'kuota'        => $xkuota,
+                          'kuota_tambah' => $xkuota_tambah,
+                          'loss'         => $xloss,
                           'created_at' => date("Y-m-d H:i:s")
                         ];
-                      
-                        $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
-        
-                        for ($i=0; $i < 8 ; $i++) { 
-                          $field_name = 'id_warna_' . ($i + 1);
-                          if(!empty($xrow->$field_name)){
 
-                            $params_d['id_walkorder_detail'] = $data_detail_wo[0]->id;
-                            $params_d['id_warna'] = $xrow->$field_name;
-                            $data_detail = $this->mworkOrder->getData_warna(null, 0, 1, null, null, $params_d);
-
-                            $xgram = 0;
-                            $xgram_nd = 0;
-                            $xkg = 0;
-                            $xloss = 0;
-                            $xkg_loss = 0;
-                            $xtotal = 0;
-                            $xkuota = 0;
-                            $xkuota_tambah = 0;
-
-                            if(!empty($data_detail[0]->gram)){
-                              $xgram = $data_detail[0]->gram;
-                              $xgram_nd = $xgram * $qty_wodet; 
-                              $xkg = $xgram_nd / 1000;
-                              $xloss = $data_detail[0]->loss;
-                              $xkg_loss = ($xkg * $xloss) / 100; 
-                              $xtotal = $xkg +  $xkg_loss;
-
-                              $xkuota = $data_detail[0]->kuota;
-                              $xkuota_tambah = $xkuota - $xtotal;
-                            }
-
-                            $isi_warna = [
-                              'id_walkorder_detail' => $wo_det_id,
-                              'id_warna' => $xrow->$field_name,
-                              'persen'       => $data_detail[0]->persen,
-                              'gram'         => $xgram,
-                              'gram_nd'      => $xgram_nd,
-                              'kg'           => $xkg,
-                              'kg_loss'      => $xkg_loss,
-                              'total'        => $xtotal,
-                              'kuota'        => $xkuota,
-                              'kuota_tambah' => $xkuota_tambah,
-                              'loss'         => $xloss,
-                              'created_at' => date("Y-m-d H:i:s")
-                            ];
-                            
-                            $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
-                          }
-                        }
-                    }else{
-                      $detail_wo = [
-                        'id_walkorder' => $wo_id,
-                        'ref_detail_id' => $xrow->id,
-                        'qty' => $this->mSalesOrder->getTotal_qty($xrow->id, 2),
-                        'tipe_id' => 2,
-                        'created_at' => date("Y-m-d H:i:s")
-                      ];
-      
-                      $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
-      
-                      for ($i=0; $i < 8 ; $i++) { 
-                        $field_name = 'id_warna_' . ($i + 1);
-                        if(!empty($xrow->$field_name)){
-                          $isi_warna = [
-                            'id_walkorder_detail' => $wo_det_id,
-                            'id_warna' => $xrow->$field_name,
-                            'created_at' => date("Y-m-d H:i:s")
-                          ];
-                          $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
-                        }
+                        $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
                       }
                     }
-                  }else{
+                  } else {
                     $detail_wo = [
                       'id_walkorder' => $wo_id,
                       'ref_detail_id' => $xrow->id,
@@ -518,12 +495,12 @@ class SalesOrder extends BaseController
                       'tipe_id' => 2,
                       'created_at' => date("Y-m-d H:i:s")
                     ];
-    
+
                     $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
-    
-                    for ($i=0; $i < 8 ; $i++) { 
+
+                    for ($i = 0; $i < 8; $i++) {
                       $field_name = 'id_warna_' . ($i + 1);
-                      if(!empty($xrow->$field_name)){
+                      if (!empty($xrow->$field_name)) {
                         $isi_warna = [
                           'id_walkorder_detail' => $wo_det_id,
                           'id_warna' => $xrow->$field_name,
@@ -533,48 +510,68 @@ class SalesOrder extends BaseController
                       }
                     }
                   }
-               
-              }
-          }
-          }
-        }else{
-          if(!empty($data_warna)){
-              foreach ($data_warna as $xrow) {
-                $detail_wo = [
-                  'id_walkorder' => $wo_id,
-                  'ref_detail_id' => $xrow->id,
-                  'qty' => $this->mSalesOrder->getTotal_qty($xrow->id, 2),
-                  'tipe_id' => 2,
-                  'created_at' => date("Y-m-d H:i:s")
-                ];
+                } else {
+                  $detail_wo = [
+                    'id_walkorder' => $wo_id,
+                    'ref_detail_id' => $xrow->id,
+                    'qty' => $this->mSalesOrder->getTotal_qty($xrow->id, 2),
+                    'tipe_id' => 2,
+                    'created_at' => date("Y-m-d H:i:s")
+                  ];
 
-                $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
+                  $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
 
-                for ($i=0; $i < 8 ; $i++) { 
-                  $field_name = 'id_warna_' . ($i + 1);
-                  if(!empty($xrow->$field_name)){
-                    $isi_warna = [
-                      'id_walkorder_detail' => $wo_det_id,
-                      'id_warna' => $xrow->$field_name,
-                      'created_at' => date("Y-m-d H:i:s")
-                    ];
-                    $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
+                  for ($i = 0; $i < 8; $i++) {
+                    $field_name = 'id_warna_' . ($i + 1);
+                    if (!empty($xrow->$field_name)) {
+                      $isi_warna = [
+                        'id_walkorder_detail' => $wo_det_id,
+                        'id_warna' => $xrow->$field_name,
+                        'created_at' => date("Y-m-d H:i:s")
+                      ];
+                      $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
+                    }
                   }
                 }
               }
+            }
+          }
+        } else {
+          if (!empty($data_warna)) {
+            foreach ($data_warna as $xrow) {
+              $detail_wo = [
+                'id_walkorder' => $wo_id,
+                'ref_detail_id' => $xrow->id,
+                'qty' => $this->mSalesOrder->getTotal_qty($xrow->id, 2),
+                'tipe_id' => 2,
+                'created_at' => date("Y-m-d H:i:s")
+              ];
+
+              $wo_det_id = $this->mworkOrder->insertRecordGetid($this->mworkOrder->table2, $detail_wo);
+
+              for ($i = 0; $i < 8; $i++) {
+                $field_name = 'id_warna_' . ($i + 1);
+                if (!empty($xrow->$field_name)) {
+                  $isi_warna = [
+                    'id_walkorder_detail' => $wo_det_id,
+                    'id_warna' => $xrow->$field_name,
+                    'created_at' => date("Y-m-d H:i:s")
+                  ];
+                  $this->mworkOrder->insertRecordGetid($this->mworkOrder->table5, $isi_warna);
+                }
+              }
+            }
           }
         }
-        
-        
       }
     }
 
     if ($this->db->transStatus() === FALSE) {
-        $this->db->transRollback();
+      $this->db->transRollback();
     } else {
-        $this->db->transCommit();
-        $msg    = "Data berhasil ditambahkan !";
-        $status = true;
+      $this->db->transCommit();
+      $msg    = "Data berhasil ditambahkan !";
+      $status = true;
     }
 
     $build_array['message'] = $msg;
@@ -674,19 +671,20 @@ class SalesOrder extends BaseController
     return $this->response->setJSON($build_array);
   }
 
-  public function getSampleBuyer(){
+  public function getSampleBuyer()
+  {
     $buyerId = $this->request->getPost("buyers");
 
     $msg = "Gagal mengambil data sample !";
     $status = false;
     $data = [];
 
-    if(!empty($buyerId)){
+    if (!empty($buyerId)) {
       $params = [
         'id_konsumen' => $buyerId
       ];
       $data_sample = $this->mSample->getData(0, 0, 99999, null, null, $params);
-      if(!empty($data_sample)){
+      if (!empty($data_sample)) {
         $msg = "Berhasil mengambil data sample !";
         $status = true;
         $data = $data_sample;
@@ -708,7 +706,7 @@ class SalesOrder extends BaseController
     }
     $data = json_decode((string)$data);
     $resData = $this->mSalesOrder->getDataDetailSalesOrderUkuranById($data->id);
-    
+
     try {
 
       $writer = new PngWriter();
@@ -744,7 +742,8 @@ class SalesOrder extends BaseController
     // echo $result->getString();
   }
 
-  function getQrcode(){
+  function getQrcode()
+  {
     $ukuran = $this->request->getGet("ukuran");
     $qty = $this->request->getGet("qty");
     $qtyp = $this->request->getGet("qtyp");
@@ -760,8 +759,8 @@ class SalesOrder extends BaseController
 
     /* QR Code File Directory Initialize */
     $dir = 'uploads/media/qrcode/';
-    if (! file_exists($dir)) {
-        mkdir($dir, 0775, true);
+    if (!file_exists($dir)) {
+      mkdir($dir, 0775, true);
     }
 
     /* QR Configuration  */
@@ -784,7 +783,7 @@ class SalesOrder extends BaseController
     ];
 
     /* QR Data  */
-    $params['data']     = $noSample.';'.$ukuran.';'.$warna.';'.$qty; //json_encode($data) ;//base_url() . "/produk/edit/" . encrypt($id);
+    $params['data']     = $noSample . ';' . $ukuran . ';' . $warna . ';' . $qty; //json_encode($data) ;//base_url() . "/produk/edit/" . encrypt($id);
     $params['level']    = 'L';
     $params['size']     = 10;
     $params['savename'] = FCPATH . $config['imagedir'] . $save_name;
@@ -792,14 +791,47 @@ class SalesOrder extends BaseController
     $oks = $this->ciqrcode->generate($params);
 
     /* Return Data */
-    
+
 
     // dd($oks);
     $url = base_url() . "/uploads/media/qrcode/" . $save_name;
-    
+
     $this->data["data"] = $data;
     $this->data["fileName"] = $save_name;
-    return view($this->views.'\vprint_qrcode', $this->data);
+    return view($this->views . '\vprint_qrcode', $this->data);
   }
 
+  public function print($id = null)
+  {
+    if (!$this->auth->loggedIn()) {
+      return redirect()->to('/auth/login');
+    }
+    $dompdf = new DompdfGenerator();
+
+    $this->data['data'] = [];
+    if ($id != "") {
+      $id = decrypt($id);
+      // dd($id);
+      // die;
+      $resData = $this->mSalesOrder->getData($id);
+      $pru['use'] = 1; // ambil ukuran yang digunnakan order 
+      $pru['id_sales_order'] = $id;
+      $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
+
+      $resDataDetail = (!empty($dtUkuran)) ? $this->mSalesOrder->getDataDetailSalesOrder_crostab($id) : [];
+      $keysUkuran = !empty($resDataDetail) ? array_keys(get_object_vars($resDataDetail[0])) : [];
+
+      // Tentukan key mana yang merupakan ukuran (filter selain `id`, `no`, `colordasar`, `colour`, dan `total_harga`)
+      $excludeKeys = ["id", "no", "colordasar", "colour", "total_harga"];
+      $ukuranKeysInc = array_values(array_diff($keysUkuran, $excludeKeys));
+
+      $this->data['data'] = !empty($resData) ? $resData : [];
+      $this->data['ukuran'] = !empty($ukuranKeysInc) ? $ukuranKeysInc : [];
+      $this->data['detail'] = !empty($resDataDetail) ? $resDataDetail : [];
+    }
+    $html = view($this->views . '\sales_order_print', $this->data);
+
+
+    $dompdf->generate($html, 'sales_order.pdf', true);
+  }
 }
