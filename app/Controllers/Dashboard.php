@@ -115,5 +115,123 @@ class Dashboard extends BaseController
       
       return $this->response->setJSON($build_array);
   }
+
+  public function lists_inv()
+  {
+      $start   = $this->request->getPost('start');
+      $limit   = $this->request->getPost('length');
+      $filters = $this->request->getPost('filter');
+      $order   = $this->request->getPost('order');
+      // $tahun   = $this->request->getPost('tahun');
+
+      // $params['tahun'] = $tahun;
+      $params = [];
+      $results = $this->mdashboard->getDataInv(null, $start, $limit, $order, $filters, $params);
+      $totalfiltered = $this->mdashboard->getDataInvCnt($filters, $params);
+      $totaldata = $this->mdashboard->getDataInvCnt(null, $params);
+      $maxpage = ceil($totalfiltered / $limit);
+      $build_array = array(
+          "last_page" => $maxpage,
+          "recordsTotal" => $totaldata,
+          "recordsFiltered" => $totalfiltered,
+          "data" => array()
+      );
+
+      foreach ($results as $row) {
+          $id = encrypt($row->id);
+
+          $btnInv = "";
+          
+          $link_inv = base_url() . "/trans/sales-invoice/form/" . $id;
+          $btnInv = "<a class='btn btn-sm btn-primary' target='_blank' href=".$link_inv." > ".$row->kode_invoice." </a>";
+
+          
+          $tgl_invoice = "";
+          if(!empty($row->tgl_invoice)){
+              $tgl_invoice = fdate_eng_to_ind($row->tgl_invoice);
+          }
+
+          $tgl_jatuh_tempo = "";
+          if(!empty($row->tgl_jatuh_tempo)){
+              $tgl_jatuh_tempo = fdate_eng_to_ind($row->tgl_jatuh_tempo);
+          }
+
+          $sisa_bayar = (float) $row->total_invoice - (float) $row->pembayaran;
+
+          
+          
+          array_push($build_array['data'], array(
+              'btnInv' => $btnInv,
+              'tgl_invoice' => $tgl_invoice,
+              'nama' => $row->nama,
+              'tgl_jatuh_tempo' => $tgl_jatuh_tempo,
+              'total_invoice' => $row->total_invoice,
+              'pembayaran' => $row->pembayaran,
+              'sisa_bayar' => $sisa_bayar,
+          ));
+
+      }
+      
+      return $this->response->setJSON($build_array);
+  }
+
+  public function lists_po()
+  {
+      $start   = $this->request->getPost('start');
+      $limit   = $this->request->getPost('length');
+      $filters = $this->request->getPost('filter');
+      $order   = $this->request->getPost('order');
+      // $tahun   = $this->request->getPost('tahun');
+
+      // $params['tahun'] = $tahun;
+      $params = [];
+      $results = $this->mdashboard->getDataPo(null, $start, $limit, $order, $filters, $params);
+      $totalfiltered = $this->mdashboard->getDataPoCnt($filters, $params);
+      $totaldata = $this->mdashboard->getDataPoCnt(null, $params);
+      $maxpage = ceil($totalfiltered / $limit);
+      $build_array = array(
+          "last_page" => $maxpage,
+          "recordsTotal" => $totaldata,
+          "recordsFiltered" => $totalfiltered,
+          "data" => array()
+      );
+
+      foreach ($results as $row) {
+          $id = encrypt($row->id);
+
+          $btnPo = "";
+          
+          $link_Po = base_url() . "/purchasing/purchase-order/form//" . $id;
+          $btnPo = "<a class='btn btn-sm btn-primary' target='_blank' href=".$link_Po." > ".$row->po_no." </a>";
+
+          
+          $po_date = "";
+          if(!empty($row->po_date)){
+              $po_date = fdate_eng_to_ind($row->po_date);
+          }
+
+          $date_exc = "";
+          if(!empty($row->date_exc)){
+              $date_exc = fdate_eng_to_ind($row->date_exc);
+          }
+
+          $sisa_bayar = (float) $row->total_bayar - (float) $row->dibayar;
+
+          
+          
+          array_push($build_array['data'], array(
+              'btnPo' => $btnPo,
+              'po_date' => $po_date,
+              'nama' => $row->nama,
+              'date_exc' => $date_exc,
+              'total_bayar' => $row->total_bayar,
+              'dibayar' => $row->dibayar,
+              'sisa_bayar' => $sisa_bayar,
+          ));
+
+      }
+      
+      return $this->response->setJSON($build_array);
+  }
     
 }

@@ -70,4 +70,139 @@ class Mdashboard extends Model
         return $this->_data;
     }
 
+
+
+    function getDataInv($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
+    {
+        $builder = $this->db->table("trans_invoice ti");
+
+        $builder->select(" ti.id, ti.kode_invoice, ti.tgl_transaksi as tgl_invoice, rk.nama, ti.tgl_jatuh_tempo,  ti.grand_total as total_invoice,
+                           COALESCE((select sum(xc.pay_item) from trans_customer_receipt_detail xc where xc.id_invoice = ti.id), 0) as pembayaran");
+
+        $builder->join("ref_konsumen rk", "rk.id = ti.id_konsumen", "left");
+
+        if ($id == null or $id == "") {
+            
+            if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+                $builder->groupStart();
+                    $builder->where('LOWER(ti.kode_invoice) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(ti.tgl_transaksi) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(rk.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(ti.tgl_jatuh_tempo) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->groupEnd();
+            }
+
+            $builder->where("ti.grand_total > COALESCE((select sum(xc.pay_item) from trans_customer_receipt_detail xc where xc.id_invoice = ti.id), 0)"); // kondisi untuk invoice yang belum lunas
+
+            if (!empty($order)) {
+                $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
+            } else {
+                $builder->orderBy("ti.tgl_jatuh_tempo asc");
+            }
+
+            if (empty($offset)) $offset = 0;
+            if (empty($limit)) $limit = 10;
+
+            $builder->limit($limit, $offset);
+
+            $this->_data = $builder->get()->getResult();
+        } else {
+            $builder->where("ti.id", $id);
+
+            $this->_data = $builder->get()->getRow();
+        }
+
+        return $this->_data;
+    }
+
+    function getDataInvCnt($filters = null, $params = null)
+    {
+        $builder = $this->db->table("trans_invoice ti");
+
+        $builder->select("count(1) as _cnt");
+
+        $builder->join("ref_konsumen rk", "rk.id = ti.id_konsumen", "left");
+
+        if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+            $builder->groupStart();
+                $builder->where('LOWER(ti.kode_invoice) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(ti.tgl_transaksi) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(rk.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(ti.tgl_jatuh_tempo) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->groupEnd();
+        }
+
+        $builder->where("ti.grand_total > (select sum(xc.pay_item) from trans_customer_receipt_detail xc where xc.id_invoice = ti.id)"); // kondisi untuk invoice yang belum lunas
+
+        $this->_data = $builder->get()->getRow()->_cnt;
+
+        return $this->_data;
+    }
+
+    function getDataPo($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
+    {
+        $builder = $this->db->table("trans_po_header ph");
+
+        $builder->select(" ph.id, ph.po_no, ph.po_date as tgl_po, rv.nama, ph.date_exc, ph.total as total_bayar,
+                           (SELECT sum(tpo.total_bayar) from trans_po_pembayaran_detail tpo where tpo.id_header = ph.id) as dibayar");
+
+        $builder->join("ref_vendor rv", "rv.id = ph.id_vendor", "left");
+
+        if ($id == null or $id == "") {
+            
+            if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+                $builder->groupStart();
+                    $builder->where('LOWER(ph.kode_invoice) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(ph.tgl_transaksi) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(rv.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(ph.tgl_jatuh_tempo) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->groupEnd();
+            }
+
+            $builder->where("ph.total > (SELECT sum(tpo.total_bayar) from trans_po_pembayaran_detail tpo where tpo.id_header = ph.id)"); // kondisi untuk PO yang belum lunas
+
+            if (!empty($order)) {
+                $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
+            } else {
+                $builder->orderBy("ph.date_exc asc");
+            }
+
+            if (empty($offset)) $offset = 0;
+            if (empty($limit)) $limit = 10;
+
+            $builder->limit($limit, $offset);
+
+            $this->_data = $builder->get()->getResult();
+        } else {
+            $builder->where("ph.id", $id);
+
+            $this->_data = $builder->get()->getRow();
+        }
+
+        return $this->_data;
+    }
+
+    function getDataPoCnt($filters = null, $params = null)
+    {
+        $builder = $this->db->table("trans_po_header ph");
+
+        $builder->select("count(1) as _cnt");
+
+        $builder->join("ref_vendor rv", "rv.id = ph.id_vendor", "left");
+
+        if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+            $builder->groupStart();
+                $builder->where('LOWER(ph.kode_invoice) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(ph.tgl_transaksi) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(rv.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->orWhere('LOWER(ph.tgl_jatuh_tempo) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->groupEnd();
+        }
+
+        $builder->where("ph.total > (SELECT sum(tpo.total_bayar) from trans_po_pembayaran_detail tpo where tpo.id_header = ph.id)"); // kondisi untuk PO yang belum lunas
+
+        $this->_data = $builder->get()->getRow()->_cnt;
+
+        return $this->_data;
+    }
 }

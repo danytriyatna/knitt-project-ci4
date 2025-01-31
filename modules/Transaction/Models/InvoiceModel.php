@@ -22,7 +22,7 @@ class InvoiceModel extends \App\Models\PrModel
 
         $builder->select("abx.id, abx.tgl_transaksi,  abx.kode_invoice, abx.keterangan, abx.id_konsumen,
                             abx.status, abx.total, abx.diskon,  abx.pph, abx.pph_total, abx.grand_total,
-                            bbx.nama as konsumen_nama");
+                            bbx.nama as konsumen_nama, abx.tgl_jatuh_tempo, abx.rentang_waktu");
 
         $builder->join("ref_konsumen bbx", "abx.id_konsumen = bbx.id", "inner");
 

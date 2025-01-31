@@ -20,7 +20,7 @@ class DompdfGenerator
     public function generate($html, $filename = 'document.pdf', $stream = true)
     {
         $this->dompdf->loadHtml($html);
-        $this->dompdf->setPaper('A4', 'portrait'); // Ukuran kertas dan orientasi
+        $this->dompdf->setPaper('A4', 'landscape'); // Ukuran kertas dan orientasi
         $this->dompdf->render();
 
         if ($stream) {

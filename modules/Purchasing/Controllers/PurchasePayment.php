@@ -240,9 +240,11 @@ class PurchasePayment extends BaseController
       $this->data['data'] = !empty($resData) ? $resData : [];
       $this->data['detail'] = !empty($resDataDetail) ? $resDataDetail : [];
     }
+    
     $html = view($this->views . '\purchase_payment_print', $this->data);
 
-
+    
     $dompdf->generate($html, 'paymeny.pdf', true);
+    exit;
   }
 }

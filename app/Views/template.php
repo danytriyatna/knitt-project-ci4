@@ -33,6 +33,8 @@
   <link href="assets/node_modules/jquery-ui-bundle/jquery-ui.min.css" rel="stylesheet">
   <link href="assets/node_modules/jquery-ui-bundle/jquery-ui.theme.min.css" rel="stylesheet">
 
+  <link href="assets/css/select2totree.css" rel="stylesheet">
+
   <link href="assets/css/custom.min.css" rel="stylesheet">
   <script>
     var baseUrl = '<?= base_url() ?>'
@@ -113,6 +115,7 @@
   <script src="assets/js/custom.js"></script>
   <script src="assets/js/jquery.mask.min.js"></script>
   <script src="assets/node_modules/jquery-ui-bundle/jquery-ui.min.js"></script>
+  <script src="assets/js/select2totree.js"></script>
   <!-- Custom JS -->
 
   <script>
