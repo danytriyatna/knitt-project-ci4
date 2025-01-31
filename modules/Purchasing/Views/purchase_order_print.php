@@ -177,6 +177,7 @@
             <tr>
                 <th class="text-center" style="width: 40px;">No.</th>
                 <th class="text-center" style="width: 54%;">NAMA BARANG</th>
+                <th class="text-center" style="width: 23%;">KODE</th>
                 <th class="text-center" style="width: 23%;">BANYAKNYA</th>
                 <th class="text-center" style="width: 23%;">HARGA SATUAN</th>
                 <th class="text-center" style="width: 23%;">DISKON</th>
@@ -191,6 +192,7 @@
                 <tr>
                     <td><?= $i++ ?></td>
                     <td><?= $row->nama_barang ?></td>
+                    <td><?= $row->kode ?></td>
                     <td class="text-right"><?= $row->qty ?></td>
                     <td class="text-right"><?= !empty($row->price) ? "Rp." . number_format(round($row->price)) : "" ?></td>
                     <td class="text-right"><?= !empty($row->disc) ? $row->disc  . "%" : "" ?></td>
