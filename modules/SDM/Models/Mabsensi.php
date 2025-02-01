@@ -20,9 +20,13 @@ class Mabsensi extends \App\Models\PrModel
 
         $builder->select("sdm.id,  sdm.id_karyawan,  sdm.posisi,  sdm.tgl_absen,  sdm.jam_masuk,  sdm.status_kehadiran,  sdm.jam_keluar,  sdm.hari_hadir,  
                           sdm.keterangan_kehadiran,  sdm.status_lembur,  sdm.jml_lembur,  sdm.keterangan_lembur,  sdm.active, 
-                          rk.id as id_karyawan_tbl, rk.nip, rk.full_name, rk.posisi, rk.upah_lembur, rk.upah_harian, rk.upah_lembur_we");
+                          rk.id as id_karyawan_tbl, rk.nip, rk.full_name, rk.posisi, rk.upah_lembur, rk.upah_harian, rk.upah_lembur_we,
+                          sdm.id_shift, sdm.jadwal_masuk, sdm.jadwal_pulang, sdm.potongan, sdm.bonus, sdm.durasi_kerja,
+                          sdm.bonus_keterangan, sdm.potongan_keterangan,
+                          sh.nama_shift, sh.jam_masuk as jam_masuk_shift, sh.jam_pulang as jam_pulang_shift");
 
         $builder->join("ref_karyawan rk", "sdm.id_karyawan = rk.id");
+        $builder->join("m_shift sh", "sdm.id_shift = sh.id", "left");
 
         if ($id == null or $id == "") {
             $builder->where('sdm.active = 1');
@@ -105,11 +109,17 @@ class Mabsensi extends \App\Models\PrModel
                           COUNT(1) FILTER (WHERE sdm.status_kehadiran = 1) AS hadir,
                           COUNT(1) FILTER (WHERE sdm.status_kehadiran = 2) AS izin,
                           COUNT(1) FILTER (WHERE sdm.status_kehadiran = 3) AS sakit,
-                          COUNT(1) FILTER (WHERE sdm.status_kehadiran = 4) AS alpha,
+                          COUNT(1) FILTER (WHERE sdm.status_kehadiran = 4 OR sdm.status_kehadiran NOT IN (1,2,3)) AS alpha,
                           rk.upah_harian,
                           (COUNT(1) FILTER (WHERE sdm.status_kehadiran = 1) * rk.upah_harian) as gaji_harian,
+                          -- Perbaikan SUM() dengan FILTER
+                          COALESCE(SUM(sdm.durasi_kerja) FILTER (WHERE sdm.status_kehadiran = 1), 0) / 60 AS jam_kerja,
+                          COALESCE(SUM(sdm.durasi_kerja) FILTER (WHERE sdm.status_kehadiran = 1), 0) / 60 * rk.upah_jam AS gaji_jam,
                           rk.upah_lembur,
                           rk.upah_lembur_we,
+                          rk.upah_jam,
+                          SUM(COALESCE(sdm.bonus, 0)) as bonus,
+                          SUM(COALESCE(sdm.potongan, 0)) as potongan,
                           SUM(COALESCE(sdm.jml_lembur, 0)) FILTER (WHERE sdm.status_lembur = 1) as lembur,
                           SUM(COALESCE(sdm.jml_lembur , 0)) FILTER (WHERE sdm.status_lembur = 2) as lembur_we,
                           (COALESCE(SUM(COALESCE(sdm.jml_lembur, 0)) FILTER (WHERE sdm.status_lembur = 1), 0) * rk.upah_lembur) as gaji_lembur,

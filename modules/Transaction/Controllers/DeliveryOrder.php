@@ -817,5 +817,6 @@ class DeliveryOrder extends BaseController
 
 
     $dompdf->generate($html, 'sales_invoice.pdf', true);
+    exit;
   }
 }

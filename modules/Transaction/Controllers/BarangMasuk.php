@@ -356,5 +356,6 @@ class BarangMasuk extends BaseController
         $html = view($this->views . '\barang_masuk_print', $this->data);
 
         $dompdf->generate($html, 'barang_masuk.pdf', true);
+        exit;
     }
 }

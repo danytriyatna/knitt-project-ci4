@@ -113,12 +113,12 @@ $(document).ready(function () {
             
 			{
 				title: 'NIK', field: 'nip', headerSort:false, sorter: 'string',
-				width: 160
+				width: 160, frozen:true
 			}, 
 				
 			{
 				title: 'Nama', field: 'full_name', headerSort:false, sorter: 'string',
-				width: 240
+				width: 240, frozen:true
 			}, 
 
             {
@@ -141,13 +141,20 @@ $(document).ready(function () {
 				width: 100, cssClass:'text-center', bottomCalc: 'sum'
 			},
 
+           
             {
 				title: 'Tanpa<br>Keterangan', field: 'alpha', headerSort:false, sorter: 'string',
 				width: 120, cssClass:'text-center', bottomCalc: 'sum'
 			},
 
             {
-				title: 'Gaji/Upah', field: 'gaji_harian', headerSort:false, sorter: 'string', align: "center",
+				title: 'Jam Kerja', field: 'jam_kerja', headerSort:false, sorter: 'string',
+				width: 100, cssClass:'text-center', bottomCalc: 'sum'
+			},
+
+
+            {
+				title: 'Gaji/Upah', field: 'gaji_jam', headerSort:false, sorter: 'string', align: "center",
                 width: 220, formatter:"money", cssClass:"text-end", bottomCalcFormatter: 'money', bottomCalc: 'sum'
 			} ,
 
@@ -163,7 +170,17 @@ $(document).ready(function () {
 
             {
 				title: 'Lembur', field: 'uang_lembur', headerSort:false, sorter: 'string', align: "center",
-                width: 220, formatter:"money", cssClass:"text-end", bottomCalc: 'sum'
+                width: 220, formatter:"money", cssClass:"text-end", bottomCalcFormatter: 'money', bottomCalc: 'sum'
+			} ,
+
+            {
+				title: 'Bonus', field: 'bonus', headerSort:false, sorter: 'string', align: "center",
+                width: 220, formatter:"money", cssClass:"text-end", bottomCalcFormatter: 'money', bottomCalc: 'sum'
+			} ,
+
+            {
+				title: 'Potongan', field: 'potongan', headerSort:false, sorter: 'string', align: "center",
+                width: 220, formatter:"money", cssClass:"text-end", bottomCalcFormatter: 'money', bottomCalc: 'sum'
 			} ,
 
             {

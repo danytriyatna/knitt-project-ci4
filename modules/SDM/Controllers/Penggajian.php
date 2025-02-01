@@ -77,10 +77,10 @@ class Penggajian extends BaseController
               $atr_del['title'] = 'Hapus';
               $atr_del['url'] = $this->urlv.'/delete/';
               $atr_del['class'] = '';
-              $atr_del['onclick'] = "return confirm('Hapus data ?')";
+              // $atr_del['onclick'] = "return confirm('Hapus data ?')";
           }
           
-          $btnAction = btn_action_group($id, $atr_edit, $atr_del);
+          $btnAction = btn_action_group($id, $atr_edit, $atr_del['url']);
 
           
           $periode_awal = "";
@@ -161,6 +161,7 @@ class Penggajian extends BaseController
             // }
             $i = 0;
             foreach  ($is_detail as $r) {
+              $is_detail[$i]->gaji_jam = $r->gaji_harian;
               $is_detail[$i]->total = $r->gaji;
               $i++;
             }
@@ -298,6 +299,9 @@ class Penggajian extends BaseController
               $dtIn["lembur_we"] = $r["lembur_we"]; 
               $dtIn["uang_lembur"] = $r["uang_lembur"]; 
               $dtIn["gaji"] = $r["total"]; 
+              $dtIn["bonus"] = $r["bonus"]; 
+              $dtIn["potongan"] = $r["potongan"]; 
+              $dtIn['durasi_kerja'] = $r['jam_kerja'];
               
               $dtIn["active"] = 1;
               $dtIn["created_by"] = $user_id;
@@ -341,11 +345,14 @@ class Penggajian extends BaseController
               $dtIn["izin"] = $r["izin"]; 
               $dtIn["sakit"] = $r["sakit"]; 
               $dtIn["alpha"] = $r["alpha"]; 
-              $dtIn["gaji_harian"] = $r["gaji_harian"]; 
+              $dtIn["gaji_harian"] = $r["gaji_jam"]; 
               $dtIn["lembur"] = $r["lembur"]; 
               $dtIn["lembur_we"] = $r["lembur_we"]; 
               $dtIn["uang_lembur"] = $r["uang_lembur"]; 
               $dtIn["gaji"] = $r["total"]; 
+              $dtIn["bonus"] = $r["bonus"]; 
+              $dtIn["potongan"] = $r["potongan"]; 
+              $dtIn['durasi_kerja'] = $r['jam_kerja'];
               
               if(empty($r["id"])){
                 $dtIn["active"] = 1;
@@ -403,7 +410,10 @@ class Penggajian extends BaseController
     if(!empty($data_laporan)){
       for ($i=0; $i < count($data_laporan); $i++) { 
         $data_laporan[$i]->uang_lembur = $data_laporan[$i]->gaji_lembur + $data_laporan[$i]->gaji_lembur_we;
-        $data_laporan[$i]->total = $data_laporan[$i]->uang_lembur + $data_laporan[$i]->gaji_harian;
+
+        $data_laporan[$i]->jam_kerja = round($data_laporan[$i]->jam_kerja);
+
+        $data_laporan[$i]->total = ($data_laporan[$i]->uang_lembur + $data_laporan[$i]->gaji_jam + $data_laporan[$i]->bonus) - $data_laporan[$i]->potongan;
       }
       $status = true;
       $msg = "Laporan Penggajian ditemukan !";
@@ -433,6 +443,56 @@ class Penggajian extends BaseController
     return view($this->views.'\vprint_sdm', $this->data);
   }
 
+  public function deactivate($id = NULL)
+    {
+        if (!$this->auth->loggedIn() OR (!$this->auth->isAdmin() && !$this->auth->isSuperadmin())) {
+			throw new \Exception('You must be an administrator to view this page.');
+        }
+        
+        if ($id != null && $id != "") {
+            $id = decrypt($id);
+        }
+
+        $id = (int)$id;
+        if ($id == 1) {
+		    return redirect()->to($this->urlv);
+        }
+        $data = ['active' => 0];
+        $deactivate = $this->mgaji->updateRecord($this->mgaji->table, $data, 'id', $id);
+        if ($deactivate) {
+            $this->mcommon->setLog($this->currentUser->user_id,$this->MOD_ALIAS,$id,"Data Ukuran Dinonaktifkan");        
+            $this->session->setFlashdata('message', "Data Ukuran berhasil di Hapus ");
+        } else {
+            $this->session->setFlashdata('err', "Data Ukuran gagal di Hapus !");
+        }
+		return redirect()->to($this->urlv);
+    }
+
+    public function delete($id = NULL)
+    {
+        if (!$this->auth->loggedIn() OR (!$this->auth->isAdmin() && !$this->auth->isSuperadmin())) {
+			throw new \Exception('You must be an administrator to view this page.');
+        }
+
+        if ($id != null && $id != "") {
+            $id = decrypt($id);
+        }
+
+        $id = (int)$id;
+        if ($id == 1) {
+		    return redirect()->to($this->urlv);
+        }
+        
+        $data = ['active' => 0];
+        $res = $this->mgaji->updateRecord($this->mgaji->table, $data, 'id', $id);
+        if ($res) {
+            $this->mcommon->setLog($this->currentUser->user_id,$this->MOD_ALIAS,$id,"Penggajian Dihapus");        
+            $this->session->setFlashdata('message', "Penggajian berhasil dihapus");
+        } else {
+            $this->session->setFlashdata('err', "Penggajian gagal dihapus");
+        }
+		return redirect()->to($this->urlv);
+    }
 
   function _get_message($msg_type, $message = '', $mode = 'success', $icons = 'check', $fadeOut = true)
   {

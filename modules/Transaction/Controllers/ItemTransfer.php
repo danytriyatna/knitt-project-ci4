@@ -238,5 +238,6 @@ class ItemTransfer extends BaseController
     $html = view($this->views . '\item_transfer_print', $this->data);
 
     $dompdf->generate($html, 'rec_item.pdf', true);
+    exit;
   }
 }

@@ -103,15 +103,19 @@ $(document).ready(function () {
     let inpTgl = $("#filter_tgl");
     let dtList = new Tabulator("#dt-absensi", {
         columns: [
+            {
+				title: 'Shift', field: 'nama_shift', headerSort:false, sorter: 'string', frozen: true,
+				width: 180, align:'center', editor:"list", editorParams:{values:{"NORMAL":"NORMAL", "SHIFT PAGI":"SHIFT PAGI"}}
+			} ,
             
 			{
 				title: 'NIK', field: 'nip', headerSort:false, sorter: 'string',
-				width: 160
+				width: 160, frozen: true
 			}, 
 				
 			{
 				title: 'Nama', field: 'full_name', headerSort:false, sorter: 'string',
-				width: 240
+				width: 240, frozen: true
 			}, 
 
             {
@@ -159,11 +163,27 @@ $(document).ready(function () {
             {
 				title: 'Jam Lembur', field: 'jml_lembur', headerSort:false, sorter: 'string', align: "center",
                 width: 160, editor:"number"
-			} ,
-
-            
+			} , 
             {
 				title: 'Keterangan Lembur', field: 'keterangan_lembur', headerSort:false, sorter: 'string', align: "center",
+                width: 220, editor:"input"
+			} ,
+
+            {
+				title: 'Bonus', field: 'bonus', headerSort:false, sorter: 'string', align: "center",
+                width: 160, editor:"number", formatter: "money"
+			} , 
+            {
+				title: 'Keterangan Bonus', field: 'bonus_keterangan', headerSort:false, sorter: 'string', align: "center",
+                width: 220, editor:"input"
+			} ,
+
+            {
+				title: 'Potongan', field: 'potongan', headerSort:false, sorter: 'string', align: "center",
+                width: 160, editor:"number", formatter: "money"
+			} , 
+            {
+				title: 'Keterangan Potongan', field: 'potongan_keterangan', headerSort:false, sorter: 'string', align: "center",
                 width: 220, editor:"input"
 			} ,
 				
