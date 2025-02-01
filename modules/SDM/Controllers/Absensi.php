@@ -243,7 +243,7 @@ class Absensi extends BaseController
             $durasi_kerja = floor($selisih_detik / 60); // 1 menit = 60 detik
 
             if($durasi_kerja >= 5){
-              $durasi_kerja = $durasi_kerja - 1;
+              $durasi_kerja = $durasi_kerja - 60;
             } else if($durasi_kerja < 0){
               $durasi_kerja = 0;
             }
@@ -391,7 +391,7 @@ class Absensi extends BaseController
                     $durasi_kerja = floor($selisih_detik / 60); // 1 menit = 60 detikif
 
                     if($durasi_kerja >= 5){
-                      $durasi_kerja = $durasi_kerja - 1;
+                      $durasi_kerja = $durasi_kerja - 60;
                     } else if($durasi_kerja < 0){
                       $durasi_kerja = 0;
                     }
