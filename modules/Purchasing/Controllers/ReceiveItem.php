@@ -326,5 +326,6 @@ class ReceiveItem extends BaseController
     $html = view($this->views . '\receive_item_print', $this->data);
 
     $dompdf->generate($html, 'rec_item.pdf', true);
+    exit;
   }
 }

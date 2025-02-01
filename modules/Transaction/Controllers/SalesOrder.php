@@ -862,5 +862,6 @@ class SalesOrder extends BaseController
 
 
     $dompdf->generate($html, 'sales_order.pdf', true);
+    exit;
   }
 }

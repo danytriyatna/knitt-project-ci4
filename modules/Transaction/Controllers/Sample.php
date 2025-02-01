@@ -553,5 +553,6 @@ class Sample extends BaseController
 
 
     $dompdf->generate($html, 'sample.pdf', true);
+    exit;
   }
 }

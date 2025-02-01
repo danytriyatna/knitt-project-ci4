@@ -596,5 +596,6 @@ class CustomerReceipt extends BaseController
 
 
         $dompdf->generate($html, 'paymeny.pdf', true);
+        exit;
     }
 }

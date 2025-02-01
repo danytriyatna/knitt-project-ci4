@@ -236,5 +236,6 @@ class PurchaseOrder extends BaseController
 
 
     $dompdf->generate($html, 'po.pdf', true);
+    exit;
   }
 }
