@@ -10,6 +10,7 @@ use Modules\Referensi\Models\JenisBarangModel;
 use Modules\Referensi\Models\SatuanModel;
 use Modules\Referensi\Models\KaryawanModel;
 use Modules\SDM\Models\Mabsensi;
+use Modules\Referensi\Models\ShiftModel;
 
 // user library spreadsheet for excel
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -26,6 +27,7 @@ class Absensi extends BaseController
 
   protected $mabsen;
   protected $mkaryawan;
+  protected $mshift;
 
 
   function __construct()
@@ -33,6 +35,7 @@ class Absensi extends BaseController
       $this->MOD_ALIAS = "MOD_SDM_ABSENSI";
       $this->mabsen = new Mabsensi();
       $this->mkaryawan = new KaryawanModel();
+      $this->mshift = new ShiftModel(); 
       
   }
 
@@ -138,6 +141,14 @@ class Absensi extends BaseController
                   "status_lembur" => $row->status_lembur,
                   "jml_lembur" => $row->jml_lembur,
                   "keterangan_lembur" => $row->keterangan_lembur,
+                  "id_shift" => $row->id_shift,
+                  "nama_shift" => $row->nama_shift,
+                  "jadwal_masuk" => $row->jadwal_masuk,
+                  "jadwal_pulang" => $row->jadwal_pulang,
+                  "potongan" => $row->potongan,
+                  "potongan_keterangan" => $row->potongan_keterangan,
+                  "bonus" => $row->bonus,
+                  "bonus_keterangan" => $row->bonus,
               )
           );
       }
@@ -156,11 +167,21 @@ class Absensi extends BaseController
     $params['tgl_absen'] = \fdate_ind_to_eng($tgl_absen);
 
     $dt_absen = $this->mabsen->getData(null, 0, 9999, null, null, $params);
+
+    $dt_shift = $this->mshift->getData(1);
     if(!empty($data_karyawan ) && empty($dt_absen)){  
+        $tgl_absen = fdate_ind_to_eng($tgl_absen);
         foreach ($data_karyawan  as $dt) {
           $isi = [];
           $isi['id_karyawan'] = $dt->id;
           $isi['posisi'] = $dt->posisi;
+          $isi['id_shift'] = 1;
+          $isi['status_kehadiran'] = 1;
+          $isi['hari_hadir'] = 1;
+          $isi['jam_masuk'] = ($dt_shift) ? $tgl_absen . ' ' . $dt_shift->jam_masuk : $tgl_absen . ' ' . '08:00';
+          $isi['jam_keluar'] = ($dt_shift) ? $tgl_absen . ' ' .$dt_shift->jam_pulang : $tgl_absen . ' ' . '08:00';
+          $isi['jadwal_masuk'] = ($dt_shift) ? $dt_shift->jam_masuk : '08:00';
+          $isi['jadwal_pulang'] = ($dt_shift) ? $dt_shift->jam_pulang : '17:00';
           $isi['tgl_absen'] = fdate_ind_to_eng($tgl_absen);
           $this->mabsen->insertRecordGetid($this->mabsen->table, $isi);
         }
@@ -192,6 +213,36 @@ class Absensi extends BaseController
       foreach ($data_list as $x) {
         $id = \decrypt($x['id']);
         $status_kehadiran = null;
+        $durasi_kerja = 8 * 60;
+        $jadwal_masuk = "08:00";
+        $jadwal_pulang = "17:00";
+        // ged data shift
+        $prms['nama_shift'] = $x['nama_shift'];
+        $dt_shift = $this->mshift->getData(null, 0, 1, null, null, $prms);
+        if(!empty($dt_shift)){
+          $dt_shift = $dt_shift[0]; 
+          $id_shift = $dt_shift->id;
+          $jadwal_masuk = $dt_shift->jam_masuk;
+          $jadwal_pulang = $dt_shift->jam_pulang;
+          if(!empty($x['jam_keluar'])){
+            // $jam_awal  = new DateTime($dt_shift->jam_masuk);
+            // $jam_akhir = new DateTime($x['jam_keluar']);
+            
+            // $interval = $jam_awal->diff($jam_akhir);
+            // $durasi_kerja = ($interval->h * 60) + $interval->i; // Konversi ke menit
+
+            $timestamp_masuk = strtotime($dt_shift->jam_masuk);
+            $timestamp_keluar = strtotime($x['jam_keluar']);
+
+            // Hitung selisih dalam detik
+            $selisih_detik = $timestamp_keluar - $timestamp_masuk;
+
+            $durasi_kerja = floor($selisih_detik / 60); // 1 menit = 60 detik
+            if($durasi_kerja < 0){
+              $durasi_kerja = 0;
+            }
+          }
+        }
 
         if($x['status_kehadiran'] == "Hadir"){
           $status_kehadiran = 1;
@@ -226,6 +277,15 @@ class Absensi extends BaseController
         $isi['status_lembur'] = $status_lembur;
         $isi['jml_lembur'] = $x['jml_lembur'];
         $isi['keterangan_lembur'] = $x['keterangan_lembur'];
+        $isi['durasi_kerja'] = $durasi_kerja;
+        $isi['bonus'] = $x['bonus'];
+        $isi['bonus_keterangan'] = $x['bonus_keterangan'];
+        $isi['potongan'] = $x['potongan'];
+        $isi['potongan_keterangan'] = $x['potongan_keterangan'];
+
+        $isi['id_shift'] = $id_shift;
+        $isi['jadwal_masuk'] = $jadwal_masuk;
+        $isi['jadwal_pulang'] = $jadwal_pulang; 
 
         $this->mabsen->updateRecord($this->mabsen->table, $isi, 'id', $id);
       }
@@ -276,6 +336,7 @@ class Absensi extends BaseController
         
           if($i >= 3){
             
+              $shift = $xr[2];
               $nip = $xr[3];
               $jamInJd = $xr[8];
               $jamIn = $xr[9];
@@ -293,6 +354,37 @@ class Absensi extends BaseController
               if(!empty($nip)){
                 $pr_kr['nip'] = $nip;
                 $get_karyawan = $this->mkaryawan->getData(null, 0, 1, null, null, $pr_kr);
+
+                $durasi_kerja = 8 * 60;
+                $jadwal_masuk = "08:00";
+                $jadwal_pulang = "17:00";
+                $prms['nama_shift'] = $shift;
+                $dt_shift = $this->mshift->getData(null, 0, 1, null, null, $prms);
+                if(!empty($dt_shift)){
+                  $dt_shift = $dt_shift[0]; 
+                  $id_shift = $dt_shift->id;
+                  $jadwal_masuk = $dt_shift->jam_masuk;
+                  $jadwal_pulang = $dt_shift->jam_pulang;
+                  if(!empty($jamOut)){
+                    // $jam_awal  = new DateTime($dt_shift->jam_masuk);
+                    // $jam_akhir = new DateTime($jamOut);
+                    
+                    // $interval = $jam_awal->diff($jam_akhir);
+                    // $durasi_kerja = ($interval->h * 60) + $interval->i; // Konversi ke menit
+
+                    // Konversi waktu ke timestamp
+                    $timestamp_masuk = strtotime($dt_shift->jam_masuk);
+                    $timestamp_keluar = strtotime($jamOut);
+
+                    // Hitung selisih dalam detik
+                    $selisih_detik = $timestamp_masuk - $timestamp_keluar;
+
+                    $durasi_kerja = floor($selisih_detik / 60); // 1 menit = 60 detik
+                    if($durasi_kerja < 0){
+                      $durasi_kerja = 0;
+                    }
+                  }
+                }
 
                 if(!empty($get_karyawan)){
                   $inNip[] = $nip;
@@ -312,15 +404,27 @@ class Absensi extends BaseController
                   }
 
                   $status_lembur = 0;
-                  
+                  $jam_lembur = 0;
+                  if(!empty($lemburAk)){
+                    $status_lembur = 1;
+                    $jam_lembur = $lemburAk / 60 + 1;
+
+                    $jam_lembur = round($jam_lembur); 
+                  }
+
                   $isi['jam_masuk'] = $tgl_absen . ' ' . $jamIn;
                   $isi['jam_keluar'] = $tgl_absen . ' ' . $jamOut;
                   $isi['status_kehadiran'] = $status_kehadiran;
                   $isi['hari_hadir'] = 1;
                   $isi['keterangan_kehadiran'] = '-';
                   $isi['status_lembur'] = $status_lembur;
-                  $isi['jml_lembur'] = $lemburD;
+                  $isi['jml_lembur'] = $jam_lembur;
                   $isi['keterangan_lembur'] = '-';
+                  // keterangan shift 
+                  $isi['id_shift'] = $id_shift;
+                  $isi['durasi_kerja'] = $durasi_kerja;
+                  $isi['jadwal_masuk'] = $jadwal_masuk;
+                  $isi['jadwal_pulang'] = $jadwal_pulang; 
 
                   $this->mabsen->insertRecordGetid($this->mabsen->table, $isi);
                 }
