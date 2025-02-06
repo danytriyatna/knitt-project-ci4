@@ -99,7 +99,69 @@
 
           <div class="row">
             <div class="col-sm-12">
-              <p><i>(Section select SO)</i></p>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th style="width: 120px;">
+                        <button type="button" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i>&nbsp; Tambah</button>
+                      </th>
+                      <th>Sales Order</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></button>
+                        <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                      </td>
+                      <td>
+                        <h6 class="f-w-700 mb-0">SOD250100005</h6>
+                        <p class="mb-0">Gamis Zipper Stripe</p>
+                      </td>
+                      <td>
+                        <table class="table table-sm mb-0">
+                          <thead>
+                            <tr>
+                              <th class="bg-transparent">No.</th>
+                              <th class="bg-transparent">Colour</th>
+                              <th class="bg-transparent">ALL</th>
+                              <th class="bg-transparent">Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>1</td>
+                              <td>KOPI TUA</td>
+                              <td>24</td>
+                              <td>Rp 2.760.000</td>
+                            </tr>
+                            <tr>
+                              <td>2</td>
+                              <td>HITAM</td>
+                              <td>24</td>
+                              <td>Rp 2.760.000</td>
+                            </tr>
+                            <tr>
+                              <td>3</td>
+                              <td>M47</td>
+                              <td>24</td>
+                              <td>Rp 2.760.000</td>
+                            </tr>
+                            <tr>
+                              <td>4</td>
+                              <td>M79</td>
+                              <td>24</td>
+                              <td>Rp 2.760.000</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
@@ -107,7 +169,48 @@
 
           <div class="row">
             <div class="col-sm-12">
-              <p><i>(Section select item)</i></p>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th style="width: 120px;">
+                        <button type="button" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i>&nbsp; Tambah</button>
+                      </th>
+                      <th>ITEM CODE</th>
+                      <th>DESCRIPTION</th>
+                      <th>QTY</th>
+                      <th>UNIT</th>
+                      <th>LOT NO</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></button>
+                        <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                      </td>
+                      <td>BRG241100002</td>
+                      <td>Kain Sutera</td>
+                      <td>1</td>
+                      <td>Pcs</td>
+                      <td>9901289</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <br>
+
+          <div class="row">
+            <div class="col-sm-10">
+              <a href="javascript:void(0)" class="btn btn-default m-e-5">
+                <span class="fa fa-arrow-left"></span> Kembali
+              </a>
+              <button type="button" class="btn btn-success">
+                <span class="fa fa-save"></span> Simpan
+              </button>
             </div>
           </div>
         </div>
