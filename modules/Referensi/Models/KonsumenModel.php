@@ -185,6 +185,10 @@ class KonsumenModel extends \App\Models\PrModel
                 $builder->where('sh.id_proses', $params['id_proses']);
             }
 
+            if(!empty($params['style'])){
+                $builder->where('rk.keterangan_style', $params['style']);
+            }
+
             if (!empty($order)) {
                 $builder->orderBy($order[0]['field'], $order[0]['dir'], TRUE);
             } else {
