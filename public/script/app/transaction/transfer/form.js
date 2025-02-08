@@ -52,12 +52,14 @@ if(inpIdHeader.val().length == 0){
 
 if(inpStatus.val() == 0){
     btnAdd.show()
+    btnView.show()
     btnSimpan.show()
     btnApprove.show()
 } else{
     btnAdd.hide()
     btnSimpan.hide()
-    btnApprove.hide()
+    btnApprove.hide() 
+    btnView.hide()
 }
 const regex = /^[0-9]+(\.[0-9]+)?$/; // Hanya angka dan desimal
 

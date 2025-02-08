@@ -296,9 +296,25 @@ class ItemTransfer extends BaseController
           'dir' => 'ASC'
         ]
       ];
+      $resDataDetSO = $this->mRefDet->getDataDetailSO($id);
+      $dataSO = [];
+      foreach ($resDataDetSO as $rowData) {
+        $pru['use'] = 1; // ambil ukuran yang digunnakan order 
+        $pru['id_sales_order'] = $rowData->id_so;
+        $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
+        $detail = (!empty($dtUkuran)) ? $this->mSalesOrder->getDataDetailSalesOrder_crostab($rowData->id_so) : [];
+        $rowData->id = encrypt($rowData->id_so);
+        $rowData->detail = $detail;
+        $keysUkuran = !empty($detail) ? array_keys(get_object_vars($detail[0])) : [];
+        $excludeKeys = ["id", "no", "colordasar", "colour", "total_harga"];
+        $ukuranKeysInc = array_values(array_diff($keysUkuran, $excludeKeys));
+        $rowData->ukuran = !empty($ukuranKeysInc) ? $ukuranKeysInc : [];
+        $dataSO[] = $rowData;
+      }
 
       $resDataDetail = $this->mRefDet->getData(null, 0, 99999, $sort, params: array("id_header" => $id, "isReceive" => false));
       $this->data['data'] = !empty($resData) ? $resData : [];
+      $this->data['dataSO'] = !empty($dataSO) ? $dataSO : [];
       $this->data['detail'] = !empty($resDataDetail) ? $resDataDetail : [];
     }
     $html = view($this->views . '\item_transfer_print', $this->data);
