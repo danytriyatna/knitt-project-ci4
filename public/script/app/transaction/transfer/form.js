@@ -278,7 +278,12 @@ let dtList = new Tabulator("#dt-list", {
             
             }
         },
-        {title: "No. SO", field: "kode_sales_order", width: "20%"},
+        {title: "Informasi", field: "kode_sales_order", width: "20%",
+            formatter: function (cell) {
+                let rowData = cell.getRow().getData();
+                return `No SO: ${rowData.kode_sales_order} <br> Style: ${rowData.style ? rowData.style : rowData.deskripsi} <br> Buyer:${rowData.nama}`;
+            },
+        },
         {
             title: "Detail",
             field: "detail",
