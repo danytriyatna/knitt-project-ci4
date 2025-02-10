@@ -15,6 +15,7 @@ let spanBarang = $('#spanBarang');
 let selectGudangAsal = $('#gudang_asal');
 let selectGudangTujuan = $('#gudang_tujuan');
 let selectProses = $('#select_proses');
+let selectCMT = $('#select_cmt');
 let inpCMT = $('#cmt');
 let inpIdCMT = $('#id_cmt');
 let divCMT = $('#div-cmt');
@@ -37,6 +38,8 @@ let inpIdGudangAsal = $('#id_gudang_asal');
 if(inpIdHeader.val().length == 0){
     selectGudangAsal.val("").trigger("change")
     selectGudangTujuan.val("").trigger("change")
+    selectCMT.val("").trigger("change")
+    selectProses.val("").trigger("change")
 } else{
     setTimeout(() => {
         try {
@@ -61,7 +64,8 @@ if(inpStatus.val() == 0){
     btnApprove.hide() 
     btnView.hide()
 }
-const regex = /^[0-9]+(\.[0-9]+)?$/; // Hanya angka dan desimal
+// const regex = /^[0-9]+(\.[0-9]+)?$/; // Hanya angka dan desimal
+const regex = /^[0-9.,]+$/;
 
 
 
@@ -435,7 +439,7 @@ let dtListDetail = new Tabulator("#dt-list-detail", {
         {title:"ITEM DESCRIPTION", field:"nama_barang", hozAlign:"left",width:"25%"},
         {title:"QTY", field:"qty", hozAlign:"center",width:"10%"},
         {title:"UNIT", field:"nama_unit", hozAlign:"center",width:"15%"},
-        {title:"PRICE", field:"price", formatter : "money",
+        {title:"PRICE", field:"price", formatter : "money", visible:false,
             formatterParams: {
                 decimal: ",",
                 thousand: ".",
@@ -467,7 +471,7 @@ inpPrice.on("input", function(e){
 })
 
 function formatRupiah(value){
-    value = value.replace(/[^,\d]/g, '').toString();
+    value = value.replace(/[^\d]/g, '').toString();
      // Pisahkan angka menjadi ribuan
     let split = value.split(',');
     let sisa = split[0].length % 3;
@@ -518,21 +522,24 @@ selectGudangTujuan.on("change",function(e){
 function checkCMT(nilai){
     if(dataGudang.length > 0){
         let resGudang = dataGudang.find(x => x.id == nilai);
-        console.log(resGudang)
         if(resGudang.tipe == 1){
             divCMT.addClass("d-none")
-            inpCMT.val()
-            inpIdCMT.val("")
+            // inpCMT.val()
+            // inpIdCMT.val("")
         } else{
             divCMT.removeClass("d-none")
-            inpCMT.val(resGudang.nama_operator)
-            inpIdCMT.val(resGudang.id_cmt)
+            // inpCMT.val(resGudang.nama_operator)
+            // inpIdCMT.val(resGudang.id_cmt)
         } 
     } 
 }
 
-inpQtyItem.keyup(function (e) {
+inpQtyItem.on("input", function(e){
+    e.target.value =  e.target.value.replace(",", ".");
+})
 
+inpQtyItem.keyup(function (e) {
+    
     if(inpBarang.val().length === 0){
         e.target.value = ""
         return Swal.fire({
@@ -718,7 +725,7 @@ function openModalDetail(row = null){
         inpIdBarang.val(data.id_barang)
         inpUnit.val(data.nama_unit)
         inpQtyItem.val(data.qty)
-        inpPrice.val(formatRupiah(data.price.toString()))
+        // inpPrice.val(formatRupiah(data.price.toString()))
         inpLotNo.val(data.lot_no)
         inpEdit.val(data.lot_no)
         inpIdLot.val(data.lot_id)
@@ -768,14 +775,14 @@ function openModalDetail(row = null){
             });
         }
 
-        if(!regex.test(price)){
-            return Swal.fire({
-                text: "Price harus berupa angka",
-                icon: 'error',
-                showConfirmButton: false,
-                timer: 2000
-            });
-        }
+        // if(!regex.test(price)){
+        //     return Swal.fire({
+        //         text: "Price harus berupa angka",
+        //         icon: 'error',
+        //         showConfirmButton: false,
+        //         timer: 2000
+        //     });
+        // }
         
         if(selectGudangAsal.val() == null){
             return Swal.fire({
@@ -801,7 +808,7 @@ function openModalDetail(row = null){
                 kode_barang                 : inpKodeBarang.val(),
                 id_barang                   : inpIdBarang.val(),
                 qty                         : inpQtyItem.val(),
-                price                         : price,
+                price                         : null,
                 qty_exist                         : inpQtyExist.val(),
                 lot_no                   : inpLotNo.val(),
                 lot_id                   : inpIdLot.val(),
@@ -815,7 +822,7 @@ function openModalDetail(row = null){
                 nama_barang                 : inpBarang.val(),
                 kode_barang                 : inpKodeBarang.val(),
                 id_barang                   : inpIdBarang.val(),
-                price                         : price,
+                price                         : null,
                 qty                         : inpQtyItem.val(),
                 qty_exist                         : inpQtyExist.val(),
                 lot_no                   : inpLotNo.val(),
@@ -995,7 +1002,7 @@ function simpanData(status) {
             id:inpIdHeader.val(),
             id_gudang_asal:selectGudangAsal.val(),
             id_gudang_tujuan:selectGudangTujuan.val(),
-            id_cmt:inpIdCMT.val(),
+            id_cmt:selectCMT.val(),
             id_proses:selectProses.val(),
             tipe:selectTipe.val(),
             tanggal:formatLocaleDate(inpTglReceive.val()),
