@@ -124,6 +124,7 @@ class SalesOrder extends BaseController
           "kode_sales_order" => $row->kode_sales_order,
           "tgl_deadline" => $row->tgl_deadline,
           "deskripsi" => $row->deskripsi,
+          "style" => $row->style,
           "uang_dp" => !empty($row->uang_dp) ? \format_angka($row->uang_dp) : 0,
           "status"  => $status,
           "file_gambar" => !empty($row->file_name) ? base_url() . "uploads/sales_order/"  . $row->file_name : "",
@@ -782,6 +783,7 @@ class SalesOrder extends BaseController
     $buyer = $this->request->getGet("buyer");
     $warna = $this->request->getGet("warna");
     $trans = $this->request->getGet("trans");
+    $style = $this->request->getGet("style");
 
     $trans = decrypt($trans);
     /* Data */
@@ -813,6 +815,7 @@ class SalesOrder extends BaseController
       'deskripsi' => $deskripsi,
       'buyer' => $buyer,
       'warna' => $warna,
+      'style' => $style,
       'warna_2' => ''
     ];
 
