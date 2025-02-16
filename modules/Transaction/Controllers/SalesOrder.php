@@ -238,6 +238,7 @@ class SalesOrder extends BaseController
     $sampleId = $this->request->getPost('samples');
     $submit_data = $this->request->getPost('submit_data');
     $uang_dp = $this->request->getPost('uang_dp');
+    $style = $this->request->getPost('style');
 
 
     $this->validation->setRules([
@@ -292,6 +293,7 @@ class SalesOrder extends BaseController
       'tgl_transaksi' => $tglTransaksi,
       'tgl_deadline' => $tglDeadline,
       'uang_dp' => $uang_dp,
+      'style' => $style,
       // 'kode_sales_order' => $noSalesOrder,
       'active' => 1,
       // 'status' => 1,
