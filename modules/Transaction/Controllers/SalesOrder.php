@@ -186,6 +186,7 @@ class SalesOrder extends BaseController
 
     $build_array =  array(
       "id"   => encrypt($results->id),
+      "style" => $results->style,
       "keterangan" => $results->keterangan,
       "id_konsumen" => $results->id_konsumen,
       "tgl_transaksi" => $results->tgl_transaksi,
@@ -290,7 +291,7 @@ class SalesOrder extends BaseController
       'deskripsi' => $deskripsi,
       'tgl_transaksi' => $tglTransaksi,
       'tgl_deadline' => $tglDeadline,
-      // 'id_sample' => $sampleId,
+      'uang_dp' => $uang_dp,
       // 'kode_sales_order' => $noSalesOrder,
       'active' => 1,
       // 'status' => 1,

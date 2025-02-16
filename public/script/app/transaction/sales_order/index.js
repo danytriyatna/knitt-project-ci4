@@ -405,8 +405,11 @@ $(document).ready(function () {
         inpTglTransaksi.val("")
         inpTglDeadline.val("")
         inpKetSalesOrder.val("")
+        inpStyle.val("")
         inpSample.val("").trigger("change")
-        inpUangDP.val("0").trigger("change");
+        setTimeout(() => {
+            inpUangDP.val("0").trigger("change");
+        }, 1000);
         rowDet.hide()
         btnSend.hide()
         isModal.modal("show");
@@ -498,6 +501,7 @@ $(document).ready(function () {
                 inpNoSalesOrder.val(data.kode_sales_order)
                 fileSalesOrderOld.val(data.gambar_id)
                 inpKetSalesOrder.val(data.keterangan)
+                inpStyle.val(data.style)
                 
                 
                 setTimeout(() => {
@@ -509,10 +513,11 @@ $(document).ready(function () {
                         setTimeout(() => {
                             inpSample.attr('value', data.id_sample);
                             inpSample.val(data.id_sample).trigger("change");
+                            inpUangDP.val(data.uang_dp).trigger("change");
                         }, 1000);
                     }, 2000);
                 }, 1000);
-                inpUangDP.val(data.uang_dp).trigger("change");
+                
                 if(data.file_gambar){
                     fileSalesOrderOld.val(data.gambar_id)
                     linkFileSalesOrder.removeClass("d-none")
