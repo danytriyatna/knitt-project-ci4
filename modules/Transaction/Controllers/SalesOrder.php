@@ -376,7 +376,7 @@ class SalesOrder extends BaseController
           'ref_id' => $id,
           'ref_kode' => $noSalesOrder,
           'id_konsumen' => $idKonsumen,
-          'keterangan_style' => $keterangan,
+          'keterangan_style' => $style,
           'tgl_deadline' => $tglDeadline,
           'tgl_transaksi' => date("Y-m-d"),
           // 'id_style' => $id,
