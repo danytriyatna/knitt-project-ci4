@@ -264,7 +264,7 @@ dtList.on("rowClick", function(e, row){
                 inpUnitPrice.val(formatRupiah(data.unit_price));
             }
             else {
-                inpUnitPrice.val(formatRupiah(0));
+                inpUnitPrice.val(formatRupiah("0"));
             }
             
         },
