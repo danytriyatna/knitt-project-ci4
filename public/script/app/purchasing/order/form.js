@@ -253,6 +253,26 @@ dtList.on("rowClick", function(e, row){
     inpIdBarang.val(idBarang)
     inpKodeBarang.val(kodeBarang)
     inpBarang.val(`${namaBarang}`)
+
+    $.ajax({
+        url: `/purchasing/purchase-order/check-unit-price?id_vendor=${inpIdVendor.val()}&id_barang=${idBarang}`,
+        type: 'GET',
+        dataType: 'json', 
+        success: function(data) {
+            
+            if(data.status == true){
+                inpUnitPrice.val(formatRupiah(data.unit_price));
+            }
+            else {
+                inpUnitPrice.val(formatRupiah(0));
+            }
+            
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching data:', error);
+        }
+    });
+    
     $("#modal-barang").modal("hide");
 })
 
@@ -280,6 +300,14 @@ spanBarang.click(function () {
 });
 
 btnAdd.click(function(){
+    if (inpIdVendor.val() == null || inpIdVendor.val() == "" || inpIdVendor.val() == " ") {
+        return Swal.fire({
+            text: "Vendor Harus dipilih dahulu!",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
     openModalDetail()
 })
 

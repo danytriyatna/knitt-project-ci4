@@ -160,7 +160,7 @@ class PurchaseOrder extends BaseController
     $this->data['titlehead'] = "Form Purchase Order";
     $this->data['shipTo'] = null;
     $addNew = $this->mPO->getData(null, null, null, null, null, null, true);
-    if (isset($addNew)) {
+    if (isset($addNew) && empty($id)) {
       $this->data['shipTo'] = $addNew->ship_to;
     }
     $resTerm = $this->mPO->getRefTerm();
@@ -255,5 +255,24 @@ class PurchaseOrder extends BaseController
 
     $dompdf->generate($html, 'po.pdf', true);
     exit;
+  }
+
+  public function checkUnitPrice()
+  {
+
+    $build_array = [];
+    $build_array["code"] = 200;
+    $build_array["status"] = false;
+    $build_array["unit_price"] = null;
+
+    $id_vendor = $this->request->getGet('id_vendor');
+    $id_barang = $this->request->getGet('id_barang');
+
+    $oldUnitPrice = $this->mPODetail->getUnitPrice($id_vendor, $id_barang);
+    if (isset($oldUnitPrice)) {
+      $build_array["unit_price"] = $oldUnitPrice->price;
+      $build_array["status"] = true;
+    }
+    return $this->response->setJSON($build_array);
   }
 }
