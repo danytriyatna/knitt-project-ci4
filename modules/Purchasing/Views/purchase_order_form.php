@@ -211,7 +211,7 @@
               <div class="form-group row">
                 <label class="control-label text-start text-md-end col-md-2 col-form-label" for="ship_to">Ship To</label>
                 <div class="col-md-10">
-                  <textarea rows="3" id="ship_to" name="ship_to" class="form-control" placeholder="Ketikkan uraian pengiriman"><?= !empty($resData->ship_to) ? $resData->ship_to : null ?></textarea>
+                  <textarea rows="3" id="ship_to" name="ship_to" class="form-control" placeholder="Ketikkan uraian pengiriman"><?= !empty($resData->ship_to) ? $resData->ship_to : $shipTo ?></textarea>
                 </div>
               </div>
             </div>

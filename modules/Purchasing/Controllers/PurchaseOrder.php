@@ -158,6 +158,11 @@ class PurchaseOrder extends BaseController
 
 
     $this->data['titlehead'] = "Form Purchase Order";
+    $this->data['shipTo'] = null;
+    $addNew = $this->mPO->getData(null, null, null, null, null, null, true);
+    if (isset($addNew)) {
+      $this->data['shipTo'] = $addNew->ship_to;
+    }
     $resTerm = $this->mPO->getRefTerm();
     $resTax = $this->mPO->getRefTax();
     $this->data['term'] = $resTerm;

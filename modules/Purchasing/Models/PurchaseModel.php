@@ -22,7 +22,7 @@ class PurchaseModel extends \App\Models\PrModel
         parent::__construct();
     }
 
-    function getData($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
+    function getData($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null, $latest = null)
     {
         $builder = $this->db->table($this->table . " uk");
         $builder->join($this->tblVendor . " dbx", "uk.id_vendor = dbx.id", "inner");
@@ -70,6 +70,10 @@ class PurchaseModel extends \App\Models\PrModel
             $builder->where("uk.id", $id);
 
             $this->_data = $builder->get()->getRow();
+        }
+
+        if ($latest) {
+            $this->_data = $builder->orderBy('id', 'DESC')->limit(1)->get()->getRow();
         }
 
         return $this->_data;
