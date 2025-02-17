@@ -464,6 +464,7 @@ class WorkOrder extends BaseController
         'qty' => $data->qty,
         'file_id' => $data->file_id,
         'keterangan_style' => $data->keterangan_style,
+        'keterangan' => $data->keterangan,
         'tgl_transaksi' => date('Y-m-d'),
         'tgl_deadline' => $data->tgl_deadline,
         'status' => 1
