@@ -189,6 +189,11 @@ class PurchasePayment extends BaseController
     // $grandTotal = $this->request->getPost('grandTotal');
     // $sisaBayar = $this->request->getPost('sisaBayar');
     $dataDetail = $this->request->getPost('data');
+    $buttonType = $this->request->getPost('buttonType');
+    $approve_status = 0;
+    if (isset($buttonType) && $buttonType == "approve") {
+      $approve_status = 1;
+    }
     if ($id != "") {
       $id = decrypt($id);
     }
@@ -201,11 +206,12 @@ class PurchasePayment extends BaseController
       "pay_date" => $pp_date,
       "id_rek" => $id_rek,
       "total_bayar" => $totalBayar,
-      "sisa_bayar" => $diskon == null ? $hutang - $totalBayar - $diskon : $hutang - $totalBayar,
+      // "sisa_bayar" => $diskon == null ? $hutang - $totalBayar - $diskon : $hutang - $totalBayar,
+      "sisa_bayar" => $diskon == null ? $hutang - $totalBayar : $hutang - $totalBayar - $diskon,
       "hutang" => $hutang,
       "diskon" => $diskon,
       // "grand_total" => $totalBayar - $diskon,
-      "status" => 1
+      "status" => $approve_status
     ];
     if ($id) {
       $dataHeader['updated_at'] = date("Y-m-d H:i:s");
