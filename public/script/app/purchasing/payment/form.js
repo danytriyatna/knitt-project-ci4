@@ -158,25 +158,14 @@ let dtListPayment = new Tabulator("#dt-list-payment", {
                 precision: 0,   // Tidak ada desimal
             }},
 
-        {title:"Remaining", field:"remaining", hozAlign:"right",width:"15%",formatter: "money",
+        {title:"Remaining", field:"sisa_bayar", hozAlign:"right",width:"15%",formatter: "money",
             formatterParams: {
                 decimal: ",",
                 thousand: ".",
                 symbol: "Rp",  // Simbol mata uang Rupiah
                 precision: 0,   // Tidak ada desimal
             },
-            mutator: function(value, data) {
-                return (data.hutang || 0) - (data.diskon || 0);
-            }
         },
-
-        // {title:"REMAINING AMOUNT", field:"sisa_bayar", hozAlign:"right",width:"15%",formatter: "money",
-        //     formatterParams: {
-        //         decimal: ",",
-        //         thousand: ".",
-        //         symbol: "Rp",  // Simbol mata uang Rupiah
-        //         precision: 0,   // Tidak ada desimal
-        //     }},
         {title:"PAYMENT", field:"total_bayar", hozAlign:"right",width:"15%",formatter: "money",
             editor:"number",cellEdited: checkRegex,
             formatterParams: {
@@ -235,8 +224,8 @@ function checkRegex(cell) {
             });
         }
 
-        let remainAmount = row.getData().hutang - row.getData().total_bayar;
-        row.update({ sisa_bayar: remainAmount });
+        let remainAmount = row.getData().hutang - row.getData().diskon - row.getData().total_bayar;
+        // row.update({ sisa_bayar: remainAmount });
 
     } 
 }
@@ -295,9 +284,9 @@ function checkDiskon(cell) {
             });
         }
 
-        let remainAmount = row.getData().hutang - row.getData().diskon;
+        let remainAmount = row.getData().hutang - row.getData().diskon - row.getData().total_bayar;
 
-        row.update({ remaining: remainAmount });
+        row.update({ sisa_bayar: remainAmount });
 
     } 
 }
@@ -339,6 +328,14 @@ btnSimpan.on("click",function(e){
             timer: 2000
         });
     }
+    // if(selectPaymentTipe.val() == null || selectPaymentTipe.val() == ""){
+    //     return Swal.fire({
+    //         text: "Payment Type harus dipilih",
+    //         icon: 'error',
+    //         showConfirmButton: false,
+    //         timer: 2000
+    //     });
+    // }
     if(inpVendor.val().length == 0){
         return Swal.fire({
             text: "Vendor harus dipilih",

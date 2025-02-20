@@ -108,6 +108,7 @@ class PurchasePayment extends BaseController
           "pay_no" => $row->pay_no,
           "pay_date" => fdate_eng_to_ind($row->pay_date),
           "hutang" => $row->hutang,
+          "diskon" => $row->diskon,
           "total_bayar" => $row->total_bayar,
           "sisa_bayar" => $row->sisa_bayar,
           "status" => $status
@@ -221,7 +222,7 @@ class PurchasePayment extends BaseController
       $dataHeader['created_by'] = $this->get_userid();
     }
     // print_r($data);exit;
-    $res = $this->mRef->trxInsertUpdateRecord($dataHeader, $id, $dataDetail);
+    $res = $this->mRef->trxInsertUpdateRecord($dataHeader, $id, $dataDetail, $approve_status);
     if ($res) {
       $status = true;
       $msg = "Data berhasil disimpan!";
