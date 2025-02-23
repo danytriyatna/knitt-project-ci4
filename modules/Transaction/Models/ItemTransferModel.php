@@ -36,7 +36,9 @@ class ItemTransferModel extends \App\Models\PrModel
         $builder->join($this->tblOperator . " cbx", "uk.id_cmt = cbx.id", "left");
 
         $builder->select("uk.id,uk.tanggal,uk.tipe,uk.id_cmt,uk.tipe,id_proses, cbx.nama_operator,  abx.nama_gudang as gudang_asal, bbx.nama_gudang as gudang_tujuan, uk.id_gudang_tujuan, uk.id_gudang_asal, uk.kode_transaksi, uk.status, uk.tanggal, uk.keterangan");
-
+        if (!empty($params['status'])) {
+            $builder->where('uk.status = 1');
+        }
         if ($id == null or $id == "") {
             $builder->where('uk.active = 1');
             if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
@@ -75,7 +77,9 @@ class ItemTransferModel extends \App\Models\PrModel
         $builder->join($this->tblGudang . " bbx", "uk.id_gudang_tujuan = bbx.id", "left");
         $builder->select("count(1) as _cnt");
         $builder->where('uk.active = 1');
-
+        if (!empty($params['status'])) {
+            $builder->where('uk.status = 1');
+        }
         if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
             $builder->groupStart();
             $builder->Where('LOWER(uk.kode_transaksi) LIKE', strtolower("%{$filters[0]['value']}%"));
@@ -171,6 +175,16 @@ class ItemTransferModel extends \App\Models\PrModel
 
         return $this->_data;
     }
+
+    function getDataByNoTrf($noTrf)
+    {
+        $builder = $this->db->table("trans_barang_trf_header abx");
+        $builder->select("abx.id");
+        $builder->where("kode_transaksi", $noTrf);
+        $this->_data = $builder->get()->getRow();
+        return $this->_data;
+    }
+
 
     function generateKodePersediaan()
     {

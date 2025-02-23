@@ -62,8 +62,12 @@ class ItemTransfer extends BaseController
     $limit      = $this->request->getPost('length');
     $filters    = $this->request->getPost('filter');
     $order      = $this->request->getPost('sort');
+    $isApprove      = $this->request->getPost('isApprove');
 
     $params = [];
+    if ($isApprove) {
+      $params['status'] = "2";
+    }
 
     $results = $this->mRef->getData(null, $start, $limit, $order, $filters, $params);
     $totalfiltered = $this->mRef->getDataCnt($filters, $params);
@@ -272,6 +276,19 @@ class ItemTransfer extends BaseController
 
     $this->data['gudang']    = $resDataGudang;
     return view($this->views . '\item_transfer_form', $this->data);
+  }
+
+  function dataSO()
+  {
+    $noSO = $this->request->getGet("noSO");
+    $data = [];
+    $results = $this->mRef->getDataByNoTrf($noSO);
+
+
+    $data['status'] = true;
+    $resDataDetSO = !empty($results) ? $this->mRefDet->getDataDetSO($results->id) : null;
+    $data['dataSO'] = !empty($resDataDetSO) ? $resDataDetSO : null;
+    return $this->response->setJSON($data);
   }
 
   function save()
