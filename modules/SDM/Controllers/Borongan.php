@@ -91,10 +91,9 @@ class Borongan extends BaseController
           "recordsFiltered" => $totalfiltered,
           "data" => array()
       );
-
       foreach ($results as $row) {
           // $id = encrypt($row->id);
-
+          $btnAction = "<button data-id_proses='".$row->id_proses."' data-id_operator='".$row->id_operator."' class='btn btn-primary btn-print-new' onclick='printLaporan(this)'><i class='fas fa-print'></i>&nbsp; Print</button>";
           $keterangan_style = "";
 
           if(!empty($row->keterangan_style)){
@@ -108,6 +107,7 @@ class Borongan extends BaseController
           array_push(
               $build_array["data"],
               array(
+                  "print" => $btnAction,
                   "keterangan_style" => $keterangan_style,
                   "nama_operator" => $row->nama_operator,
                   "id_proses" => $row->id_proses,
@@ -132,7 +132,7 @@ class Borongan extends BaseController
     $params['tgl_awal'] = \fdate_ind_to_eng($tgl_awal);
     $params['tgl_akhir'] = \fdate_ind_to_eng($tgl_akhir);
     $params['id_operator'] = $id_operator;
-    $params['id_proses'] = $id_proses;    
+    // $params['id_proses'] = $id_proses;    
 
     $results = $this->mborongan->getData(null, 0, 99999, null, null, $params);
     $this->data['row'] = $stdData;

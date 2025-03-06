@@ -185,7 +185,7 @@
         <th class="text-left" style="width: 30%;">Proses</th>
         <!-- <th class="text-right" style="width: 20%;">Harga</th> -->
         <th class="text-right" style="width: 20%;">Qty</th>
-        <th class="text-right" style="width: 20%;">Harga Total</th>
+        <th class="text-right" style="width: 25%;">Harga Total</th>
       </tr>
     </thead>
     <tbody>
@@ -207,7 +207,7 @@
             <!-- <td style="border-bottom:1px solid #000;" class="text-right"></td> -->
             <td style="border-bottom:1px solid #000;" class="text-right"></td>
             <td style="border-bottom:1px solid #000;" class="text-right"></td>
-          </tr>
+          </tr> -->
         <?php $proses = $r->proses; } ?>
 
         <tr>
