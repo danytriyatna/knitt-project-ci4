@@ -29,14 +29,23 @@ let inpStatus = $('#status');
 let inpIdHeader = $('#id_header');
 let inpIdDetail = $('#idDetail');
 
+const divDetail = $("#div_detail");
+const divRefProduk = $("#div_ref_produk");
+
 if(inpIdHeader.val().length == 0){
     selectGudang.val("").trigger("change")
     selectKategori.val("").trigger("change")
 }
 
-if(selectKategori.val() == 3){
-    divNamaKonsumen.removeClass("d-none")
-}
+setTimeout(() => {
+    if(selectKategori.val() == 3){
+        divNamaKonsumen.removeClass("d-none")
+    }else if(selectKategori.val() == 12){
+        dtList.hideColumn('amount');
+        divDetail.hide();
+        divRefProduk.show();
+    }
+}, 500);
 
 if(inpStatus.val() == 0){
     btnAdd.show()
@@ -300,7 +309,7 @@ let dtListSO = new Tabulator("#dt-list-sample", {
     ],
     
     locale: 'id',    
-    ajaxURL: "/trans/item-transfer/list",
+    ajaxURL: "/trans/item-transfer/list-ref",
     ajaxConfig: "POST",
     sortMode: "remote",
     filterMode: "remote",
@@ -310,6 +319,7 @@ let dtListSO = new Tabulator("#dt-list-sample", {
         params.start = params.size * (params.page - 1);
         params.length = params.size;
         params.isApprove = true;
+        params.kategori = selectKategori.val();
     },
     ajaxResponse: function (url, params, response) {
         let pageSize = dtListSO.getPageSize();
@@ -346,10 +356,27 @@ let dtListSO = new Tabulator("#dt-list-sample", {
     },
 });
 
+const inpProses = $("#proses");
+const inpIdproses = $("#id_proses");
+
+const inpOperator = $("#nama_operator");
+const inpIdCmt = $("#id_cmt");
+
+
+
 dtListSO.on("rowClick", function(e, row){
-    inpNoRefTrf.val(row.getData().kode_transaksi)
+        const xdata = row.getData();
+        
+        inpNoRefTrf.val(xdata.kode_transaksi)
+        inpProses.val(xdata.proses);
+        inpIdproses.val(xdata.id_proses);
+
+        inpOperator.val(xdata.nama_operator);
+        inpIdCmt.val(xdata.id_cmt);
+
+
         $.ajax({
-            url: `/trans/item-transfer/data-so?noSO=${row.getData().kode_transaksi}`,
+            url: `/trans/item-transfer/data-so?noSO=${xdata.kode_transaksi}`,
             type: 'GET',
             dataType: 'json', 
             success: function(data) {
@@ -475,6 +502,7 @@ let dtList = new Tabulator("#dt-list-so", {
         {title: "Buyer", field: "buyer", width: "20%"},
         {title: "Colour", field: "color", width: "20%"},
         {title: "Qty", field: "qty", width: "20%"},
+        {title: "Ukuran", field: "kode_ukuran", width: "20%"},
         {title: "Amount", field: "amount", width: "20%",formatter: "money",    formatterParams: {
             decimal: ",",
             thousand: ".",
@@ -603,14 +631,26 @@ spanBarang.click(function () {
     $("#modal-barang").modal("show");
     dtListBarang.deselectRow();
 });
-
+divRefProduk.hide();
 selectKategori.on("change",function(e){
     var nilai = e.target.value;
-    if(nilai == 3){
-        divNamaKonsumen.removeClass("d-none")
-    } else if(nilai == 9){
+
+    divNamaKonsumen.addClass("d-none")
+    divDetail.show();
+    divRefProduk.hide();
+    // if(nilai == 3){
+    //     divNamaKonsumen.removeClass("d-none")
+    // } else
+    
+    if(nilai == 9){
         divNamaKonsumen.addClass("d-none")
-    } 
+    }else if(nilai == 12){
+        dtList.hideColumn('amount');
+        divDetail.hide();
+        divRefProduk.show();
+    }
+
+    dtListSO.setData();
 })
 
 function submitData(status,message){
@@ -653,13 +693,15 @@ function submitData(status,message){
 
 
     
-    if(dtListDetail.getData().length == 0){
-        return Swal.fire({
-            text: "Data detail tidak boleh kosong",
-            icon: 'error',
-            showConfirmButton: false,
-            timer: 2000
-        });
+    if(selectKategori.val() != 12){
+        if(dtListDetail.getData().length == 0){
+            return Swal.fire({
+                text: "Data detail tidak boleh kosong",
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
     }
  
     Swal.fire({
@@ -826,6 +868,10 @@ function openModalDetail(row = null){
 }
 
 
+const inpJmlMesin = $("#jml_mesin");
+const inpJmlQc = $("#jml_qc");
+const inpJmlLain = $("#jml_lain");
+
 function simpanData(status) {
     $.ajax({
         type: 'POST',
@@ -840,7 +886,12 @@ function simpanData(status) {
             no_ref_trf:inpNoRefTrf.val(),
             data:dtListDetail.getData(),
             keterangan:inpKeterangan.val(),
-            status:status
+            status:status,
+            id_proses: inpIdproses.val(),
+            id_cmt: inpIdCmt.val(),
+            jml_qc: inpJmlQc.val(),
+            jml_mesin: inpJmlMesin.val(),
+            jml_lain: inpJmlLain.val(),
         },
         dataType: "json",
         beforeSend: function () {
