@@ -392,20 +392,20 @@ class BarangMasuk extends BaseController
         if (!$this->auth->loggedIn()) {
             return redirect()->to('/auth/login');
         }
-        $dompdf = new DompdfGenerator();
+        $dompdf = new \Dompdf\Dompdf();
+        // Set Dompdf options for portrait orientation
+        $dompdf->setPaper('A4', 'portrait');
 
         $this->data['data'] = [];
         if ($id != "") {
             $id = decrypt($id);
-            // dd($id);
-            // die;
             $resData = $this->mRef->getData($id);
 
             $sort = [
-                [
-                    'field' => 'uk.id',
-                    'dir' => 'ASC'
-                ]
+            [
+                'field' => 'uk.id',
+                'dir' => 'ASC'
+            ]
             ];
 
             $resDataDetail = $this->mRefDet->getData(null, 0, 99999, $sort, params: array("id_header" => $id, "isReceive" => false));
@@ -417,7 +417,9 @@ class BarangMasuk extends BaseController
         }
         $html = view($this->views . '\barang_masuk_print', $this->data);
 
-        $dompdf->generate($html, 'barang_masuk.pdf', true);
+        $dompdf->loadHtml($html);
+        $dompdf->render();
+        $dompdf->stream('rec_item.pdf', ['Attachment' => true]);
         exit;
     }
 }

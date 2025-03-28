@@ -167,9 +167,10 @@ $(document).ready(function () {
             //     }
             // },
             // {headerSort:false, title:"Date", field:"date", width:"8%"},
+            {headerSort:false, title:"Kode Transaksi", field:"kode_transaksi", width:"8%"},
             {headerSort:false, title:"Colour", field:"kode_warna", hozAlign:"left",width:"15%"},
             {headerSort:false, title:"Process", field:"process", hozAlign:"left",width:"10%"},
-            {headerSort:false, title:"Operator", field:"operator", hozAlign:"left",width:"27%"},
+            {headerSort:false, title:"Operator", field:"operator", hozAlign:"left",width:"19%"},
             {headerSort:false, title:"Nomor Mesin", field:"nomor_mesin", hozAlign:"left",width:"15%"},
             {headerSort:false, title:"Size", field:"kode_ukuran", hozAlign:"left",width:"5%"},
             {headerSort:false, title:"QTY", field:"qty", hozAlign:"center",width:"5%", editor: "number", cellEdited: updateTotal},

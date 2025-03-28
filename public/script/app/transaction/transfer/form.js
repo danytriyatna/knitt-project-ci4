@@ -188,7 +188,7 @@ let elSearchSO = $("#tb-search-so");
             }
             clearTimeout(searchSO);
             searchSO = setTimeout(function () {
-                dtListSample.setFilter("", "like", elSearchSO.val());
+                dtListSO.setFilter("", "like", elSearchSO.val());
             }, 600);
         });
     }

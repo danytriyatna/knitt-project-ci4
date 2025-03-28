@@ -228,8 +228,12 @@ class BarangMasukModel extends \App\Models\PrModel
 
             if($data['id_kategori'] == 12){
                 if(!empty($dataProduksi)){
+
+                    $hedr_data = $this->getData($id);
+
                     $id_proses = $data['id_proses'];
                     $id_cmt = $data['id_cmt'];
+                    $kode_transaksi = $hedr_data->kode_transaksi;
                     foreach ($dataProduksi as $xrow) {
                         
                         $xpr['kode_sales_order'] = $xrow['kode_sales_order'];
@@ -252,6 +256,7 @@ class BarangMasukModel extends \App\Models\PrModel
                             "deskripsi" => $xrow['deskripsi'],
                             "style" => !empty($xrow['style']) ? $xrow['style'] : null,
                             "qty" => !empty($xrow['qty']) ? $xrow['qty'] : null,
+                            "qty_kirim" => !empty($xrow['qty_kirim']) ? $xrow['qty_kirim'] : null,
                             "id_konsumen" => $xrow['id_konsumen'],
                             "kode_sales_order" => $xrow['kode_sales_order'],
                             "kode_ukuran" => $xrow['kode_ukuran'],
@@ -270,6 +275,7 @@ class BarangMasukModel extends \App\Models\PrModel
                                 $idProduksi = $this->getDataProduksiByIdWalkorder($dtProses->id_walkorder)->id;
                                 // insert data produksi
                                 $arrDataUkuran = [
+                                    "kode_transaksi" => $kode_transaksi,
                                     "id_produksi" => $idProduksi,
                                     "id_walkorder_proses_ukuran" => $dtProses->key_kedua,
                                     "id_proses" => $id_proses,
@@ -423,7 +429,7 @@ class BarangMasukModel extends \App\Models\PrModel
         $builder = $this->db->table("trans_barang_masuk_produksi abx");
 
         $builder->select("abx.qty, abx.kode_sales_order, abx.id_konsumen, abx.style, abx.kode_sales_order, abx.deskripsi, 
-                          abx.color,abx.amount,cbx.nama as buyer, abx.kode_ukuran, abx.keterangan, abx.id_ref");
+                          abx.color,abx.amount,cbx.nama as buyer, abx.kode_ukuran, abx.keterangan, abx.id_ref, abx.qty_kirim");
 
         $builder->join("ref_konsumen cbx", "abx.id_konsumen = cbx.id", "inner");
 

@@ -272,7 +272,7 @@
           </div>
 
           <hr>
-          <div id="div_detail" >
+          <div id="div_details" >
             <div class="col-sm-3 mb-2">
               <button type="button" class="btn btn-sm btn-primary" id="btn-add"> <i class="fa fa-plus"></i></button>
             </div>

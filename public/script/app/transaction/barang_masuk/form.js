@@ -531,7 +531,8 @@ let dtListProduksi = new Tabulator("#dt-list-so-produksi", {
         {title: "Deskripsi", field: "deskripsi", width: "20%"},
         {title: "Buyer", field: "buyer", width: "20%"},
         {title: "Colour", field: "color", width: "20%"},
-        {title: "Qty", field: "qty", width: "20%"},
+        {title: "Qty", field: "qty_kirim", width: "20%"},
+        {title: "Qty Terima", field: "qty", width: "20%", editor: "number"},
         {title: "Ukuran", field: "kode_ukuran", width: "20%"},
         {title: "Amount", field: "amount", width: "20%",formatter: "money",    formatterParams: {
             decimal: ",",

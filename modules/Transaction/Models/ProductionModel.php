@@ -160,7 +160,7 @@ class ProductionModel extends \App\Models\PrModel
     {
         $builder = $this->db->table("trans_produksi_operator abx");
         $builder->select("abx.flag, abx.id_proses as id_walkorder_proses_ukuran, abx.qty, ebx.nama_operator as operator, dbx.kode_warna, 
-                          abx.harga_total, abx.harga, abx.tgl_transaksi as date,bbx.nama as process,cbx.kode_ukuran, abx.nomor_mesin");
+                          abx.harga_total, abx.harga, abx.tgl_transaksi as date,bbx.nama as process,cbx.kode_ukuran, abx.nomor_mesin, abx.kode_transaksi");
 
         $builder->join("_jenis_proses_produksi bbx", "abx.id_proses = bbx.id", "inner");
         $builder->join("ref_ukuran cbx", "abx.id_ukuran = cbx.id", "inner");
