@@ -180,11 +180,18 @@ class BarangMasuk extends BaseController
                 $rowData->id_barang = encrypt($rowData->id_barang);
             }
             $results = $this->mTrf->getDataByNoTrf($resData->no_ref_trf);
-            $resDataDetSO = !empty($results) ? $this->mTrfDet->getDataDetSO($results->id) : null;
+            
 
             $this->data['resData'] = $resData;
             $this->data['detail'] = json_encode($resDataDetail);
-            $this->data['dataSO'] = json_encode($resDataDetSO);
+
+            if($resData->id_kategori == 12){
+                $resDataDetSO = !empty($results) ? $this->mRef->getDataDetSO($id) : null;
+                $this->data['dataSO'] = json_encode($resDataDetSO);
+            }else{
+                $resDataDetSO = !empty($results) ? $this->mTrfDet->getDataDetSO($results->id) : null;
+                $this->data['dataSO'] = json_encode($resDataDetSO);
+            }
         }
         $reDataKategori = $this->mBarangMasuk->getRefKategoriPersedian();
         $sortGudang = [
@@ -233,6 +240,8 @@ class BarangMasuk extends BaseController
         $jml_mesin = $this->request->getPost("jml_mesin");
         $jml_lain = $this->request->getPost("jml_lain");
 
+        $dataProduksi = $this->request->getPost("dataProduksi");
+
         if ($id != "") {
             $id = decrypt($id);
         }
@@ -277,7 +286,7 @@ class BarangMasuk extends BaseController
             $dataHeader['created_by'] = $this->get_userid();
         }
         // print_r(json_encode($dataHeader));exit;
-        $res = $this->mRef->trxInsertUpdateRecord($dataHeader, $id, $dataDetail, null);
+        $res = $this->mRef->trxInsertUpdateRecord($dataHeader, $id, $dataDetail, $dataProduksi);
         if ($res) {
             $status = true;
             $msg = "Data berhasil disimpan!";

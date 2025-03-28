@@ -597,16 +597,16 @@ function checkCMT(nilai){
     if(dataGudang.length > 0){
         let resGudang = dataGudang.find(x => x.id == nilai);
         
-        if(resGudang.tipe == 1){
-            divCMT.addClass("d-none")
-            // inpCMT.val()
-            // inpIdCMT.val("")
-        } else{
+        // if(resGudang.tipe == 1){
+        //     divCMT.addClass("d-none")
+        //     // inpCMT.val()
+        //     // inpIdCMT.val("")
+        // } else{
             divCMT.removeClass("d-none")
             // inpCMT.val(resGudang.nama_operator)
             // inpIdCMT.val(resGudang.id_cmt)
             selectCMT.val(resGudang.id_cmt).trigger("change");
-        } 
+        // } 
     } 
 }
 

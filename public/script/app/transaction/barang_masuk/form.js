@@ -29,8 +29,8 @@ let inpStatus = $('#status');
 let inpIdHeader = $('#id_header');
 let inpIdDetail = $('#idDetail');
 
-const divDetail = $("#div_detail");
-const divRefProduk = $("#div_ref_produk");
+const divDetail = $(".div_detail");
+const divRefProduk = $(".div_produksi");
 
 if(inpIdHeader.val().length == 0){
     selectGudang.val("").trigger("change")
@@ -382,7 +382,8 @@ dtListSO.on("rowClick", function(e, row){
             success: function(data) {
                 
                 if(data.status){
-                    dtList.setData(data.dataSO)
+                    dtList.setData(data.dataSO);
+                    dtListProduksi.setData(data.dataSO);
                 }
                
             },
@@ -509,9 +510,39 @@ let dtList = new Tabulator("#dt-list-so", {
             symbol: "Rp",  // Simbol mata uang Rupiah
             precision: 0,   // Tidak ada desimal
         }},
+        // {title: "Amount", field: "amount_edit", width: "20%",formatter: "money",    formatterParams: {
+        //     decimal: ",",
+        //     thousand: ".",
+        //     symbol: "Rp",  // Simbol mata uang Rupiah
+        //     precision: 0,   // Tidak ada desimal
+        // }, editor: "number"},
     ],
     placeholder: "Tidak ada data",
 });
+
+let dtListProduksi = new Tabulator("#dt-list-so-produksi", {
+    pagination: true, 
+    paginationSize: 10,
+    paginationButtonCount: 5,
+    columns: [
+        {title: "ID", field: "id_konsumen", width: "20%",visible:false},
+        {title: "No.SO", field: "kode_sales_order", width: "20%"},
+        {title: "Style", field: "style", width: "20%"},
+        {title: "Deskripsi", field: "deskripsi", width: "20%"},
+        {title: "Buyer", field: "buyer", width: "20%"},
+        {title: "Colour", field: "color", width: "20%"},
+        {title: "Qty", field: "qty", width: "20%"},
+        {title: "Ukuran", field: "kode_ukuran", width: "20%"},
+        {title: "Amount", field: "amount", width: "20%",formatter: "money",    formatterParams: {
+            decimal: ",",
+            thousand: ".",
+            symbol: "Rp",  // Simbol mata uang Rupiah
+            precision: 0,   // Tidak ada desimal
+        }, editor: "number"},
+    ],
+    placeholder: "Tidak ada data",
+});
+
 
 
 if(dataSO.length > 0){
@@ -519,6 +550,7 @@ if(dataSO.length > 0){
         try {
             let isdata = JSON.parse(dataSO);
             dtList.setData(isdata)
+            dtListProduksi.setData(isdata)
         } catch (e) {
             console.error("Error parsing JSON:", e);
         }
@@ -645,13 +677,13 @@ selectKategori.on("change",function(e){
     if(nilai == 9){
         divNamaKonsumen.addClass("d-none")
     }else if(nilai == 12){
-        dtList.hideColumn('amount');
         divDetail.hide();
         divRefProduk.show();
     }
 
     dtListSO.setData();
 })
+
 
 function submitData(status,message){
 
@@ -885,6 +917,7 @@ function simpanData(status) {
             id_buyer:inpIdKonsumen.val(),
             no_ref_trf:inpNoRefTrf.val(),
             data:dtListDetail.getData(),
+            dataProduksi:dtListProduksi.getData(),
             keterangan:inpKeterangan.val(),
             status:status,
             id_proses: inpIdproses.val(),

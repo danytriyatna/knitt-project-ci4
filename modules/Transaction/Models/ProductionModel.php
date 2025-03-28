@@ -482,9 +482,10 @@ class ProductionModel extends \App\Models\PrModel
                         ) subquery
                         WHERE twp.id_walkorder = {$id_walkorder}
                         AND twp.id_proses = (
-                            SELECT MAX(tx.id_proses) 
-                            FROM trans_walkorder_proses tx 
-                            WHERE tx.id_walkorder = {$id_walkorder}
+                            SELECT ( tx.id_proses ) FROM trans_walkorder_proses tx 
+                            inner join _jenis_proses_produksi jp on jp.id = tx.id_proses 
+                            WHERE tx.id_walkorder = {$id_walkorder} 
+                            order by jp.seq desc limit 1
                         )
                         ORDER BY twpu.ref_detail_id, twp.id_proses, column_name
                         $$,

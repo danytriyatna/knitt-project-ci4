@@ -289,7 +289,7 @@
           </div>
           <hr>
 
-          <div class="row" id="div_ref_produk">
+          <div class="row div_produksi">
             <div class="col-sm-7">
               <div class="row">
                   <div class="col-sm-6">
@@ -346,16 +346,27 @@
             <hr>
           </div>
 
-         
+         <div class="div_detail">
           <div class="row">
-            <div class="col-sm-12">
-              <div id="dt-list-so" class="table-responsive table-striped"></div>
+              <div class="col-sm-12">
+                <div id="dt-list-so" class="table-responsive table-striped"></div>
+              </div>
             </div>
+
+            <hr>
+         </div>
+         
+          <div class="div_produksi">
+            <div class="row">
+              <div class="col-sm-12">
+                <div id="dt-list-so-produksi" class="table-responsive table-striped"></div>
+              </div>
+            </div>
+
+            <hr>
           </div>
 
-          <hr>
-
-          <div id="div_detail">
+          <div class="div_detail">
             <div class="col-sm-3 mb-2">
               <button type="button" class="btn btn-sm btn-primary" id="btn-add"> <i class="fa fa-plus"></i></button>
             </div>
