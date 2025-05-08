@@ -486,6 +486,8 @@ class ItemTransfer extends BaseController
       $this->data['detail'] = !empty($resDataDetail) ? $resDataDetail : [];
 
     }
+
+    // dd($this->data);
     $html = view($this->views . '\item_transfer_print', $this->data);
 
     $dompdf->loadHtml($html);
