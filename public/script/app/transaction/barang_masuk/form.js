@@ -821,8 +821,8 @@ dtListProduksiRef.on("rowClick", function(e, row){
     //     });
     // }
     data.amount = (parseFloat(data.qty) || 0) * (parseFloat(data.harga) || 0);
-    dtListProduksi.addRow(data);
-    // addItem(data);
+    // dtListProduksi.addRow(data);
+    addItem(data);
     modalRefpo.modal("hide");
 
     setTimeout(() => {
@@ -1359,43 +1359,51 @@ function simpanData(status) {
 
 
     function addItem(data){
-        
-        // const data = row._row.data
         let produksi_data = dtListProduksi.getData();
         let index = -1;
+
         if (produksi_data.some(x=>x.kode_sales_order == data.kode_sales_order && x.color == data.color && x.kode_ukuran == data.kode_ukuran)) {
             index = produksi_data.findIndex(x => 
+
                 x.kode_sales_order == data.kode_sales_order &&
-                (x.color ? x.color.split('~')[0] : '') == (data.color ? data.color.split('~')[0] : '') &&
-                x.kode_ukuran == data.kode_ukuran
+                (x.color ? x.color.split('~')[0] : '') == (data.color ? data.color.split('~')[0] : '') && (x.color ? x.color.split('~')[1] : '') == (data.color ? data.color.split('~')[1] : '') &&                x.kode_ukuran == data.kode_ukuran
             );
         }
+        if(index !== -1){
+            produksi_data[index].qty = parseFloat(produksi_data[index].qty || 0) + parseFloat(data.qty || 0);
+            produksi_data[index].amount = parseFloat(produksi_data[index].qty) * parseFloat(produksi_data[index].harga || 0); // hitung ulang amount
+            dtListProduksi.setData(produksi_data);
+        } else {
+            const matchingItems = produksi_data.filter(x =>
+                x.kode_sales_order == data.kode_sales_order &&
+                x.kode_ukuran == data.kode_ukuran &&
+                (x.color ? x.color.split('~')[0] : '') == (data.color ? data.color.split('~')[0] : '')
+            );
 
+            let totalQty = 0;
+            let totalAmount = 0;
 
-       if(index !== -1){
-           const row = produksi_data;
-            row[index].qty = parseFloat(row[index].qty) + parseFloat(data.qty);
-            dtListProduksi.setData(row);
-       }else{
+            matchingItems.forEach(item => {
+                totalQty += parseFloat(item.qty) || 0;
+                totalAmount += parseFloat(item.amount) || 0;
+            });
+
+            const hargaRata = totalQty > 0 ? Math.floor(totalAmount / totalQty) : 0;
+
             const now = new Date();
             const yyyy = now.getFullYear();
             const mm = String(now.getMonth() + 1).padStart(2, '0');
             const dd = String(now.getDate()).padStart(2, '0');
-            data.tgl_transaksi = ${yyyy}-${mm}-${dd};
+            data.tgl_transaksi = `${yyyy}-${mm}-${dd}`;
 
-            // if (list_verif.length > 0) {
-            //     return Swal.fire({
-            //         text: Data dengan warna ${data.color} dan ukuran ${data.kode_ukuran} sudah ada.,
-            //         icon: 'error',
-            //         showConfirmButton: false,
-            //         timer: 2000
-            //     });
-            // }
-            data.amount = (parseFloat(data.qty) || 0) * (parseFloat(data.harga) || 0);
+            const hargaFix = (parseFloat(data.harga) || 0) > 0 ? parseFloat(data.harga) : hargaRata;
+            data.harga = hargaFix;
+            data.amount = (parseFloat(data.qty) || 0) * hargaFix;
+
             dtListProduksi.addRow(data);
-       }
+        }
 
-        $( "#text_barcode" ).val("");
+        $("#text_barcode").val("");
     }
 
 
