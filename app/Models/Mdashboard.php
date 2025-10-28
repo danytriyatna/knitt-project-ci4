@@ -252,72 +252,92 @@ class Mdashboard extends Model
     {
         $builder = $this->db->table('ref_konsumen rk');
 
-            $subNilaiSO = "
-                COALESCE((
-                    SELECT SUM(tsou.harga_total)
-                    FROM trans_sales_order_ukuran tsou
-                    INNER JOIN trans_sales_order tsod ON tsod.id = tsou.id_sales_order
-                    WHERE tsou.active = 1
-                    AND tsod.id_konsumen = rk.id
-                    AND tsod.id IN (
-                        SELECT DISTINCT tid.id_ref
-                        FROM trans_invoice_detail tid
-                        WHERE tid.tipe_id = 2
-                    )
-                ), 0)
-            ";
+        $subNilaiSO = "
+            COALESCE((
+                SELECT SUM(tsou.harga_total)
+                FROM trans_sales_order_ukuran tsou
+                INNER JOIN trans_sales_order tsod ON tsod.id = tsou.id_sales_order
+                WHERE tsou.active = 1
+                AND tsod.id_konsumen = rk.id
+                AND tsod.id IN (
+                    SELECT DISTINCT tid.id_ref
+                    FROM trans_invoice_detail tid
+                    WHERE tid.tipe_id = 2
+                )
+            ), 0)
+        ";
 
-            $subTotalInvoice = "
-                COALESCE((
-                    SELECT SUM(ti.total)
-                    FROM trans_invoice ti
-                    WHERE ti.id_konsumen = rk.id
-                ), 0)
-            ";
+        $subNilaiSample = "
+            COALESCE(SUM((
+                SELECT SUM(tsu.harga_total)
+                FROM trans_sample_ukuran tsu
+                INNER JOIN trans_sample tsd ON tsd.id = tsu.id_sample
+                WHERE tsu.active = 1 
+                AND tsd.id_konsumen = rk.id
+                AND tsd.id IN (
+                    SELECT DISTINCT tid.id_ref
+                    FROM trans_invoice_detail tid
+                    where tid.tipe_id = 1
+                )
+            )), 0)
+        ";
 
-            $subTotalDP = "
-                COALESCE((
-                    SELECT SUM(tsot.uang_dp)
-                    FROM trans_sales_order tsot
-                    WHERE tsot.id_konsumen = rk.id
-                ), 0)
-            ";
+        $subTotalInvoice = "
+            COALESCE((
+                SELECT SUM(ti.total)
+                FROM trans_invoice ti
+                WHERE ti.id_konsumen = rk.id
+            ), 0)
+        ";
 
-            $subPembayaran = "
-                COALESCE((
-                    SELECT SUM(xc.pay_item)
-                    FROM trans_customer_receipt_detail xc
-                    INNER JOIN trans_customer_receipt tcr ON tcr.id = xc.id_cr
-                    WHERE tcr.id_konsumen = rk.id
-                ), 0)
-            ";
+        $subTotalDP = "
+            COALESCE(SUM((
+                SELECT SUM(tsot.down_payment)
+                FROM trans_invoice_detail tsot
+                INNER JOIN trans_invoice ti ON ti.id = tsot.id_invoice
+                WHERE ti.id_konsumen = rk.id
+            )), 0)
+        ";
 
-            // subquery utama
-            $builder->select("
-                rk.nama AS buyer,
-                {$subNilaiSO} AS nilai_so,
-                {$subTotalInvoice} AS nilai_invoice,
-                ({$subTotalDP} + {$subPembayaran}) AS pembayaran,
-                ({$subNilaiSO} - {$subTotalInvoice}) AS sisa_tagihan,
-                ({$subNilaiSO} - ({$subTotalDP} + {$subPembayaran})) AS sisa_pembayaran
-            ");
-            if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
-                $builder->groupStart();
-                    // $builder->where('LOWER(ti.kode_invoice) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    // $builder->orWhere('LOWER(ti.tgl_transaksi) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    $builder->where('LOWER(rk.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
-                    // $builder->orWhere('LOWER(ti.tgl_jatuh_tempo) LIKE', strtolower("%{$filters[0]['value']}%"));
-                $builder->groupEnd();
-            }
-            $builder->groupBy(['rk.id', 'rk.nama']);
-            $builder->having("{$subNilaiSO} > ({$subTotalDP} + {$subPembayaran})");
+        $subPembayaran = "
+            COALESCE((
+                SELECT SUM(xc.pay_item)
+                FROM trans_customer_receipt_detail xc
+                INNER JOIN trans_customer_receipt tcr ON tcr.id = xc.id_cr
+                WHERE tcr.id_konsumen = rk.id
+            ), 0)
+        ";
 
-            // Dapatkan SQL-nya
-            $sql = $builder->getCompiledSelect();
+        // Pilih kolom utama dan subquery
+        $builder->select("
+            rk.nama AS buyer,
+            {$subNilaiSO} AS nilai_so,
+            {$subTotalInvoice} AS nilai_invoice,
+            ({$subTotalDP} + {$subPembayaran}) AS pembayaran,
+            ({$subNilaiSO} - {$subTotalInvoice}) AS sisa_tagihan,
+            ({$subNilaiSO} - ({$subTotalDP} + {$subPembayaran})) AS sisa_pembayaran
+        ");
 
-            // Bungkus dan hitung jumlah baris
-            $countQuery = $this->db->query("SELECT COUNT(*) AS total FROM ({$sql}) AS x");
-            $total = $countQuery->getRow()->total;
+        if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+            $builder->groupStart();
+                // $builder->where('LOWER(ti.kode_invoice) LIKE', strtolower("%{$filters[0]['value']}%"));
+                // $builder->orWhere('LOWER(ti.tgl_transaksi) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->where('LOWER(rk.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
+                // $builder->orWhere('LOWER(ti.tgl_jatuh_tempo) LIKE', strtolower("%{$filters[0]['value']}%"));
+            $builder->groupEnd();
+        }
+
+        // Group & filter
+        $builder->groupBy(['rk.id', 'rk.nama']);
+        $builder->having("{$subNilaiSO} > ({$subTotalDP} + {$subPembayaran})");
+        $builder->orderBy('rk.nama', 'ASC');
+
+        // Dapatkan SQL-nya
+        $sql = $builder->getCompiledSelect();
+
+        // Bungkus dan hitung jumlah baris
+        $countQuery = $this->db->query("SELECT COUNT(*) AS total FROM ({$sql}) AS x");
+        $total = $countQuery->getRow()->total;
 
         return $total;
 
