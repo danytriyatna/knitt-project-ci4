@@ -177,13 +177,18 @@ class Mdashboard extends Model
         ";
 
         $subNilaiSample = "
-            COALESCE((
+            COALESCE(SUM((
                 SELECT SUM(tsu.harga_total)
                 FROM trans_sample_ukuran tsu
                 INNER JOIN trans_sample tsd ON tsd.id = tsu.id_sample
-                WHERE tsu.active = 1
+                WHERE tsu.active = 1 
                 AND tsd.id_konsumen = rk.id
-            ), 0)
+                AND tsd.id IN (
+                    SELECT DISTINCT tid.id_ref
+                    FROM trans_invoice_detail tid
+                    where tid.tipe_id = 1
+                )
+            )), 0)
         ";
 
         $subTotalInvoice = "
@@ -195,11 +200,12 @@ class Mdashboard extends Model
         ";
 
         $subTotalDP = "
-            COALESCE((
-                SELECT SUM(tsot.uang_dp)
-                FROM trans_sales_order tsot
-                WHERE tsot.id_konsumen = rk.id
-            ), 0)
+            COALESCE(SUM((
+                SELECT SUM(tsot.down_payment)
+                FROM trans_invoice_detail tsot
+                INNER JOIN trans_invoice ti ON ti.id = tsot.id_invoice
+                WHERE ti.id_konsumen = rk.id
+            )), 0)
         ";
 
         $subPembayaran = "
