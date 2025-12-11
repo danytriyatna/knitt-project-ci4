@@ -222,7 +222,7 @@
                     <td>
                         <?= !empty($row->style) ? $row->style : $row->deskripsi ?>
                     </td>
-                    <td class="text-left"><?= $row->deskripsi ?></td>
+                    <td class="text-left"><?= !empty($row->deskripsi) ? $row->deskripsi : $row->color ?></td>
                     <td class="text-right"><?= $row->qty ?></td>
                     <!-- <td class="text-right"><?= !empty($row->amount) ? "Rp." . number_format(round($row->amount)) : "" ?></td> -->
                     <td class="text-left"><?= $row->kode_ukuran ?></td>
