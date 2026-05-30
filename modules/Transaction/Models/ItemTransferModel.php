@@ -601,7 +601,7 @@ class ItemTransferModel extends \App\Models\PrModel
                     else {
                         if ($data['status'] == 1) {
                             $updateQtyKirimBtm = $this->updateDataBTMQtyKirim($rowData['kode_sales_order'], $rowData['kode_ukuran'], 
-                                                            $rowData['color'], $rowData['id_konsumen'], $$data['id_proses'], 
+                                                            $rowData['color'], $rowData['id_konsumen'], $data['id_proses'], 
                                                             $data['id_cmt'], 'plus', $rowData['qty']);
                         }
                         $IncludedIDSO[] = $this->insertRecordGetid($this->tblDetailSO, $dataDetail);
