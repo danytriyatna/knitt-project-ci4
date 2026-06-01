@@ -637,7 +637,7 @@ class ItemTransferModel extends \App\Models\PrModel
                                     throw new \Exception("QTY tidak dapat diubah lebih kecil dari {$total_selisih} pada ({$rowData['kode_sales_order']})");
                                     break;
                                 }
-                                }
+                            }
                         }
                         $this->deleteRecordCondition('trans_barang_trf_so_det', 'id', $IncludedIDSO, 'id_header', $id);
                     }
