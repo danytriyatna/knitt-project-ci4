@@ -156,6 +156,7 @@ class SalesOrder extends BaseController
           "deskripsi" => $row->deskripsi,
           "stylex" => $row->stylex,
           "style" => $row->style,
+          "ref_po" => $row->ref_po,
           "style_cnt_order" => $row->style_cnt,
           "uang_dp" => !empty($row->uang_dp) ? \format_angka($row->uang_dp) : 0,
           "uang_dp_2" => !empty($row->uang_dp_2) ? \format_angka($row->uang_dp_2) : 0,
@@ -305,6 +306,7 @@ class SalesOrder extends BaseController
       $type_dp_2 = null;
     }
     $style = $this->request->getPost('style');
+    $ref_po = $this->request->getPost('ref_po');
     $repeat = $this->request->getPost('repeat');
     if (strpos($tgl_dp, 'undefined') !== false || empty($tgl_dp))  {
       $tgl_dp = null;
@@ -375,6 +377,7 @@ class SalesOrder extends BaseController
       'type_dp_2' => $type_dp_2,
       'pengiriman' => $pengiriman,
       'style' => $style,
+      'ref_po' => $ref_po,
       'style_cnt' => $repeat,
       // 'kode_sales_order' => $noSalesOrder,
       'active' => 1,
