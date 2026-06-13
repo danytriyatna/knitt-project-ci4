@@ -222,6 +222,7 @@ class SalesOrder extends BaseController
       "id_konsumen" => $results->id_konsumen,
       "tgl_transaksi" => $results->tgl_transaksi,
       "kode_sales_order" => $results->kode_sales_order,
+      "ref_po" => $results->ref_po,
       "tgl_deadline" => $results->tgl_deadline,
       "tgl_deadline_dua" => $results->tgl_deadline_dua,
       "deskripsi" => $results->deskripsi,
