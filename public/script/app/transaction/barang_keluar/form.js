@@ -158,7 +158,7 @@ let dtListBarang = new Tabulator("#dt-list-barang", {
     columns: [
         {
             title: "ID Barang", field: "id", headerSort: false,
-            width: "15%",visible:true
+            width: "15%",visible:false
         },
         {
             title: "ID Lots", field: "lot_id", headerSort: false,
