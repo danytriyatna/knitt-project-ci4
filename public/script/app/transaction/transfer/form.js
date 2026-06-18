@@ -15,6 +15,7 @@ let spanBarang = $('#spanBarang');
 let spanWO = $('#spanWO');
 let selectGudangAsal = $('#gudang_asal');
 let inpIdWO = $('#id_wo');
+let inpKodeWO = $('#kode_walkorder');
 let selectGudangTujuan = $('#gudang_tujuan');
 let selectProses = $('#select_proses');
 let selectCMT = $('#select_cmt');
@@ -128,7 +129,7 @@ let dtListBarang = new Tabulator("#dt-list-barang", {
         params.start = params.size * (params.page - 1);
         params.length = params.size;
         params.idGudang = selectGudangAsal.val()
-        params.idWO = inpIdWO.val()
+        params.kode_walkorder = inpKodeWO.val()
         params.tipe = 'transfer'
     },
     ajaxResponse: function (url, params, response) {
@@ -211,8 +212,8 @@ let dtListWO = new Tabulator("#dt-list-workorder", {
         params.length = params.size;
     },
     ajaxResponse: function (url, params, response) {
-        let pageSize = dtList.getPageSize();
-        let pageNo = dtList.getPage();
+        let pageSize = dtListWO.getPageSize();
+        let pageNo = dtListWO.getPage();
         let startRow = (pageSize * (pageNo - 1)) + 1;
         let endRow = response.data.length + startRow - 1;
         if (response.data.length === 0) {
@@ -233,7 +234,7 @@ let dtListWO = new Tabulator("#dt-list-workorder", {
         }
         return response;
     },
-     footerElement: '<div id="table-footer" class="pull-left tabulator-info">'
+    footerElement: '<div id="table-footer" class="pull-left tabulator-info">'
         + 'Menampilkan <span class="tabulator-startrow"></span> - <span class="tabulator-endrow"></span> dari '
         + '<span class="tabulator-totalrow"></span> entri<span class="tabulator-totalfilteredrow"></span></div>',
     pagination: true,
@@ -274,6 +275,20 @@ if (elSearchBarang != null) {
         clearTimeout(searchThreadBarang);
         searchThreadBarang = setTimeout(function () {
             dtListBarang.setFilter("", "like", elSearchBarang.val());
+        }, 600);
+    });
+}
+
+let searchThreadWO = null;
+let elSearchWO = $("#tb-search-wo");
+if (elSearchWO != null) {
+    elSearchWO.on("keyup", function (e) {
+        if ($(this).val().length < 3 && e.keyCode > 13) {
+            return;
+        }
+        clearTimeout(searchThreadWO);
+        searchThreadWO = setTimeout(function () {
+            dtListWO.setFilter("", "like", elSearchWO.val());
         }, 600);
     });
 }
@@ -350,8 +365,34 @@ dtListBarang.on("rowClick", function (e, row) {
     inpQtyExist.val(qty)
     inpIdLot.val(idLot)
     inpPrice.val(hargasatuan)
-    console.log(hargasatuan)
     $("#modal-barang").modal("hide");
+})
+
+dtListWO.on("rowClick", function (e, row) {
+
+    if (selectGudangAsal.val() == null) {
+        return Swal.fire({
+            text: "Gudang Asal harus dipilih",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+    if (selectGudangTujuan.val() == null) {
+        return Swal.fire({
+            text: "Gudang Tujuan harus dipilih",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+
+
+    const kodeWO = row._row.data.kode_walkorder.replace(/<[^>]*>/g, '');
+    const idWO = row._row.data.id;
+    inpIdWO.val(idWO)
+    inpKodeWO.val(`${kodeWO}`)
+    $("#modal-workorder").modal("hide");
 })
 
 
@@ -649,19 +690,22 @@ let dtListDetail = new Tabulator("#dt-list-detail", {
 
             }
         },
+        { title: "ID WO", field: "id_wo", visible: false, width: '10%' },
+        { title: "No. Workorder", field: "kode_walkorder", hozAlign: "left", width: "10%" },
         { title: "ITEM CODE", field: "kode_barang", hozAlign: "left", width: "10%" },
         { title: "ITEM DESCRIPTION", field: "nama_barang", hozAlign: "left", width: "25%" },
-        { title: "QTY", field: "qty", hozAlign: "center", width: "10%",
+        {
+            title: "QTY", field: "qty", hozAlign: "center", width: "10%",
             bottomCalc: "sum",
-            bottomCalcFormatter: function(cell) {
+            bottomCalcFormatter: function (cell) {
                 let val = cell.getValue();
                 return parseFloat(val.toFixed(2));
             },
-            formatter: function(cell) {
+            formatter: function (cell) {
                 let val = cell.getValue();
                 return parseFloat(parseFloat(val).toFixed(2));
             }
-         },
+        },
         { title: "UNIT", field: "nama_unit", hozAlign: "center", width: "15%" },
         {
             title: "PRICE", field: "price", formatter: "money", visible: false,
@@ -805,7 +849,6 @@ inpQtyItem.keyup(function (e) {
 spanBarang.click(function () {
     Swal.showLoading();
     dtListBarang.replaceData()
-
     if (inpIdWO.val() == null || inpIdWO.val() == '' || inpIdWO.val() == undefined) {
         return Swal.fire({
             text: "No. Work Order harus dipilih",
@@ -1001,6 +1044,7 @@ function openModalDetail(row = null) {
         inpBarang.val(data.nama_barang)
         inpIdBarang.val(data.id_barang)
         inpIdWO.val(data.id_wo)
+        inpKodeWO.val(data.kode_walkorder)
         inpUnit.val(data.nama_unit)
         inpQtyItem.val(data.qty)
         inpPrice.val(formatRupiah(data.price.toString()))
@@ -1015,6 +1059,7 @@ function openModalDetail(row = null) {
         inpBarang.val("")
         inpIdBarang.val("")
         inpIdWO.val('')
+        inpKodeWO.val('')
         inpUnit.val("")
         inpQtyItem.val("")
         inpPrice.val("")
@@ -1083,7 +1128,6 @@ function openModalDetail(row = null) {
                 timer: 2000
             });
         }
-
         if (row) {
             row.update({
                 id: inpIdDetail.val(),
@@ -1091,6 +1135,7 @@ function openModalDetail(row = null) {
                 kode_barang: inpKodeBarang.val(),
                 id_barang: inpIdBarang.val(),
                 id_wo: inpIdWO.val(),
+                kode_walkorder: inpKodeWO.val(),
                 qty: inpQtyItem.val(),
                 price: inpPrice.val(),
                 qty_exist: inpQtyExist.val(),
@@ -1109,6 +1154,7 @@ function openModalDetail(row = null) {
                 kode_barang: inpKodeBarang.val(),
                 id_barang: inpIdBarang.val(),
                 id_wo: inpIdWO.val(),
+                kode_walkorder: inpKodeWO.val(),
                 price: inpPrice.val(),
                 qty: inpQtyItem.val(),
                 qty_exist: inpQtyExist.val(),

@@ -13,7 +13,7 @@
           <label class="control-label text-start text-md-end col-md-2 col-form-label" for="select_item">No. WO</label>
           <div class="col-md-9">
             <div class="input-group">
-              <input type="text" id="no_wo" readonly name="no_wo" class="form-control" placeholder="Pilih No. Work Order" required>
+              <input type="text" id="kode_walkorder" readonly name="kode_walkorder" class="form-control" placeholder="Pilih No. Work Order" required>
               <input type="hidden" id="id_wo" name="id_wo" class="form-control" required>
               <span id="spanWO" class="input-group-text bg-white" id="basic-addon12"><i class="ti-search"></i></span>
             </div>
@@ -121,7 +121,7 @@
           <div class="col-md-12 mb-3">
             <div class="col-md-4" style="float: right; position: relative; right: 15px;">
               <div class="homeSearch w-100" style="width: 100%; margin-left: 5%; margin-top: 0;">
-                <input type="text" id="tb-search-order" class="form-control" placeholder="Pencarian . . .">
+                <input type="text" id="tb-search-wo" class="form-control" placeholder="Pencarian . . .">
               </div>
             </div>
           </div>
