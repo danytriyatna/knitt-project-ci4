@@ -697,6 +697,7 @@ class ItemTransfer extends BaseController
       $order      = $this->request->getPost('sort');
 
       $idGudang      = $this->request->getPost('idGudang');
+      $idWo      = $this->request->getPost('idWo');
 
       $params = [];
       if ($idGudang != "") {
