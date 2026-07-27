@@ -11,11 +11,13 @@ class Auth extends \IonAuth\Controllers\Auth
 	protected $user;
 	protected $files;
 	protected $situs;
+	protected $session;
 
 	function __construct()
 	{
 		parent::__construct();
 		helper('path');        
+		$this->session 		= \Config\Services::session();
 		$this->email 		= \Config\Services::email();
 		$this->auth 		= new \App\Libraries\CIonAuth();
 		$this->validation 	= \Config\Services::validation();

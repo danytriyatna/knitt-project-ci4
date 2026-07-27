@@ -59,29 +59,32 @@ class SalesOrderModel extends \App\Models\PrModel
     function getDataCnt($filters = null, $params = null)
     {
         $builder = $this->db->table($this->table . " abx");
+        $hasFilter = !empty($filters) && is_array($filters) && count($filters) >= 1 && !empty($filters[0]['value']);
 
-        $builder->join("ref_konsumen bbx", "abx.id_konsumen = bbx.id", "inner");
+        if ($hasFilter) {
+            $builder->join("ref_konsumen bbx", "abx.id_konsumen = bbx.id", "inner");
+        }
+
         $builder->select("count(1) as _cnt");
         $builder->where('abx.active = 1');
 
-        if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+        if ($hasFilter) {
             $builder->groupStart();
             $builder->where('LOWER(abx.kode_sales_order) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->orWhere('LOWER(bbx.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
             $builder->groupEnd();
         }
 
-        if(!empty($params['style'])){
+        if (!empty($params['style'])) {
             $builder->where("abx.style", $params['style']);
         }
 
-        if(!empty($params['id_konsumen'])){
+        if (!empty($params['id_konsumen'])) {
             $builder->where("abx.id_konsumen", $params['id_konsumen']);
         }
 
-        $this->_data = $builder->get()->getRow()->_cnt;
-
-        return $this->_data;
+        $row = $builder->get()->getRow();
+        return $row ? (int)$row->_cnt : 0;
     }
 
     function getDataUkuran($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null, $idProses = null)

@@ -66,19 +66,20 @@ class SalesOrder extends BaseController
       return redirect()->to('/auth/login');
     }
 
+    $cache = \Config\Services::cache();
     $this->data['titlehead'] = "SalesOrder";
-    $this->data['buyer'] = $this->mkonsumen->where("active", 1)->findAll();
-    $this->data['type'] = $this->mkonsumen->where("active", 1)->findAll();
-    $this->data['ukuran'] = $this->mUkuran->where("active", 1)->findAll();
-    $this->data['warna'] = $this->mWarna->where("active", 1)->findAll();
-    $this->data['rekening_list'] = $this->mRekening->where("active", 1)->findAll();
+    $this->data['buyer'] = $cache->remember('ref_konsumen_active', 3600, fn() => $this->mkonsumen->where("active", 1)->findAll());
+    $this->data['type'] = $this->data['buyer'];
+    $this->data['ukuran'] = $cache->remember('ref_ukuran_active', 3600, fn() => $this->mUkuran->where("active", 1)->findAll());
+    $this->data['warna'] = $cache->remember('ref_warna_active', 3600, fn() => $this->mWarna->where("active", 1)->findAll());
+    $this->data['rekening_list'] = $cache->remember('ref_rekening_active', 3600, fn() => $this->mRekening->where("active", 1)->findAll());
     $this->data['role_id'] = session()->get('role_id');
     $this->data['new_access'] = $this->_new;
     $this->data['edit_access'] = $this->_edit;
     $this->data['delete_access'] = $this->_delete;
     $this->data['print_access'] = $this->_print;
     $this->data['approve_access'] = $this->_approve;
-    $this->data['barang'] = $this->mBarang->where("active", 1)->orderBy("nama_barang", 'asc')->findAll();
+    $this->data['barang'] = $cache->remember('ref_barang_active', 3600, fn() => $this->mBarang->where("active", 1)->orderBy("nama_barang", 'asc')->findAll());
     
     return view($this->views . '\sales_order_list', $this->data);
   }
