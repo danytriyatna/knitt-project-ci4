@@ -240,10 +240,12 @@ class BarangMasukModel extends \App\Models\PrModel
                 // $this->deleteRecordMultipleColumn('trans_barang_masuk_produksi', $arrDelete);
                 $getCurrent = $this->getData($id);
                 $data['kode_transaksi'] = $getCurrent->kode_transaksi;
-                $arrParam =  [
-                    "id" => $id,
-                ];
                 $this->updateRecords($this->table, $data, $arrParam);
+                if (!empty($tgl_trans) && !empty($data['kode_transaksi'])) {
+                    $this->db->table($this->tblTrxBarang)
+                        ->where('kode_transaksi', $data['kode_transaksi'])
+                        ->update(['tanggal' => date("Y-m-d H:i:s", strtotime($tgl_trans))]);
+                }
             } else {
                 $data['kode_transaksi'] = $this->generateKodePersediaan("BTM", $data['id_perusahaan']);
                 $id = $this->insertRecordGetid($this->table,  $data);
@@ -303,7 +305,7 @@ class BarangMasukModel extends \App\Models\PrModel
                             "id_barang" => $idBarang,
                             "jenis_transaksi" => 1,
                             "jumlah" =>  $rowData['qty'],
-                            "tanggal" => date("Y-m-d H:i:s"),
+                            "tanggal" => !empty($tgl_trans) ? date("Y-m-d H:i:s", strtotime($tgl_trans)) : date("Y-m-d H:i:s"),
                             "id_gudang_tujuan" =>  !empty($data['id_gudang']) ? $data['id_gudang'] : null,
                             "nama" => $nama,
                             "id_kategori" => $data['id_kategori'],
