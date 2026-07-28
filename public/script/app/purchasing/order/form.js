@@ -789,7 +789,16 @@ let dtListDetailPO = new Tabulator("#dt-list-po", {
         {title:"Kode Barang", field:"kode_barang",hozAlign:"left", width:"15%"},
         {title:"Nama Barang", field:"nama_barang", hozAlign:"left",width:"20%"},
         {title:"KODE", field:"kode", hozAlign:"left",width:"20%"},
-        {title:"QTY", field:"qty", hozAlign:"center",width:"10%"},
+        {
+            title:"QTY", field:"qty", hozAlign:"center",width:"10%",
+            bottomCalc: "sum",
+            bottomCalcParams: { precision: 2 },
+            bottomCalcFormatter: function(cell) {
+                let val = cell.getValue();
+                if (val === null || val === undefined || isNaN(val)) return "0";
+                return parseFloat(val).toLocaleString('id-ID', { maximumFractionDigits: 2 });
+            }
+        },
         {title:"Satuan", field:"nama_satuan", hozAlign:"center",width:"10%"},
         {title:"ID Satuan", field:"id_satuan", hozAlign:"center",width:"10%", visible:false},
         {title:"Harga Per Unit", field:"price", hozAlign:"right",width:"15%",formatter: "money",formatterParams: {
@@ -801,12 +810,22 @@ let dtListDetailPO = new Tabulator("#dt-list-po", {
         },
         {title:"DISC (%)", field:"disc", hozAlign:"center",width:"10%",visible:false},
         {title:"Pajak (%)", field:"tax", hozAlign:"center",width:"10%"},
-        {title:"Total", width:"15%", field:"grand_price",formatter: "money", formatterParams: {
-            decimal: ",",
-            thousand: ".",
-            symbol: "Rp",  // Simbol mata uang Rupiah
-            precision: 0,   // Tidak ada desimal
-        }, hozAlign:"right"},
+        {
+            title:"Total", width:"15%", field:"grand_price",formatter: "money", formatterParams: {
+                decimal: ",",
+                thousand: ".",
+                symbol: "Rp",  // Simbol mata uang Rupiah
+                precision: 0,   // Tidak ada desimal
+            }, hozAlign:"right",
+            bottomCalc: "sum",
+            bottomCalcFormatter: "money",
+            bottomCalcFormatterParams: {
+                decimal: ",",
+                thousand: ".",
+                symbol: "Rp",
+                precision: 0,
+            }
+        },
     ],
     locale: 'id',    
     // layout: 'fitColumns',
