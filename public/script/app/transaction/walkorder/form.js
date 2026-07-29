@@ -182,16 +182,18 @@ $(document).ready(function () {
                 title: " ", field: "aksi", headerSort: false, formatter: fmEditDetail,
                 width: 100,
                 cellClick: function(e, cell) {
-                    if (e.target.title === 'edit') {
-                        let curLoss = parseFloat(rowData.loss);
-                        if (isNaN(curLoss) || curLoss <= 0) {
-                            curLoss = 5;
-                        }
-                        inpDetailLoss.val(curLoss);
-                        
-                        dtListDetailWarna.setData(rowData.details)
-                        mdDetail.modal("show");
+                    let rowData = cell.getRow().getData();
+                    textDetId.val(rowData.id);
+                    textTitleWarna.html(rowData.wdasar);
+                    textQtyWarna.html(rowData.qty);
+                    let curLoss = parseFloat(rowData.loss);
+                    if (isNaN(curLoss) || curLoss <= 0) {
+                        curLoss = 5;
                     }
+                    inpDetailLoss.val(curLoss);
+                    
+                    dtListDetailWarna.setData(rowData.details || []);
+                    mdDetail.modal("show");
                 }
             },
             
