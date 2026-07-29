@@ -915,4 +915,36 @@ class BarangMasukModel extends \App\Models\PrModel
 
         return $this->_data;
     }
+
+    /**
+     * Ambil harga dari transaksi Barang Masuk terakhir dengan kombinasi
+     * Proses + CMT (header) dan Style (detail) yang sama.
+     * Khusus dipakai untuk validasi auto-harga perusahaan "Citra Knitt".
+     */
+    function getLastHargaByProsesCmtStyle($id_proses, $id_cmt, $style, $id_perusahaan = null)
+    {
+        if (empty($id_proses) || empty($id_cmt) || empty($style)) {
+            return null;
+        }
+
+        $builder = $this->db->table("trans_barang_masuk_produksi abx");
+        $builder->select("abx.id as id_mp, abx.harga, abx.style, abx.tgl_transaksi, abx.created_at, head.id_proses, head.id_cmt, head.id_perusahaan");
+        $builder->join("trans_barang_header head", "abx.id_header = head.id", "inner");
+        $builder->where("head.id_proses", $id_proses);
+        $builder->where("head.id_cmt", $id_cmt);
+        $builder->where("abx.style", $style);
+        $builder->where("head.active", 1);
+        $builder->where("abx.harga >", 0);
+
+        if (!empty($id_perusahaan)) {
+            $builder->where("head.id_perusahaan", $id_perusahaan);
+        }
+
+        $builder->orderBy("abx.tgl_transaksi", "DESC");
+        $builder->orderBy("abx.id", "DESC");
+        $builder->limit(1);
+
+        $this->_data = $builder->get()->getRow();
+        return $this->_data;
+    }
 }

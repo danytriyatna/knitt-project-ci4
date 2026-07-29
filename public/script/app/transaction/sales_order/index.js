@@ -82,9 +82,25 @@ $(document).ready(function () {
 
     $.each(mapping, function (barangId, warnaId) {
         $('#' + barangId).on('change', function () {
+            const selectEl = $(this);
             // Ambil data-warna dari option yang dipilih
-            const selectedOption = $(this).find('option:selected');
-            const idWarna = selectedOption.data('warna');
+            const selectedOption = selectEl.find('option:selected');
+            const idBarang = selectEl.val();
+            const idWarna = selectedOption.attr('data-warna') || selectedOption.data('warna');
+
+            // Validasi: barang dipilih tapi belum punya relasi warna di Master Barang
+            if (idBarang && (!idWarna || idWarna == "0" || idWarna == "" || idWarna == "null")) {
+                const namaBarang = selectedOption.text();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Validasi Relasi Warna',
+                    html: `Barang <b>${namaBarang}</b> belum memiliki relasi Warna di Master Barang!<br>Silakan tentukan warna barang terlebih dahulu.`,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                });
+                selectEl.val("").trigger("change.select2");
+                return false;
+            }
 
             const $warna = $('#' + warnaId);
 
