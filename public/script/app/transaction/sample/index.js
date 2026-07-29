@@ -450,65 +450,8 @@ $(document).ready(function () {
 
 
         onRendered(() => {
-
-            document.querySelector(`.edit[data-id='${data.id}']`).addEventListener('click', () => {
-                fileSample.val(null)
-                linkFileSample.attr('src', "")
-                linkFileSample.addClass("d-none")
-                getDetail(data.id)
-            });
-
-            document.querySelector(`.print[data-id='${data.id}']`).addEventListener('click', () => {
-                window.open(`${baseUrl}/trans/sample/print/${data.id}`, "_blank");
-            });
-            document.querySelector(`.delete[data-id='${data.id}']`).addEventListener('click', () => {
-                Swal.fire({
-                    title: "Apakah anda yakin ingin menghapus data?",
-                    icon: 'question',
-                    confirmButtonText: 'Hapus',
-                    confirmButtonColor: '#dc3545',
-                    showCancelButton: true,
-                    cancelButtonText: 'Batal',
-                    cancelButtonColor: '#6C757D'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.replace(baseUrl + "/trans/sample/delete/list" + data.id);
-                    }
-                })
-            });
-
             let isColumn = [
                 { headerSort: false, title: "No", field: "no", width: "5%" },
-                // {headerSort: false,  title:"QR", width:"7%", formatter: print_btn,
-                //     cellClick: function(e, cell) {
-                //         let row = cell.getRow();
-                //         let data_row = row.getData();
-                //         if (e.target.title === 'print-warna') {
-                //             // console.log(data_row)
-
-                //             const inpp_slcUkuran = $("#print_slc_ukuran");
-                //             const inpp_qty       = $("#print_qty");
-                //             const inpp_qtyp      = $("#print_qtyp");
-
-                //             // inpp_slcUkuran
-                //             inpp_qty.val(1)
-                //             inpp_qtyp.val(1)
-
-                //             inpp_foto.attr('src', data.file_gambar);
-                //             inpp_noSample.html(data.kode_sample)
-                //             inpp_deskripsi.html(data.deskripsi);
-                //             inpp_warna.html(data_row.colordasar);
-                //             inpp_tglSample.html(formatterDate(data.tgl_transaksi))
-                //             inpp_tglDeadline.html(formatterDate(data.tgl_deadline))
-                //             inpp_buyer.html(data.nama)
-
-                //             setTimeout(() => {
-                //                 // inpp_trans.html(data.id);
-                //                 mdlPrint.modal("show");
-                //             }, 500);
-                //         } 
-                //     }
-                // },
                 {
                     headerSort: false, title: "QR", width: "10%", hozAlign: "center", formatter: print_btn,
                     cellClick: function (e, cell) {
@@ -542,8 +485,6 @@ $(document).ready(function () {
                             inpp_qty.val(1)
                             inpp_qtyp.val(1)
 
-
-
                             inpp_foto.attr('src', data.file_gambar);
                             inpp_noSample.html(data.kode_sample)
                             inpp_deskripsi.html(data.deskripsi);
@@ -551,9 +492,7 @@ $(document).ready(function () {
                             inpp_tglSample.html(formatterDate(data.tgl_transaksi))
                             inpp_tglDeadline.html(data.tgl_deadline ? formatterDate(data.tgl_deadline) : '-')
 
-                            // brcStyle.val(xdata.style)
                             inpp_buyer.html(data.nama)
-
 
                             setTimeout(() => {
                                 inpp_trans.html(data_row.id);
@@ -603,21 +542,60 @@ $(document).ready(function () {
                         precision: 0 // Tidak ada desimal
                     },
                     hozAlign: "right", cssClass: 'text-end', width: "15%"
-                })
+                });
 
-            new Tabulator(`#dt-list-detail-${data.id}`, {
-                data: data.detail,
-                layout: "fitColumns",
-                resizableColumnFit: true,
-                // pagination: true, 
-                // paginationSize: 10,
-                // paginationButtonCount: 5,
-                columns: isColumn,
-            });
+            let pos = cell.getRow().getPosition() || 0;
+            setTimeout(() => {
+                let elTarget = document.getElementById(`dt-list-detail-${data.id}`);
+                if (elTarget) {
+                    new Tabulator(elTarget, {
+                        data: data.detail,
+                        layout: "fitColumns",
+                        resizableColumnFit: true,
+                        columns: isColumn,
+                    });
+                }
+            }, pos * 20);
         });
 
         return cardHtml; // Return HTML Card
     }
+
+    $(document).on("click", "#dt-list .edit", function (e) {
+        e.preventDefault();
+        let id = $(this).data("id");
+        if (!id) return;
+        fileSample.val(null);
+        linkFileSample.attr('src', "");
+        linkFileSample.addClass("d-none");
+        getDetail(id);
+    });
+
+    $(document).on("click", "#dt-list .print", function (e) {
+        e.preventDefault();
+        let id = $(this).data("id");
+        if (!id) return;
+        window.open(`${baseUrl}/trans/sample/print/${id}`, "_blank");
+    });
+
+    $(document).on("click", "#dt-list .delete", function (e) {
+        e.preventDefault();
+        let id = $(this).data("id");
+        if (!id) return;
+        Swal.fire({
+            title: "Apakah anda yakin ingin menghapus data?",
+            icon: 'question',
+            confirmButtonText: 'Hapus',
+            confirmButtonColor: '#dc3545',
+            showCancelButton: true,
+            cancelButtonText: 'Batal',
+            cancelButtonColor: '#6C757D'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.replace(baseUrl + "/trans/sample/delete/list" + id);
+            }
+        });
+    });
 
     $("#btn-add").on("click", function () {
         let today = new Date().toISOString().split('T')[0];
