@@ -1327,6 +1327,11 @@ $(document).ready(function () {
         return 0;
     }
 
+    $(document).on("click", "#btn-refresh-gram", function (e) {
+        e.preventDefault();
+        setGramasi();
+    });
+
     let inpDetailLoss = $("#loss_perc");
     function setGramasi() {
         detailQty = getBottomCalcValue(dtListDetailQty, 'qty');
