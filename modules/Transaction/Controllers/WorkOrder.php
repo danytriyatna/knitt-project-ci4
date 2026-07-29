@@ -209,6 +209,7 @@ class WorkOrder extends BaseController
       
       $data_detail = [];
       if ($stdData->tipe_id == 1) {
+        $this->mSample->syncWorkOrderFromSample($stdData->ref_id);
         $list_detail = $this->mSample->getDataDetailSample_crostab($stdData->ref_id);
         $stdData->file_gambar = !empty($stdData->file_name) ? base_url() . "uploads/sample/"  . $stdData->file_name : "";
 
