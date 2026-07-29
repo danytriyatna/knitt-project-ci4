@@ -1209,7 +1209,7 @@ $(document).ready(function () {
                     title: 'Loading...',
                     allowOutsideClick: false,
                     showConfirmButton: false,
-                    onBeforeOpen: () => {
+                    didOpen: () => {
                         Swal.showLoading();
                     }
                 });
@@ -1224,8 +1224,10 @@ $(document).ready(function () {
                         timer: 2000
                     });
                     Swal.close();
-                    getDetail(idSample)
-                    dtList.setData()
+                    getDetail(idSample);
+                    if (dtList && typeof dtList.replaceData === 'function') {
+                        dtList.replaceData();
+                    }
                     isModalPO.modal("hide");
                 } else {
                     Swal.fire({
@@ -1237,7 +1239,7 @@ $(document).ready(function () {
                 }
             },
             error: function (e) {
-                let msg = e.responseJSON.message;
+                let msg = (e.responseJSON && e.responseJSON.message) ? e.responseJSON.message : "Terjadi kesalahan pada server.";
                 Swal.close();
 
                 Swal.fire({
@@ -1534,43 +1536,37 @@ $(document).ready(function () {
                 title: "GRAM", field: "gram", sorter: "string", headerSort: false, align: "center", cssClass: "text-end tabulator-editable",
                 width: "14%", editor: "number", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
                 cellEdited: function (cell) {
+                    if (window.isUpdatingRowGram) return;
+                    window.isUpdatingRowGram = true;
+                    try {
+                        let qty = parseInt(detailQty);
+                        let rowData = cell.getRow().getData();
+                        let tableColumn = cell._cell.column.cells;
+                        let total_gram = 0;
+                        if (tableColumn.length > 0) {
+                            let index_total = tableColumn.length - 1;
+                            total_gram = tableColumn[index_total].value;
+                        }
+                        updateRow(rowData, total_gram);
+                        let val_gram = rowData.gram ? rowData.gram : 0;
+                        let val_gram_nd = val_gram * qty;
+                        let val_kg = val_gram_nd / 1000;
+                        let val_kg_loss = inpDetailLoss.val().length > 0 ? (val_kg * inpDetailLoss.val()) / 100 : 0;
+                        let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
+                        let val_kuota = 0;
+                        let val_kuota_tambah = val_kuota - val_total;
 
-                    let qty = parseInt(detailQty)
-                    //  console.log(qty)
-                    // Dapatkan baris data yang telah diedit
-                    let rowData = cell.getRow().getData();
-                    let tableColumn = cell._cell.column.cells;
-                    let total_gram = 0;
-                    if (tableColumn.length > 0) {
-                        let index_total = tableColumn.length - 1;
-                        total_gram = tableColumn[index_total].value
+                        cell.getRow().update({
+                            gram_nd: val_gram_nd,
+                            kg: val_kg,
+                            kg_loss: val_kg_loss,
+                            total: val_total,
+                            kuota: val_kuota,
+                            kuota_tambah: val_kuota_tambah,
+                        });
+                    } finally {
+                        window.isUpdatingRowGram = false;
                     }
-                    updateRow(rowData, total_gram)
-                    let val_gram = rowData.gram ? rowData.gram : 0;
-                    // let val_persen = total_gram > 0 ? (rowData.gram/total_gram) * 100 : 0;
-                    //     val_persen = val_persen > 0 ? val_persen.toFixed(2) : 0;
-                    let val_gram_nd = val_gram * qty;
-                    let val_kg = val_gram_nd / 1000;
-                    // val_kg = val_kg > 0 ? val_kg.toFixed(2) : 0;
-                    let val_kg_loss = inpDetailLoss.val().length > 0 ? (val_kg * inpDetailLoss.val()) / 100 : 0
-                    // val_kg_loss = val_kg_loss > 0 ? val_kg_loss.toFixed(2) : 0;
-
-                    let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
-                    // val_total = val_total > 0 ? val_total.toFixed(2) : 0
-                    let val_kuota = 0;
-                    // val_kuota    = val_kuota    > 0 ? val_kuota   .toFixed(2) : 0
-                    let val_kuota_tambah = val_kuota - val_total
-
-                    // Set nilai total di baris yang sama
-                    cell.getRow().update({
-                        // persen: val_persen,
-                        gram_nd: val_gram_nd,
-                        kg: val_kg,
-                        kg_loss: val_kg_loss,
-                        total: val_total,
-                        kuota: val_kuota,
-                        kuota_tambah: val_kuota_tambah,
-                    });
                 },
             },
             {
@@ -1607,30 +1603,35 @@ $(document).ready(function () {
     });
 
     inpDetailLoss.on("change", function () {
-        let val = $(this).val()
+        let val = $(this).val();
         let rows = dtListDetailGram.getRows();
-        rows.forEach(row => {
-            let rowData = row.getData();
-            let val_kg = rowData.kg;
+        window.isUpdatingRowGram = true;
+        try {
+            rows.forEach(row => {
+                let rowData = row.getData();
+                let val_kg = rowData.kg;
 
-            let val_kg_loss = val.length > 0 ? (val_kg * val) / 100 : 0
-            val_kg_loss = val_kg_loss > 0 ? val_kg_loss.toFixed(2) : 0;
+                let val_kg_loss = val.length > 0 ? (val_kg * val) / 100 : 0;
+                val_kg_loss = val_kg_loss > 0 ? val_kg_loss.toFixed(2) : 0;
 
-            let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
-            val_total = val_total > 0 ? val_total.toFixed(2) : 0
+                let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
+                val_total = val_total > 0 ? val_total.toFixed(2) : 0;
 
-            let val_kuota = 0;//parseFloat(val_kg) - parseFloat(val_kg_loss);
-            val_kuota = val_kuota > 0 ? val_kuota.toFixed(2) : 0
+                let val_kuota = 0;
+                val_kuota = val_kuota > 0 ? val_kuota.toFixed(2) : 0;
 
-            let val_kuota_tambah = val_kuota - val_total;
+                let val_kuota_tambah = val_kuota - val_total;
 
-            row.update({
-                kg_loss: val_kg_loss,
-                total: val_total,
-                kuota: val_kuota,
-                kuota_tambah: val_kuota_tambah,
+                row.update({
+                    kg_loss: val_kg_loss,
+                    total: val_total,
+                    kuota: val_kuota,
+                    kuota_tambah: val_kuota_tambah,
+                });
             });
-        });
+        } finally {
+            window.isUpdatingRowGram = false;
+        }
     });
 
     function updateRow(data, total) {
