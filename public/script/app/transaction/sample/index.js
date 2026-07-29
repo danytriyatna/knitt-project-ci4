@@ -270,11 +270,11 @@ $(document).ready(function () {
             //         } 
             //     }
             // },
-            { headerSort: false, title: "No", formatter: "rownum", cssClass: 'text-center', hozAlign: "center", width: "6%", minWidth: 40 },
+            { headerSort: false, title: "No", formatter: "rownum", cssClass: 'text-center', hozAlign: "center", width: 50, resizable: false },
             { headerSort: false, title: "id_ukuran", field: "id_ukuran", cssClass: 'text-center', hozAlign: "center", visible: false },
-            { headerSort: false, title: "Ukuran", field: "ukuran", cssClass: 'text-center', hozAlign: "center", width: "20%", minWidth: 70 },
+            { headerSort: false, title: "Ukuran", field: "ukuran", cssClass: 'text-center', hozAlign: "center", widthGrow: 2, minWidth: 70 },
             {
-                headerSort: false, title: "QTY", field: "qty", cssClass: 'text-center', hozAlign: "center", width: "14%", minWidth: 60, editor: "number", cellEdited: updateTotal,
+                headerSort: false, title: "QTY", field: "qty", cssClass: 'text-center', hozAlign: "center", widthGrow: 2, minWidth: 70, editor: "number", cellEdited: updateTotal,
                 bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney
             },
             {
@@ -283,7 +283,7 @@ $(document).ready(function () {
                     thousand: ".",
                     symbol: "Rp",  // Simbol mata uang Rupiah
                     precision: 0,   // Tidak ada desimal
-                }, hozAlign: "right", width: "30%", minWidth: 100, editor: "number", cellEdited: updateTotal,
+                }, hozAlign: "right", widthGrow: 3, minWidth: 110, editor: "number", cellEdited: updateTotal,
                 bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney
             },
             {
@@ -292,7 +292,7 @@ $(document).ready(function () {
                     thousand: ".",
                     symbol: "Rp",  // Simbol mata uang Rupiah
                     precision: 0,   // Tidak ada desimal
-                }, hozAlign: "right", width: "30%", minWidth: 100,
+                }, hozAlign: "right", widthGrow: 3, minWidth: 110,
                 bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney
             },
         ],
@@ -1473,7 +1473,7 @@ $(document).ready(function () {
         columns: [
             {
                 title: "Colour", field: "kode_warna", sorter: "string", headerSort: false, align: "center", cssClass: "text-left",
-                width: "20%"
+                widthGrow: 3, minWidth: 120
             },
             {
                 title: "ID", field: "id", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
@@ -1481,11 +1481,11 @@ $(document).ready(function () {
             },
             {
                 title: "%", field: "persen", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
-                width: "10%"
+                widthGrow: 1, minWidth: 50
             },
             {
                 title: "GRAM", field: "gram", sorter: "string", headerSort: false, align: "center", cssClass: "text-end tabulator-editable",
-                width: "12%", editor: "number", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                widthGrow: 2, minWidth: 70, editor: "number", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
                 cellEdited: function (cell) {
                     if (window.isUpdatingRowGram) return;
                     window.isUpdatingRowGram = true;
@@ -1528,22 +1528,22 @@ $(document).ready(function () {
             },
             {
                 title: "NEEDS<br>(GRAM)", field: "gram_nd", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
-                width: "15%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                widthGrow: 2, minWidth: 90, bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
             },
 
             {
                 title: "IN KG", field: "kg", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
-                width: "13%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                widthGrow: 2, minWidth: 70, bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
             },
 
             {
                 title: "LOSS<br>(KG)", field: "kg_loss", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
-                width: "14%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                widthGrow: 2, minWidth: 70, bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
             },
 
             {
                 title: "NFP (KG)", field: "total", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
-                width: "16%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                widthGrow: 2, minWidth: 80, bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
             }
         ],
         locale: 'id',

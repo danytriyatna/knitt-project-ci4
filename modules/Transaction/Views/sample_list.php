@@ -338,7 +338,7 @@
         <h6 class="f-w-700">Quantity dan Harga per Ukuran</h6>
         <div class="row m-t-16">
           <div class="col-sm-12">
-            <div id="dt-detail-qty" class="table-responsive table-striped"></div>
+            <div id="dt-detail-qty" class="table-responsive table-striped w-100"></div>
           </div>
         </div>
 
@@ -358,7 +358,7 @@
               </div>
             </div>
             <br>
-            <div id="dt-detail-gram" class="table-responsive table-striped"></div>
+            <div id="dt-detail-gram" class="table-responsive table-striped w-100"></div>
           </div>
         </div>
       </div>
