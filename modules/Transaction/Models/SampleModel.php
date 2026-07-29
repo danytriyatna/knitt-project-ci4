@@ -1304,7 +1304,21 @@ class SampleModel extends \App\Models\PrModel
                 $dtGram = $this->getData_gram(null, 0, 999, null, null, $prgram);
 
                 if (!empty($dtGram)) {
+                    $sum_gram = 0;
+                    $sum_gram_nd = 0;
+                    $sum_kg = 0;
+                    $max_loss = 0;
+                    $sum_kg_loss = 0;
+                    $sum_total = 0;
+
                     foreach ($dtGram as $x) {
+                        $sum_gram += (float)($x->gram ?? 0);
+                        $sum_gram_nd += (float)($x->gram_nd ?? 0);
+                        $sum_kg += (float)($x->kg ?? 0);
+                        if ((float)($x->loss ?? 0) > $max_loss) $max_loss = (float)$x->loss;
+                        $sum_kg_loss += (float)($x->kg_loss ?? 0);
+                        $sum_total += (float)($x->total ?? 0);
+
                         $arrWarna = [
                             'id_walkorder_detail' => $woIdDet,
                             'id_barang' => $x->id_barang,
@@ -1318,6 +1332,16 @@ class SampleModel extends \App\Models\PrModel
                         ];
                         $this->insertRecordGetid("trans_walkorder_warna", $arrWarna);
                     }
+
+                    $this->updateRecord("trans_walkorder_detail", [
+                        'gram' => $sum_gram,
+                        'gram_nd' => $sum_gram_nd,
+                        'kg' => $sum_kg,
+                        'loss' => $max_loss,
+                        'kg_loss' => $sum_kg_loss,
+                        'total' => $sum_total,
+                        'kuota_tambah' => 0 - $sum_total
+                    ], 'id', $woIdDet);
                 } else {
                     for ($i = 0; $i < 8; $i++) {
                         $field_name = 'id_barang_' . ($i + 1);
