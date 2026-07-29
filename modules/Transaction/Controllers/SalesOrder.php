@@ -105,45 +105,45 @@ class SalesOrder extends BaseController
       "data" => array()
     );
 
+    $soDetailsMap = [];
+    $allDetIds = [];
+
+    // Phase 1: Collect details and IDs
     foreach ($results as $key => $row) {
-      
-      $id = encrypt($row->id);
-
-      $atr_edit = null;
-      $atr_del = null;
-      $btnAction = null;
-      if ($this->_edit) {
-        $atr_edit['title'] = 'Edit';
-        $atr_edit['url'] = $this->urlv . '/edit/';
-        $atr_edit['class'] = '';
-      }
-      if ($this->_delete) {
-        $atr_del['title'] = 'Hapus';
-        $atr_del['url'] = $this->urlv . '/delete/';
-        $atr_del['class'] = '';
-        $atr_del['onclick'] = "return confirm('Hapus Data ?')";
-      }
-      if ($atr_edit || $atr_del)
-        $btnAction = btn_action_group($id, $atr_edit, $atr_del);
-
-      // $aktif =  ($row->active) ? "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/deactivate/".$id."' data-confirm-message='Anda yakin ingin menonaktifkan user ini?'><i class='fa fa-check text-success'>&nbsp;</i></a>" :
-      //                            "<a href='javascript:void(0)' class='atr_active' data-item-active='utilitas/users/activate/".$id."' data-confirm-message='Anda yakin ingin mengaktifkan user ini?'><i class='fa fa-times text-danger'>&nbsp;</i></a>";
-        
-      $status = $row->status == 1 ? "Draft" : "Approved";
-
-      $pru['use'] = 1; // ambil ukuran yang digunnakan order 
-      $pru['id_sales_order'] = $row->id;
+      $pru = ['use' => 1, 'id_sales_order' => $row->id];
       $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
-      
       $detail = (!empty($dtUkuran)) ? $this->mSalesOrder->getDataDetailSalesOrder_crostab($row->id) : [];
       if (!empty($detail)) {
-        for ($i = 0; $i < count($detail); $i++) {
-          $drow = $detail[$i];
-          $allQty = $this->mSalesOrder->getTotal_qty($drow->id, 2);
-          $detail[$i]->qty      = $allQty;
+        foreach ($detail as $drow) {
+          if (!empty($drow->id)) {
+            $allDetIds[] = $drow->id;
+          }
         }
       }
-        
+      $soDetailsMap[$row->id] = [
+        'dtUkuran' => $dtUkuran,
+        'detail' => $detail
+      ];
+    }
+
+    // Phase 2: Batch query total qty for all collected detail IDs
+    $qtyMap = !empty($allDetIds) ? $this->mSalesOrder->getBatchTotalQtyByDetIds(array_unique($allDetIds)) : [];
+
+    // Phase 3: Populate build_array
+    foreach ($results as $key => $row) {
+      $id = encrypt($row->id);
+      $status = $row->status == 1 ? "Draft" : "Approved";
+
+      $dtUkuran = $soDetailsMap[$row->id]['dtUkuran'];
+      $detail = $soDetailsMap[$row->id]['detail'];
+
+      if (!empty($detail)) {
+        for ($i = 0; $i < count($detail); $i++) {
+          $dId = $detail[$i]->id;
+          $detail[$i]->qty = isset($qtyMap[$dId]) ? $qtyMap[$dId] : 0;
+        }
+      }
+
       array_push(
         $build_array["data"],
         array(
@@ -164,7 +164,6 @@ class SalesOrder extends BaseController
           "pengiriman" => !empty($row->pengiriman) ? \format_angka($row->pengiriman) : 0,
           "status"  => $status,
           "file_gambar" => !empty($row->file_name) ? base_url() . "uploads/sales_order/"  . $row->file_name : "",
-          // "detail" => $this->mSalesOrder->getDataDetailSalesOrder($row->id)
           "detail" => $detail,
           "key_ukuran" => $dtUkuran
         )
