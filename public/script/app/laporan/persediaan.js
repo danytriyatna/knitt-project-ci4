@@ -230,8 +230,22 @@ $("#exportExcel").click(function () {
 });
 
 $("#btn-reset").click(function () {
-  $("#filter_jenis_barang").val("").trigger("change");
-  $("#filter_gudang").val("").trigger("change");
+  const selectGudang = document.getElementById("filter_gudang");
+  let defaultGudangVal = "";
+  if (selectGudang) {
+    let optUtama = Array.from(selectGudang.options).find(opt => opt.text.trim().toLowerCase() === "gudang utama" || opt.value == "1");
+    if (optUtama) defaultGudangVal = optUtama.value;
+  }
+
+  const selectJenisBarang = document.getElementById("filter_jenis_barang");
+  let defaultJenisVal = "";
+  if (selectJenisBarang) {
+    let optBenang = Array.from(selectJenisBarang.options).find(opt => opt.text.trim().toUpperCase() === "BENANG RAJUT" || opt.value == "2");
+    if (optBenang) defaultJenisVal = optBenang.value;
+  }
+
+  $("#filter_jenis_barang").val(defaultJenisVal).trigger("change");
+  $("#filter_gudang").val(defaultGudangVal).trigger("change");
   $("#filter_tahun").val("").trigger("change");
   $("#filter_bulan").val("").trigger("change");
 });
@@ -299,8 +313,26 @@ function getUpdateDataLaporan() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+  const selectGudang = document.getElementById("filter_gudang");
+  const selectJenisBarang = document.getElementById("filter_jenis_barang");
   const selectBulan = document.getElementById("filter_bulan");
   const selectTahun = document.getElementById("filter_tahun");
+
+  // Set Gudang Utama sebagai default
+  if (selectGudang) {
+    let optUtama = Array.from(selectGudang.options).find(opt => opt.text.trim().toLowerCase() === "gudang utama" || opt.value == "1");
+    if (optUtama) {
+      $(selectGudang).val(optUtama.value).trigger("change");
+    }
+  }
+
+  // Set BENANG RAJUT sebagai default
+  if (selectJenisBarang) {
+    let optBenang = Array.from(selectJenisBarang.options).find(opt => opt.text.trim().toUpperCase() === "BENANG RAJUT" || opt.value == "2");
+    if (optBenang) {
+      $(selectJenisBarang).val(optBenang.value).trigger("change");
+    }
+  }
 
   const now = new Date();
   const bulanSekarang = now.getMonth() + 1; // getMonth() = 0–11

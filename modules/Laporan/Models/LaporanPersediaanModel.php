@@ -818,9 +818,12 @@ class LaporanPersediaanModel extends \App\Models\PrModel
                     $builder_detail->where('abx.month', $bulan);
                     $builder_detail->where('abx.year', $tahun);
                     $builder_detail->where('abx.lot_no', $lot_no);
-                    $builder_detail->where('abx.pack_id', $pack_id[$key]);
                     $builder_detail->where('abx.id_barang', $data->id_barang);
-                    // $builder_detail->where('abx.id_trans_barang', $value->id);
+                    if (!empty($pack_id[$key])) {
+                        $builder_detail->where('abx.pack_id', $pack_id[$key]);
+                    } else {
+                        $builder_detail->where('abx.pack_id IS NULL');
+                    }
                     $builder_detail->select("*");
 
                     $detail = $builder_detail->get()->getRow();
@@ -833,7 +836,17 @@ class LaporanPersediaanModel extends \App\Models\PrModel
                         }
                     }
                     else {
-                        $this->db->table("trans_barang_history")->update($isi, array("month" => $bulan, "year" => $tahun, "lot_no" => $lot_no, "id_barang" => $data->id_barang, "pack_id" => $pack_id[$key]));
+                        $builder_update = $this->db->table("trans_barang_history");
+                        $builder_update->where("month", $bulan);
+                        $builder_update->where("year", $tahun);
+                        $builder_update->where("lot_no", $lot_no);
+                        $builder_update->where("id_barang", $data->id_barang);
+                        if (!empty($pack_id[$key])) {
+                            $builder_update->where("pack_id", $pack_id[$key]);
+                        } else {
+                            $builder_update->where("pack_id IS NULL");
+                        }
+                        $builder_update->update($isi);
                     }
                 }
                 
