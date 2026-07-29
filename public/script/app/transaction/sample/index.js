@@ -825,9 +825,19 @@ $(document).ready(function () {
                     inpPoBarang8.val(data.detail.id_barang_8).trigger('change');
                 }
 
-                dtListDetailQty.setData(data.detailUkuran)
+                dtListDetailQty.setData(data.detailUkuran);
 
-                dtListDetailGram.setData(data.detail_gram)
+                window.savedGramMapByBarang = {};
+                window.savedGramMapByIndex = {};
+                if (data.detail_gram && data.detail_gram.length > 0) {
+                    data.detail_gram.forEach((gRow, idx) => {
+                        let valGram = parseFloat(gRow.gram) || 0;
+                        if (gRow.id_barang) window.savedGramMapByBarang[gRow.id_barang] = valGram;
+                        window.savedGramMapByIndex[idx] = valGram;
+                    });
+                }
+
+                dtListDetailGram.setData(data.detail_gram);
                 isModalPO.modal("show");
                 setTimeout(() => {
                     dtListDetailQty.redraw(true)
@@ -1299,222 +1309,98 @@ $(document).ready(function () {
         }
     });
 
-    // start table detail warna 
-    let detailQty = 0;
-    $("#btn-refresh-gram").on("click", function (e) {
-        e.preventDefault();
-        setGramasi()
-    });
+    function getGramForSlot(idx, idBarang, idWarna) {
+        let currentRows = dtListDetailGram ? dtListDetailGram.getData() : [];
+        if (idBarang && currentRows && currentRows.length > 0) {
+            let match = currentRows.find(r => r.id_barang == idBarang && (parseFloat(r.gram) || 0) > 0);
+            if (match) return parseFloat(match.gram) || 0;
+        }
+        if (currentRows && currentRows[idx] && (parseFloat(currentRows[idx].gram) || 0) > 0) {
+            return parseFloat(currentRows[idx].gram) || 0;
+        }
+        if (idBarang && window.savedGramMapByBarang && window.savedGramMapByBarang[idBarang] !== undefined) {
+            return parseFloat(window.savedGramMapByBarang[idBarang]) || 0;
+        }
+        if (window.savedGramMapByIndex && window.savedGramMapByIndex[idx] !== undefined) {
+            return parseFloat(window.savedGramMapByIndex[idx]) || 0;
+        }
+        return 0;
+    }
 
     let inpDetailLoss = $("#loss_perc");
     function setGramasi() {
         detailQty = getBottomCalcValue(dtListDetailQty, 'qty');
-        loss = inpDetailLoss.val().length > 0 ? inpDetailLoss.val() : 0
+        loss = inpDetailLoss.val().length > 0 ? parseFloat(inpDetailLoss.val()) : 0;
 
         Swal.fire({
-            title: "Muat Ulang data Gramasi akan menghilangkan data sebelumnya",
+            title: "Muat Ulang data Gramasi akan menyesuaikan ulang komposisi warna?",
             icon: 'question',
             confirmButtonText: 'Ya',
-            confirmButtonColor: '#dc3545',
+            confirmButtonColor: '#198754',
             showCancelButton: true,
             cancelButtonText: 'Batal',
             cancelButtonColor: '#6C757D'
         }).then((result) => {
             if (!result.isConfirmed) {
-                dtListDetailGram.setData([]);
-                return false
+                return false;
             }
-        })
+            buildGramasiData();
+        });
+    }
+
+    function buildGramasiData() {
+        detailQty = getBottomCalcValue(dtListDetailQty, 'qty');
+        loss = inpDetailLoss.val().length > 0 ? parseFloat(inpDetailLoss.val()) : 0;
 
         let gramData = [];
-        let gramIsi = {
-            'qty': detailQty,
-            'loss': loss,
-            'id': '',
-            'id_warna': '',
-            'id_barang': '',
-            'kode_warna': '',
-            'persen': 0,
-            'gram': 0,
-            'gram_nd': 0,
-            'kg': 0,
-            'kg_loss': 0,
-            'total': 0,
-        }
+        let slots = [
+            { warna: inpPoWarna1, barang: inpPoBarang1, elWarna: $("#po_warna1") },
+            { warna: inpPoWarna2, barang: inpPoBarang2, elWarna: $("#po_warna2") },
+            { warna: inpPoWarna3, barang: inpPoBarang3, elWarna: $("#po_warna3") },
+            { warna: inpPoWarna4, barang: inpPoBarang4, elWarna: $("#po_warna4") },
+            { warna: inpPoWarna5, barang: inpPoBarang5, elWarna: $("#po_warna5") },
+            { warna: inpPoWarna6, barang: inpPoBarang6, elWarna: $("#po_warna6") },
+            { warna: inpPoWarna7, barang: inpPoBarang7, elWarna: $("#po_warna7") },
+            { warna: inpPoWarna8, barang: inpPoBarang8, elWarna: $("#po_warna8") },
+        ];
 
+        slots.forEach((slot, idx) => {
+            let valWarna = slot.warna.val();
+            let valBarang = slot.barang.val();
+            let textWarna = slot.elWarna.find("option:selected").text();
 
-        let text1 = $("#po_warna1 option:selected").text();
-        if (inpPoWarna1.val().length > 0) {
-            let arrW1 = gramIsi
-            arrW1.id_warna = inpPoWarna1.val()
-            arrW1.kode_warna = text1
+            if ((valWarna && valWarna.length > 0) || (valBarang && valBarang.length > 0)) {
+                let gramVal = getGramForSlot(idx, valBarang, valWarna);
+                let val_gram_nd = gramVal * detailQty;
+                let val_kg = val_gram_nd / 1000;
+                let val_kg_loss = loss > 0 ? (val_kg * loss) / 100 : 0;
+                let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
 
-            gramData.push({
-                'id': '',
-                'id_warna': inpPoWarna1.val(),
-                'id_barang': inpPoBarang1.val(),
-                'kode_warna': text1,
-                'qty': detailQty,
-                'loss': loss,
-                'persen': 0,
-                'gram': 0,
-                'gram_nd': 0,
-                'kg': 0,
-                'kg_loss': 0,
-                'total': 0,
-            })
-        }
+                gramData.push({
+                    'id': '',
+                    'id_warna': valWarna,
+                    'id_barang': valBarang,
+                    'kode_warna': textWarna,
+                    'qty': detailQty,
+                    'loss': loss,
+                    'persen': 0,
+                    'gram': gramVal,
+                    'gram_nd': val_gram_nd,
+                    'kg': val_kg,
+                    'kg_loss': val_kg_loss,
+                    'total': val_total,
+                });
+            }
+        });
 
-        let text2 = $("#po_warna2 option:selected").text();
-        if (inpPoWarna2.val().length > 0) {
-            let arrW2 = gramIsi
-            arrW2.id_warna = inpPoWarna2.val()
-            arrW2.kode_warna = text2
-            gramData.push({
-                'id': '',
-                'id_warna': inpPoWarna2.val(),
-                'id_barang': inpPoBarang2.val(),
-                'kode_warna': text2,
-                'qty': detailQty,
-                'loss': loss,
-                'persen': 0,
-                'gram': 0,
-                'gram_nd': 0,
-                'kg': 0,
-                'kg_loss': 0,
-                'total': 0,
-            })
-        }
+        dtListDetailGram.setData(gramData);
 
-        let text3 = $("#po_warna3 option:selected").text();
-        if (inpPoWarna3.val().length > 0) {
-            let arrW3 = gramIsi
-            arrW3.id_warna = inpPoWarna3.val()
-            arrW3.kode_warna = text3
-            gramData.push({
-                'id': '',
-                'id_warna': inpPoWarna3.val(),
-                'id_barang': inpPoBarang3.val(),
-                'kode_warna': text3,
-                'qty': detailQty,
-                'loss': loss,
-                'persen': 0,
-                'gram': 0,
-                'gram_nd': 0,
-                'kg': 0,
-                'kg_loss': 0,
-                'total': 0,
-            })
-        }
-
-        let text4 = $("#po_warna4 option:selected").text();
-        if (inpPoWarna4.val().length > 0) {
-            let arrW4 = gramIsi
-            arrW4.id_warna = inpPoWarna4.val()
-            arrW4.kode_warna = text4
-            gramData.push({
-                'id': '',
-                'id_warna': inpPoWarna4.val(),
-                'id_barang': inpPoBarang4.val(),
-                'kode_warna': text4,
-                'qty': detailQty,
-                'loss': loss,
-                'persen': 0,
-                'gram': 0,
-                'gram_nd': 0,
-                'kg': 0,
-                'kg_loss': 0,
-                'total': 0,
-            })
-        }
-
-        let text5 = $("#po_warna5 option:selected").text();
-        if (inpPoWarna5.val().length > 0) {
-            let arrW5 = gramIsi
-            arrW5.id_warna = inpPoWarna5.val()
-            arrW5.kode_warna = text5
-            gramData.push({
-                'id': '',
-                'id_warna': inpPoWarna5.val(),
-                'id_barang': inpPoBarang5.val(),
-                'kode_warna': text5,
-                'qty': detailQty,
-                'loss': loss,
-                'persen': 0,
-                'gram': 0,
-                'gram_nd': 0,
-                'kg': 0,
-                'kg_loss': 0,
-                'total': 0,
-            })
-        }
-
-        let text6 = $("#po_warna6 option:selected").text();
-        if (inpPoWarna6.val().length > 0) {
-            let arrW6 = gramIsi
-            arrW6.id_warna = inpPoWarna6.val()
-            arrW6.kode_warna = text6
-            gramData.push({
-                'id': '',
-                'id_warna': inpPoWarna6.val(),
-                'id_barang': inpPoBarang6.val(),
-                'kode_warna': text6,
-                'qty': detailQty,
-                'loss': loss,
-                'persen': 0,
-                'gram': 0,
-                'gram_nd': 0,
-                'kg': 0,
-                'kg_loss': 0,
-                'total': 0,
-            })
-        }
-
-        let text7 = $("#po_warna7 option:selected").text();
-        if (inpPoWarna7.val().length > 0) {
-            let arrW7 = gramIsi
-            arrW7.id_warna = inpPoWarna7.val()
-            arrW7.kode_warna = text7
-            gramData.push({
-                'id': '',
-                'id_warna': inpPoWarna7.val(),
-                'id_barang': inpPoBarang7.val(),
-                'kode_warna': text7,
-                'qty': detailQty,
-                'loss': loss,
-                'persen': 0,
-                'gram': 0,
-                'gram_nd': 0,
-                'kg': 0,
-                'kg_loss': 0,
-                'total': 0,
-            })
-        }
-
-        let text8 = $("#po_warna8 option:selected").text();
-        if (inpPoWarna8.val().length > 0) {
-            let arrW8 = gramIsi
-            arrW8.id_warna = inpPoWarna8.val()
-            arrW8.kode_warna = text8
-            gramData.push({
-                'id': '',
-                'id_warna': inpPoWarna8.val(),
-                'id_barang': inpPoBarang8.val(),
-                'kode_warna': text8,
-                'qty': detailQty,
-                'loss': loss,
-                'persen': 0,
-                'gram': 0,
-                'gram_nd': 0,
-                'kg': 0,
-                'kg_loss': 0,
-                'total': 0,
-            })
-        }
-        // console.log(gramData);
         setTimeout(() => {
-            dtListDetailGram.setData(gramData);
-        }, 500);
+            let total_gram = gramData.reduce(function (sum, row) {
+                return sum + (parseFloat(row.gram) || 0);
+            }, 0);
+            updateRow([], total_gram);
+        }, 300);
     }
 
 
