@@ -317,7 +317,11 @@ $(document).ready(function () {
         if (!dtListDetailGram) return;
         let detailQty = getBottomCalcValue(dtListDetailQty, 'qty') || 0;
         let calcQty = (detailQty && parseFloat(detailQty) > 0) ? parseFloat(detailQty) : 1;
-        let loss = inpDetailLoss.val().length > 0 ? parseFloat(inpDetailLoss.val()) : 0;
+        let loss = parseFloat(inpDetailLoss.val());
+        if (isNaN(loss) || loss <= 0) {
+            loss = 5;
+            inpDetailLoss.val(5);
+        }
 
         let rows = dtListDetailGram.getRows();
         window.isUpdatingRowGram = true;
@@ -1381,7 +1385,11 @@ $(document).ready(function () {
     function buildGramasiData() {
         detailQty = getBottomCalcValue(dtListDetailQty, 'qty') || 0;
         let calcQty = (detailQty && parseFloat(detailQty) > 0) ? parseFloat(detailQty) : 1;
-        loss = inpDetailLoss.val().length > 0 ? parseFloat(inpDetailLoss.val()) : 0;
+        loss = parseFloat(inpDetailLoss.val());
+        if (isNaN(loss) || loss <= 0) {
+            loss = 5;
+            inpDetailLoss.val(5);
+        }
 
         let gramData = [];
         let slots = [
@@ -1469,7 +1477,11 @@ $(document).ready(function () {
                         let val_gram = rowData.gram ? parseFloat(rowData.gram) : 0;
                         let val_gram_nd = val_gram * qty;
                         let val_kg = val_gram_nd / 1000;
-                        let val_loss = inpDetailLoss.val().length > 0 ? parseFloat(inpDetailLoss.val()) : 0;
+                        let val_loss = parseFloat(inpDetailLoss.val());
+                        if (isNaN(val_loss) || val_loss <= 0) {
+                            val_loss = 5;
+                            inpDetailLoss.val(5);
+                        }
                         let val_kg_loss = val_loss > 0 ? (val_kg * val_loss) / 100 : 0;
                         let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
                         let val_kuota = 0;

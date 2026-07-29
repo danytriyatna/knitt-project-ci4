@@ -1177,7 +1177,7 @@ class SampleModel extends \App\Models\PrModel
                         "gram" => $xrow['gram'],
                         "gram_nd" => $xrow['gram_nd'],
                         "kg" => $xrow['kg'],
-                        "loss" => $xrow['loss'],
+                        "loss" => (!empty($xrow['loss']) && (float)$xrow['loss'] > 0) ? (float)$xrow['loss'] : 5,
                         "kg_loss" => $xrow['kg_loss'],
                         "total" => $xrow['total'],
                         "active" => 1,

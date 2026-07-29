@@ -340,6 +340,9 @@ class WorkOrder extends BaseController
     $detail_id    = $this->request->getPost('detail');
     $detail_qty   = $this->request->getPost('detail_qty');
     $detail_loss  = $this->request->getPost('detail_loss');
+    if (empty($detail_loss) || (float)$detail_loss <= 0) {
+      $detail_loss = 5;
+    }
     $list_data    = $this->request->getPost('warna_data');
 
 
