@@ -310,6 +310,38 @@ $(document).ready(function () {
             let newTotal = calculateTotal(row.getData());
             row.update({ harga_total: newTotal });
         }
+        recalcGramasi();
+    }
+
+    function recalcGramasi() {
+        if (!dtListDetailGram) return;
+        let detailQty = getBottomCalcValue(dtListDetailQty, 'qty') || 0;
+        let calcQty = (detailQty && parseFloat(detailQty) > 0) ? parseFloat(detailQty) : 1;
+        let loss = inpDetailLoss.val().length > 0 ? parseFloat(inpDetailLoss.val()) : 0;
+
+        let rows = dtListDetailGram.getRows();
+        window.isUpdatingRowGram = true;
+        try {
+            rows.forEach(row => {
+                let rowData = row.getData();
+                let val_gram = parseFloat(rowData.gram) || 0;
+                let val_gram_nd = val_gram * calcQty;
+                let val_kg = val_gram_nd / 1000;
+                let val_kg_loss = loss > 0 ? (val_kg * loss) / 100 : 0;
+                let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
+
+                row.update({
+                    qty: calcQty,
+                    loss: loss,
+                    gram_nd: val_gram_nd,
+                    kg: val_kg,
+                    kg_loss: val_kg_loss,
+                    total: val_total
+                });
+            });
+        } finally {
+            window.isUpdatingRowGram = false;
+        }
     }
 
 
@@ -1347,7 +1379,8 @@ $(document).ready(function () {
     }
 
     function buildGramasiData() {
-        detailQty = getBottomCalcValue(dtListDetailQty, 'qty');
+        detailQty = getBottomCalcValue(dtListDetailQty, 'qty') || 0;
+        let calcQty = (detailQty && parseFloat(detailQty) > 0) ? parseFloat(detailQty) : 1;
         loss = inpDetailLoss.val().length > 0 ? parseFloat(inpDetailLoss.val()) : 0;
 
         let gramData = [];
@@ -1369,7 +1402,7 @@ $(document).ready(function () {
 
             if ((valWarna && valWarna.length > 0) || (valBarang && valBarang.length > 0)) {
                 let gramVal = getGramForSlot(idx);
-                let val_gram_nd = gramVal * detailQty;
+                let val_gram_nd = gramVal * calcQty;
                 let val_kg = val_gram_nd / 1000;
                 let val_kg_loss = loss > 0 ? (val_kg * loss) / 100 : 0;
                 let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
@@ -1379,7 +1412,7 @@ $(document).ready(function () {
                     'id_warna': valWarna,
                     'id_barang': valBarang,
                     'kode_warna': textWarna,
-                    'qty': detailQty,
+                    'qty': calcQty,
                     'loss': loss,
                     'persen': 0,
                     'gram': gramVal,
@@ -1423,7 +1456,8 @@ $(document).ready(function () {
                     if (window.isUpdatingRowGram) return;
                     window.isUpdatingRowGram = true;
                     try {
-                        let qty = parseInt(detailQty);
+                        let dQty = getBottomCalcValue(dtListDetailQty, 'qty') || 0;
+                        let qty = (dQty && parseFloat(dQty) > 0) ? parseFloat(dQty) : 1;
                         let rowData = cell.getRow().getData();
                         let tableColumn = cell._cell.column.cells;
                         let total_gram = 0;
@@ -1432,10 +1466,11 @@ $(document).ready(function () {
                             total_gram = tableColumn[index_total].value;
                         }
                         updateRow(rowData, total_gram);
-                        let val_gram = rowData.gram ? rowData.gram : 0;
+                        let val_gram = rowData.gram ? parseFloat(rowData.gram) : 0;
                         let val_gram_nd = val_gram * qty;
                         let val_kg = val_gram_nd / 1000;
-                        let val_kg_loss = inpDetailLoss.val().length > 0 ? (val_kg * inpDetailLoss.val()) / 100 : 0;
+                        let val_loss = inpDetailLoss.val().length > 0 ? parseFloat(inpDetailLoss.val()) : 0;
+                        let val_kg_loss = val_loss > 0 ? (val_kg * val_loss) / 100 : 0;
                         let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
                         let val_kuota = 0;
                         let val_kuota_tambah = val_kuota - val_total;
@@ -1487,35 +1522,7 @@ $(document).ready(function () {
     });
 
     inpDetailLoss.on("change", function () {
-        let val = $(this).val();
-        let rows = dtListDetailGram.getRows();
-        window.isUpdatingRowGram = true;
-        try {
-            rows.forEach(row => {
-                let rowData = row.getData();
-                let val_kg = rowData.kg;
-
-                let val_kg_loss = val.length > 0 ? (val_kg * val) / 100 : 0;
-                val_kg_loss = val_kg_loss > 0 ? val_kg_loss.toFixed(2) : 0;
-
-                let val_total = parseFloat(val_kg) + parseFloat(val_kg_loss);
-                val_total = val_total > 0 ? val_total.toFixed(2) : 0;
-
-                let val_kuota = 0;
-                val_kuota = val_kuota > 0 ? val_kuota.toFixed(2) : 0;
-
-                let val_kuota_tambah = val_kuota - val_total;
-
-                row.update({
-                    kg_loss: val_kg_loss,
-                    total: val_total,
-                    kuota: val_kuota,
-                    kuota_tambah: val_kuota_tambah,
-                });
-            });
-        } finally {
-            window.isUpdatingRowGram = false;
-        }
+        recalcGramasi();
     });
 
     function updateRow(data, total) {
