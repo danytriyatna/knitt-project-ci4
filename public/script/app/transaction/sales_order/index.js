@@ -1167,7 +1167,11 @@ $(document).ready(function () {
                 success: function (res) {
                     if (res.data && res.data.length > 0) {
                         rowDet.show();
-                        setColumDetailData(res);
+                        // res dari endpoint "view" berformat {data, ukuran},
+                        // sedangkan setColumDetailData() mengharapkan {detail, key_ukuran}
+                        // (format endpoint "detail"). Normalisasi dulu supaya tabel Colour
+                        // ikut terisi otomatis saat memilih Sample pada SO baru.
+                        setColumDetailData({ detail: res.data, key_ukuran: res.ukuran });
                     }
                 }
             });

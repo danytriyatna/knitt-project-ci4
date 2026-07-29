@@ -177,70 +177,77 @@ class SalesOrder extends BaseController
   {
     $detail = [];
     $dtUkuran = [];
+    $idSample = $this->request->getGet('idSample');
     $kodeOrder = $this->request->getGet('kodeOrder');
     $soId = $this->request->getGet('soId');
 
-    $data = $this->mSalesOrder->getDataSO($kodeOrder);
-
-    if (!empty($data)) {
-      $id = !empty($data) ? $data->id : null;
-      $pru['use'] = 1; // ambil ukuran yang digunakan order 
-      $pru['id_sales_order'] = $id;
-      $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
-      $detail = (!empty($dtUkuran)) ? $this->mSalesOrder->getDataDetailSalesOrder_crostab($id) : [];
-    } else {
-      $data = $this->mSample->getDataSample($kodeOrder);
+    if (!empty($idSample)) {
+      $id = $idSample;
+      $pru['use'] = 1;
+      $pru['id_sample'] = $id;
+      $dtUkuran = $this->mSample->getUkuranTrans($pru);
+      $detail = (!empty($dtUkuran)) ? $this->mSample->getDataDetailSample_crostab($id) : [];
+    } else if (!empty($kodeOrder)) {
+      $data = $this->mSalesOrder->getDataSO($kodeOrder);
       if (!empty($data)) {
         $id = !empty($data) ? $data->id : null;
         $pru['use'] = 1; // ambil ukuran yang digunakan order 
-        $pru['id_sample'] = $id;
-        $dtUkuran = $this->mSample->getUkuranTrans($pru);
-
-        $detail = (!empty($dtUkuran)) ? $this->mSample->getDataDetailSample_crostab($id) : [];
-
-        if (empty($soId)) {
-          // ✅ SAAT TAMBAH BARU: Set seluruh QTY warna dari sampel ke 0
-          if (!empty($detail)) {
-            foreach ($detail as &$drow) {
-              foreach ($dtUkuran as $uk) {
-                $keyUk = ($uk->key_ukuran == 'all') ? 'all_' : $uk->key_ukuran;
-                if (isset($drow->$keyUk)) {
-                  $drow->$keyUk = 0;
-                }
-              }
-              $drow->total_harga = 0;
-            }
-          }
-        } else {
-          // ✅ SAAT EDIT: Pertahankan warna & QTY yang sudah terinput di SO, set QTY 0 hanya untuk warna sampel yang belum terinput
-          $existingDetail = $this->mSalesOrder->getDataDetailSalesOrder_crostab(decrypt($soId));
-          $existingColorMap = [];
-          if (!empty($existingDetail)) {
-            foreach ($existingDetail as $ex) {
-              $existingColorMap[$ex->colour] = $ex;
-            }
-          }
-
-          $finalDetail = [];
-          if (!empty($detail)) {
-            foreach ($detail as $drow) {
-              if (isset($existingColorMap[$drow->colour])) {
-                $finalDetail[] = $existingColorMap[$drow->colour];
-              } else {
-                foreach ($dtUkuran as $uk) {
-                  $keyUk = ($uk->key_ukuran == 'all') ? 'all_' : $uk->key_ukuran;
-                  if (isset($drow->$keyUk)) {
-                    $drow->$keyUk = 0;
-                  }
-                }
-                $drow->total_harga = 0;
-                $finalDetail[] = $drow;
-              }
-            }
-          }
-          $detail = $finalDetail;
+        $pru['id_sales_order'] = $id;
+        $dtUkuran = $this->mSalesOrder->getUkuranTrans($pru);
+        $detail = (!empty($dtUkuran)) ? $this->mSalesOrder->getDataDetailSalesOrder_crostab($id) : [];
+      } else {
+        $data = $this->mSample->getDataSample($kodeOrder);
+        if (!empty($data)) {
+          $id = !empty($data) ? $data->id : null;
+          $pru['use'] = 1; // ambil ukuran yang digunakan order 
+          $pru['id_sample'] = $id;
+          $dtUkuran = $this->mSample->getUkuranTrans($pru);
+          $detail = (!empty($dtUkuran)) ? $this->mSample->getDataDetailSample_crostab($id) : [];
         }
       }
+    }
+
+    if (empty($soId)) {
+      // ✅ SAAT TAMBAH BARU: Set seluruh QTY warna dari sampel ke 0
+      if (!empty($detail)) {
+        foreach ($detail as &$drow) {
+          foreach ($dtUkuran as $uk) {
+            $keyUk = ($uk->key_ukuran == 'all') ? 'all_' : $uk->key_ukuran;
+            if (isset($drow->$keyUk)) {
+              $drow->$keyUk = 0;
+            }
+          }
+          $drow->total_harga = 0;
+        }
+      }
+    } else {
+      // ✅ SAAT EDIT: Pertahankan warna & QTY yang sudah terinput di SO, set QTY 0 hanya untuk warna sampel yang belum terinput
+      $existingDetail = $this->mSalesOrder->getDataDetailSalesOrder_crostab(decrypt($soId));
+      $existingColorMap = [];
+      if (!empty($existingDetail)) {
+        foreach ($existingDetail as $ex) {
+          $existingColorMap[$ex->colour] = $ex;
+        }
+      }
+
+      $finalDetail = [];
+      if (!empty($detail)) {
+        foreach ($detail as $drow) {
+          if (isset($existingColorMap[$drow->colour])) {
+            $finalDetail[] = $existingColorMap[$drow->colour];
+          } else {
+            foreach ($dtUkuran as $uk) {
+              $keyUk = ($uk->key_ukuran == 'all') ? 'all_' : $uk->key_ukuran;
+              if (isset($drow->$keyUk)) {
+                $drow->$keyUk = 0;
+              }
+            }
+            $drow->total_harga = 0;
+            $finalDetail[] = $drow;
+          }
+        }
+      }
+      $detail = $finalDetail;
     }
 
     return $this->response->setJSON(array("data" => $detail, "ukuran" => $dtUkuran));
