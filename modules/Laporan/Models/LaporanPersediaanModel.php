@@ -391,7 +391,7 @@ class LaporanPersediaanModel extends \App\Models\PrModel
     {
         // dd($idJenisBarang);
         $builder = $this->db->table("trans_barang_history a");
-        $builder->select("a.*, b.nama_barang, c.nama_jenis_barang, a.pack_id, rp.pack_name, b.kode_barang || ' ' || b.nama_barang as barang, 
+        $builder->select("a.*, b.nama_barang, c.nama_jenis_barang, a.pack_id, COALESCE(rp.pack_name, '-') as pack_name, COALESCE(NULLIF(a.lot_no, ''), '-') as lot_no, b.kode_barang || ' ' || b.nama_barang as barang, 
                             CAST(a.jumlah AS DECIMAL(18,2)) as saldo_akhir, CAST(a.stok_awal AS DECIMAL(18,2)) as saldo_awal,
                             w.keterangan as color_code, rs.nama_satuan");
         $builder->join("ref_barang b", "a.id_barang = b.id", "inner");

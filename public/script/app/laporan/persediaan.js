@@ -28,8 +28,9 @@ let dtList = new Tabulator("#dt-list", {
       `;
     }
 
-    // Level pack_name: tampil normal
-    return `<b>${value}</b> <span style="color:#666;">(${count} items)</span>`;
+    // Level pack_name: jika pack_name null/empty/undefined, tampilkan "-"
+    let displayPack = (value === null || value === "null" || value === "" || !value) ? "-" : value;
+    return `<b>${displayPack}</b> <span style="color:#666;">(${count} items)</span>`;
   },
 
   columns: [
