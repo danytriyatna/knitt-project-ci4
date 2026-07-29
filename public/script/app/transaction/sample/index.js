@@ -1471,7 +1471,7 @@ $(document).ready(function () {
         columns: [
             {
                 title: "Colour", field: "kode_warna", sorter: "string", headerSort: false, align: "center", cssClass: "text-left",
-                width: "22%"
+                width: "20%"
             },
             {
                 title: "ID", field: "id", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
@@ -1483,7 +1483,7 @@ $(document).ready(function () {
             },
             {
                 title: "GRAM", field: "gram", sorter: "string", headerSort: false, align: "center", cssClass: "text-end tabulator-editable",
-                width: "13%", editor: "number", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                width: "12%", editor: "number", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
                 cellEdited: function (cell) {
                     if (window.isUpdatingRowGram) return;
                     window.isUpdatingRowGram = true;
@@ -1536,12 +1536,12 @@ $(document).ready(function () {
 
             {
                 title: "LOSS<br>(KG)", field: "kg_loss", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
-                width: "13%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                width: "14%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
             },
 
             {
                 title: "NFP (KG)", field: "total", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
-                width: "14%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                width: "16%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
             }
         ],
         locale: 'id',
