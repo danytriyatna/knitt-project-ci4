@@ -270,11 +270,11 @@ $(document).ready(function () {
             //         } 
             //     }
             // },
-            { headerSort: false, title: "No", formatter: "rownum", cssClass: 'text-center', hozAlign: "center", width: "6%" },
+            { headerSort: false, title: "No", formatter: "rownum", cssClass: 'text-center', hozAlign: "center", width: "6%", minWidth: 40 },
             { headerSort: false, title: "id_ukuran", field: "id_ukuran", cssClass: 'text-center', hozAlign: "center", visible: false },
-            { headerSort: false, title: "Ukuran", field: "ukuran", cssClass: 'text-center', hozAlign: "center", width: "20%" },
+            { headerSort: false, title: "Ukuran", field: "ukuran", cssClass: 'text-center', hozAlign: "center", width: "20%", minWidth: 70 },
             {
-                headerSort: false, title: "QTY", field: "qty", cssClass: 'text-center', hozAlign: "center", width: "14%", editor: "number", cellEdited: updateTotal,
+                headerSort: false, title: "QTY", field: "qty", cssClass: 'text-center', hozAlign: "center", width: "14%", minWidth: 60, editor: "number", cellEdited: updateTotal,
                 bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney
             },
             {
@@ -283,7 +283,7 @@ $(document).ready(function () {
                     thousand: ".",
                     symbol: "Rp",  // Simbol mata uang Rupiah
                     precision: 0,   // Tidak ada desimal
-                }, hozAlign: "right", width: "30%", editor: "number", cellEdited: updateTotal,
+                }, hozAlign: "right", width: "30%", minWidth: 100, editor: "number", cellEdited: updateTotal,
                 bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney
             },
             {
@@ -292,7 +292,7 @@ $(document).ready(function () {
                     thousand: ".",
                     symbol: "Rp",  // Simbol mata uang Rupiah
                     precision: 0,   // Tidak ada desimal
-                }, hozAlign: "right", width: "30%",
+                }, hozAlign: "right", width: "30%", minWidth: 100,
                 bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney
             },
         ],
@@ -813,6 +813,14 @@ $(document).ready(function () {
 
     isModalPO.on('show.bs.modal shown.bs.modal', function () {
         ensureSelect2Barang();
+        setTimeout(function () {
+            if (typeof dtListDetailQty !== 'undefined') dtListDetailQty.redraw(true);
+            if (typeof dtListDetailGram !== 'undefined') dtListDetailGram.redraw(true);
+        }, 50);
+        setTimeout(function () {
+            if (typeof dtListDetailQty !== 'undefined') dtListDetailQty.redraw(true);
+            if (typeof dtListDetailGram !== 'undefined') dtListDetailGram.redraw(true);
+        }, 250);
     });
 
     function getDetailQty(id, idDet) {
