@@ -37,14 +37,34 @@ let dtList = new Tabulator("#dt-list", {
     { title: "PACK", field: "pack_name", width: "9%" },
     { title: "LOT", field: "lot_no", width: "9%" },
     { title: "Size/Warna", field: "nama_satuan", hozAlign: "left", width: "15%" },
-    { title: "Qty<br>Awal", field: "saldo_awal", hozAlign: "right", width: "12%", headerHozAlign: "right" },
-    { title: "Qty<br>Masuk", field: "masuk", hozAlign: "right", width: "12%", headerHozAlign: "right", bottomCalc: "sum" },
-    { title: "Qty<br>Keluar", field: "keluar", hozAlign: "right", width: "12%", headerHozAlign: "right", bottomCalc: "sum" },
     {
-      title: "Qty<br>Akhir", field: "saldo_akhir", hozAlign: "right", width: "12%", headerHozAlign: "right",
+      title: "Qty<br>Awal", field: "saldo_awal", hozAlign: "right", width: "12%", headerHozAlign: "right",
+      formatter: "money",
+      formatterParams: { decimal: ",", thousand: ".", precision: 2 }
+    },
+    {
+      title: "Qty<br>Masuk", field: "masuk", hozAlign: "right", width: "12%", headerHozAlign: "right",
+      formatter: "money",
+      formatterParams: { decimal: ",", thousand: ".", precision: 2 },
       bottomCalc: "sum",
       bottomCalcFormatter: "money",
-      bottomCalcFormatterParams: { decimal: ",", thousand: "." }
+      bottomCalcFormatterParams: { decimal: ",", thousand: ".", precision: 2 }
+    },
+    {
+      title: "Qty<br>Keluar", field: "keluar", hozAlign: "right", width: "12%", headerHozAlign: "right",
+      formatter: "money",
+      formatterParams: { decimal: ",", thousand: ".", precision: 2 },
+      bottomCalc: "sum",
+      bottomCalcFormatter: "money",
+      bottomCalcFormatterParams: { decimal: ",", thousand: ".", precision: 2 }
+    },
+    {
+      title: "Qty<br>Akhir", field: "saldo_akhir", hozAlign: "right", width: "12%", headerHozAlign: "right",
+      formatter: "money",
+      formatterParams: { decimal: ",", thousand: ".", precision: 2 },
+      bottomCalc: "sum",
+      bottomCalcFormatter: "money",
+      bottomCalcFormatterParams: { decimal: ",", thousand: ".", precision: 2 }
     },
     {
       title: "Nilai", field: "price", hozAlign: "right", width: "17%",

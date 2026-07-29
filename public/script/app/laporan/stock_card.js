@@ -12,7 +12,10 @@ let dtList = new Tabulator("#dt-list", {
         { title: "Pack", field: "pack_name", hozAlign: "left", width: "10%" },
         // {title:"Saldo Awal", field:"saldo_awal", hozAlign:"right",width:"10%", bottomCalc: 'sum'},
         {
-            title: "Qty<br>Masuk", field: "masuk", hozAlign: "right", width: "10%", bottomCalc: "sum",
+            title: "Qty<br>Masuk", field: "masuk", hozAlign: "right", width: "10%",
+            formatter: "money",
+            formatterParams: { decimal: ",", thousand: ".", precision: 2 },
+            bottomCalc: "sum",
             bottomCalcFormatter: "money",
             bottomCalcFormatterParams: {
                 decimal: ",",
@@ -21,7 +24,10 @@ let dtList = new Tabulator("#dt-list", {
             },
         },
         {
-            title: "Qty<br>Keluar", field: "keluar", hozAlign: "right", width: "10%", bottomCalc: "sum",
+            title: "Qty<br>Keluar", field: "keluar", hozAlign: "right", width: "10%",
+            formatter: "money",
+            formatterParams: { decimal: ",", thousand: ".", precision: 2 },
+            bottomCalc: "sum",
             bottomCalcFormatter: "money",
             bottomCalcFormatterParams: {
                 decimal: ",",
