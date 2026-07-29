@@ -241,7 +241,7 @@
             <div class="form-group row">
               <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_barang1">Barang A</label>
               <div class="col-md-9">
-                <select id="po_barang1" name="po_barang1" class="form-select select2" data-placeholder="-- Pilih Barang A --">
+                <select id="po_barang1" name="po_barang1" class="form-select select2-barang-lazy" data-placeholder="-- Pilih Barang A --">
                   <option value=""></option>
                   <?php foreach ($barang as $item) : ?>
                     <option data-warna="<?= $item['id_warna'] ?>" value="<?= $item['id'] ?>"><?= $item['kode_barang']." - ".$item['nama_barang'] ?></option>
@@ -252,7 +252,7 @@
             <div class="form-group row">
               <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_barang2">Barang B</label>
               <div class="col-md-9">
-                <select id="po_barang2" name="po_barang2" class="form-select select2" data-placeholder="-- Pilih Barang B --">
+                <select id="po_barang2" name="po_barang2" class="form-select select2-barang-lazy" data-placeholder="-- Pilih Barang B --">
                   <option value=""></option>
                   <?php foreach ($barang as $item) : ?>
                     <option data-warna="<?= $item['id_warna'] ?>" value="<?= $item['id'] ?>"><?= $item['kode_barang']." - ".$item['nama_barang'] ?></option>
@@ -263,7 +263,7 @@
             <div class="form-group row">
               <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_barang3">Barang C</label>
               <div class="col-md-9">
-                <select id="po_barang3" name="po_barang3" class="form-select select2" data-placeholder="-- Pilih Barang C --">
+                <select id="po_barang3" name="po_barang3" class="form-select select2-barang-lazy" data-placeholder="-- Pilih Barang C --">
                   <option value=""></option>
                   <?php foreach ($barang as $item) : ?>
                     <option data-warna="<?= $item['id_warna'] ?>" value="<?= $item['id'] ?>"><?= $item['kode_barang']." - ".$item['nama_barang'] ?></option>
@@ -274,7 +274,7 @@
             <div class="form-group row">
               <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_barang4">Barang D</label>
               <div class="col-md-9">
-                <select id="po_barang4" name="po_barang4" class="form-select select2" data-placeholder="-- Pilih Barang D --">
+                <select id="po_barang4" name="po_barang4" class="form-select select2-barang-lazy" data-placeholder="-- Pilih Barang D --">
                   <option value=""></option>
                   <?php foreach ($barang as $item) : ?>
                     <option data-warna="<?= $item['id_warna'] ?>" value="<?= $item['id'] ?>"><?= $item['kode_barang']." - ".$item['nama_barang'] ?></option>
@@ -288,7 +288,7 @@
             <div class="form-group row">
               <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_barang6">Barang E</label>
               <div class="col-md-9">
-                <select id="po_barang5" name="po_barang5" class="form-select select2" data-placeholder="-- Pilih Barang E --">
+                <select id="po_barang5" name="po_barang5" class="form-select select2-barang-lazy" data-placeholder="-- Pilih Barang E --">
                   <option value=""></option>
                   <?php foreach ($barang as $item) : ?>
                     <option data-warna="<?= $item['id_warna'] ?>" value="<?= $item['id'] ?>"><?= $item['kode_barang']." - ".$item['nama_barang'] ?></option>
@@ -299,7 +299,7 @@
             <div class="form-group row">
               <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_barang7">Barang F</label>
               <div class="col-md-9">
-                <select id="po_barang6" name="po_barang6" class="form-select select2" data-placeholder="-- Pilih Barang F --">
+                <select id="po_barang6" name="po_barang6" class="form-select select2-barang-lazy" data-placeholder="-- Pilih Barang F --">
                   <option value=""></option>
                   <?php foreach ($barang as $item) : ?>
                     <option data-warna="<?= $item['id_warna'] ?>" value="<?= $item['id'] ?>"><?= $item['kode_barang']." - ".$item['nama_barang'] ?></option>
@@ -310,7 +310,7 @@
             <div class="form-group row">
               <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_barang7">Barang G</label>
               <div class="col-md-9">
-                <select id="po_barang7" name="po_barang7" class="form-select select2" data-placeholder="-- Pilih Barang G --">
+                <select id="po_barang7" name="po_barang7" class="form-select select2-barang-lazy" data-placeholder="-- Pilih Barang G --">
                   <option value=""></option>
                   <?php foreach ($barang as $item) : ?>
                     <option data-warna="<?= $item['id_warna'] ?>" value="<?= $item['id'] ?>"><?= $item['kode_barang']." - ".$item['nama_barang'] ?></option>
@@ -321,7 +321,7 @@
             <div class="form-group row">
               <label class="control-label text-start text-md-end col-md-3 col-form-label" for="po_barang9">Barang H</label>
               <div class="col-md-9">
-                <select id="po_barang8" name="po_barang8" class="form-select select2" data-placeholder="-- Pilih Barang H --">
+                <select id="po_barang8" name="po_barang8" class="form-select select2-barang-lazy" data-placeholder="-- Pilih Barang H --">
                   <option value=""></option>
                   <?php foreach ($barang as $item) : ?>
                     <option data-warna="<?= $item['id_warna'] ?>" value="<?= $item['id'] ?>"><?= $item['kode_barang']." - ".$item['nama_barang'] ?></option>

@@ -822,7 +822,23 @@ $(document).ready(function () {
         }, 500);
     }
 
+    let isSelect2BarangInit = false;
+    function ensureSelect2Barang() {
+        if (!isSelect2BarangInit) {
+            isSelect2BarangInit = true;
+            $('.select2-barang-lazy').select2({
+                dropdownParent: $('#modal-form-po'),
+                width: '100%'
+            });
+        }
+    }
+
+    isModalPO.on('show.bs.modal shown.bs.modal', function () {
+        ensureSelect2Barang();
+    });
+
     function getDetailQty(id, idDet) {
+        ensureSelect2Barang();
         dtListDetailQty.setData([])
         $.ajax({
             url: `/trans/sample/detail-qty/${id}/${idDet}`,
