@@ -270,11 +270,11 @@ $(document).ready(function () {
             //         } 
             //     }
             // },
-            { headerSort: false, title: "No", formatter: "rownum", cssClass: 'text-center', hozAlign: "center", width: "8%" },
+            { headerSort: false, title: "No", formatter: "rownum", cssClass: 'text-center', hozAlign: "center", width: "6%" },
             { headerSort: false, title: "id_ukuran", field: "id_ukuran", cssClass: 'text-center', hozAlign: "center", visible: false },
-            { headerSort: false, title: "Ukuran", field: "ukuran", cssClass: 'text-center', hozAlign: "center", width: "18%" },
+            { headerSort: false, title: "Ukuran", field: "ukuran", cssClass: 'text-center', hozAlign: "center", width: "20%" },
             {
-                headerSort: false, title: "QTY", field: "qty", cssClass: 'text-center', hozAlign: "center", width: "10%", editor: "number", cellEdited: updateTotal,
+                headerSort: false, title: "QTY", field: "qty", cssClass: 'text-center', hozAlign: "center", width: "14%", editor: "number", cellEdited: updateTotal,
                 bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney
             },
             {
@@ -283,7 +283,7 @@ $(document).ready(function () {
                     thousand: ".",
                     symbol: "Rp",  // Simbol mata uang Rupiah
                     precision: 0,   // Tidak ada desimal
-                }, hozAlign: "right", width: "32%", editor: "number", cellEdited: updateTotal,
+                }, hozAlign: "right", width: "30%", editor: "number", cellEdited: updateTotal,
                 bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney
             },
             {
@@ -292,13 +292,14 @@ $(document).ready(function () {
                     thousand: ".",
                     symbol: "Rp",  // Simbol mata uang Rupiah
                     precision: 0,   // Tidak ada desimal
-                }, hozAlign: "right", width: "32%",
+                }, hozAlign: "right", width: "30%",
                 bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney
             },
         ],
 
         locale: 'id',
-        // layout: 'fitColumns',
+        layout: 'fitColumns',
+        resizableColumnFit: true,
         height: '300px',
         placeholder: "Tidak ada data",
         pagination: false
@@ -1470,7 +1471,7 @@ $(document).ready(function () {
         columns: [
             {
                 title: "Colour", field: "kode_warna", sorter: "string", headerSort: false, align: "center", cssClass: "text-left",
-                width: "16%"
+                width: "22%"
             },
             {
                 title: "ID", field: "id", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
@@ -1478,11 +1479,11 @@ $(document).ready(function () {
             },
             {
                 title: "%", field: "persen", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
-                width: "14%"
+                width: "10%"
             },
             {
                 title: "GRAM", field: "gram", sorter: "string", headerSort: false, align: "center", cssClass: "text-end tabulator-editable",
-                width: "14%", editor: "number", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                width: "13%", editor: "number", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
                 cellEdited: function (cell) {
                     if (window.isUpdatingRowGram) return;
                     window.isUpdatingRowGram = true;
@@ -1525,17 +1526,17 @@ $(document).ready(function () {
             },
             {
                 title: "NEEDS<br>(GRAM)", field: "gram_nd", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
-                width: "14%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                width: "15%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
             },
 
             {
                 title: "IN KG", field: "kg", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
-                width: "14%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                width: "13%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
             },
 
             {
                 title: "LOSS<br>(KG)", field: "kg_loss", sorter: "string", headerSort: false, align: "center", cssClass: "text-end",
-                width: "14%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
+                width: "13%", bottomCalc: "sum", bottomCalcFormatter: cellMoney, formatter: cellMoney,
             },
 
             {
@@ -1544,7 +1545,8 @@ $(document).ready(function () {
             }
         ],
         locale: 'id',
-        //  layout: 'fitColumns',
+        layout: 'fitColumns',
+        resizableColumnFit: true,
         height: '300px',
         placeholder: "Tidak ada data",
         pagination: false,

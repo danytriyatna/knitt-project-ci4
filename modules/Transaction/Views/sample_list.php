@@ -110,7 +110,7 @@
 </div>
 
 <div id="modal-form-po" class="modal fade" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable" style="max-width: 92vw;" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Form Detail Warna & Ukuran Sample</h5>
