@@ -251,14 +251,14 @@ class SampleModel extends \App\Models\PrModel
         return $this->_data;
     }
 
-    function getDataDetailSample_crostab($id)
+    function getDataDetailSample_crostab($id, $dtUkuran = null)
     {
-
-
-        // get data ukuran 
-        $pru['use'] = 1; // ambil ukuran yang digunnakan order 
-        $pru['id_sample'] = $id;
-        $dtUkuran = $this->getUkuranTrans($pru);
+        if ($dtUkuran === null) {
+            // get data ukuran 
+            $pru['use'] = 1; // ambil ukuran yang digunnakan order 
+            $pru['id_sample'] = $id;
+            $dtUkuran = $this->getUkuranTrans($pru);
+        }
 
         // looping data ukuran
         // Dynamic Columns

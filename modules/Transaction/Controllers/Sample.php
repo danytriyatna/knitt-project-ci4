@@ -64,7 +64,7 @@ class Sample extends BaseController
     $this->data['buyer'] = $this->mkonsumen->where("active", 1)->findAll();
     $this->data['ukuran'] = $this->mUkuran->where("active", 1)->findAll();
     $this->data['warna'] = $this->mWarna->where("active", 1)->findAll();
-    $this->data['barang'] = $this->mBarang->where("active", 1)->orderBy("nama_barang", 'asc')->findAll();
+    $this->data['barang'] = $this->mBarang->select("id, kode_barang, nama_barang, id_warna")->where("active", 1)->orderBy("nama_barang", 'asc')->findAll();
     return view($this->views . '\sample_list', $this->data);
   }
 
