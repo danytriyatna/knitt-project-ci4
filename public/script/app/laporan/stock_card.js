@@ -174,7 +174,13 @@ $("#btn-tampilkan").click(function () {
 $("#btn-reset").click(function () {
     $("#filter_barang").val("");
     $("#filter_barang_id").val("");
-    $("#filter_gudang").val("").trigger("change");
+    const selectGudang = document.getElementById("filter_gudang");
+    let defaultGudangVal = "";
+    if (selectGudang) {
+        let optUtama = Array.from(selectGudang.options).find(opt => opt.text.trim().toLowerCase() === "gudang utama" || opt.value == "1");
+        if (optUtama) defaultGudangVal = optUtama.value;
+    }
+    $("#filter_gudang").val(defaultGudangVal).trigger("change");
     $("#filter_tahun").val("").trigger("change");
     $("#filter_bulan").val("").trigger("change");
 });
@@ -200,8 +206,17 @@ function getDataLaporan() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    const selectGudang = document.getElementById("filter_gudang");
     const selectBulan = document.getElementById("filter_bulan");
     const selectTahun = document.getElementById("filter_tahun");
+
+    // Set Gudang Utama sebagai default jika opsi tersedia
+    if (selectGudang) {
+        let optUtama = Array.from(selectGudang.options).find(opt => opt.text.trim().toLowerCase() === "gudang utama" || opt.value == "1");
+        if (optUtama) {
+            $(selectGudang).val(optUtama.value).trigger("change");
+        }
+    }
 
     const now = new Date();
     const bulanSekarang = now.getMonth() + 1; // getMonth() = 0–11
