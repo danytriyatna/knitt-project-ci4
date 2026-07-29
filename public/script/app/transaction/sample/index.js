@@ -1309,20 +1309,13 @@ $(document).ready(function () {
         }
     });
 
-    function getGramForSlot(idx, idBarang, idWarna) {
+    function getGramForSlot(idx) {
         let currentRows = dtListDetailGram ? dtListDetailGram.getData() : [];
-        if (idBarang && currentRows && currentRows.length > 0) {
-            let match = currentRows.find(r => r.id_barang == idBarang && (parseFloat(r.gram) || 0) > 0);
-            if (match) return parseFloat(match.gram) || 0;
+        if (currentRows && currentRows[idx] && parseFloat(currentRows[idx].gram) > 0) {
+            return parseFloat(currentRows[idx].gram);
         }
-        if (currentRows && currentRows[idx] && (parseFloat(currentRows[idx].gram) || 0) > 0) {
-            return parseFloat(currentRows[idx].gram) || 0;
-        }
-        if (idBarang && window.savedGramMapByBarang && window.savedGramMapByBarang[idBarang] !== undefined) {
-            return parseFloat(window.savedGramMapByBarang[idBarang]) || 0;
-        }
-        if (window.savedGramMapByIndex && window.savedGramMapByIndex[idx] !== undefined) {
-            return parseFloat(window.savedGramMapByIndex[idx]) || 0;
+        if (window.savedGramMapByIndex && window.savedGramMapByIndex[idx] !== undefined && window.savedGramMapByIndex[idx] > 0) {
+            return parseFloat(window.savedGramMapByIndex[idx]);
         }
         return 0;
     }
@@ -1375,7 +1368,7 @@ $(document).ready(function () {
             let textWarna = slot.elWarna.find("option:selected").text();
 
             if ((valWarna && valWarna.length > 0) || (valBarang && valBarang.length > 0)) {
-                let gramVal = getGramForSlot(idx, valBarang, valWarna);
+                let gramVal = getGramForSlot(idx);
                 let val_gram_nd = gramVal * detailQty;
                 let val_kg = val_gram_nd / 1000;
                 let val_kg_loss = loss > 0 ? (val_kg * loss) / 100 : 0;
