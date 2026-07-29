@@ -285,6 +285,16 @@ let customSumQtyReceive = function (values, data, calcParams) {
     return sum > 0 ? (Math.round(sum * 100) / 100).toString() : "0";
 };
 
+let customSumPackReceive = function (values, data, calcParams) {
+    let count = 0;
+    values.forEach(function (val) {
+        if (val && val.toString().trim() !== "" && val !== "-") {
+            count++;
+        }
+    });
+    return count > 0 ? count + " PACK" : "0 PACK";
+};
+
 let dtListDetail = new Tabulator("#dt-list-detail", {
     pagination: true,
     paginationSize: 10,
@@ -342,7 +352,7 @@ let dtListDetail = new Tabulator("#dt-list-detail", {
         },
         { title: "WAREHOUSE", field: "nama_gudang", hozAlign: "center", width: "20%" },
         { title: "LOT NO", width: "10%", field: "lot_no", hozAlign: "left" },
-        { title: "PACK NAME", width: "10%", field: "pack_name", hozAlign: "left" },
+        { title: "PACK NAME", width: "10%", field: "pack_name", hozAlign: "left", bottomCalc: customSumPackReceive },
     ],
     locale: 'id',
     placeholder: "Tidak ada data",
