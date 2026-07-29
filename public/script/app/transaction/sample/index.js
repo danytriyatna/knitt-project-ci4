@@ -1356,6 +1356,29 @@ $(document).ready(function () {
         return 0;
     }
 
+    $(document).on("change", "#po_barang1, #po_barang2, #po_barang3, #po_barang4, #po_barang5, #po_barang6, #po_barang7, #po_barang8", function () {
+        let selectEl = $(this);
+        let selectedOption = selectEl.find("option:selected");
+        let idBarang = selectEl.val();
+        let idWarna = selectedOption.attr("data-warna") || selectEl.find("option:selected").data("warna");
+
+        if (idBarang && (!idWarna || idWarna == "0" || idWarna == "" || idWarna == "null")) {
+            let namaBarang = selectedOption.text();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Validasi Relasi Warna',
+                html: `Barang <b>${namaBarang}</b> belum memiliki relasi Warna di Master Barang!<br>Silakan tentukan warna barang terlebih dahulu.`,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            });
+            selectEl.val("").trigger("change.select2");
+            buildGramasiData();
+            return false;
+        }
+
+        buildGramasiData();
+    });
+
     $(document).on("click", "#btn-refresh-gram", function (e) {
         e.preventDefault();
         setGramasi();
