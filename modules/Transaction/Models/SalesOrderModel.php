@@ -1146,7 +1146,22 @@ class SalesOrderModel extends \App\Models\PrModel
             $builder->where("tsu.id_sales_order_det", $trans_id);
         }
         $this->_data = $builder->get()->getRow();
-        return $this->_data->cnt;
+        return $this->_data ? $this->_data->cnt : 0;
+    }
+
+    function getBatchTotalQtyByDetIds(array $detIds)
+    {
+        if (empty($detIds)) return [];
+        $builder = $this->db->table("trans_sales_order_ukuran tsu");
+        $builder->select("tsu.id_sales_order_det, SUM(tsu.qty) as cnt");
+        $builder->whereIn("tsu.id_sales_order_det", $detIds);
+        $builder->groupBy("tsu.id_sales_order_det");
+        $rows = $builder->get()->getResult();
+        $map = [];
+        foreach ($rows as $r) {
+            $map[$r->id_sales_order_det] = $r->cnt;
+        }
+        return $map;
     }
 
     function getDataSO($kodeSalesOrder)
