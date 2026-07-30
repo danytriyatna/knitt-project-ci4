@@ -665,10 +665,6 @@ class ItemTransferModel extends \App\Models\PrModel
                             : 0,
                     ];
                     $this->insertRecordGetid($this->tblDet, $dataDetail);
-                    $trxTanggal = !empty($data['tanggal']) ? (strlen($data['tanggal']) <= 10 ? $data['tanggal'] . " " . date("H:i:s") : $data['tanggal']) : date("Y-m-d H:i:s");
-                    if ($data['status'] == 1 && $key === 0 && !empty($data['kode_transaksi'])) {
-                        $this->db->table($this->tblTrxBarang)->where('kode_transaksi', $data['kode_transaksi'])->delete();
-                    }
                     if ($data['status'] == 1) {
                         $mBarangMasuk = new IncomingGoodsModel();
                         $arrParam =  [
@@ -679,7 +675,7 @@ class ItemTransferModel extends \App\Models\PrModel
                         $dataLots = [
                             "id_barang" => $idBarang,
                             "id_gudang" => !empty($data['id_gudang_tujuan']) ? $data['id_gudang_tujuan'] : null,
-                            "tanggal" => $trxTanggal,
+                            "tanggal" => date("Y-m-d H:i:s"),
                             "lot_no" => $rowData['lot_no'],
                             "qty" => $rowData['qty'],
                             "active" => 1,
@@ -701,7 +697,7 @@ class ItemTransferModel extends \App\Models\PrModel
                             "id_barang" => $idBarang,
                             "jenis_transaksi" => 1,
                             "jumlah" =>  $rowData['qty'],
-                            "tanggal" => $trxTanggal,
+                            "tanggal" => date("Y-m-d H:i:s"),
                             "id_gudang_tujuan" =>  !empty($data['id_gudang_tujuan']) ? $data['id_gudang_tujuan'] : null,
                             "id_kategori" => 4,
                             "keterangan" => "Barang Masuk Dari Transfer",
@@ -718,7 +714,7 @@ class ItemTransferModel extends \App\Models\PrModel
                         $arrStockBalances = [
                             "id_barang" => $idBarang,
                             "id_gudang" => !empty($data['id_gudang_tujuan']) ? $data['id_gudang_tujuan'] : null,
-                            "tanggal" => $trxTanggal,
+                            "tanggal" => date("Y-m-d H:i:s"),
                             "lot_id" => $idLotsMasuk,
                             "lot_no" => $rowData['lot_no'],
                             "pack_id" => !empty($rowData['pack_id']) ? $rowData['pack_id'] : null,
@@ -748,7 +744,7 @@ class ItemTransferModel extends \App\Models\PrModel
                             "id_barang" => $idBarang,
                             "jenis_transaksi" => 2,
                             "jumlah" =>  $rowData['qty'],
-                            "tanggal" => $trxTanggal,
+                            "tanggal" => date("Y-m-d H:i:s"),
                             "id_gudang_asal" =>  !empty($data['id_gudang_asal']) ? $data['id_gudang_asal'] : null,
                             "id_kategori" => 4,
                             "keterangan" => "Barang Keluar Dari Transfer",
@@ -765,7 +761,7 @@ class ItemTransferModel extends \App\Models\PrModel
                         $arrStockBalances = [
                             "id_barang" => $idBarang,
                             "id_gudang" => !empty($data['id_gudang_asal']) ? $data['id_gudang_asal'] : null,
-                            "tanggal" => $trxTanggal,
+                            "tanggal" => date("Y-m-d H:i:s"),
                             "lot_id" => $idLots,
                             "lot_no" => $rowData['lot_no'],
                             "pack_id" => !empty($rowData['pack_id']) ? $rowData['pack_id'] : null,

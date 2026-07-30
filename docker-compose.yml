@@ -23,7 +23,9 @@ services:
       - internal
 
   postgres:
-    image: postgres:15-alpine
+    build:
+      context: .
+      dockerfile: docker/postgresql/Dockerfile
     environment: 
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

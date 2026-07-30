@@ -92,34 +92,42 @@ class Mdashboard extends Model
 
     function getSumData($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)
     {
-        $table = (!empty($params) && !empty($params['tabel'])) ? $params['tabel'] : 'v_traking_order_so';
-        $builder = $this->db->table($table . " tbl");
+        
+        $builder = $this->db->table($params['tabel']." tbl");
 
-        $builder->select("
-            COALESCE(SUM(tbl.qty), 0) AS total_qty,
-            COALESCE(SUM(tbl.qty_prod), 0) AS total_qty_prod,
-            COALESCE(SUM(tbl.qty_kirim), 0) AS total_qty_kirim,
-            COALESCE(SUM(tbl.qty - tbl.qty_prod), 0) AS total_qty_sisa_prod,
-            COALESCE(SUM(tbl.qty - tbl.qty_kirim), 0) AS total_qty_sisa_kirim
-        ");
-
+        $builder->select("tbl.trans_id, tbl.trans_kode, tbl.tgl_transaksi, tbl.id_konsumen, tbl.nama, tbl.keterangan, tbl.tgl_deadline, tbl.qty, tbl.style, tbl.deskripsi, tbl.tipe, 
+                          tbl.kode_prod, tbl.id_prod, tbl.qty_prod, nilai_pembayaran,
+                          tbl.kode_dev, tbl.id_dev, tbl.qty_kirim, rk.id_walkorder, tbl.file_name, tbl.uang_dp, tbl.uang_dp_2, tbl.harga_total, tbl.nilai_invoice");
+        
+        $builder->join("trans_produksi rk", "rk.id = tbl.id_prod", "left");
+        
+        
         $builder->groupStart();
             $builder->where("tbl.qty > tbl.qty_kirim");
-            $builder->orWhere("tbl.harga_total > (coalesce(tbl.uang_dp, 0) + coalesce(tbl.uang_dp_2, 0) + coalesce(tbl.nilai_pembayaran, 0))");
+            $builder->orWhere("tbl.harga_total > (tbl.uang_dp + tbl.uang_dp_2 + tbl.nilai_pembayaran)");
         $builder->groupEnd();
 
-        if (!empty($filters) && is_array($filters) && count($filters) >= 1 && !empty($filters[0]['value'])) {
-            $val = strtolower($filters[0]['value']);
-            $builder->groupStart();
-                $builder->where('LOWER(tbl.keterangan) LIKE', "%{$val}%");
-                $builder->orWhere('LOWER(tbl.trans_kode) LIKE', "%{$val}%");
-                $builder->orWhere('LOWER(tbl.kode_dev) LIKE', "%{$val}%");
-                $builder->orWhere('LOWER(tbl.kode_prod) LIKE', "%{$val}%");
-                $builder->orWhere('LOWER(tbl.nama) LIKE', "%{$val}%");
-            $builder->groupEnd();
-        }
+        // $builder->where("EXTRACT(MONTH FROM tbl.tgl_dp) = 10");
+        // $builder->where("EXTRACT(YEAR FROM tbl.tgl_dp) = 2025"); 
+        if ($id == null or $id == "") {
+            
+            if (!empty($filters) && is_array($filters) && count($filters) >= 1) {
+                $builder->groupStart();
+                    $builder->where('LOWER(tbl.keterangan) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(tbl.trans_kode) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(tbl.kode_dev) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(tbl.kode_prod) LIKE', strtolower("%{$filters[0]['value']}%"));
+                    $builder->orWhere('LOWER(tbl.nama) LIKE', strtolower("%{$filters[0]['value']}%"));
+                $builder->groupEnd();
+            }
 
-        return $builder->get()->getRow();
+            $this->_data = $builder->get()->getResult();
+        } else {
+            $builder->where("tbl.trans_id", $id);
+
+            $this->_data = $builder->get()->getRow();
+        }
+        return $this->_data;
     }
 
     function getDataSample($id = null, $offset = null, $limit = null, $order = null, $filters = null, $params = null)

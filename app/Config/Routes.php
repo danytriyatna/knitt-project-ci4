@@ -83,14 +83,19 @@ if (file_exists(APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php'))
  * Include Modules Routes Files
  * --------------------------------------------------------------------
  */
-if (file_exists(ROOTPATH . 'modules')) {
-	$modulesPath = ROOTPATH . 'modules/';
-	$modules = ['Keuangan', 'Laporan', 'Purchasing', 'Referensi', 'SDM', 'Transaction', 'Utility', 'Vip'];
+if (file_exists(ROOTPATH.'modules')) {
+	$modulesPath = ROOTPATH.'modules/';
+	$modules = scandir($modulesPath);
 
 	foreach ($modules as $module) {
-		$routesPath = $modulesPath . $module . '/Config/Routes.php';
-		if (file_exists($routesPath)) {
-			require($routesPath);
+		if ($module === '.' || $module === '..') continue;
+		if (is_dir($modulesPath) . '/' . $module) {
+			$routesPath = $modulesPath . $module . '/Config/Routes.php';
+			if (file_exists($routesPath)) {
+				require($routesPath);
+			} else {
+				continue;
+			}
 		}
 	}
 }
