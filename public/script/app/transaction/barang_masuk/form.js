@@ -763,10 +763,10 @@ let dtListProduksi = new Tabulator("#dt-list-so-produksi", {
             editor: "number",
             bottomCalc: "sum",
             formatter: function (cell) {
-                return parseFloat(cell.getValue() || 0).toFixed(2);
+                return parseFloat(cell.getValue() || 0).toFixed(0);
             },
             bottomCalcFormatter: function (cell) {
-                return parseFloat(cell.getValue() || 0).toFixed(2);
+                return parseFloat(cell.getValue() || 0).toFixed(0);
             },
             // 🌟 TAMBAHKAN INI: Update Amount & Refresh Kalkulasi saat Qty diubah
             cellEdited: function (cell) {
